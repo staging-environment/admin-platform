@@ -1,0 +1,12 @@
+name: admin-platform
+type: laravel
+php_version: "8.3"
+docroot: public
+mariadb_version: "10.11"
+web_environment:
+  - LARAVEL_ENV=local
+hooks:
+  post-start:
+    - exec: composer install
+    - exec: php artisan migrate --force
+    - exec: php artisan key:generate
