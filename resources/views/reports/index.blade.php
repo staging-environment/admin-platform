@@ -192,6 +192,31 @@
                                 </select>
                             </div>
 
+                            <div>
+                                <label for="station_code" class="block text-sm font-medium text-gray-700">
+                                    Estación
+                                </label>
+
+                                <select
+                                    id="station_code"
+                                    name="station_code"
+                                    class="mt-1 max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                    <option value="">
+                                        Todas
+                                    </option>
+
+                                    @foreach($stations as $station)
+                                        <option value="{{ $station['code'] }}" @selected(($selectedStationCode ?? null) === $station['code'])>
+                                            {{ $station['name'] }}
+                                            @if(!empty($station['town']))
+                                                - {{ $station['town'] }}
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <button
                                 type="submit"
                                 class="inline-flex items-center justify-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"

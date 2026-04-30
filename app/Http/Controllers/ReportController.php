@@ -11,12 +11,14 @@ class ReportController extends Controller
     public function index(Request $request, VirtusgesnetService $virtusgesnetService): View
     {
         $tables = [];
+        $stations = [];
         $monthlySales = [];
 
         $selectedYear = (int) $request->integer('year', (int) date('Y'));
         $selectedDocumentType = $request->string('document_type', 'all')->toString();
         $selectedStartMonth = $request->filled('start_month') ? (int) $request->integer('start_month') : null;
         $selectedEndMonth = $request->filled('end_month') ? (int) $request->integer('end_month') : null;
+        $selectedStationCode = $request->filled('station_code') ? (int) $request->integer('station_code') : null;
 
         if (!in_array($selectedDocumentType, ['all', 'invoices', 'tickets'], true)) {
             $selectedDocumentType = 'all';
@@ -34,14 +36,20 @@ class ReportController extends Controller
             [$selectedStartMonth, $selectedEndMonth] = [$selectedEndMonth, $selectedStartMonth];
         }
 
+        if ($selectedStationCode !== null && $selectedStationCode <= 0) {
+            $selectedStationCode = null;
+        }
+
         try {
             $tables = $virtusgesnetService->getTables();
+            $stations = $virtusgesnetService->getStations();
 
             $monthlySales = $virtusgesnetService->getMonthlySalesSummary(
                 $selectedYear,
                 $selectedDocumentType,
                 $selectedStartMonth,
-                $selectedEndMonth
+                $selectedEndMonth,
+                $selectedStationCode
             );
         } catch (\Throwable $exception) {
             report($exception);
@@ -49,12 +57,14 @@ class ReportController extends Controller
 
         return view('reports.index', [
             'tables' => $tables,
+            'stations' => $stations,
             'tableGroups' => $this->groupTablesByBusinessArea($tables),
             'monthlySales' => $monthlySales,
             'selectedYear' => $selectedYear,
             'selectedDocumentType' => $selectedDocumentType,
             'selectedStartMonth' => $selectedStartMonth,
             'selectedEndMonth' => $selectedEndMonth,
+            'selectedStationCode' => $selectedStationCode,
             'months' => $this->months(),
         ]);
     }

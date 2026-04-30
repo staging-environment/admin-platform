@@ -22,6 +22,32 @@ class VirtusgesnetService
     }
 
     /**
+     * Obtener estaciones disponibles.
+     */
+    public function getStations(): array
+    {
+        return DB::connection('virtusgesnet')
+            ->table('estaciones')
+            ->select([
+                'Codigo',
+                'Nombre',
+                'Poblacion',
+                'Provincia',
+            ])
+            ->orderBy('Nombre')
+            ->get()
+            ->map(function ($station) {
+                return [
+                    'code' => (int) $station->Codigo,
+                    'name' => $station->Nombre ?: 'Estación ' . $station->Codigo,
+                    'town' => $station->Poblacion,
+                    'province' => $station->Provincia,
+                ];
+            })
+            ->all();
+    }
+
+    /**
      * Obtener datos de una tabla con filtros.
      */
     public function getTableData($table, $filters = [], $limit = 100, $offset = 0): array
@@ -80,7 +106,8 @@ class VirtusgesnetService
         ?int $year = null,
         string $documentType = 'all',
         ?int $startMonth = null,
-        ?int $endMonth = null
+        ?int $endMonth = null,
+        ?int $stationCode = null
     ): array {
         $year ??= (int) date('Y');
 
@@ -118,6 +145,10 @@ class VirtusgesnetService
 
         if ($endMonth !== null) {
             $query->whereRaw('MONTH(FechaYHora) <= ?', [$endMonth]);
+        }
+
+        if ($stationCode !== null) {
+            $query->where('CodigoDeEstacion', $stationCode);
         }
 
         return $query
