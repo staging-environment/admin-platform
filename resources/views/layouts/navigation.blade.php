@@ -16,6 +16,12 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @role('Admin')
+                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                        {{ __('Informes') }}
+                    </x-nav-link>
+                    @endrole
+
                     @can('manage-users')
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                             {{ __('Usuarios') }}
@@ -76,6 +82,12 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @role('Admin')
+            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                {{ __('Informes') }}
+            </x-responsive-nav-link>
+            @endrole
 
             @can('manage-users')
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
