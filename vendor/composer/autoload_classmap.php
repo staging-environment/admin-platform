@@ -46,6 +46,7 @@ return array(
     'App\\Http\\Requests\\ProfileUpdateRequest' => $baseDir . '/app/Http/Requests/ProfileUpdateRequest.php',
     'App\\Models\\Filter' => $baseDir . '/app/Models/Filter.php',
     'App\\Models\\Gasolinera' => $baseDir . '/app/Models/Gasolinera.php',
+    'App\\Models\\PreciosProducto' => $baseDir . '/app/Models/PreciosProducto.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\Filament\\AdminPanelProvider' => $baseDir . '/app/Providers/Filament/AdminPanelProvider.php',

@@ -15,7 +15,7 @@ class PermissionMatrix extends Page
 
     protected string $view = 'filament.pages.permission-matrix';
 
-    protected static ?string $navigationLabel = 'Permisos (Matriz)';
+    protected static ?string $navigationLabel = 'Permisos';
     protected static ?string $title = 'Matriz de Permisos';
 
     /**

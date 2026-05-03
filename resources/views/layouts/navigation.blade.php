@@ -23,14 +23,8 @@
                     @endrole
 
                     @can('manage-users')
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                            {{ __('Usuarios') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('manage-users')
                         <x-nav-link href="/admin" :active="request()->is('admin*')">
-                            {{ __('Administración') }}
+                            {{ __('Administración de usuarios') }}
                         </x-nav-link>
                     @endcan
                 </div>
@@ -94,12 +88,6 @@
                 {{ __('Informes') }}
             </x-responsive-nav-link>
             @endrole
-
-            @can('manage-users')
-                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                    {{ __('Usuarios') }}
-                </x-responsive-nav-link>
-            @endcan
 
             @can('manage-users')
                 <x-responsive-nav-link href="/admin" :active="request()->is('admin*')">
