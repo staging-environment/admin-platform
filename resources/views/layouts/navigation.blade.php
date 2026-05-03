@@ -27,6 +27,12 @@
                             {{ __('Usuarios') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('manage-users')
+                        <x-nav-link href="/admin" :active="request()->is('admin*')">
+                            {{ __('Administración') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -92,6 +98,12 @@
             @can('manage-users')
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                     {{ __('Usuarios') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage-users')
+                <x-responsive-nav-link href="/admin" :active="request()->is('admin*')">
+                    {{ __('Administración  de usuarios') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

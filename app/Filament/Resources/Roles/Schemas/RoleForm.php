@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Roles\Schemas;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Schemas\Schema;
+use Spatie\Permission\Models\Permission;
 
 class RoleForm
 {
@@ -10,7 +13,18 @@ class RoleForm
     {
         return $schema
             ->components([
-                //
+
+                TextInput::make('name')
+                    ->label('Nombre del rol')
+                    ->required()
+                    ->maxLength(255),
+
+                CheckboxList::make('permissions')
+                    ->label('Permisos')
+                    ->relationship('permissions', 'name')
+                    ->columns(3)
+                    ->searchable(),
+
             ]);
     }
 }

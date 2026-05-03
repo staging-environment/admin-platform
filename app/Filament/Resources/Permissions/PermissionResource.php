@@ -16,6 +16,9 @@ use Filament\Tables\Table;
 
 class PermissionResource extends Resource
 {
+    // 🔥 QUITA ESTE RESOURCE DEL MENÚ
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Permission::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
