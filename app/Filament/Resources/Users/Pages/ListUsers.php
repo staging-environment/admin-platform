@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Users\Pages;
 
-use App\Filament\Resources\Users\UserResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+// Cambiamos esta línea para que apunte a la carpeta Users
+use App\Filament\Resources\Users\UserResource;
 
 class ListUsers extends ListRecords
 {
@@ -13,7 +14,12 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\Action::make('back')
+                ->label('Volver al Dashboard')
+                ->color('gray')
+                ->icon('heroicon-m-arrow-left')
+                ->url('/dashboard'),
+            Actions\CreateAction::make(),
         ];
     }
 }

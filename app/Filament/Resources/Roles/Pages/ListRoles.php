@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Roles\Pages;
 
-use App\Filament\Resources\Roles\RoleResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+// Cambiamos esta línea para que apunte a la carpeta Roles
+use App\Filament\Resources\Roles\RoleResource;
 
 class ListRoles extends ListRecords
 {
@@ -13,7 +14,12 @@ class ListRoles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\Action::make('back')
+                ->label('Volver al Dashboard')
+                ->color('gray')
+                ->icon('heroicon-m-arrow-left')
+                ->url('/dashboard'),
+            Actions\CreateAction::make(),
         ];
     }
 }
