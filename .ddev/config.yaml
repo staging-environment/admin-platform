@@ -3,8 +3,8 @@ type: laravel
 docroot: public
 php_version: "8.3"
 webserver_type: nginx-fpm
-router_http_port: "8080"
-router_https_port: "8443"
+router_http_port: "33002"
+router_https_port: "33003"
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
@@ -24,6 +24,13 @@ web_environment:
     - LARAVEL_ENV=local
 corepack_enable: false
 
+default_container_networks:
+  - ddev_default
+
+# Cambiamos phpMyAdmin del 8080 (que es el que falla) a otro
+phpmyadmin_port: "8038"
+# Cambiamos Mailpit del 8025 a otro por si acaso
+mailpit_port: "8027"
 # Key features of DDEV's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides
