@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\FtpUserController; // <-- Importamos tu nuevo controlador
 use App\Http\Controllers\Api\DataQueryController;
 use App\Http\Controllers\Api\FilterController;
 
@@ -44,12 +45,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ESTA ES LA RUTA QUE FALLABA:
-    Route::middleware('role:Admin')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     });
 
+    // Gestión de usuarios de la plataforma y del repositorio FTP
     Route::middleware('permission:manage-users')->group(function () {
         Route::resource('users', UserManagementController::class)->except(['show']);
+
+        // --- NUEVAS RUTAS PARA EL FTP ---
+        Route::get('/ftp-users', [FtpUserController::class, 'index'])->name('ftp.index');
+        Route::post('/ftp-users', [FtpUserController::class, 'store'])->name('ftp.store');
+        Route::delete('/ftp-users/{id}', [FtpUserController::class, 'destroy'])->name('ftp.destroy');
     });
 
     // Rutas de la API para el panel
