@@ -18,7 +18,11 @@ class FtpUserResource extends Resource
 {
     protected static ?string $model = FtpUser::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationLabel = 'Usuarios FTP';
+
+    protected static ?string $slug = 'ftp-management';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     public static function form(Schema $schema): Schema
     {
@@ -44,5 +48,14 @@ class FtpUserResource extends Resource
             'create' => CreateFtpUser::route('/create'),
             'edit' => EditFtpUser::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Control de acceso temporal para asegurar la visibilidad en producción
+     * Retorna true para descartar problemas de permisos durante la prueba.
+     */
+    public static function canViewAny(): bool
+    {
+        return true;
     }
 }

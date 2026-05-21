@@ -11,16 +11,37 @@ class FtpUserForm
     {
         return $schema
             ->components([
-                TextInput::make('username')
+                TextInput::make('user')
+                    ->label('Usuario')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(50),
 
                 TextInput::make('password')
+                    ->label('Contraseña')
                     ->password()
-                    ->required()
-                    ->revealable() // Para que podáis verla con el icono del ojo
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->dehydrated(fn (?string $state) => filled($state))
+                    ->revealable()
                     ->maxLength(255),
+
+                TextInput::make('dir')
+                    ->label('Directorio')
+                    ->required()
+                    ->default(fn (?string $state, $get) => $state ?: '/home/ftpusers/' . $get('user'))
+                    ->maxLength(255),
+
+                TextInput::make('uid')
+                    ->label('UID')
+                    ->numeric()
+                    ->default(1000)
+                    ->required(),
+
+                TextInput::make('gid')
+                    ->label('GID')
+                    ->numeric()
+                    ->default(1000)
+                    ->required(),
             ]);
     }
 }

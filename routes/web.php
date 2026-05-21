@@ -57,6 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/ftp-users', [FtpUserController::class, 'index'])->name('ftp.index');
         Route::post('/ftp-users', [FtpUserController::class, 'store'])->name('ftp.store');
         Route::delete('/ftp-users/{id}', [FtpUserController::class, 'destroy'])->name('ftp.destroy');
+
+        // Rutas de gestión de archivos dentro del panel
+        Route::get('/ftp-users/{username}', [FtpUserController::class, 'show'])->name('ftp.show');
+        Route::post('/ftp-users/{username}/upload', [FtpUserController::class, 'upload'])->name('ftp.upload');
+        Route::get('/ftp-users/{username}/download/{filename}', [FtpUserController::class, 'download'])->name('ftp.download');
+        Route::delete('/ftp-users/{username}/file/{filename}', [FtpUserController::class, 'deleteFile'])->name('ftp.deleteFile');
     });
 
     // Rutas de la API para el panel

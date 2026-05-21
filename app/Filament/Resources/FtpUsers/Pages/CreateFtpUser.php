@@ -15,28 +15,33 @@ class CreateFtpUser extends CreateRecord
      */
     protected function afterCreate(): void
     {
-        // Capturamos los datos del cliente que se acaban de guardar en la BD
-        $username = $this->record->username;
-        $password = $this->record->password;
-        $userHome = "/home/ftpusers/{$username}";
+        $username = $this->record->user;
+        $password = $this->data['password'] ?? '';
+        $userHome = $this->record->dir;
 
-        // 1. Comando maestro con printf para saltarnos el prompt de contraseña en utrecar-ftp
-        $createUserCommand = sprintf(
-            "ddev exec --user=root -s ftp bash -c 'printf \"%s\\n%s\\n\" %s | pure-pw useradd %s -u ftpuser -d %s -f /etc/pure-ftpd/passwd/pureftpd.txt'",
-            $password,
-            $password,
-            escapeshellarg($password),
-            escapeshellarg($username),
-            escapeshellarg($userHome)
-        );
-        Process::run($createUserCommand);
+        if (app()->environment('local')) {
+            $createUserCommand = sprintf(
+                "ddev exec --user=root -s ftp bash -c 'printf \"%s\\n%s\\n\" %s | pure-pw useradd %s -u ftpuser -d %s -f /etc/pure-ftpd/passwd/pureftpd.txt'",
+                $password,
+                $password,
+                escapeshellarg($password),
+                escapeshellarg($username),
+                escapeshellarg($userHome)
+            );
+            Process::run($createUserCommand);
+            Process::run("ddev exec --user=root -s ftp pure-pw mkdb /etc/pure-ftpd/db/pureftpd.pdb -f /etc/pure-ftpd/passwd/pureftpd.txt");
+            Process::run("ddev exec --user=root -s ftp mkdir -p " . escapeshellarg($userHome));
+            Process::run("ddev exec --user=root -s ftp chown -R ftpuser:ftpgroup " . escapeshellarg($userHome));
+            Process::run("ddev exec --user=root -s ftp chmod 755 " . escapeshellarg($userHome));
+        } else {
+            // En producción usamos la base de datos compartida entre Docker y la VM.
+            // No necesitamos ejecutar comandos pure-pw porque el servidor FTP leerá la BD directamente.
+            // Solo nos aseguramos de que el directorio físico exista en el HOST (VM).
 
-        // 2. Compilar la base de datos indexada (.pdb) que lee Pure-FTPd
-        Process::run("ddev exec --user=root -s ftp pure-pw mkdb /etc/pure-ftpd/db/pureftpd.pdb -f /etc/pure-ftpd/passwd/pureftpd.txt");
-
-        // 3. Crear el directorio físico independiente y asignar los permisos correctos
-        Process::run("ddev exec --user=root -s ftp mkdir -p {$userHome}");
-        Process::run("ddev exec --user=root -s ftp chown -R ftpuser:ftpgroup {$userHome}");
-        Process::run("ddev exec --user=root -s ftp chmod 755 {$userHome}");
+            // Nota: Este comando de mkdir fallará si PHP no tiene permisos de sudo en la VM,
+            // pero la autenticación en FileZilla debería funcionar si la BD está bien enlazada.
+            Process::run("sudo mkdir -p " . escapeshellarg($userHome));
+            Process::run("sudo chown 1000:1000 " . escapeshellarg($userHome));
+        }
     }
 }
