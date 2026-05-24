@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\FtpUser;
-use App\Services\FtpPermissionsManager;
+use App\Services\FtpPermissionsManager; // Reintroducido de producción
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Log; // Reintroducido de producción
+use Illuminate\Support\Facades\Storage; // Necesario para gestionar archivos
+use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para descargas
 
 class FtpUserController extends Controller
 {
@@ -17,13 +17,18 @@ class FtpUserController extends Controller
      */
     public function index()
     {
-        $ftpUsers = FtpUser::all();
+        // Trae los usuarios ordenados desde la base de datos secundaria 'mariadb_ftp'
+        $ftpUsers = FtpUser::orderBy('user', 'asc')->get();
+
+        // Para cada usuario, contamos cuántos archivos tiene
+        foreach ($ftpUsers as $user) {
+            $path = 'ftp/' . $user->user;
+            $user->files_count = count(Storage::disk('public')->files($path));
+        }
+
         return view('ftp.index', compact('ftpUsers'));
     }
 
-    /**
-     * Crea un nuevo acceso SFTP con permisos granulares.
-     */
     public function show($username)
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
@@ -87,51 +92,40 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación estricta
+        // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
         $request->validate([
-            'user'     => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
-            'password' => 'required|min:6',
-            'role'     => 'required|in:editor,viewer',
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
+            'role'         => 'required|in:editor,viewer', // Validación de rol de producción
             'can_upload'   => 'boolean',
             'can_download' => 'boolean',
             'can_delete'   => 'boolean',
         ]);
 
         $username = $request->user;
-        $role     = $request->input('role');
-        $targetDir = '/home/ftpusers/' . $username;
+        $role     = $request->input('role'); // Obtenemos el rol de producción
+        $targetDir = '/home/ftpusers/' . $username; // Directorio de producción
 
-        // 2. Creación del directorio en el servidor
+        // 2. Creación del directorio en el servidor (lógica de producción)
         if (!File::exists($targetDir)) {
             File::makeDirectory($targetDir, 0755, true, true);
         }
 
-        // 3. Registro en Base de Datos (Ahora incluye el rol)
+        // 3. Registro en Base de Datos (Combinamos roles y permisos granulares)
         try {
             $user = FtpUser::create([
-                'user'     => $username,
-                'password' => $request->password, // Nota: Asegúrate de manejar el hash si tu sistema lo requiere
-                'dir'      => $targetDir,
-                'role'     => $role,
-                'uid'      => 33,
-                'gid'      => 33,
+                'user'         => $username,
+                'password'     => $request->password,
+                'dir'          => $targetDir, // Usamos el directorio de producción
+                'role'         => $role, // Incluimos el rol de producción
+                'uid'          => 33, // UID de producción
+                'gid'          => 33, // GID de producción
+                'can_upload'   => $request->boolean('can_upload', true),
+                'can_download' => $request->boolean('can_download', true),
+                'can_delete'   => $request->boolean('can_delete', true),
             ]);
-        // 4. Insertamos el registro.
-        // Mantenemos el registro por compatibilidad, aunque ahora usamos un usuario maestro SFTP
-        FtpUser::create([
-            'user'         => $username,
-            'password'     => $request->password,
-            'dir'          => '/home/db/upload/' . $username, // Mantener la ruta lógica para el FTP
-            'uid'          => 1000,
-            'gid'          => 1000,
-            'can_upload'   => $request->boolean('can_upload', true), // Default true
-            'can_download' => $request->boolean('can_download', true), // Default true
-            'can_delete'   => $request->boolean('can_delete', true),   // Default true
-        ]);
 
-            // 4. Aplicación de la capa de seguridad (Permisos y Grupos)
+            // 4. Aplicación de la capa de seguridad (Permisos y Grupos) de producción
             if (FtpPermissionsManager::apply($user, $role)) {
                 return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente.");
             }
@@ -149,10 +143,15 @@ class FtpUserController extends Controller
      */
     public function destroy($id)
     {
+        // Buscamos al usuario en la base de datos
         $user = FtpUser::findOrFail($id);
 
-        if (File::exists($user->dir)) {
-            File::deleteDirectory($user->dir);
+        // Borramos su carpeta física (lógica local para DDEV)
+        $storagePath = 'public/ftp/' . $user->user;
+        $laravelLocalPath = storage_path('app/' . $storagePath);
+
+        if (File::exists($laravelLocalPath)) {
+            File::deleteDirectory($laravelLocalPath);
         }
 
         $user->delete();
