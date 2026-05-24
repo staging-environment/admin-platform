@@ -25,7 +25,13 @@ class FtpUser extends Model
         'dir',
         'uid',
         'gid',
+<<<<<<< HEAD
         'role', // Integrado para control de permisos
+=======
+        'can_upload',   // Añadido
+        'can_download', // Añadido
+        'can_delete',   // Añadido
+>>>>>>> 7176c9fb85d7db25198c8aadf7141b83ba425255
     ];
 
     protected static function boot()

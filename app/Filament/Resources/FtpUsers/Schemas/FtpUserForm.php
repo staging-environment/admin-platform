@@ -4,6 +4,7 @@ namespace App\Filament\Resources\FtpUsers\Schemas;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Checkbox; // Importamos el componente Checkbox
 
 class FtpUserForm
 {
@@ -42,6 +43,19 @@ class FtpUserForm
                     ->numeric()
                     ->default(1000)
                     ->required(),
+
+                // Nuevos campos de permisos
+                Checkbox::make('can_upload')
+                    ->label('Puede Subir Archivos')
+                    ->default(true), // Por defecto, permitir subir
+
+                Checkbox::make('can_download')
+                    ->label('Puede Descargar Archivos')
+                    ->default(true), // Por defecto, permitir descargar
+
+                Checkbox::make('can_delete')
+                    ->label('Puede Eliminar Archivos')
+                    ->default(true), // Por defecto, permitir eliminar
             ]);
     }
 }

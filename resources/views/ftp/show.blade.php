@@ -17,7 +17,48 @@
                     <button @click="show = false" class="font-bold">&times;</button>
                 </div>
             @endif
+            @if (session('error'))
+                <div x-data="{ show: true }" x-show="show" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg flex justify-between items-center">
+                    <span>{{ session('error') }}</span>
+                    <button @click="show = false" class="font-bold">&times;</button>
+                </div>
+            @endif
 
+            {{-- Sección de Permisos del Usuario FTP --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-medium mb-4">Permisos de {{ $ftpUser->user }}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <strong>Subir Archivos:</strong>
+                            @if($ftpUser->can_upload)
+                                <span class="text-green-500">✔ Sí</span>
+                            @else
+                                <span class="text-red-500">✖ No</span>
+                            @endif
+                        </div>
+                        <div>
+                            <strong>Descargar Archivos:</strong>
+                            @if($ftpUser->can_download)
+                                <span class="text-green-500">✔ Sí</span>
+                            @else
+                                <span class="text-red-500">✖ No</span>
+                            @endif
+                        </div>
+                        <div>
+                            <strong>Eliminar Archivos:</strong>
+                            @if($ftpUser->can_delete)
+                                <span class="text-green-500">✔ Sí</span>
+                            @else
+                                <span class="text-red-500">✖ No</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Formulario para subir archivos (condicional) --}}
+            @if($ftpUser->can_upload)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-medium mb-4">Subir nuevo archivo</h3>
@@ -30,7 +71,15 @@
                     </form>
                 </div>
             </div>
+            @else
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 text-red-600">
+                    <p>Este usuario no tiene permiso para subir archivos.</p>
+                </div>
+            </div>
+            @endif
 
+            {{-- Listado de archivos --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-medium mb-4">Listado de archivos</h3>
@@ -49,12 +98,21 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $file['name'] }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $file['size'] }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                            <a href="{{ route('ftp.download', [$ftpUser->user, $file['name']]) }}" class="text-indigo-600 hover:text-indigo-900">Descargar</a>
-                                            <form action="{{ route('ftp.deleteFile', [$ftpUser->user, $file['name']]) }}" method="POST" class="inline" onsubmit="return confirm('¿Borrar archivo?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
-                                            </form>
+                                            @if($ftpUser->can_download)
+                                                <a href="{{ route('ftp.download', [$ftpUser->user, $file['name']]) }}" class="text-indigo-600 hover:text-indigo-900">Descargar</a>
+                                            @else
+                                                <span class="text-gray-400">Descargar</span>
+                                            @endif
+
+                                            @if($ftpUser->can_delete)
+                                                <form action="{{ route('ftp.deleteFile', [$ftpUser->user, $file['name']]) }}" method="POST" class="inline" onsubmit="return confirm('¿Borrar archivo?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400">Eliminar</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
