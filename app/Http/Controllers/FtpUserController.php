@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\FtpUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Storage; // Necesario para gestionar archivos
+use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para descargas
 
 class FtpUserController extends Controller
 {
+    /**
+     * Muestra la lista de usuarios y el formulario de alta.
+     */
     public function index()
     {
         // Trae los usuarios ordenados desde la base de datos secundaria 'mariadb_ftp'
@@ -87,7 +90,7 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Forzamos la validación del 'unique' apuntando a la conexión y tabla correctas
+        // 1. Validación estricta
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
@@ -113,7 +116,7 @@ class FtpUserController extends Controller
         FtpUser::create([
             'user'         => $username,
             'password'     => $request->password,
-            'dir'          => '/home/db/upload/' . $username,
+            'dir'          => '/home/db/upload/' . $username, // Mantener la ruta lógica para el FTP
             'uid'          => 1000,
             'gid'          => 1000,
             'can_upload'   => $request->boolean('can_upload', true), // Default true
@@ -124,6 +127,9 @@ class FtpUserController extends Controller
         return redirect()->back()->with('success', "Empleado '{$username}' creado correctamente. Ahora puedes subir sus archivos directamente.");
     }
 
+    /**
+     * Revoca acceso y elimina directorios asociados.
+     */
     public function destroy($id)
     {
         // Buscamos al usuario en la base de datos
