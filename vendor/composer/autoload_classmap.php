@@ -59,6 +59,7 @@ return array(
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\Filament\\AdminPanelProvider' => $baseDir . '/app/Providers/Filament/AdminPanelProvider.php',
     'App\\Services\\AdministracionCorporativaService' => $baseDir . '/app/Services/AdministracionCorporativaService.php',
+    'App\\Services\\FtpPermissionsManager' => $baseDir . '/app/Services/FtpPermissionsManager.php',
     'App\\Services\\VirtusgesnetService' => $baseDir . '/app/Services/VirtusgesnetService.php',
     'App\\View\\Components\\AppLayout' => $baseDir . '/app/View/Components/AppLayout.php',
     'App\\View\\Components\\GuestLayout' => $baseDir . '/app/View/Components/GuestLayout.php',

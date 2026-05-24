@@ -787,6 +787,7 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\Filament\\AdminPanelProvider' => __DIR__ . '/../..' . '/app/Providers/Filament/AdminPanelProvider.php',
         'App\\Services\\AdministracionCorporativaService' => __DIR__ . '/../..' . '/app/Services/AdministracionCorporativaService.php',
+        'App\\Services\\FtpPermissionsManager' => __DIR__ . '/../..' . '/app/Services/FtpPermissionsManager.php',
         'App\\Services\\VirtusgesnetService' => __DIR__ . '/../..' . '/app/Services/VirtusgesnetService.php',
         'App\\View\\Components\\AppLayout' => __DIR__ . '/../..' . '/app/View/Components/AppLayout.php',
         'App\\View\\Components\\GuestLayout' => __DIR__ . '/../..' . '/app/View/Components/GuestLayout.php',
