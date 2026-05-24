@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class FtpUser extends Model
 {
@@ -24,40 +25,49 @@ class FtpUser extends Model
         'dir',
         'uid',
         'gid',
-        'role',         // Reintroducido de producción
+        'role',
         'can_upload',
         'can_download',
         'can_delete',
     ];
 
-    /**
-     * Eventos del modelo: Aquí automatizamos los valores antes de guardar.
-     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            // 1. Forzamos siempre el UID/GID 33 (www-data) para producción
             $model->uid = 33;
             $model->gid = 33;
 
-            // 2. Si la ruta no trae el nombre del usuario, se lo concatenamos
-            // Esto asegura que la ruta sea /home/ftpusers/nombre_usuario
             if (!str_ends_with($model->dir, $model->user)) {
                 $model->dir = rtrim($model->dir, '/') . '/' . $model->user;
+            }
+
+            // Sincronizamos homedir con la base por si el FTP la requiere
+            $model->homedir = $model->dir;
+        });
+
+        // --- ESTO ES LO QUE FALTA: CREACIÓN FÍSICA ---
+        static::created(function ($model) {
+            $path = $model->dir;
+
+            try {
+                if (!file_exists($path)) {
+                    // Creamos la carpeta con permisos 0775 (recursivo)
+                    mkdir($path, 0775, true);
+
+                    // Intentamos asegurar que el grupo sea www-data si el sistema lo permite
+                    @chown($path, 'www-data');
+                    @chgrp($path, 'www-data');
+                }
+            } catch (\Exception $e) {
+                Log::error("No se pudo crear la carpeta FTP para {$model->user}: " . $e->getMessage());
             }
         });
     }
 
-    /**
-     * Mutador: Si el FTP está en 'cleartext', quitamos el md5.
-     * Si prefieres MD5, déjalo con md5($value).
-     */
     public function setPasswordAttribute($value)
     {
-        // De momento lo dejamos en texto plano para que coincida con el config del FTP
         $this->attributes['password'] = $value;
     }
 }
-
