@@ -6,12 +6,9 @@ use App\Models\FtpUser;
 use App\Services\FtpPermissionsManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Log;
-=======
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
->>>>>>> 7176c9fb85d7db25198c8aadf7141b83ba425255
 
 class FtpUserController extends Controller
 {
@@ -24,11 +21,9 @@ class FtpUserController extends Controller
         return view('ftp.index', compact('ftpUsers'));
     }
 
-<<<<<<< HEAD
     /**
      * Crea un nuevo acceso SFTP con permisos granulares.
      */
-=======
     public function show($username)
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
@@ -90,22 +85,18 @@ class FtpUserController extends Controller
         return redirect()->back()->with('success', 'Archivo eliminado.');
     }
 
->>>>>>> 7176c9fb85d7db25198c8aadf7141b83ba425255
     public function store(Request $request)
     {
         // 1. Validación estricta
         $request->validate([
-<<<<<<< HEAD
             'user'     => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password' => 'required|min:6',
             'role'     => 'required|in:editor,viewer',
-=======
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
             'can_upload'   => 'boolean',
             'can_download' => 'boolean',
             'can_delete'   => 'boolean',
->>>>>>> 7176c9fb85d7db25198c8aadf7141b83ba425255
         ]);
 
         $username = $request->user;
@@ -117,7 +108,6 @@ class FtpUserController extends Controller
             File::makeDirectory($targetDir, 0755, true, true);
         }
 
-<<<<<<< HEAD
         // 3. Registro en Base de Datos (Ahora incluye el rol)
         try {
             $user = FtpUser::create([
@@ -128,20 +118,18 @@ class FtpUserController extends Controller
                 'uid'      => 33,
                 'gid'      => 33,
             ]);
-=======
         // 4. Insertamos el registro.
         // Mantenemos el registro por compatibilidad, aunque ahora usamos un usuario maestro SFTP
         FtpUser::create([
             'user'         => $username,
             'password'     => $request->password,
-            'dir'          => '/home/db/upload/' . $username,
+            'dir'          => '/home/db/upload/' . $username, // Mantener la ruta lógica para el FTP
             'uid'          => 1000,
             'gid'          => 1000,
             'can_upload'   => $request->boolean('can_upload', true), // Default true
             'can_download' => $request->boolean('can_download', true), // Default true
             'can_delete'   => $request->boolean('can_delete', true),   // Default true
         ]);
->>>>>>> 7176c9fb85d7db25198c8aadf7141b83ba425255
 
             // 4. Aplicación de la capa de seguridad (Permisos y Grupos)
             if (FtpPermissionsManager::apply($user, $role)) {
