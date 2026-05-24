@@ -24,6 +24,9 @@ class FtpUser extends Model
         'dir',
         'uid',
         'gid',
+        'can_upload',   // Añadido
+        'can_download', // Añadido
+        'can_delete',   // Añadido
     ];
 
     /**

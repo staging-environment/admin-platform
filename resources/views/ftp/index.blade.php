@@ -14,6 +14,12 @@
                     <button @click="show = false" class="font-bold">&times;</button>
                 </div>
             @endif
+            @if (session('error'))
+                <div x-data="{ show: true }" x-show="show" class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800 flex justify-between items-center">
+                    <span>{{ session('error') }}</span>
+                    <button @click="show = false" class="font-bold">&times;</button>
+                </div>
+            @endif
 
             <div class="p-4 sm:p-8 bg-green-50 shadow sm:rounded-lg border-l-4 border-green-400">
                 <h3 class="text-lg font-medium text-green-900">🚀 Conexión SFTP Habilitada</h3>
@@ -52,12 +58,31 @@
                                 @enderror
                             </div>
 
-                            <div>
+                            <div class="mt-4">
                                 <label class="block font-medium text-sm text-gray-700" for="password">Contraseña FTP</label>
                                 <input id="password" name="password" type="password" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required autocomplete="new-password" />
                                 @error('password')
                                 <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
                                 @enderror
+                            </div>
+
+                            <div class="mt-4 space-y-2">
+                                <p class="block font-medium text-sm text-gray-700">Permisos:</p>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="can_upload" name="can_upload" value="1" checked class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                    <label for="can_upload" class="ml-2 text-sm text-gray-600">Puede Subir Archivos</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="can_download" name="can_download" value="1" checked class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                    <label for="can_download" class="ml-2 text-sm text-gray-600">Puede Descargar Archivos</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="can_delete" name="can_delete" value="1" checked class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                    <label for="can_delete" class="ml-2 text-sm text-gray-600">Puede Eliminar Archivos</label>
+                                </div>
+                                @error('can_upload') <p class="text-sm text-red-600 mt-2">{{ $message }}</p> @enderror
+                                @error('can_download') <p class="text-sm text-red-600 mt-2">{{ $message }}</p> @enderror
+                                @error('can_delete') <p class="text-sm text-red-600 mt-2">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="flex items-center gap-4">
@@ -81,6 +106,9 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Archivos</th>
+                                <th class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subir</th>
+                                <th class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Descargar</th>
+                                <th class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Eliminar</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                             </tr>
                             </thead>
@@ -94,6 +122,27 @@
                                         <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                                             {{ $ftpUser->files_count ?? 0 }} archivos
                                         </span>
+                                    </td>
+                                    <td class="px-2 py-4 whitespace-nowrap text-center text-sm">
+                                        @if($ftpUser->can_upload)
+                                            <span class="text-green-500">✔</span>
+                                        @else
+                                            <span class="text-red-500">✖</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-2 py-4 whitespace-nowrap text-center text-sm">
+                                        @if($ftpUser->can_download)
+                                            <span class="text-green-500">✔</span>
+                                        @else
+                                            <span class="text-red-500">✖</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-2 py-4 whitespace-nowrap text-center text-sm">
+                                        @if($ftpUser->can_delete)
+                                            <span class="text-green-500">✔</span>
+                                        @else
+                                            <span class="text-red-500">✖</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                         <a href="{{ route('ftp.show', $ftpUser->user) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold">
@@ -110,7 +159,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-8 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td colspan="6" class="px-6 py-8 whitespace-nowrap text-sm text-gray-500 text-center">
                                         No hay usuarios creados todavía.
                                     </td>
                                 </tr>

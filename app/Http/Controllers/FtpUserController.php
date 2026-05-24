@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\FtpUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -45,6 +44,11 @@ class FtpUserController extends Controller
 
     public function upload(Request $request, $username)
     {
+        $ftpUser = FtpUser::where('user', $username)->firstOrFail();
+        if (!$ftpUser->can_upload) {
+            return redirect()->back()->with('error', 'No tienes permiso para subir archivos.');
+        }
+
         $request->validate([
             'file' => 'required|file|max:10240', // Max 10MB
         ]);
@@ -57,6 +61,11 @@ class FtpUserController extends Controller
 
     public function download($username, $filename)
     {
+        $ftpUser = FtpUser::where('user', $username)->firstOrFail();
+        if (!$ftpUser->can_download) {
+            return redirect()->back()->with('error', 'No tienes permiso para descargar archivos.');
+        }
+
         $path = 'ftp/' . $username . '/' . $filename;
         if (!Storage::disk('public')->exists($path)) {
             abort(404);
@@ -66,6 +75,11 @@ class FtpUserController extends Controller
 
     public function deleteFile($username, $filename)
     {
+        $ftpUser = FtpUser::where('user', $username)->firstOrFail();
+        if (!$ftpUser->can_delete) {
+            return redirect()->back()->with('error', 'No tienes permiso para eliminar archivos.');
+        }
+
         $path = 'ftp/' . $username . '/' . $filename;
         Storage::disk('public')->delete($path);
         return redirect()->back()->with('success', 'Archivo eliminado.');
@@ -75,8 +89,11 @@ class FtpUserController extends Controller
     {
         // 1. Forzamos la validación del 'unique' apuntando a la conexión y tabla correctas
         $request->validate([
-            'user'     => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
-            'password' => 'required|min:6',
+            'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
+            'password'     => 'required|min:6',
+            'can_upload'   => 'boolean',
+            'can_download' => 'boolean',
+            'can_delete'   => 'boolean',
         ]);
 
         $username = $request->user;
@@ -94,11 +111,14 @@ class FtpUserController extends Controller
         // 4. Insertamos el registro.
         // Mantenemos el registro por compatibilidad, aunque ahora usamos un usuario maestro SFTP
         FtpUser::create([
-            'user'     => $username,
-            'password' => $request->password,
-            'dir'      => '/home/db/upload/' . $username,
-            'uid'      => 1000,
-            'gid'      => 1000,
+            'user'         => $username,
+            'password'     => $request->password,
+            'dir'          => '/home/db/upload/' . $username,
+            'uid'          => 1000,
+            'gid'          => 1000,
+            'can_upload'   => $request->boolean('can_upload', true), // Default true
+            'can_download' => $request->boolean('can_download', true), // Default true
+            'can_delete'   => $request->boolean('can_delete', true),   // Default true
         ]);
 
         return redirect()->back()->with('success', "Empleado '{$username}' creado correctamente. Ahora puedes subir sus archivos directamente.");
