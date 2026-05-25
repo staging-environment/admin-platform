@@ -70,7 +70,7 @@ class FtpUserController extends Controller
         ]);
 
         $path = 'ftp/' . $username;
-        $request->file('file')->storeAs($path, $request->file('file')->getClientOriginalName(), 'public');
+        $request->file('file')->storeAs($path, $request->file()->getClientOriginalName(), 'public');
 
         return redirect()->back()->with('success', 'Archivo subido correctamente.');
     }
@@ -103,7 +103,6 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        throw new \Exception('Error de prueba forzado para logs.'); // Añade esta línea
         // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
