@@ -10,23 +10,41 @@ class FtpPermissionsManager
     public static function apply(FtpUser $user, string $role): bool
     {
         $path = $user->dir;
-        $groupName = "ftp_" . $user->user;
-        $mode = ($role === 'editor') ? '2775' : '2755';
 
-        // Comandos de sistema para DDEV
-        $commands = [
-            "groupadd {$groupName} 2>/dev/null || true",
-            "chown -R www-data:{$groupName} " . escapeshellarg($path),
-            "chmod -R {$mode} " . escapeshellarg($path)
-        ];
+        // Sincronizamos con la lógica del modelo
+        // Si no puede subir, forzamos lectura (555)
+        $rawUpload = $user->getAttributes()['can_upload'] ?? 1;
+        $canUpload = !($rawUpload === 0 || $rawUpload === "0" || $rawUpload === false);
 
-        foreach ($commands as $command) {
-            exec($command . ' 2>&1', $output, $returnCode);
-            if ($returnCode !== 0) {
-                Log::error("Error permisos: " . implode(" ", $output));
-                return false;
-            }
+        $rawDelete = $user->getAttributes()['can_delete'] ?? 1;
+        $canDelete = !($rawDelete === 0 || $rawDelete === "0" || $rawDelete === false);
+
+        $rawDownload = $user->getAttributes()['can_download'] ?? 1;
+        $canDownload = !($rawDownload === 0 || $rawDownload === "0" || $rawDownload === false);
+
+        if (!$canDownload) {
+            $modeOctal = 0000;
+        } elseif (!$canUpload) {
+            $modeOctal = 0555;
+        } else {
+            $modeOctal = 02775;
         }
-        return true;
+
+        // Si la carpeta no existe, intentamos crearla aquí también por si acaso
+
+        // Comandos de sistema para DDEV / Producción
+        // Usamos funciones nativas de PHP ya que 'developer' es dueño de /home/ftpusers
+        try {
+            if (!file_exists($path)) {
+                @mkdir($path, 0775, true);
+            }
+            @chown($path, 'developer');
+            @chgrp($path, 'www-data');
+            chmod($path, $modeOctal);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

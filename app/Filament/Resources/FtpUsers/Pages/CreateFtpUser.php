@@ -15,11 +15,14 @@ class CreateFtpUser extends CreateRecord
      */
     protected function afterCreate(): void
     {
-        $username = $this->record->user;
-        $password = $this->data['password'] ?? '';
-        $userHome = $this->record->dir;
+        // En producción y local, confiamos en el modelo FtpUser para la creación de directorios y permisos.
+        // Solo manejamos Pure-FTPd en local vía DDEV.
 
         if (app()->environment('local')) {
+            $username = $this->record->user;
+            $password = $this->data['password'] ?? '';
+            $userHome = $this->record->dir;
+
             $createUserCommand = sprintf(
                 "ddev exec --user=root -s ftp bash -c 'printf \"%s\\n%s\\n\" %s | pure-pw useradd %s -u ftpuser -d %s -f /etc/pure-ftpd/passwd/pureftpd.txt'",
                 $password,
@@ -30,18 +33,6 @@ class CreateFtpUser extends CreateRecord
             );
             Process::run($createUserCommand);
             Process::run("ddev exec --user=root -s ftp pure-pw mkdb /etc/pure-ftpd/db/pureftpd.pdb -f /etc/pure-ftpd/passwd/pureftpd.txt");
-            Process::run("ddev exec --user=root -s ftp mkdir -p " . escapeshellarg($userHome));
-            Process::run("ddev exec --user=root -s ftp chown -R ftpuser:ftpgroup " . escapeshellarg($userHome));
-            Process::run("ddev exec --user=root -s ftp chmod 755 " . escapeshellarg($userHome));
-        } else {
-            // En producción usamos la base de datos compartida entre Docker y la VM.
-            // No necesitamos ejecutar comandos pure-pw porque el servidor FTP leerá la BD directamente.
-            // Solo nos aseguramos de que el directorio físico exista en el HOST (VM).
-
-            // Nota: Este comando de mkdir fallará si PHP no tiene permisos de sudo en la VM,
-            // pero la autenticación en FileZilla debería funcionar si la BD está bien enlazada.
-            Process::run("sudo mkdir -p " . escapeshellarg($userHome));
-            Process::run("sudo chown 1000:1000 " . escapeshellarg($userHome));
         }
     }
 }

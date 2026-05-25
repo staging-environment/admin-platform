@@ -92,45 +92,35 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
+        // 1. Validación estricta
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
-            'role'         => 'required|in:editor,viewer', // Validación de rol de producción
+            'role'         => 'required|in:editor,viewer',
             'can_upload'   => 'boolean',
             'can_download' => 'boolean',
             'can_delete'   => 'boolean',
         ]);
 
         $username = $request->user;
-        $role     = $request->input('role'); // Obtenemos el rol de producción
-        $targetDir = '/home/ftpusers/' . $username; // Directorio de producción
+        $role     = $request->input('role');
+        $targetDir = '/home/ftpusers/' . $username;
 
-        // 2. Creación del directorio en el servidor (lógica de producción)
-        if (!File::exists($targetDir)) {
-            File::makeDirectory($targetDir, 0755, true, true);
-        }
-
-        // 3. Registro en Base de Datos (Combinamos roles y permisos granulares)
+        // 3. Registro en Base de Datos
         try {
             $user = FtpUser::create([
                 'user'         => $username,
                 'password'     => $request->password,
-                'dir'          => $targetDir, // Usamos el directorio de producción
-                'role'         => $role, // Incluimos el rol de producción
-                'uid'          => 33, // UID de producción
-                'gid'          => 33, // GID de producción
+                'dir'          => $targetDir,
+                'role'         => $role,
+                'uid'          => 1000,
+                'gid'          => 33,
                 'can_upload'   => $request->boolean('can_upload', true),
                 'can_download' => $request->boolean('can_download', true),
                 'can_delete'   => $request->boolean('can_delete', true),
             ]);
 
-            // 4. Aplicación de la capa de seguridad (Permisos y Grupos) de producción
-            if (FtpPermissionsManager::apply($user, $role)) {
-                return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente.");
-            }
-
-            return redirect()->back()->with('error', 'Usuario creado, pero hubo un problema aplicando los permisos.');
+            return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente.");
 
         } catch (\Exception $e) {
             Log::error("Error crítico al crear usuario FTP: " . $e->getMessage());

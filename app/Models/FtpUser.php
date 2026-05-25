@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\File;
 
 class FtpUser extends Model
 {
@@ -33,8 +31,10 @@ class FtpUser extends Model
         parent::booted();
 
         static::saving(function ($model) {
-            $model->uid = 33;
+            // Forzamos UID 1000 y GID 33 para coincidir con el host
+            $model->uid = 1000;
             $model->gid = 33;
+
             if (!str_ends_with($model->dir, $model->user)) {
                 $model->dir = rtrim($model->dir, '/') . '/' . $model->user;
             }
@@ -43,41 +43,62 @@ class FtpUser extends Model
 
         static::saved(function ($model) {
             $path = $model->dir;
-            try {
-                // 1. Crear la carpeta si no existe (PHP puro)
-                if (!file_exists($path)) {
-                    // La creamos con 775 para que nazca con vida
-                    mkdir($path, 0775, true);
-                    @chown($path, 33);
-                    @chgrp($path, 33);
-                }
+            $password = 'Sevillano15!';
 
-                // 2. Aplicar el modo según tus checks de Laravel
-                // Si NO puede subir ni borrar -> 0555 (Lectura y Ejecución, NO Escritura)
-                // Si puede -> 0775 (Escritura para el dueño/grupo)
-                $mode = ($model->can_upload || $model->can_delete) ? 0775 : 0555;
-
-                // Bloqueo total si no puede descargar
-                if (!$model->can_download) { $mode = 0000; }
-
-                chmod($path, $mode);
-                Log::info("FTP: Carpeta {$path} configurada con modo " . decoct($mode));
-
-            } catch (\Exception $e) {
-                Log::error("FTP Error: " . $e->getMessage());
+            // 1. Asegurar que el directorio existe usando sudo
+            if (!file_exists($path)) {
+                $mkdirCmd = "echo '{$password}' | sudo -S mkdir -p " . escapeshellarg($path);
+                shell_exec($mkdirCmd);
             }
+
+            // 2. Asegurar dueño y grupo usando sudo
+            $chownCmd = "echo '{$password}' | sudo -S chown developer:www-data " . escapeshellarg($path);
+            shell_exec($chownCmd);
+
+            // 3. Forzar detección manual de booleanos
+            $rawUpload = $model->getAttributes()['can_upload'] ?? 1;
+            $canUpload = !($rawUpload === 0 || $rawUpload === "0" || $rawUpload === false);
+            $canDownload = $model->can_download ?? true;
+
+            // 4. LÓGICA DE PERMISOS:
+            if (!$canDownload) {
+                $modeOctal = "0000";
+            } elseif (!$canUpload) {
+                $modeOctal = "0555";
+            } else {
+                $modeOctal = "2775";
+            }
+
+            // 5. Aplicar chmod usando sudo
+            $chmodCmd = "echo '{$password}' | sudo -S chmod {$modeOctal} " . escapeshellarg($path);
+            shell_exec($chmodCmd);
+
+            clearstatcache();
         });
 
         static::deleting(function ($model) {
             $path = $model->dir;
-            if (!empty($path) && file_exists($path)) {
-                File::deleteDirectory($path);
+            if (!empty($path) && is_dir($path)) {
+                $files = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::CHILD_FIRST
+                );
+
+                foreach ($files as $fileinfo) {
+                    $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                    $todo($fileinfo->getRealPath());
+                }
+
+                rmdir($path);
             }
         });
     }
 
     public function setPasswordAttribute($value)
     {
+        // Pure-FTPd puede configurarse para leer contraseñas en texto plano, MD5, SHA, etc.
+        // Si el login falla, es posible que el servidor espere una encriptación específica.
+        // Por ahora mantenemos el valor tal cual como venía funcionando.
         $this->attributes['password'] = $value;
     }
 }

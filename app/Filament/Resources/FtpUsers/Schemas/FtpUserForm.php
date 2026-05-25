@@ -16,6 +16,7 @@ class FtpUserForm
                     ->label('Usuario')
                     ->required()
                     ->unique(ignoreRecord: true)
+                    ->live(onBlur: true)
                     ->maxLength(50),
 
                 TextInput::make('password')
@@ -30,31 +31,42 @@ class FtpUserForm
                     ->label('Directorio')
                     ->required()
                     ->default(fn (?string $state, $get) => $state ?: '/home/ftpusers/' . $get('user'))
+                    ->live(onBlur: true)
                     ->maxLength(255),
 
                 TextInput::make('uid')
                     ->label('UID')
                     ->numeric()
                     ->default(1000)
+                    ->disabled()
+                    ->dehydrated()
                     ->required(),
 
                 TextInput::make('gid')
                     ->label('GID')
                     ->numeric()
-                    ->default(1000)
+                    ->default(33)
+                    ->disabled()
+                    ->dehydrated()
                     ->required(),
 
                 // Nuevos campos de permisos
                 Checkbox::make('can_upload')
                     ->label('Puede Subir Archivos')
+                    ->inline(false)
+                    ->dehydrated()
                     ->default(true), // Por defecto, permitir subir
 
                 Checkbox::make('can_download')
                     ->label('Puede Descargar Archivos')
+                    ->inline(false)
+                    ->dehydrated()
                     ->default(true), // Por defecto, permitir descargar
 
                 Checkbox::make('can_delete')
                     ->label('Puede Eliminar Archivos')
+                    ->inline(false)
+                    ->dehydrated()
                     ->default(true), // Por defecto, permitir eliminar
             ]);
     }
