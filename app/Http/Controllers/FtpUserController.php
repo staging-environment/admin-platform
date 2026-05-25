@@ -122,6 +122,7 @@ class FtpUserController extends Controller
 
         // 3. Insertamos el registro en Base de Datos
         try {
+            Log::info("Iniciando creación de usuario FTP: " . $username);
             $user = FtpUser::create([
                 'user'         => $username,
                 'password'     => $request->password,
@@ -137,9 +138,11 @@ class FtpUserController extends Controller
             // 4. Aplicación de la capa de seguridad (Permisos y Grupos) de producción
             // Ahora FtpPermissionsManager::apply() manejará la ausencia del directorio.
             if (FtpPermissionsManager::apply($user)) { // Solo pasamos el objeto $user
+                Log::info("Usuario FTP creado y permisos aplicados con éxito: " . $username);
                 return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente. Los permisos de sistema de archivos se aplicarán tras la primera conexión FTP.");
             }
 
+            Log::error("Usuario creado, pero falló la aplicación de permisos para: " . $username);
             return redirect()->back()->with('error', 'Usuario creado, pero hubo un problema aplicando los permisos de sistema de archivos.');
 
         } catch (\Exception $e) {
