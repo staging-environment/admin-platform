@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\FtpUser;
-use App\Services\FtpPermissionsManager; // Reintroducido de producción
+use App\Services\FtpPermissionsManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log; // Reintroducido de producción
-use Illuminate\Support\Facades\Storage; // Necesario para gestionar archivos
-use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para descargas
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FtpUserController extends Controller
 {
@@ -23,7 +23,12 @@ class FtpUserController extends Controller
         // Para cada usuario, contamos cuántos archivos tiene
         foreach ($ftpUsers as $user) {
             $path = 'ftp/' . $user->user;
-            $user->files_count = count(Storage::disk('public')->files($path));
+            // Comprobamos si el directorio existe antes de intentar contar archivos
+            if (Storage::disk('public')->exists($path)) {
+                $user->files_count = count(Storage::disk('public')->files($path));
+            } else {
+                $user->files_count = 0;
+            }
         }
 
         return view('ftp.index', compact('ftpUsers'));
@@ -33,6 +38,12 @@ class FtpUserController extends Controller
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
         $path = 'ftp/' . $username;
+
+        // Comprobamos si el directorio existe antes de intentar listar archivos
+        if (!Storage::disk('public')->exists($path)) {
+            return view('ftp.show', compact('ftpUser'))->with('fileList', []);
+        }
+
         $files = Storage::disk('public')->files($path);
 
         $fileList = array_map(function($file) use ($username) {
@@ -92,11 +103,11 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación estricta
+        // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
-            'role'         => 'required|in:editor,viewer',
+            'role'         => 'required|in:editor,viewer', // Validación de rol de producción
             'can_upload'   => 'boolean',
             'can_download' => 'boolean',
             'can_delete'   => 'boolean',
@@ -104,23 +115,32 @@ class FtpUserController extends Controller
 
         $username = $request->user;
         $role     = $request->input('role');
-        $targetDir = '/home/ftpusers/' . $username;
+        $targetDir = '/home/ftpusers/' . $username; // Directorio de producción
 
-        // 3. Registro en Base de Datos
+        // 2. NO creamos el directorio aquí. Pure-FTPd lo hará en la primera conexión.
+        // Eliminado: File::makeDirectory($targetDir, 0755, true, true);
+
+        // 3. Insertamos el registro en Base de Datos
         try {
             $user = FtpUser::create([
                 'user'         => $username,
                 'password'     => $request->password,
                 'dir'          => $targetDir,
                 'role'         => $role,
-                'uid'          => 1000,
-                'gid'          => 33,
+                'uid'          => 1000, // UID de 'developer'
+                'gid'          => 33,   // GID de 'www-data'
                 'can_upload'   => $request->boolean('can_upload', true),
                 'can_download' => $request->boolean('can_download', true),
                 'can_delete'   => $request->boolean('can_delete', true),
             ]);
 
-            return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente.");
+            // 4. Aplicación de la capa de seguridad (Permisos y Grupos) de producción
+            // Ahora FtpPermissionsManager::apply() manejará la ausencia del directorio.
+            if (FtpPermissionsManager::apply($user)) { // Solo pasamos el objeto $user
+                return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente. Los permisos de sistema de archivos se aplicarán tras la primera conexión FTP.");
+            }
+
+            return redirect()->back()->with('error', 'Usuario creado, pero hubo un problema aplicando los permisos de sistema de archivos.');
 
         } catch (\Exception $e) {
             Log::error("Error crítico al crear usuario FTP: " . $e->getMessage());
@@ -140,8 +160,21 @@ class FtpUserController extends Controller
         $storagePath = 'public/ftp/' . $user->user;
         $laravelLocalPath = storage_path('app/' . $storagePath);
 
-        if (File::exists($laravelLocalPath)) {
-            File::deleteDirectory($laravelLocalPath);
+        // La eliminación del directorio también debería ser manejada por FtpPermissionsManager
+        // o un servicio dedicado que use sudo de forma segura.
+        // Por ahora, se mantiene la lógica de eliminación recursiva, pero sin sudo.
+        if (!empty($laravelLocalPath) && is_dir($laravelLocalPath)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($laravelLocalPath, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($files as $fileinfo) {
+                $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                @$todo($fileinfo->getRealPath()); // @ para suprimir errores si no hay permisos
+            }
+
+            @rmdir($laravelLocalPath); // @ para suprimir errores si no hay permisos
         }
 
         $user->delete();
