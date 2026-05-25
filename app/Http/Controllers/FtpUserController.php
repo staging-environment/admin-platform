@@ -103,6 +103,7 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
+        throw new \Exception('Error de prueba forzado para logs.'); // Añade esta línea
         // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
