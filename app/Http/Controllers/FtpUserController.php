@@ -61,9 +61,10 @@ class FtpUserController extends Controller
     public function upload(Request $request, $username)
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
-        if (!$ftpUser->can_upload) {
-            return redirect()->back()->with('error', 'No tienes permiso para subir archivos.');
-        }
+        // Eliminada la comprobación de can_upload, ya que los permisos se gestionan a nivel de sistema de archivos por Pure-FTPd
+        // if (!$ftpUser->can_upload) {
+        //     return redirect()->back()->with('error', 'No tienes permiso para subir archivos.');
+        // }
 
         $request->validate([
             'file' => 'required|file|max:10240', // Max 10MB
@@ -78,9 +79,10 @@ class FtpUserController extends Controller
     public function download($username, $filename)
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
-        if (!$ftpUser->can_download) {
-            return redirect()->back()->with('error', 'No tienes permiso para descargar archivos.');
-        }
+        // Eliminada la comprobación de can_download, ya que los permisos se gestionan a nivel de sistema de archivos por Pure-FTPd
+        // if (!$ftpUser->can_download) {
+        //     return redirect()->back()->with('error', 'No tienes permiso para descargar archivos.');
+        // }
 
         $path = 'ftp/' . $username . '/' . $filename;
         if (!Storage::disk('public')->exists($path)) {
@@ -92,9 +94,10 @@ class FtpUserController extends Controller
     public function deleteFile($username, $filename)
     {
         $ftpUser = FtpUser::where('user', $username)->firstOrFail();
-        if (!$ftpUser->can_delete) {
-            return redirect()->back()->with('error', 'No tienes permiso para eliminar archivos.');
-        }
+        // Eliminada la comprobación de can_delete, ya que los permisos se gestionan a nivel de sistema de archivos por Pure-FTPd
+        // if (!$ftpUser->can_delete) {
+        //     return redirect()->back()->with('error', 'No tienes permiso para eliminar archivos.');
+        // }
 
         $path = 'ftp/' . $username . '/' . $filename;
         Storage::disk('public')->delete($path);
@@ -103,22 +106,19 @@ class FtpUserController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validación estricta: Combinamos la validación de roles y permisos granulares
+        // 1. Validación estricta
         $request->validate([
             'user'         => 'required|alpha_dash|unique:mariadb_ftp.ftp_users,user|max:50',
             'password'     => 'required|min:6',
-            'role'         => 'required|in:editor,viewer', // Validación de rol de producción
-            'can_upload'   => 'boolean',
-            'can_download' => 'boolean',
-            'can_delete'   => 'boolean',
+            // 'role'         => 'required|in:editor,viewer', // Eliminado
+            // 'can_upload'   => 'boolean', // Eliminado
+            // 'can_download' => 'boolean', // Eliminado
+            // 'can_delete'   => 'boolean', // Eliminado
         ]);
 
         $username = $request->user;
-        $role     = $request->input('role');
+        // $role     = $request->input('role'); // Eliminado
         $targetDir = '/home/ftpusers/' . $username; // Directorio de producción
-
-        // 2. NO creamos el directorio aquí. Pure-FTPd lo hará en la primera conexión.
-        // Eliminado: File::makeDirectory($targetDir, 0755, true, true);
 
         // 3. Insertamos el registro en Base de Datos
         try {
@@ -127,19 +127,19 @@ class FtpUserController extends Controller
                 'user'         => $username,
                 'password'     => $request->password,
                 'dir'          => $targetDir,
-                'role'         => $role,
+                // 'role'         => $role, // Eliminado
                 'uid'          => 1000, // UID de 'developer'
                 'gid'          => 33,   // GID de 'www-data'
-                'can_upload'   => $request->boolean('can_upload', true),
-                'can_download' => $request->boolean('can_download', true),
-                'can_delete'   => $request->boolean('can_delete', true),
+                // 'can_upload'   => $request->boolean('can_upload', true), // Eliminado
+                // 'can_download' => $request->boolean('can_download', true), // Eliminado
+                // 'can_delete'   => $request->boolean('can_delete', true), // Eliminado
             ]);
 
             // 4. Aplicación de la capa de seguridad (Permisos y Grupos) de producción
-            // Ahora FtpPermissionsManager::apply() manejará la ausencia del directorio.
+            // Ahora FtpPermissionsManager::apply() manejará la creación del directorio y los permisos.
             if (FtpPermissionsManager::apply($user)) { // Solo pasamos el objeto $user
                 Log::info("Usuario FTP creado y permisos aplicados con éxito: " . $username);
-                return redirect()->back()->with('success', "Empleado '{$username}' creado como {$role} correctamente. Los permisos de sistema de archivos se aplicarán tras la primera conexión FTP.");
+                return redirect()->back()->with('success', "Usuario FTP '{$username}' creado correctamente."); // Mensaje simplificado
             }
 
             Log::error("Usuario creado, pero falló la aplicación de permisos para: " . $username);

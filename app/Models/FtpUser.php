@@ -17,13 +17,11 @@ class FtpUser extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'user', 'password', 'dir', 'uid', 'gid', 'role', 'can_upload', 'can_download', 'can_delete',
+        'user', 'password', 'dir', 'uid', 'gid',
     ];
 
     protected $casts = [
-        'can_upload' => 'boolean',
-        'can_download' => 'boolean',
-        'can_delete' => 'boolean',
+        // Los permisos granulares ya no se manejan directamente en el modelo
     ];
 
     protected static function booted()
@@ -39,15 +37,7 @@ class FtpUser extends Model
             if (!str_ends_with($model->dir, $model->user)) {
                 $model->dir = rtrim($model->dir, '/') . '/' . $model->user;
             }
-            // Si 'homedir' es una columna de DB, debe estar en $fillable y en la migración.
-            // Si no lo es, esta asignación no tendrá efecto en la persistencia.
-            // Por ahora, la comento si no es una columna de DB.
-            // $model->homedir = $model->dir;
         });
-
-        // Toda la lógica de shell_exec para mkdir, chown, chmod y la contraseña hardcodeada
-        // DEBE ser eliminada de aquí y manejada de forma segura por FtpPermissionsManager.
-        // static::saved(function ($model) { ... }); // ELIMINADO POR SEGURIDAD
 
         static::deleting(function ($model) {
             $path = $model->dir;

@@ -27,16 +27,6 @@ class FtpUserForm
                     ->revealable()
                     ->maxLength(255),
 
-                // Campo de rol reintroducido
-                Select::make('role')
-                    ->label('Rol')
-                    ->options([
-                        'editor' => 'Editor (Puede subir, descargar, eliminar)',
-                        'viewer' => 'Visor (Solo puede descargar)',
-                    ])
-                    ->required()
-                    ->default('editor'),
-
                 TextInput::make('dir')
                     ->label('Directorio')
                     ->required()
@@ -55,19 +45,6 @@ class FtpUserForm
                     ->numeric()
                     ->default(33) // Ajustado a 33 (www-data)
                     ->required(),
-
-                // Campos de permisos granulares
-                Checkbox::make('can_upload')
-                    ->label('Puede Subir Archivos')
-                    ->default(true),
-
-                Checkbox::make('can_download')
-                    ->label('Puede Descargar Archivos')
-                    ->default(true),
-
-                Checkbox::make('can_delete')
-                    ->label('Puede Eliminar Archivos')
-                    ->default(true),
             ]);
     }
 }
