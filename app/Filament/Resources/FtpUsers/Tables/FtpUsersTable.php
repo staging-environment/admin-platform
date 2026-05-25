@@ -10,7 +10,7 @@ use Filament\Tables\Columns\IconColumn; // Importamos el componente IconColumn
 
 class FtpUsersTable
 {
-    public static function configure(Table $table): Table
+    public static function configure(\Filament\Tables\Table $table): \Filament\Tables\Table // Usando FQCN
     {
         return $table
             ->columns([
