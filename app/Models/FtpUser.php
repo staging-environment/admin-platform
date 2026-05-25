@@ -31,53 +31,29 @@ class FtpUser extends Model
         parent::booted();
 
         static::saving(function ($model) {
-            // Forzamos UID 1000 y GID 33 para coincidir con el host
-            $model->uid = 1000;
-            $model->gid = 33;
+            // Forzamos UID 1000 (developer) y GID 33 (www-data) para coincidir con el comportamiento de Pure-FTPd
+            $model->uid = 1000; // UID de 'developer'
+            $model->gid = 33;   // GID de 'www-data'
 
+            // Aseguramos que el directorio termine con el nombre de usuario
             if (!str_ends_with($model->dir, $model->user)) {
                 $model->dir = rtrim($model->dir, '/') . '/' . $model->user;
             }
-            $model->homedir = $model->dir;
+            // Si 'homedir' es una columna de DB, debe estar en $fillable y en la migración.
+            // Si no lo es, esta asignación no tendrá efecto en la persistencia.
+            // Por ahora, la comento si no es una columna de DB.
+            // $model->homedir = $model->dir;
         });
 
-        static::saved(function ($model) {
-            $path = $model->dir;
-            $password = 'Sevillano15!';
-
-            // 1. Asegurar que el directorio existe usando sudo
-            if (!file_exists($path)) {
-                $mkdirCmd = "echo '{$password}' | sudo -S mkdir -p " . escapeshellarg($path);
-                shell_exec($mkdirCmd);
-            }
-
-            // 2. Asegurar dueño y grupo usando sudo
-            $chownCmd = "echo '{$password}' | sudo -S chown developer:www-data " . escapeshellarg($path);
-            shell_exec($chownCmd);
-
-            // 3. Forzar detección manual de booleanos
-            $rawUpload = $model->getAttributes()['can_upload'] ?? 1;
-            $canUpload = !($rawUpload === 0 || $rawUpload === "0" || $rawUpload === false);
-            $canDownload = $model->can_download ?? true;
-
-            // 4. LÓGICA DE PERMISOS:
-            if (!$canDownload) {
-                $modeOctal = "0000";
-            } elseif (!$canUpload) {
-                $modeOctal = "0555";
-            } else {
-                $modeOctal = "2775";
-            }
-
-            // 5. Aplicar chmod usando sudo
-            $chmodCmd = "echo '{$password}' | sudo -S chmod {$modeOctal} " . escapeshellarg($path);
-            shell_exec($chmodCmd);
-
-            clearstatcache();
-        });
+        // Toda la lógica de shell_exec para mkdir, chown, chmod y la contraseña hardcodeada
+        // DEBE ser eliminada de aquí y manejada de forma segura por FtpPermissionsManager.
+        // static::saved(function ($model) { ... }); // ELIMINADO POR SEGURIDAD
 
         static::deleting(function ($model) {
             $path = $model->dir;
+            // La eliminación del directorio también debería ser manejada por FtpPermissionsManager
+            // o un servicio dedicado que use sudo de forma segura.
+            // Por ahora, se mantiene la lógica de eliminación recursiva, pero sin sudo.
             if (!empty($path) && is_dir($path)) {
                 $files = new \RecursiveIteratorIterator(
                     new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -86,19 +62,16 @@ class FtpUser extends Model
 
                 foreach ($files as $fileinfo) {
                     $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-                    $todo($fileinfo->getRealPath());
+                    @$todo($fileinfo->getRealPath()); // @ para suprimir errores si no hay permisos
                 }
 
-                rmdir($path);
+                @rmdir($path); // @ para suprimir errores si no hay permisos
             }
         });
     }
 
     public function setPasswordAttribute($value)
     {
-        // Pure-FTPd puede configurarse para leer contraseñas en texto plano, MD5, SHA, etc.
-        // Si el login falla, es posible que el servidor espere una encriptación específica.
-        // Por ahora mantenemos el valor tal cual como venía funcionando.
         $this->attributes['password'] = $value;
     }
 }

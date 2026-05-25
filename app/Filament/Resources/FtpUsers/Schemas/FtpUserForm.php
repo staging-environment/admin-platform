@@ -4,7 +4,8 @@ namespace App\Filament\Resources\FtpUsers\Schemas;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Checkbox; // Importamos el componente Checkbox
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Select; // Importamos el componente Select
 
 class FtpUserForm
 {
@@ -16,7 +17,6 @@ class FtpUserForm
                     ->label('Usuario')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->live(onBlur: true)
                     ->maxLength(50),
 
                 TextInput::make('password')
@@ -27,47 +27,47 @@ class FtpUserForm
                     ->revealable()
                     ->maxLength(255),
 
+                // Campo de rol reintroducido
+                Select::make('role')
+                    ->label('Rol')
+                    ->options([
+                        'editor' => 'Editor (Puede subir, descargar, eliminar)',
+                        'viewer' => 'Visor (Solo puede descargar)',
+                    ])
+                    ->required()
+                    ->default('editor'),
+
                 TextInput::make('dir')
                     ->label('Directorio')
                     ->required()
                     ->default(fn (?string $state, $get) => $state ?: '/home/ftpusers/' . $get('user'))
-                    ->live(onBlur: true)
                     ->maxLength(255),
 
+                // UID y GID se gestionan en el modelo, pero los mantenemos aquí para visibilidad si se desea editar
                 TextInput::make('uid')
                     ->label('UID')
                     ->numeric()
-                    ->default(1000)
-                    ->disabled()
-                    ->dehydrated()
+                    ->default(1000) // Ajustado a 1000 (developer)
                     ->required(),
 
                 TextInput::make('gid')
                     ->label('GID')
                     ->numeric()
-                    ->default(33)
-                    ->disabled()
-                    ->dehydrated()
+                    ->default(33) // Ajustado a 33 (www-data)
                     ->required(),
 
-                // Nuevos campos de permisos
+                // Campos de permisos granulares
                 Checkbox::make('can_upload')
                     ->label('Puede Subir Archivos')
-                    ->inline(false)
-                    ->dehydrated()
-                    ->default(true), // Por defecto, permitir subir
+                    ->default(true),
 
                 Checkbox::make('can_download')
                     ->label('Puede Descargar Archivos')
-                    ->inline(false)
-                    ->dehydrated()
-                    ->default(true), // Por defecto, permitir descargar
+                    ->default(true),
 
                 Checkbox::make('can_delete')
                     ->label('Puede Eliminar Archivos')
-                    ->inline(false)
-                    ->dehydrated()
-                    ->default(true), // Por defecto, permitir eliminar
+                    ->default(true),
             ]);
     }
 }
