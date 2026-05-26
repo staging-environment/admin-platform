@@ -12,6 +12,7 @@ class GasolineraContenido extends Model
     protected $fillable = [
         'gasolinera_codigo',
         'slider_images',
+        'imagen',
         'texto_inicio',
         'quienes_somos',
         'donde_estamos_texto',

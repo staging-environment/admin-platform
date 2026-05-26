@@ -49,6 +49,14 @@ class GasolineraForm
                     ->description('Configura los datos del slider, información corporativa, ubicación y servicios para esta estación de servicio.')
                     ->relationship('contenido')
                     ->schema([
+                        FileUpload::make('imagen')
+                            ->label('Imagen Principal / Destacada')
+                            ->helperText('Sube una imagen representativa para la estación de servicio. Se mostrará en la página de inicio.')
+                            ->image()
+                            ->disk('public')
+                            ->directory('gasolineras/imagenes')
+                            ->columnSpanFull(),
+
                         FileUpload::make('slider_images')
                             ->label('Imágenes para el Slider')
                             ->helperText('Sube imágenes atractivas para el carrusel superior. Se redimensionarán automáticamente.')

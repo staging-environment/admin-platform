@@ -16,8 +16,10 @@ use Illuminate\Http\Request;
 // --- SECCIÓN PÚBLICA ---
 Route::get('/', function () {
     $gasolineras = [];
+    $homeConfig = null;
     try {
-        $gasolineras = Gasolinera::take(4)->get()->map(function ($estacion) {
+        $homeConfig = \App\Models\HomeConfig::find(1);
+        $gasolineras = Gasolinera::with('contenido')->get()->map(function ($estacion) {
             $estacion->diesel = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
                 ->where('CodigoProducto', '1')->value('PVP');
             $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
@@ -25,7 +27,7 @@ Route::get('/', function () {
             return $estacion;
         });
     } catch (\Exception $e) { report($e); }
-    return view('welcome', compact('gasolineras'));
+    return view('welcome', compact('gasolineras', 'homeConfig'));
 });
 
 Route::get('/estacion/{codigo}', function ($codigo) {
@@ -33,7 +35,8 @@ Route::get('/estacion/{codigo}', function ($codigo) {
         $estacion = Gasolinera::with('contenido')->where('Codigo', $codigo)->firstOrFail();
         $estacion->diesel = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '1')->value('PVP');
         $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '2')->value('PVP');
-        return view('estacion-detalle', compact('estacion'));
+        $homeConfig = \App\Models\HomeConfig::find(1);
+        return view('estacion-detalle', compact('estacion', 'homeConfig'));
     } catch (\Exception $e) { return redirect('/'); }
 })->name('estacion.show');
 
@@ -53,6 +56,23 @@ Route::post('/estacion/{codigo}/contacto', function (Request $request, $codigo) 
 
     return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
 })->name('estacion.contacto');
+
+Route::post('/contacto', function (Request $request) {
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'mensaje' => 'required|string',
+    ]);
+
+    ContactoMensaje::create([
+        'gasolinera_codigo' => null,
+        'nombre' => $request->nombre,
+        'email' => $request->email,
+        'mensaje' => $request->mensaje,
+    ]);
+
+    return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+})->name('home.contacto');
 
 // --- SECCIÓN PRIVADA (BACKEND) ---
 Route::middleware(['auth', 'verified'])->group(function () {
