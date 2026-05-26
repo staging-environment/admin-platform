@@ -30,8 +30,11 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+                'danger' => Color::Red,
+                'success' => Color::Green,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->pages([])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
@@ -49,6 +52,14 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::HEAD_END,
+                fn (): string => \Illuminate\Support\Facades\Blade::render("@vite(['resources/css/filament-nav.css'])"),
+            )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::BODY_START,
+                fn (): string => \Illuminate\Support\Facades\Blade::render('@include("layouts.navigation")'),
+            )
             ->authMiddleware([
                 Authenticate::class,
             ]);

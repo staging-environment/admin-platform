@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\FtpUsers\Pages;
 
 use App\Filament\Resources\FtpUsers\FtpUserResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Process;
 
@@ -14,7 +14,12 @@ class ListFtpUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            Actions\Action::make('back')
+                ->label('Volver al Dashboard')
+                ->color('gray')
+                ->icon('heroicon-m-arrow-left')
+                ->url('/dashboard'),
+            Actions\CreateAction::make(),
         ];
     }
 

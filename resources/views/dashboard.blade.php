@@ -1,11 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard - VirtusGesNet Admin') }}
-            </h2>
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Dashboard') }}
+                </h2>
+
+                <p class="mt-1 text-sm text-gray-600">
+                    Panel de informes basado principalmente en la base de datos VirtusGesNet.
+                </p>
+            </div>
+
             <div class="text-sm text-gray-600">
-                Usuario: {{ auth()->user()->name }} | Rol: {{ auth()->user()->getRoleNames()->first() ?? 'Sin rol' }}
+                Tablas VirtusGesNet: {{ count($tables) }}
             </div>
         </div>
     </x-slot>
@@ -13,310 +20,652 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <!-- Error Message -->
-            @if(isset($error))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    <strong>Error:</strong> {{ $error }}
-                </div>
-            @endif
-
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Tablas Admin Corp</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ count($tablesAdmin) }}</dd>
-                                </dl>
-                            </div>
+                        <h3 class="text-lg font-medium text-gray-900">
+                            Compras
+                        </h3>
+
+                        <p class="mt-2 text-sm text-gray-600">
+                            Tablas candidatas relacionadas con compras, proveedores, entradas o recepciones.
+                        </p>
+
+                        <div class="mt-6">
+                            @if(count($tableGroups['compras']) > 0)
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {{ count($tableGroups['compras']) }} tablas detectadas
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Sin tablas detectadas
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Tablas VirtusGesNet</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ count($tablesVirtus) }}</dd>
-                                </dl>
-                            </div>
+                        <h3 class="text-lg font-medium text-gray-900">
+                            Ventas
+                        </h3>
+
+                        <p class="mt-2 text-sm text-gray-600">
+                            Tablas candidatas relacionadas con ventas, facturas, albaranes, tickets o pedidos.
+                        </p>
+
+                        <div class="mt-6">
+                            @if(count($tableGroups['ventas']) > 0)
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {{ count($tableGroups['ventas']) }} tablas detectadas
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Sin tablas detectadas
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Permisos</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ auth()->user()->getAllPermissions()->count() }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        <h3 class="text-lg font-medium text-gray-900">
+                            Rentabilidad
+                        </h3>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Estado</dt>
-                                    <dd class="text-lg font-medium text-green-600">Conectado</dd>
-                                </dl>
-                            </div>
+                        <p class="mt-2 text-sm text-gray-600">
+                            Cruce futuro entre compras y ventas para detectar márgenes, desviaciones y oportunidades.
+                        </p>
+
+                        <div class="mt-6">
+                            @if(count($tableGroups['compras']) > 0 && count($tableGroups['ventas']) > 0)
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    Base de datos candidata localizada
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Faltan tablas por identificar
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Database Tables Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">
+                                Resumen mensual de ventas
+                            </h3>
 
-                <!-- Administracion Corporativa Tables -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">Administración Corporativa</h3>
-                            <span class="text-sm text-gray-500">{{ count($tablesAdmin) }} tablas</span>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Basado en la tabla facturasyticketsdeventa usando FechaYHora e ImporteTotal.
+                            </p>
                         </div>
 
-                        <div class="mb-4">
-                            <input type="text" id="search-admin" placeholder="Buscar tablas..."
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+                        <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col gap-3 xl:flex-row xl:items-end">
+                            <div>
+                                <label for="year" class="block text-sm font-medium text-gray-700">
+                                    Año
+                                </label>
 
-                        <div class="max-h-96 overflow-y-auto">
-                            <div id="tables-admin-list" class="space-y-2">
-                                @foreach($tablesAdmin as $table)
-                                    <div class="table-item flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
-                                         data-table="{{ $table }}" data-db="admin">
-                                        <span class="font-medium">{{ $table }}</span>
-                                        <button class="query-table-btn text-blue-600 hover:text-blue-800 text-sm"
-                                                data-table="{{ $table }}" data-db="admin">
-                                            Consultar
-                                        </button>
-                                    </div>
-                                @endforeach
+                                <input
+                                    type="number"
+                                    id="year"
+                                    name="year"
+                                    value="{{ $selectedYear }}"
+                                    min="2000"
+                                    max="{{ date('Y') + 1 }}"
+                                    class="mt-1 w-28 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- VirtusGesNet Tables -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">VirtusGesNet</h3>
-                            <span class="text-sm text-gray-500">{{ count($tablesVirtus) }} tablas</span>
-                        </div>
+                            <div>
+                                <label for="document_type" class="block text-sm font-medium text-gray-700">
+                                    Tipo
+                                </label>
 
-                        <div class="mb-4">
-                            <input type="text" id="search-virtus" placeholder="Buscar tablas..."
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                        </div>
+                                <select
+                                    id="document_type"
+                                    name="document_type"
+                                    class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                    <option value="all" @selected(($selectedDocumentType ?? 'all') === 'all')>
+                                        Todos
+                                    </option>
 
-                        <div class="max-h-96 overflow-y-auto">
-                            <div id="tables-virtus-list" class="space-y-2">
-                                @foreach($tablesVirtus as $table)
-                                    <div class="table-item flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
-                                         data-table="{{ $table }}" data-db="virtus">
-                                        <span class="font-medium">{{ $table }}</span>
-                                        <button class="query-table-btn text-green-600 hover:text-green-800 text-sm"
-                                                data-table="{{ $table }}" data-db="virtus">
-                                            Consultar
-                                        </button>
-                                    </div>
-                                @endforeach
+                                    <option value="invoices" @selected(($selectedDocumentType ?? 'all') === 'invoices')>
+                                        Facturas
+                                    </option>
+
+                                    <option value="tickets" @selected(($selectedDocumentType ?? 'all') === 'tickets')>
+                                        Tickets
+                                    </option>
+                                </select>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Query Results Modal -->
-            <div id="query-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-                <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white">
-                    <div class="mt-3">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900" id="modal-title">Consultando tabla...</h3>
-                            <button id="close-modal" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
+                            <div>
+                                <label for="start_month" class="block text-sm font-medium text-gray-700">
+                                    Mes desde
+                                </label>
+
+                                <select
+                                    id="start_month"
+                                    name="start_month"
+                                    class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    @foreach($months as $monthNumber => $monthName)
+                                        <option value="{{ $monthNumber }}" @selected(($selectedStartMonth ?? null) === $monthNumber)>
+                                            {{ $monthName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="end_month" class="block text-sm font-medium text-gray-700">
+                                    Mes hasta
+                                </label>
+
+                                <select
+                                    id="end_month"
+                                    name="end_month"
+                                    class="mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                    <option value="">
+                                        Todos
+                                    </option>
+
+                                    @foreach($months as $monthNumber => $monthName)
+                                        <option value="{{ $monthNumber }}" @selected(($selectedEndMonth ?? null) === $monthNumber)>
+                                            {{ $monthName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="station_code" class="block text-sm font-medium text-gray-700">
+                                    Estación
+                                </label>
+
+                                <select
+                                    id="station_code"
+                                    name="station_code"
+                                    class="mt-1 max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                >
+                                    <option value="">
+                                        Todas
+                                    </option>
+
+                                    @foreach($stations as $station)
+                                        <option value="{{ $station['code'] }}" @selected(($selectedStationCode ?? null) === $station['code'])>
+                                            {{ $station['name'] }}
+                                            @if(!empty($station['town']))
+                                                - {{ $station['town'] }}
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="inline-flex items-center justify-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
+                            >
+                                Filtrar
                             </button>
+                        </form>
+                    </div>
+
+                    @if(count($monthlySales) > 0)
+                        <div class="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h4 class="text-sm font-semibold text-gray-800">
+                                            Evolución mensual
+                                        </h4>
+
+                                        <p class="text-xs text-gray-500">
+                                            Total vendido por mes
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="h-80">
+                                    <canvas id="monthlySalesChart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <h4 class="text-sm font-semibold text-gray-800 mb-4">
+                                    Resumen del año {{ $selectedYear }}
+                                </h4>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-gray-500">
+                                            Total vendido
+                                        </p>
+
+                                        <p class="mt-1 text-2xl font-bold text-gray-900">
+                                            {{ number_format(collect($monthlySales)->sum('total_amount'), 2, ',', '.') }} €
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-gray-500">
+                                            Documentos
+                                        </p>
+
+                                        <p class="mt-1 text-2xl font-bold text-gray-900">
+                                            {{ number_format(collect($monthlySales)->sum('documents_count'), 0, ',', '.') }}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-gray-500">
+                                            IVA
+                                        </p>
+
+                                        <p class="mt-1 text-2xl font-bold text-gray-900">
+                                            {{ number_format(collect($monthlySales)->sum('tax_amount'), 2, ',', '.') }} €
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wide text-gray-500">
+                                            Ticket medio aproximado
+                                        </p>
+
+                                        <p class="mt-1 text-2xl font-bold text-gray-900">
+                                            @php
+                                                $totalDocuments = collect($monthlySales)->sum('documents_count');
+                                                $totalAmount = collect($monthlySales)->sum('total_amount');
+                                                $averageTicket = $totalDocuments > 0 ? $totalAmount / $totalDocuments : 0;
+                                            @endphp
+
+                                            {{ number_format($averageTicket, 2, ',', '.') }} €
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="query-results" class="max-h-96 overflow-y-auto">
-                            <div class="text-center py-8">
-                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-                                <p class="mt-4 text-gray-600">Cargando datos...</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Mes
+                                    </th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Documentos
+                                    </th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Bruto
+                                    </th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Descuentos / cargos
+                                    </th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        IVA
+                                    </th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Total
+                                    </th>
+                                </tr>
+                                </thead>
+
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($monthlySales as $month)
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                                            {{ $month['month_name'] }}
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+                                            {{ number_format($month['documents_count'], 0, ',', '.') }}
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+                                            {{ number_format($month['gross_amount'], 2, ',', '.') }} €
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+                                            {{ number_format($month['discounts_and_charges_amount'], 2, ',', '.') }} €
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-gray-700 text-right">
+                                            {{ number_format($month['tax_amount'], 2, ',', '.') }} €
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                            {{ number_format($month['total_amount'], 2, ',', '.') }} €
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+
+                                <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">
+                                        Total año {{ $selectedYear }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                        {{ number_format(collect($monthlySales)->sum('documents_count'), 0, ',', '.') }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                        {{ number_format(collect($monthlySales)->sum('gross_amount'), 2, ',', '.') }} €
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                        {{ number_format(collect($monthlySales)->sum('discounts_and_charges_amount'), 2, ',', '.') }} €
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                        {{ number_format(collect($monthlySales)->sum('tax_amount'), 2, ',', '.') }} €
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                        {{ number_format(collect($monthlySales)->sum('total_amount'), 2, ',', '.') }} €
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    @else
+                        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
+                            No hay ventas localizadas para el año {{ $selectedYear }} con los filtros seleccionados.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Ideas iniciales de informes
+                    </h3>
+
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Evolución mensual de ventas
+                            </h4>
+
+                            <p class="mt-2 text-sm text-gray-600">
+                                Comparativa de ventas por mes, negocio, cliente o línea de producto.
+                            </p>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Top clientes y productos
+                            </h4>
+
+                            <p class="mt-2 text-sm text-gray-600">
+                                Ranking de clientes, artículos o familias con mayor facturación.
+                            </p>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Control de compras
+                            </h4>
+
+                            <p class="mt-2 text-sm text-gray-600">
+                                Análisis de compras por proveedor, producto, periodo y variación de precios.
+                            </p>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Margen estimado
+                            </h4>
+
+                            <p class="mt-2 text-sm text-gray-600">
+                                Cruce entre precios de compra y ventas para analizar rentabilidad aproximada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Tablas candidatas para informes
+                    </h3>
+
+                    <p class="mt-2 text-sm text-gray-600">
+                        Esta clasificación se basa en el nombre de las tablas. Nos servirá para identificar de dónde sacar los primeros informes reales.
+                    </p>
+
+                    <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Ventas
+                            </h4>
+
+                            <div class="mt-3 space-y-2">
+                                @forelse($tableGroups['ventas'] as $table)
+                                    <div class="px-3 py-2 bg-green-50 border border-green-100 rounded text-sm text-green-900">
+                                        {{ $table }}
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-gray-500">
+                                        No se han detectado tablas de ventas por nombre.
+                                    </p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Compras
+                            </h4>
+
+                            <div class="mt-3 space-y-2">
+                                @forelse($tableGroups['compras'] as $table)
+                                    <div class="px-3 py-2 bg-blue-50 border border-blue-100 rounded text-sm text-blue-900">
+                                        {{ $table }}
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-gray-500">
+                                        No se han detectado tablas de compras por nombre.
+                                    </p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Clientes
+                            </h4>
+
+                            <div class="mt-3 space-y-2">
+                                @forelse($tableGroups['clientes'] as $table)
+                                    <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
+                                        {{ $table }}
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-gray-500">
+                                        No se han detectado tablas de clientes por nombre.
+                                    </p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800">
+                                Artículos / productos / stock
+                            </h4>
+
+                            <div class="mt-3 space-y-2">
+                                @forelse($tableGroups['articulos'] as $table)
+                                    <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
+                                        {{ $table }}
+                                    </div>
+                                @empty
+                                    <p class="text-sm text-gray-500">
+                                        No se han detectado tablas de artículos por nombre.
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">
+                            Tablas disponibles en VirtusGesNet
+                        </h3>
+
+                        <span class="text-sm text-gray-500">
+                            {{ count($tables) }} tablas
+                        </span>
+                    </div>
+
+                    @if(count($tables) > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            @foreach($tables as $table)
+                                <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
+                                    {{ $table }}
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
+                            No se han podido cargar las tablas de VirtusGesNet en este momento.
+                        </div>
+                    @endif
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    @if(count($monthlySales) > 0)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const monthlySalesData = @json($monthlySales);
 
-            console.log('JS CARGADO 🔥');
-
-            // Search functionality
-            document.getElementById('search-admin').addEventListener('input', function(e) {
-                filterTables('tables-admin-list', e.target.value);
-            });
-
-            document.getElementById('search-virtus').addEventListener('input', function(e) {
-                filterTables('tables-virtus-list', e.target.value);
-            });
-
-            function filterTables(containerId, searchTerm) {
-                const container = document.getElementById(containerId);
-                const items = container.querySelectorAll('.table-item');
-
-                items.forEach(item => {
-                    const tableName = item.querySelector('span').textContent.toLowerCase();
-                    item.style.display = tableName.includes(searchTerm.toLowerCase()) ? 'flex' : 'none';
+                const labels = monthlySalesData.map(function (item) {
+                    return item.month_name;
                 });
-            }
 
-            // BOTONES CONSULTAR
-            document.querySelectorAll('.query-table-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    console.log('CLICK 🔥');
+                const totals = monthlySalesData.map(function (item) {
+                    return item.total_amount;
+                });
 
-                    const table = this.getAttribute('data-table');
-                    const db = this.getAttribute('data-db');
-                    openQueryModal(table, db);
+                const grossAmounts = monthlySalesData.map(function (item) {
+                    return item.gross_amount;
+                });
+
+                const taxAmounts = monthlySalesData.map(function (item) {
+                    return item.tax_amount;
+                });
+
+                const canvas = document.getElementById('monthlySalesChart');
+
+                if (!canvas || typeof Chart === 'undefined') {
+                    return;
+                }
+
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                type: 'bar',
+                                label: 'Total vendido',
+                                data: totals,
+                                backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                                borderColor: 'rgba(37, 99, 235, 1)',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                            },
+                            {
+                                type: 'line',
+                                label: 'Bruto',
+                                data: grossAmounts,
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                borderWidth: 2,
+                                tension: 0.35,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                            },
+                            {
+                                type: 'line',
+                                label: 'IVA',
+                                data: taxAmounts,
+                                borderColor: 'rgba(245, 158, 11, 1)',
+                                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                borderWidth: 2,
+                                tension: 0.35,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.parsed.y || 0;
+
+                                        return context.dataset.label + ': ' + new Intl.NumberFormat('es-ES', {
+                                            style: 'currency',
+                                            currency: 'EUR',
+                                        }).format(value);
+                                    },
+                                },
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return new Intl.NumberFormat('es-ES', {
+                                            style: 'currency',
+                                            currency: 'EUR',
+                                            maximumFractionDigits: 0,
+                                        }).format(value);
+                                    },
+                                },
+                            },
+                        },
+                    },
                 });
             });
-
-            function openQueryModal(table, db) {
-                console.log('FETCH 🔥', table, db);
-
-                const modal = document.getElementById('query-modal');
-                const title = document.getElementById('modal-title');
-                const results = document.getElementById('query-results');
-
-                const dbName = db === 'admin' ? 'administracioncorporativa' : 'virtusgesnet';
-                const displayName = db === 'admin' ? 'Admin Corp' : 'VirtusGesNet';
-
-                title.textContent = `Consultando tabla: ${table} (${displayName})`;
-
-                results.innerHTML = `
-            <div class="text-center py-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-                <p class="mt-4 text-gray-600">Cargando datos...</p>
-            </div>
-        `;
-
-                modal.classList.remove('hidden');
-
-                 window.axios.post('/api/data/query', {
-                         database: dbName,
-                         table: table,
-                         limit: 50
-                     })
-                     .then(response => displayQueryResults(response.data, table))
-                     .catch(error => {
-                         console.error('Error fetching data:', error);
-                         results.innerHTML = `
-                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                     Error: ${error.response?.data?.message || error.message}
-                 </div>
-             `;
-                     });
-            }
-
-            function displayQueryResults(responseData, tableName) {
-                const results = document.getElementById('query-results');
-
-                // Extract the actual data array from the response
-                const tableData = responseData.data?.data || [];
-                const total = responseData.data?.total || 0;
-
-                if (responseData.success && tableData.length > 0) {
-                    let html = `
-                <div class="mb-4">
-                    <p class="text-sm text-gray-600">
-                        Mostrando ${tableData.length} de ${total} registros de "${tableName}"
-                    </p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-            `;
-
-                    if (tableData.length > 0) {
-                        Object.keys(tableData[0]).forEach(key => {
-                            html += `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">${key}</th>`;
-                        });
-                    }
-
-                    html += `</tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
-
-                    tableData.forEach(row => {
-                        html += '<tr>';
-                        Object.values(row).forEach(value => {
-                            html += `<td class="px-6 py-4 text-sm">${value ?? 'NULL'}</td>`;
-                        });
-                        html += '</tr>';
-                    });
-
-                    html += `</tbody></table></div>`;
-                    results.innerHTML = html;
-
-                } else {
-                    results.innerHTML = `
-                <div class="text-center py-8">
-                    <p class="text-gray-600">Sin datos en "${tableName}"</p>
-                </div>
-            `;
-                }
-            }
-
-            // Cerrar modal
-            document.getElementById('close-modal').addEventListener('click', function() {
-                document.getElementById('query-modal').classList.add('hidden');
-            });
-
-            document.getElementById('query-modal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.add('hidden');
-                }
-            });
-
-        });
-    </script>
+        </script>
+    @endif
 </x-app-layout>

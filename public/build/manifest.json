@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DxGKd23x.css",
+    "file": "assets/app-B-wUV4pJ.css",
     "name": "app",
     "names": [
       "app.css"
@@ -8,8 +8,17 @@
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/css/filament-nav.css": {
+    "file": "assets/filament-nav-BD2K190O.css",
+    "name": "filament-nav",
+    "names": [
+      "filament-nav.css"
+    ],
+    "src": "resources/css/filament-nav.css",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-BM8qvKWD.js",
+    "file": "assets/app-DkpxVi32.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

@@ -13,6 +13,17 @@
       0 => 'BladeUI\\Icons\\BladeIconsServiceProvider',
     ),
   ),
+  'dotswan/filament-map-picker' => 
+  array (
+    'aliases' => 
+    array (
+      'MapPicker' => 'Dotswan\\MapPicker\\Facades\\MapPicker',
+    ),
+    'providers' => 
+    array (
+      0 => 'Dotswan\\MapPicker\\MapPickerServiceProvider',
+    ),
+  ),
   'filament/actions' => 
   array (
     'providers' => 

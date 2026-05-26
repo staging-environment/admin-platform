@@ -12,19 +12,17 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
                     @role('admin')
-                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                        {{ __('Informes') }}
-                    </x-nav-link>
+                        @if(!request()->is('admin*'))
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                        @endif
                     @endrole
 
                     @can('manage-users')
                         <x-nav-link href="/admin" :active="request()->is('admin*')">
-                            {{ __('Administración de usuarios') }}
+                            {{ __('Administración de la plataforma') }}
                         </x-nav-link>
                     @endcan
                 </div>
@@ -32,6 +30,14 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @role('admin')
+                    @if(request()->is('admin*'))
+                        <a href="{{ route('dashboard') }}" class="mr-4 inline-flex items-center px-3 py-1.5 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            {{ __('Volver al Dashboard') }}
+                        </a>
+                    @endif
+                @endrole
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -79,19 +85,23 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-
             @role('Admin')
-            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                {{ __('Informes') }}
-            </x-responsive-nav-link>
+                @if(request()->is('admin*'))
+                    <div class="px-4 py-2">
+                        <a href="{{ route('dashboard') }}" class="block w-full text-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            {{ __('Volver al Dashboard') }}
+                        </a>
+                    </div>
+                @else
+                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                @endif
             @endrole
 
             @can('manage-users')
                 <x-responsive-nav-link href="/admin" :active="request()->is('admin*')">
-                    {{ __('Administración  de usuarios') }}
+                    {{ __('Administración de la plataforma') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

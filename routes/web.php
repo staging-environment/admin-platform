@@ -10,6 +10,8 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\FtpUserController; // <-- Importamos tu nuevo controlador
 use App\Http\Controllers\Api\DataQueryController;
 use App\Http\Controllers\Api\FilterController;
+use App\Models\ContactoMensaje;
+use Illuminate\Http\Request;
 
 // --- SECCIÓN PÚBLICA ---
 Route::get('/', function () {
@@ -28,13 +30,29 @@ Route::get('/', function () {
 
 Route::get('/estacion/{codigo}', function ($codigo) {
     try {
-        $estacion = Gasolinera::where('Codigo', $codigo)->firstOrFail();
+        $estacion = Gasolinera::with('contenido')->where('Codigo', $codigo)->firstOrFail();
         $estacion->diesel = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '1')->value('PVP');
         $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '2')->value('PVP');
-        $extras = ['descripcion' => "Estación Utrecar en {$estacion->Poblacion}.", 'horario' => '24h', 'servicios' => ['Tienda', 'Lavado'], 'rating' => rand(40,50)/10];
-        return view('estacion-detalle', compact('estacion', 'extras'));
+        return view('estacion-detalle', compact('estacion'));
     } catch (\Exception $e) { return redirect('/'); }
 })->name('estacion.show');
+
+Route::post('/estacion/{codigo}/contacto', function (Request $request, $codigo) {
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'mensaje' => 'required|string',
+    ]);
+
+    ContactoMensaje::create([
+        'gasolinera_codigo' => $codigo,
+        'nombre' => $request->nombre,
+        'email' => $request->email,
+        'mensaje' => $request->mensaje,
+    ]);
+
+    return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+})->name('estacion.contacto');
 
 // --- SECCIÓN PRIVADA (BACKEND) ---
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -44,10 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ESTA ES LA RUTA QUE FALLABA:
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    });
+
 
     // Gestión de usuarios de la plataforma y del repositorio FTP
     Route::middleware('permission:manage-users')->group(function () {

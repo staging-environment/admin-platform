@@ -22,6 +22,8 @@ class FtpUserResource extends Resource
 
     protected static ?string $slug = 'ftp-management';
 
+
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     public static function form(Schema $schema): Schema
