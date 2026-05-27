@@ -26,9 +26,7 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value="/var/www/html/database/database_test.sqlite"/>
         <env name="DB_MARIADB_DRIVER" value="sqlite"/>
-        <env name="DB_FTP_DRIVER" value="sqlite"/>
         <env name="DB_MARIADB_DATABASE" value="/var/www/html/database/database_test.sqlite"/>
-        <env name="DB_FTP_DATABASE" value="/var/www/html/database/database_test.sqlite"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

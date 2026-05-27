@@ -26,12 +26,6 @@ corepack_enable: false
 
 default_container_networks:
   - ddev_default
-  - ddev-utrecar-ftp_default
-
-# MAPEADO DE CARPETAS DEL FTP (Para evitar el Permission Denied en Laravel)
-bind_mounts:
-  - host_path: /home/developer/Projects/utrecar-ftp/data
-    container_path: /home/ftpusers
 
 # Cambiamos phpMyAdmin del 8080 (que es el que falla) a otro
 phpmyadmin_port: "8038"

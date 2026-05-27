@@ -104,19 +104,6 @@ return [
             'strict' => false,
         ],
 
-        'mariadb_ftp' => [
-            'driver' => env('DB_FTP_DRIVER', 'mariadb'),
-            'host' => env('FTP_DB_HOST', 'db'),
-            'port' => env('FTP_DB_PORT', '3306'),
-            'database' => env('DB_FTP_DATABASE', env('FTP_DB_DATABASE', 'utrecar_ftp_db')),
-            'username' => env('FTP_DB_USERNAME', 'db'),
-            'password' => env('FTP_DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8mb4'),
-            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-        ],
     ],
 
     'migrations' => [

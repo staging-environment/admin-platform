@@ -1,2 +1,45 @@
 @tailwind components;
 @tailwind utilities;
+
+/* Ocultar el menú lateral (sidebar) y la barra superior (topbar) nativa de Filament */
+.fi-sidebar,
+.fi-topbar,
+.fi-sidebar-trigger,
+button.fi-topbar-trigger {
+    display: none !important;
+}
+
+/* Ajustar el contenedor principal de Filament para ocupar todo el ancho */
+.fi-main-ctn {
+    padding-inline-start: 0 !important;
+    margin-inline-start: 0 !important;
+}
+
+.fi-main {
+    width: 100% !important;
+    max-width: 80rem !important; /* max-w-7xl */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 3rem !important; /* py-12 */
+    padding-bottom: 3rem !important;
+}
+
+@media (min-width: 640px) {
+    .fi-main {
+        padding-left: 1.5rem !important; /* sm:px-6 */
+        padding-right: 1.5rem !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .fi-main {
+        padding-left: 2rem !important; /* lg:px-8 */
+        padding-right: 2rem !important;
+    }
+}
+
+.fi-layout {
+    min-height: 0 !important;
+}

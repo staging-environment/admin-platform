@@ -7,7 +7,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserManagementController;
-use App\Http\Controllers\FtpUserController; // <-- Importamos tu nuevo controlador
 use App\Http\Controllers\Api\DataQueryController;
 use App\Http\Controllers\Api\FilterController;
 use App\Models\ContactoMensaje;
@@ -88,16 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:manage-users')->group(function () {
         Route::resource('users', UserManagementController::class)->except(['show']);
 
-        // --- NUEVAS RUTAS PARA EL FTP ---
-        Route::get('/ftp-users', [FtpUserController::class, 'index'])->name('ftp.index');
-        Route::post('/ftp-users', [FtpUserController::class, 'store'])->name('ftp.store');
-        Route::delete('/ftp-users/{id}', [FtpUserController::class, 'destroy'])->name('ftp.destroy');
 
-        // Rutas de gestión de archivos dentro del panel
-        Route::get('/ftp-users/{username}', [FtpUserController::class, 'show'])->name('ftp.show');
-        Route::post('/ftp-users/{username}/upload', [FtpUserController::class, 'upload'])->name('ftp.upload');
-        Route::get('/ftp-users/{username}/download/{filename}', [FtpUserController::class, 'download'])->name('ftp.download');
-        Route::delete('/ftp-users/{username}/file/{filename}', [FtpUserController::class, 'deleteFile'])->name('ftp.deleteFile');
     });
 
     // Rutas de la API para el panel
