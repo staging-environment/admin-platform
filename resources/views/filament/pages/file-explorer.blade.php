@@ -32,6 +32,17 @@
                     </x-filament::input.wrapper>
                 </div>
 
+                {{-- Toggle Hidden Files Button --}}
+                <x-filament::button
+                    wire:click="$toggle('showHiddenFiles')"
+                    color="gray"
+                    size="sm"
+                    icon="{{ $showHiddenFiles ? 'heroicon-o-eye-slash' : 'heroicon-o-eye' }}"
+                    class="shrink-0"
+                >
+                    {{ $showHiddenFiles ? 'Ocultar ocultos' : 'Mostrar ocultos' }}
+                </x-filament::button>
+
                 {{-- Select All Button --}}
                 @if (!empty($items))
                     <x-filament::button

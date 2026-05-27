@@ -52,10 +52,10 @@ class FileExplorerTest extends TestCase
 
         Livewire::actingAs($user)
             ->test(FileExplorer::class)
-            ->assertSet('selectedDisk', 'public')
-            ->assertSet('viewMode', 'grid')
-            ->call('selectDisk', 'local')
             ->assertSet('selectedDisk', 'local')
+            ->assertSet('viewMode', 'grid')
+            ->call('selectDisk', 'public')
+            ->assertSet('selectedDisk', 'public')
             ->call('goToPath', 'test-folder')
             ->assertSet('currentPath', 'test-folder');
     }
@@ -130,6 +130,31 @@ class FileExplorerTest extends TestCase
         $this->assertFalse($disk->exists('folder-to-delete'));
         $this->assertFalse($disk->exists('test-file.txt'));
         $this->assertTrue($disk->exists('folder-to-keep'));
+    }
+
+    public function test_admin_can_toggle_hidden_files_visibility(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+
+        $disk = \Illuminate\Support\Facades\Storage::fake('public');
+        $disk->put('.gitignore', 'git content');
+        $disk->makeDirectory('livewire-tmp');
+        $disk->put('test-file.txt', 'visible content');
+
+        Livewire::actingAs($user)
+            ->test(FileExplorer::class)
+            ->set('selectedDisk', 'public')
+            ->assertSet('showHiddenFiles', false)
+            // Toggle showing hidden files
+            ->set('showHiddenFiles', true)
+            // Now it should have them in selection list when we select all
+            ->call('toggleSelectAll')
+            ->assertSet('selectedItems', [
+                'livewire-tmp|folder',
+                '.gitignore|file',
+                'test-file.txt|file',
+            ]);
     }
 }
 

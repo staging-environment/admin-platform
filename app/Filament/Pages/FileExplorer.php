@@ -22,14 +22,16 @@ class FileExplorer extends Page
 
     public string $currentPath = '';
     public string $search = '';
-    public string $selectedDisk = 'public';
+    public string $selectedDisk = 'local';
     public string $viewMode = 'grid';
     public array $selectedItems = [];
+    public bool $showHiddenFiles = false;
 
     protected $queryString = [
         'currentPath' => ['except' => ''],
-        'selectedDisk' => ['except' => 'public'],
+        'selectedDisk' => ['except' => 'local'],
         'viewMode' => ['except' => 'grid'],
+        'showHiddenFiles' => ['except' => false],
     ];
 
     public static function canAccess(): bool
@@ -58,8 +60,8 @@ class FileExplorer extends Page
     public function getDisks(): array
     {
         return [
-            'public' => 'Almacenamiento Público (Storage)',
             'local' => 'Almacenamiento Local (App)',
+            'public' => 'Almacenamiento Público (Storage)',
         ];
     }
 
@@ -121,6 +123,12 @@ class FileExplorer extends Page
             // Folders
             foreach ($directories as $dir) {
                 $name = basename($dir);
+                
+                // Hide system temporary folders from the explorer view unless configured to show
+                if (!$this->showHiddenFiles && $name === 'livewire-tmp') {
+                    continue;
+                }
+
                 if ($this->search && !Str::contains(strtolower($name), strtolower($this->search))) {
                     continue;
                 }
@@ -139,6 +147,12 @@ class FileExplorer extends Page
             // Files
             foreach ($files as $file) {
                 $name = basename($file);
+
+                // Hide hidden files/dotfiles (e.g. .gitignore) unless configured to show
+                if (!$this->showHiddenFiles && str_starts_with($name, '.')) {
+                    continue;
+                }
+
                 if ($this->search && !Str::contains(strtolower($name), strtolower($this->search))) {
                     continue;
                 }
