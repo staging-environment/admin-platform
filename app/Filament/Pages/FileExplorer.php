@@ -24,6 +24,7 @@ class FileExplorer extends Page
     public string $search = '';
     public string $selectedDisk = 'public';
     public string $viewMode = 'grid';
+    public array $selectedItems = [];
 
     protected $queryString = [
         'currentPath' => ['except' => ''],
@@ -68,6 +69,7 @@ class FileExplorer extends Page
             $this->selectedDisk = $disk;
             $this->currentPath = '';
             $this->search = '';
+            $this->selectedItems = [];
         }
     }
 
@@ -75,6 +77,7 @@ class FileExplorer extends Page
     {
         $this->currentPath = $this->sanitizePath($path);
         $this->search = '';
+        $this->selectedItems = [];
     }
 
     public function getExplorerBreadcrumbs(): array
@@ -300,6 +303,66 @@ class FileExplorer extends Page
                     Notification::make()->title('Error al eliminar')->body($e->getMessage())->danger()->send();
                 }
             });
+    }
+
+    public function deleteSelectedAction(): Action
+    {
+        return Action::make('deleteSelected')
+            ->label('Eliminar Seleccionados')
+            ->requiresConfirmation()
+            ->modalHeading('¿Eliminar elementos seleccionados?')
+            ->modalDescription('Esta acción es irreversible y eliminará todos los archivos/carpetas seleccionados.')
+            ->color('danger')
+            ->action(function () {
+                try {
+                    if (empty($this->selectedItems)) {
+                        return;
+                    }
+                    
+                    $disk = Storage::disk($this->selectedDisk);
+                    $deletedCount = 0;
+                    
+                    foreach ($this->selectedItems as $serialized) {
+                        $parts = explode('|', $serialized);
+                        if (count($parts) < 2) continue;
+                        
+                        $path = $this->sanitizePath($parts[0]);
+                        $type = $parts[1];
+                        
+                        if ($type === 'folder') {
+                            $disk->deleteDirectory($path);
+                        } else {
+                            $disk->delete($path);
+                        }
+                        $deletedCount++;
+                    }
+                    
+                    $this->selectedItems = [];
+                    Notification::make()->title("{$deletedCount} elementos eliminados correctamente")->success()->send();
+                } catch (\Exception $e) {
+                    Notification::make()->title('Error al eliminar')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
+
+    public function toggleSelectAll(): void
+    {
+        $items = $this->getItems();
+        $allItemsSerialized = collect($items)->map(fn($item) => $item['path'] . '|' . $item['type'])->toArray();
+
+        $allSelected = count($allItemsSerialized) > 0;
+        foreach ($allItemsSerialized as $serialized) {
+            if (!in_array($serialized, $this->selectedItems)) {
+                $allSelected = false;
+                break;
+            }
+        }
+
+        if ($allSelected) {
+            $this->selectedItems = array_values(array_diff($this->selectedItems, $allItemsSerialized));
+        } else {
+            $this->selectedItems = array_values(array_unique(array_merge($this->selectedItems, $allItemsSerialized)));
+        }
     }
 
     public function previewFileAction(): Action

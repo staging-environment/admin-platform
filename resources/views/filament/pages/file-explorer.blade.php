@@ -1,4 +1,9 @@
 <x-filament-panels::page>
+    @php
+        $items = $this->getItems();
+        $allItemsSerialized = collect($items)->map(fn($item) => $item['path'] . '|' . $item['type'])->toArray();
+        $allSelected = count($allItemsSerialized) > 0 && collect($allItemsSerialized)->every(fn($i) => in_array($i, $selectedItems));
+    @endphp
     <div class="space-y-6">
         {{-- Toolbar: Disk switcher, Search input, View selector --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -26,6 +31,19 @@
                         />
                     </x-filament::input.wrapper>
                 </div>
+
+                {{-- Select All Button --}}
+                @if (!empty($items))
+                    <x-filament::button
+                        wire:click="toggleSelectAll"
+                        color="gray"
+                        size="sm"
+                        icon="heroicon-o-check-circle"
+                        class="shrink-0"
+                    >
+                        {{ $allSelected ? 'Desmarcar todos' : 'Seleccionar todos' }}
+                    </x-filament::button>
+                @endif
 
                 {{-- View Mode Toggle --}}
                 <div class="flex items-center p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200/50 dark:border-white/10 shrink-0">
@@ -74,10 +92,34 @@
             </div>
         </div>
 
+        {{-- Bulk Actions Bar --}}
+        @if (count($selectedItems) > 0)
+            <div class="flex items-center justify-between p-3 bg-danger-50 dark:bg-danger-950/20 rounded-xl border border-danger-200/50 dark:border-danger-500/10 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-danger-700 dark:text-danger-400 font-mono">
+                        {{ count($selectedItems) }} {{ count($selectedItems) === 1 ? 'elemento seleccionado' : 'elementos seleccionados' }}
+                    </span>
+                    <button
+                        wire:click="$set('selectedItems', [])"
+                        class="text-[10px] font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
+                    >
+                        Desmarcar todos
+                    </button>
+                </div>
+                <div>
+                    <x-filament::button
+                        wire:click="mountAction('deleteSelected')"
+                        color="danger"
+                        size="sm"
+                        icon="heroicon-o-trash"
+                    >
+                        Eliminar seleccionados
+                    </x-filament::button>
+                </div>
+            </div>
+        @endif
+
         {{-- Items display container --}}
-        @php
-            $items = $this->getItems();
-        @endphp
 
         <div class="relative">
             @if (empty($items))
@@ -107,14 +149,28 @@
                     {{-- Grid View with modern card design and overlays --}}
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         @foreach ($items as $item)
+                            @php
+                                $itemSerialized = $item['path'] . '|' . $item['type'];
+                                $isSelected = in_array($itemSerialized, $selectedItems);
+                            @endphp
                             <div
-                                class="group relative flex flex-col items-center justify-between p-4 rounded-2xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-md hover:border-primary-500 dark:hover:border-primary-400/50 hover:bg-gray-50/50 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                                class="group relative flex flex-col items-center justify-between p-4 rounded-2xl {{ $isSelected ? 'bg-primary-500/5 dark:bg-primary-500/10 border-primary-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' }} shadow-sm hover:shadow-md hover:border-primary-500 dark:hover:border-primary-400/50 hover:bg-gray-50/50 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
                                 @if ($item['type'] === 'folder')
                                     wire:click="goToPath('{{ addslashes($item['path']) }}')"
                                 @else
                                     wire:click="mountAction('previewFile', { path: '{{ addslashes($item['path']) }}' })"
                                 @endif
                             >
+                                {{-- Checkbox Selection --}}
+                                <div class="absolute top-3 left-3 z-10 {{ $isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100' }} transition-opacity duration-200" onclick="event.stopPropagation();">
+                                    <input
+                                        type="checkbox"
+                                        wire:model.live="selectedItems"
+                                        value="{{ $itemSerialized }}"
+                                        class="rounded border-gray-300 dark:border-white/10 text-primary-600 shadow-sm focus:ring-primary-500 focus:ring-offset-0 dark:bg-white/5 dark:checked:bg-primary-500 w-4 h-4 cursor-pointer focus:ring-1 transition-all duration-150"
+                                    />
+                                </div>
+
                                 <div class="flex flex-col items-center text-center space-y-3 w-full">
                                     <div class="relative p-1 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors duration-200 w-16 h-16 flex items-center justify-center overflow-hidden border border-gray-200/50 dark:border-white/10 pointer-events-none">
                                         @if (isset($item['url']) && $item['url'])
@@ -174,6 +230,14 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <th class="p-4 w-12 text-center">
+                                        <input
+                                            type="checkbox"
+                                            wire:click="toggleSelectAll"
+                                            @if($allSelected) checked @endif
+                                            class="rounded border-gray-300 dark:border-white/10 text-primary-600 shadow-sm focus:ring-primary-500 focus:ring-offset-0 dark:bg-white/5 dark:checked:bg-primary-500 w-4 h-4 cursor-pointer focus:ring-1 transition-all duration-150"
+                                        />
+                                    </th>
                                     <th class="p-4">Nombre</th>
                                     <th class="p-4 hidden sm:table-cell">Última Modificación</th>
                                     <th class="p-4">Tamaño</th>
@@ -182,14 +246,26 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-white/10">
                                 @foreach ($items as $item)
+                                    @php
+                                        $itemSerialized = $item['path'] . '|' . $item['type'];
+                                        $isSelected = in_array($itemSerialized, $selectedItems);
+                                    @endphp
                                     <tr
-                                        class="hover:bg-gray-50/50 dark:hover:bg-white/10 transition-colors duration-150 text-sm cursor-pointer group"
+                                        class="{{ $isSelected ? 'bg-primary-500/5 dark:bg-primary-500/10' : '' }} hover:bg-gray-50/50 dark:hover:bg-white/10 transition-colors duration-150 text-sm cursor-pointer group"
                                         @if ($item['type'] === 'folder')
                                             wire:click="goToPath('{{ addslashes($item['path']) }}')"
                                         @else
                                             wire:click="mountAction('previewFile', { path: '{{ addslashes($item['path']) }}' })"
                                         @endif
                                     >
+                                        <td class="p-4 w-12 text-center" onclick="event.stopPropagation();">
+                                            <input
+                                                type="checkbox"
+                                                wire:model.live="selectedItems"
+                                                value="{{ $itemSerialized }}"
+                                                class="rounded border-gray-300 dark:border-white/10 text-primary-600 shadow-sm focus:ring-primary-500 focus:ring-offset-0 dark:bg-white/5 dark:checked:bg-primary-500 w-4 h-4 cursor-pointer focus:ring-1 transition-all duration-150"
+                                            />
+                                        </td>
                                         <td class="p-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
                                             @if (isset($item['url']) && $item['url'])
                                                 <div class="w-7 h-7 rounded bg-gray-50 dark:bg-white/5 overflow-hidden border border-gray-200/30 dark:border-white/5 shrink-0 flex items-center justify-center pointer-events-none">
