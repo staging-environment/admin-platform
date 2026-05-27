@@ -21,6 +21,41 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
 
+            @php
+                $unreadMessages = \App\Models\ContactoMensaje::with('gasolinera')->where('is_read', false)->orderBy('created_at', 'desc')->get();
+            @endphp
+            @if($unreadMessages->count() > 0)
+                <div class="flex flex-col gap-4">
+                    @foreach($unreadMessages as $msg)
+                        <div class="bg-red-600 rounded-lg p-3 shadow flex flex-col md:flex-row md:items-center justify-between text-white border border-red-700" style="background-color: #dc2626;">
+                            <div class="flex items-center gap-3 mb-3 md:mb-0">
+                                <div class="bg-white/20 p-1.5 rounded-full">
+                                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold uppercase tracking-wider text-white">
+                                        @if($msg->gasolinera)
+                                            ¡NUEVO MENSAJE PARA {{ $msg->gasolinera->Nombre }}!
+                                        @else
+                                            ¡NUEVO MENSAJE DE CONTACTO PRINCIPAL!
+                                        @endif
+                                    </h3>
+                                    <p class="text-xs text-red-100">
+                                        De: {{ $msg->nombre }} ({{ $msg->email }}) - Hace {{ str_replace('hace ', '', $msg->created_at->diffForHumans()) }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <a href="{{ url('/admin/contacto-mensajes/' . $msg->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-white text-red-600 rounded-md font-bold shadow hover:bg-gray-50 transition-all text-xs" style="color: #dc2626;">
+                                LEER MENSAJE
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">

@@ -14,6 +14,11 @@ class ContactoMensaje extends Model
         'nombre',
         'email',
         'mensaje',
+        'is_read',
+    ];
+
+    protected $casts = [
+        'is_read' => 'boolean',
     ];
 
     public function gasolinera()

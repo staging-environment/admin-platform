@@ -74,12 +74,12 @@
             </a>
             <div class="flex gap-3">
                 @auth
-                    @role('admin')
+                    @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_gasolineras') || auth()->user()->id === 1)
                     <a href="{{ url('/admin/gasolineras/' . $estacion->Codigo . '/edit') }}" class="text-xs font-bold glass-panel text-emerald-600 px-5 py-2.5 rounded-full hover:bg-emerald-50 transition-all shadow-lg flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         EDITAR
                     </a>
-                    @endrole
+                    @endif
                     <a href="{{ route('dashboard') }}" class="text-xs font-bold glass-panel text-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-50 transition-all shadow-lg flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         PANEL

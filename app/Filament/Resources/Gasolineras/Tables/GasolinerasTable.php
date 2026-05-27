@@ -53,7 +53,13 @@ class GasolinerasTable
                 //
             ])
             ->actions([
-                EditAction::make(),
+                \Filament\Actions\Action::make('view_public')
+                    ->label('Ver Web')
+                    ->icon('heroicon-o-globe-alt')
+                    ->color('info')
+                    ->url(fn (\App\Models\Gasolinera $record): string => url('/estacion/' . $record->Codigo))
+                    ->openUrlInNewTab(),
+                \Filament\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 // Deshabilitamos el borrado masivo por seguridad
