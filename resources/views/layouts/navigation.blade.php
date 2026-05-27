@@ -35,6 +35,9 @@
                                 </x-slot>
 
                                 <x-slot name="content">
+                                    <x-dropdown-link href="/admin/informes">
+                                        {{ __('Informes') }}
+                                    </x-dropdown-link>
                                     <x-dropdown-link href="/admin/gasolineras">
                                         {{ __('Gasolineras') }}
                                     </x-dropdown-link>
@@ -126,6 +129,9 @@
                         {{ __('Administración') }}
                     </div>
                     <div class="mt-2 space-y-1">
+                        <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
+                            {{ __('Informes') }}
+                        </x-responsive-nav-link>
                         <x-responsive-nav-link href="/admin/gasolineras" :active="request()->is('admin/gasolineras*')">
                             {{ __('Gasolineras') }}
                         </x-responsive-nav-link>
