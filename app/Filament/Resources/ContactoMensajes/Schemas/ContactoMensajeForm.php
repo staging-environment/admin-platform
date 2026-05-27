@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ContactoMensajes\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class ContactoMensajeForm
@@ -26,9 +25,6 @@ class ContactoMensajeForm
                     ->label('Mensaje')
                     ->disabled()
                     ->columnSpanFull(),
-                Toggle::make('is_read')
-                    ->label('Leído')
-                    ->disabled(),
             ]);
     }
 }

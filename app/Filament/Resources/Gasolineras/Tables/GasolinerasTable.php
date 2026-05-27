@@ -57,7 +57,7 @@ class GasolinerasTable
                     ->label('Ver Web')
                     ->icon('heroicon-o-globe-alt')
                     ->color('info')
-                    ->url(fn (\App\Models\Gasolinera $record): string => url('/estacion/' . $record->Codigo))
+                    ->url(fn (\App\Models\Gasolinera $record): string => url('/estacion/' . \Illuminate\Support\Str::slug($record->Nombre)))
                     ->openUrlInNewTab(),
                 \Filament\Actions\EditAction::make(),
             ])

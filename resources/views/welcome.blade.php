@@ -220,7 +220,7 @@
                             <!-- Details (Uses Custom Address and Displays Brand & Prices) -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <a href="{{ route('estacion.show', $gasolinera->Codigo) }}" class="hover:text-blue-600 transition-colors duration-300">
+                                    <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="hover:text-blue-600 transition-colors duration-300">
                                         <h3 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors duration-300 truncate">
                                             {{ $gasolinera->Nombre }}
                                         </h3>
@@ -259,7 +259,7 @@
 
                                 <!-- CTA Ficha Completa Button Directly Below Prices -->
                                 <div class="mb-4">
-                                    <a href="{{ route('estacion.show', $gasolinera->Codigo) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5 uppercase tracking-wider">
+                                    <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5 uppercase tracking-wider">
                                         Ver Ficha Completa
                                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>

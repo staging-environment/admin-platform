@@ -29,9 +29,17 @@ Route::get('/', function () {
     return view('welcome', compact('gasolineras', 'homeConfig'));
 });
 
-Route::get('/estacion/{codigo}', function ($codigo) {
+Route::get('/estacion/{slug}', function ($slug) {
     try {
-        $estacion = Gasolinera::with('contenido')->where('Codigo', $codigo)->firstOrFail();
+        $estacion = Gasolinera::with('contenido')->get()->first(function ($e) use ($slug) {
+            return \Illuminate\Support\Str::slug($e->Nombre) === $slug || $e->Codigo == $slug;
+        });
+        
+        if (!$estacion) {
+            return redirect('/');
+        }
+        
+        $codigo = $estacion->Codigo;
         $estacion->diesel = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '1')->value('PVP');
         $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $codigo)->where('CodigoProducto', '2')->value('PVP');
         $homeConfig = \App\Models\HomeConfig::find(1);
@@ -39,7 +47,14 @@ Route::get('/estacion/{codigo}', function ($codigo) {
     } catch (\Exception $e) { return redirect('/'); }
 })->name('estacion.show');
 
-Route::post('/estacion/{codigo}/contacto', function (Request $request, $codigo) {
+Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
+    $estacion = Gasolinera::get()->first(function ($e) use ($slug) {
+        return \Illuminate\Support\Str::slug($e->Nombre) === $slug || $e->Codigo == $slug;
+    });
+    
+    if (!$estacion) abort(404);
+    
+    $codigo = $estacion->Codigo;
     $request->validate([
         'nombre' => 'required|string|max:255',
         'email' => 'required|email|max:255',

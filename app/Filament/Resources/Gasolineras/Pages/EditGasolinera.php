@@ -17,7 +17,7 @@ class EditGasolinera extends EditRecord
                 ->label('Visitar zona pública')
                 ->icon('heroicon-o-globe-alt')
                 ->color('info')
-                ->url(fn () => url('/estacion/' . $this->getRecord()->Codigo))
+                ->url(fn () => url('/estacion/' . \Illuminate\Support\Str::slug($this->getRecord()->Nombre)))
                 ->openUrlInNewTab(),
         ];
     }
