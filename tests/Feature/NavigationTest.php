@@ -24,7 +24,7 @@ class NavigationTest extends TestCase
 
     public function test_guest_cannot_see_administration_menu(): void
     {
-        $response = $this->get('/dashboard');
+        $response = $this->get('/admin/dashboard');
         $response->assertRedirect('/login');
     }
 
@@ -32,7 +32,7 @@ class NavigationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        $response = $this->actingAs($user)->get('/admin/dashboard');
         $response->assertSuccessful();
         $response->assertDontSee(__('Administración'));
         $response->assertDontSee('/admin/gasolineras');
@@ -45,7 +45,7 @@ class NavigationTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('Admin');
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        $response = $this->actingAs($user)->get('/admin/dashboard');
         $response->assertSuccessful();
         $response->assertSee(__('Administración'));
         $response->assertSee('/admin/gasolineras');

@@ -17,7 +17,7 @@ class ListGasolineras extends ListRecords
                 ->label('Volver al Dashboard')
                 ->color('gray')
                 ->icon('heroicon-m-arrow-left')
-                ->url('/dashboard'),
+                ->url(route('dashboard')),
         ];
     }
 }

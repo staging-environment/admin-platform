@@ -37,7 +37,7 @@ class PermissionMatrix extends Page
                 ->color('gray')
                 ->icon('heroicon-m-arrow-left')
                 // Apunta directamente a la ruta raíz de tu dashboard
-                ->url('/dashboard'),
+                ->url(route('dashboard')),
         ];
     }
 
