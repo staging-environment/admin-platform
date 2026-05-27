@@ -6,6 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Filament\\Pages\\FileExplorer' => $baseDir . '/app/Filament/Pages/FileExplorer.php',
+    'App\\Filament\\Pages\\ManageHome' => $baseDir . '/app/Filament/Pages/ManageHome.php',
     'App\\Filament\\Pages\\PermissionMatrix' => $baseDir . '/app/Filament/Pages/PermissionMatrix.php',
     'App\\Filament\\Resources\\FtpUsers\\FtpUserResource' => $baseDir . '/app/Filament/Resources/FtpUsers/FtpUserResource.php',
     'App\\Filament\\Resources\\FtpUsers\\Pages\\CreateFtpUser' => $baseDir . '/app/Filament/Resources/FtpUsers/Pages/CreateFtpUser.php',
@@ -37,6 +39,7 @@ return array(
     'App\\Filament\\Resources\\Users\\Schemas\\UserForm' => $baseDir . '/app/Filament/Resources/Users/Schemas/UserForm.php',
     'App\\Filament\\Resources\\Users\\Tables\\UsersTable' => $baseDir . '/app/Filament/Resources/Users/Tables/UsersTable.php',
     'App\\Filament\\Resources\\Users\\UserResource' => $baseDir . '/app/Filament/Resources/Users/UserResource.php',
+    'App\\Filament\\Widgets\\BeneficiosChart' => $baseDir . '/app/Filament/Widgets/BeneficiosChart.php',
     'App\\Http\\Controllers\\Api\\DataQueryController' => $baseDir . '/app/Http/Controllers/Api/DataQueryController.php',
     'App\\Http\\Controllers\\Api\\FilterController' => $baseDir . '/app/Http/Controllers/Api/FilterController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
@@ -62,6 +65,7 @@ return array(
     'App\\Models\\FtpUser' => $baseDir . '/app/Models/FtpUser.php',
     'App\\Models\\Gasolinera' => $baseDir . '/app/Models/Gasolinera.php',
     'App\\Models\\GasolineraContenido' => $baseDir . '/app/Models/GasolineraContenido.php',
+    'App\\Models\\HomeConfig' => $baseDir . '/app/Models/HomeConfig.php',
     'App\\Models\\PreciosProducto' => $baseDir . '/app/Models/PreciosProducto.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
@@ -8464,6 +8468,7 @@ return array(
     'Tests\\Feature\\Auth\\PasswordUpdateTest' => $baseDir . '/tests/Feature/Auth/PasswordUpdateTest.php',
     'Tests\\Feature\\Auth\\RegistrationTest' => $baseDir . '/tests/Feature/Auth/RegistrationTest.php',
     'Tests\\Feature\\ExampleTest' => $baseDir . '/tests/Feature/ExampleTest.php',
+    'Tests\\Feature\\FileExplorerTest' => $baseDir . '/tests/Feature/FileExplorerTest.php',
     'Tests\\Feature\\ProfileTest' => $baseDir . '/tests/Feature/ProfileTest.php',
     'Tests\\TestCase' => $baseDir . '/tests/TestCase.php',
     'Tests\\Unit\\ExampleTest' => $baseDir . '/tests/Unit/ExampleTest.php',

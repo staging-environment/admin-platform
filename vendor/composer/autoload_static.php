@@ -744,6 +744,8 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
     );
 
     public static $classMap = array (
+        'App\\Filament\\Pages\\FileExplorer' => __DIR__ . '/../..' . '/app/Filament/Pages/FileExplorer.php',
+        'App\\Filament\\Pages\\ManageHome' => __DIR__ . '/../..' . '/app/Filament/Pages/ManageHome.php',
         'App\\Filament\\Pages\\PermissionMatrix' => __DIR__ . '/../..' . '/app/Filament/Pages/PermissionMatrix.php',
         'App\\Filament\\Resources\\FtpUsers\\FtpUserResource' => __DIR__ . '/../..' . '/app/Filament/Resources/FtpUsers/FtpUserResource.php',
         'App\\Filament\\Resources\\FtpUsers\\Pages\\CreateFtpUser' => __DIR__ . '/../..' . '/app/Filament/Resources/FtpUsers/Pages/CreateFtpUser.php',
@@ -775,6 +777,7 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
         'App\\Filament\\Resources\\Users\\Schemas\\UserForm' => __DIR__ . '/../..' . '/app/Filament/Resources/Users/Schemas/UserForm.php',
         'App\\Filament\\Resources\\Users\\Tables\\UsersTable' => __DIR__ . '/../..' . '/app/Filament/Resources/Users/Tables/UsersTable.php',
         'App\\Filament\\Resources\\Users\\UserResource' => __DIR__ . '/../..' . '/app/Filament/Resources/Users/UserResource.php',
+        'App\\Filament\\Widgets\\BeneficiosChart' => __DIR__ . '/../..' . '/app/Filament/Widgets/BeneficiosChart.php',
         'App\\Http\\Controllers\\Api\\DataQueryController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/DataQueryController.php',
         'App\\Http\\Controllers\\Api\\FilterController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/FilterController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
@@ -800,6 +803,7 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
         'App\\Models\\FtpUser' => __DIR__ . '/../..' . '/app/Models/FtpUser.php',
         'App\\Models\\Gasolinera' => __DIR__ . '/../..' . '/app/Models/Gasolinera.php',
         'App\\Models\\GasolineraContenido' => __DIR__ . '/../..' . '/app/Models/GasolineraContenido.php',
+        'App\\Models\\HomeConfig' => __DIR__ . '/../..' . '/app/Models/HomeConfig.php',
         'App\\Models\\PreciosProducto' => __DIR__ . '/../..' . '/app/Models/PreciosProducto.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
@@ -9202,6 +9206,7 @@ class ComposerStaticInitc57754c93ae34ac3b9b716a0fd2f2149
         'Tests\\Feature\\Auth\\PasswordUpdateTest' => __DIR__ . '/../..' . '/tests/Feature/Auth/PasswordUpdateTest.php',
         'Tests\\Feature\\Auth\\RegistrationTest' => __DIR__ . '/../..' . '/tests/Feature/Auth/RegistrationTest.php',
         'Tests\\Feature\\ExampleTest' => __DIR__ . '/../..' . '/tests/Feature/ExampleTest.php',
+        'Tests\\Feature\\FileExplorerTest' => __DIR__ . '/../..' . '/tests/Feature/FileExplorerTest.php',
         'Tests\\Feature\\ProfileTest' => __DIR__ . '/../..' . '/tests/Feature/ProfileTest.php',
         'Tests\\TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
         'Tests\\Unit\\ExampleTest' => __DIR__ . '/../..' . '/tests/Unit/ExampleTest.php',

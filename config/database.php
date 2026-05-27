@@ -34,11 +34,11 @@ return [
         ],
 
         'mariadb' => [
-            'driver' => 'mariadb',
+            'driver' => env('DB_MARIADB_DRIVER', 'mariadb'),
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            'database' => env('DB_MARIADB_DATABASE', env('DB_DATABASE', 'laravel')),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
@@ -105,10 +105,10 @@ return [
         ],
 
         'mariadb_ftp' => [
-            'driver' => 'mariadb',
+            'driver' => env('DB_FTP_DRIVER', 'mariadb'),
             'host' => env('FTP_DB_HOST', 'db'),
             'port' => env('FTP_DB_PORT', '3306'),
-            'database' => env('FTP_DB_DATABASE', 'utrecar_ftp_db'),
+            'database' => env('DB_FTP_DATABASE', env('FTP_DB_DATABASE', 'utrecar_ftp_db')),
             'username' => env('FTP_DB_USERNAME', 'db'),
             'password' => env('FTP_DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
