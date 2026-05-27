@@ -20,6 +20,14 @@ class FileExplorer extends Page
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '#' => 'Administración de la plataforma',
+            static::getNavigationLabel(),
+        ];
+    }
+
     public string $currentPath = '';
     public string $search = '';
     public string $selectedDisk = 'local';
@@ -57,10 +65,33 @@ class FileExplorer extends Page
         return $path;
     }
 
+    protected function getPhysicalPath(string $virtualPath): string
+    {
+        $virtualPath = $this->sanitizePath($virtualPath);
+        if ($this->selectedDisk === 'personal') {
+            $userId = auth()->id() ?? 'guest';
+            return trim("users/{$userId}/{$virtualPath}", '/');
+        }
+        return $virtualPath;
+    }
+
+    protected function getVirtualPath(string $physicalPath): string
+    {
+        if ($this->selectedDisk === 'personal') {
+            $userId = auth()->id() ?? 'guest';
+            $prefix = "users/{$userId}";
+            if (str_starts_with($physicalPath, $prefix)) {
+                return trim(substr($physicalPath, strlen($prefix)), '/');
+            }
+        }
+        return $physicalPath;
+    }
+
     public function getDisks(): array
     {
         return [
             'local' => 'Almacenamiento Local (App)',
+            'personal' => 'Mis Archivos (Personal)',
             'public' => 'Almacenamiento Público (Storage)',
         ];
     }
@@ -109,15 +140,16 @@ class FileExplorer extends Page
     public function getItems(): array
     {
         try {
-            $disk = Storage::disk($this->selectedDisk);
+            $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+            $physicalCurrentPath = $this->getPhysicalPath($this->currentPath);
             
             // Ensure path exists
-            if (!$disk->exists($this->currentPath)) {
-                $disk->makeDirectory($this->currentPath);
+            if (!$disk->exists($physicalCurrentPath)) {
+                $disk->makeDirectory($physicalCurrentPath);
             }
 
-            $directories = $disk->directories($this->currentPath);
-            $files = $disk->files($this->currentPath);
+            $directories = $disk->directories($physicalCurrentPath);
+            $files = $disk->files($physicalCurrentPath);
             $items = [];
 
             // Folders
@@ -129,13 +161,18 @@ class FileExplorer extends Page
                     continue;
                 }
 
+                // Hide the 'users' directory from the root of the 'local' disk
+                if ($this->selectedDisk === 'local' && $this->currentPath === '' && $name === 'users') {
+                    continue;
+                }
+
                 if ($this->search && !Str::contains(strtolower($name), strtolower($this->search))) {
                     continue;
                 }
 
                 $items[] = [
                     'name' => $name,
-                    'path' => $dir,
+                    'path' => $this->getVirtualPath($dir),
                     'type' => 'folder',
                     'size' => '--',
                     'last_modified' => date('d/m/Y H:i', $disk->lastModified($dir)),
@@ -179,7 +216,7 @@ class FileExplorer extends Page
 
                 $items[] = [
                     'name' => $name,
-                    'path' => $file,
+                    'path' => $this->getVirtualPath($file),
                     'type' => 'file',
                     'size' => $this->formatSize($disk->size($file)),
                     'last_modified' => date('d/m/Y H:i', $disk->lastModified($file)),
@@ -233,14 +270,15 @@ class FileExplorer extends Page
     {
         try {
             $path = $this->sanitizePath($path);
-            $disk = Storage::disk($this->selectedDisk);
+            $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+            $physicalPath = $this->getPhysicalPath($path);
             
-            if (!$disk->exists($path)) {
+            if (!$disk->exists($physicalPath)) {
                 Notification::make()->title('El archivo no existe')->danger()->send();
                 return null;
             }
 
-            return $disk->download($path);
+            return $disk->download($physicalPath);
         } catch (\Exception $e) {
             Notification::make()->title('Error al descargar el archivo')->body($e->getMessage())->danger()->send();
             return null;
@@ -263,14 +301,15 @@ class FileExplorer extends Page
                 ->action(function (array $data) {
                     try {
                         $newPath = trim($this->currentPath . '/' . $data['folderName'], '/');
-                        $disk = Storage::disk($this->selectedDisk);
+                        $physicalNewPath = $this->getPhysicalPath($newPath);
+                        $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
                         
-                        if ($disk->exists($newPath)) {
+                        if ($disk->exists($physicalNewPath)) {
                             Notification::make()->title('La carpeta ya existe')->danger()->send();
                             return;
                         }
                         
-                        $disk->makeDirectory($newPath);
+                        $disk->makeDirectory($physicalNewPath);
                         Notification::make()->title('Carpeta creada correctamente')->success()->send();
                     } catch (\Exception $e) {
                         Notification::make()->title('Error al crear carpeta')->body($e->getMessage())->danger()->send();
@@ -285,8 +324,8 @@ class FileExplorer extends Page
                         ->label('Seleccionar Archivos')
                         ->multiple()
                         ->required()
-                        ->disk(fn() => $this->selectedDisk)
-                        ->directory(fn() => $this->currentPath ?: '/')
+                        ->disk(fn() => $this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk)
+                        ->directory(fn() => $this->getPhysicalPath($this->currentPath) ?: '/')
                         ->preserveFilenames()
                 ])
                 ->action(function (array $data) {
@@ -304,12 +343,13 @@ class FileExplorer extends Page
                 try {
                     $path = $this->sanitizePath($arguments['path']);
                     $type = $arguments['type'];
-                    $disk = Storage::disk($this->selectedDisk);
+                    $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+                    $physicalPath = $this->getPhysicalPath($path);
                     
                     if ($type === 'folder') {
-                        $disk->deleteDirectory($path);
+                        $disk->deleteDirectory($physicalPath);
                     } else {
-                        $disk->delete($path);
+                        $disk->delete($physicalPath);
                     }
                     
                     Notification::make()->title('Eliminado correctamente')->success()->send();
@@ -333,7 +373,7 @@ class FileExplorer extends Page
                         return;
                     }
                     
-                    $disk = Storage::disk($this->selectedDisk);
+                    $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
                     $deletedCount = 0;
                     
                     foreach ($this->selectedItems as $serialized) {
@@ -342,11 +382,12 @@ class FileExplorer extends Page
                         
                         $path = $this->sanitizePath($parts[0]);
                         $type = $parts[1];
+                        $physicalPath = $this->getPhysicalPath($path);
                         
                         if ($type === 'folder') {
-                            $disk->deleteDirectory($path);
+                            $disk->deleteDirectory($physicalPath);
                         } else {
-                            $disk->delete($path);
+                            $disk->delete($physicalPath);
                         }
                         $deletedCount++;
                     }
@@ -386,8 +427,9 @@ class FileExplorer extends Page
             ->modalContent(function (array $arguments) {
                 try {
                     $path = $this->sanitizePath($arguments['path']);
-                    $disk = Storage::disk($this->selectedDisk);
-                    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                    $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+                    $physicalPath = $this->getPhysicalPath($path);
+                    $extension = strtolower(pathinfo($physicalPath, PATHINFO_EXTENSION));
                     
                     $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']);
                     $isPdf = $extension === 'pdf';
@@ -395,26 +437,26 @@ class FileExplorer extends Page
                     $canReadText = in_array($extension, ['txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'php', 'log']);
                     $textContent = null;
                     
-                    if ($canReadText && $disk->size($path) < 1024 * 1024) { // Max 1MB
-                        $textContent = $disk->get($path);
+                    if ($canReadText && $disk->size($physicalPath) < 1024 * 1024) { // Max 1MB
+                        $textContent = $disk->get($physicalPath);
                     }
                     
                     $url = null;
                     if ($this->selectedDisk === 'public') {
-                        $url = Storage::disk('public')->url($path);
+                        $url = Storage::disk('public')->url($physicalPath);
                     } else {
-                        if ($isImage && $disk->size($path) < 10 * 1024 * 1024) {
-                            $fileData = $disk->get($path);
+                        if ($isImage && $disk->size($physicalPath) < 10 * 1024 * 1024) {
+                            $fileData = $disk->get($physicalPath);
                             $mime = ($extension === 'svg') ? 'image/svg+xml' : 'image/' . $extension;
                             $url = 'data:' . $mime . ';base64,' . base64_encode($fileData);
-                        } elseif ($isPdf && $disk->size($path) < 5 * 1024 * 1024) {
-                            $fileData = $disk->get($path);
+                        } elseif ($isPdf && $disk->size($physicalPath) < 5 * 1024 * 1024) {
+                            $fileData = $disk->get($physicalPath);
                             $url = 'data:application/pdf;base64,' . base64_encode($fileData);
                         }
                     }
 
                     return view('filament.pages.file-preview', [
-                        'name' => basename($path),
+                        'name' => basename($physicalPath),
                         'path' => $path,
                         'url' => $url,
                         'isImage' => $isImage,
@@ -422,8 +464,8 @@ class FileExplorer extends Page
                         'canReadText' => $canReadText,
                         'textContent' => $textContent,
                         'extension' => $extension,
-                        'size' => $this->formatSize($disk->size($path)),
-                        'last_modified' => date('d/m/Y H:i', $disk->lastModified($path)),
+                        'size' => $this->formatSize($disk->size($physicalPath)),
+                        'last_modified' => date('d/m/Y H:i', $disk->lastModified($physicalPath)),
                     ]);
                 } catch (\Exception $e) {
                     return view('filament.pages.file-preview-error', ['error' => $e->getMessage()]);

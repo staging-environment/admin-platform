@@ -34,6 +34,14 @@ class ManageHome extends Page implements HasForms, HasTable
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '#' => 'Administración de la plataforma',
+            static::getNavigationLabel(),
+        ];
+    }
+
     public ?array $data = [];
 
     public function mount(): void

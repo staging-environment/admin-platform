@@ -18,6 +18,16 @@ class PermissionMatrix extends Page
     protected static ?string $navigationLabel = 'Permisos';
     protected static ?string $title = 'Matriz de Permisos';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '#' => 'Administración de la plataforma',
+            static::getNavigationLabel(),
+        ];
+    }
+
     /**
      * Asegura el ancho completo en pantallas grandes
      */

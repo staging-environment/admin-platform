@@ -43,3 +43,8 @@ button.fi-topbar-trigger {
 .fi-layout {
     min-height: 0 !important;
 }
+
+/* Forzar la visibilidad de las migas de pan (breadcrumbs) en la cabecera en todos los tamaños de pantalla */
+.fi-header .fi-breadcrumbs {
+    display: block !important;
+}

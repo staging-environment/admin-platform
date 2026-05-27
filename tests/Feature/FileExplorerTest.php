@@ -156,5 +156,41 @@ class FileExplorerTest extends TestCase
                 'test-file.txt|file',
             ]);
     }
+
+    public function test_user_personal_storage_isolation(): void
+    {
+        $userA = User::factory()->create();
+        $userA->assignRole('admin');
+        
+        $userB = User::factory()->create();
+        $userB->assignRole('admin');
+
+        $disk = \Illuminate\Support\Facades\Storage::fake('local');
+        
+        // Write file inside userA's scoped folder: users/{userA_id}/file-a.txt
+        $disk->put("users/{$userA->id}/file-a.txt", 'content A');
+        // Write file inside userB's scoped folder: users/{userB_id}/file-b.txt
+        $disk->put("users/{$userB->id}/file-b.txt", 'content B');
+
+        // Test User A view
+        Livewire::actingAs($userA)
+            ->test(FileExplorer::class)
+            ->set('selectedDisk', 'personal')
+            ->call('toggleSelectAll')
+            // User A should see only their file (virtual path)
+            ->assertSet('selectedItems', [
+                'file-a.txt|file',
+            ]);
+
+        // Test User B view
+        Livewire::actingAs($userB)
+            ->test(FileExplorer::class)
+            ->set('selectedDisk', 'personal')
+            ->call('toggleSelectAll')
+            // User B should see only their file (virtual path)
+            ->assertSet('selectedItems', [
+                'file-b.txt|file',
+            ]);
+    }
 }
 

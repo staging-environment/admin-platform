@@ -62,4 +62,4 @@
             </table>
         </div>
     </x-filament::section>
-</x-filament-panels::page>s
+</x-filament-panels::page>
