@@ -116,8 +116,12 @@
                                 @endif
                             >
                                 <div class="flex flex-col items-center text-center space-y-3 w-full">
-                                    <div class="relative p-3.5 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors duration-200">
-                                        <x-dynamic-component :component="$item['icon']" class="w-10 h-10 {{ $item['color'] }}" />
+                                    <div class="relative p-1 rounded-xl bg-gray-50 dark:bg-white/5 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/20 transition-colors duration-200 w-16 h-16 flex items-center justify-center overflow-hidden border border-gray-200/50 dark:border-white/10 pointer-events-none">
+                                        @if (isset($item['url']) && $item['url'])
+                                            <img src="{{ $item['url'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover rounded-lg shadow-sm" />
+                                        @else
+                                            <x-dynamic-component :component="$item['icon']" class="w-10 h-10 {{ $item['color'] }}" />
+                                        @endif
                                     </div>
 
                                     <div class="w-full space-y-0.5">
@@ -187,7 +191,13 @@
                                         @endif
                                     >
                                         <td class="p-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
-                                            <x-dynamic-component :component="$item['icon']" class="w-5 h-5 {{ $item['color'] }} shrink-0" />
+                                            @if (isset($item['url']) && $item['url'])
+                                                <div class="w-7 h-7 rounded bg-gray-50 dark:bg-white/5 overflow-hidden border border-gray-200/30 dark:border-white/5 shrink-0 flex items-center justify-center pointer-events-none">
+                                                    <img src="{{ $item['url'] }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover" />
+                                                </div>
+                                            @else
+                                                <x-dynamic-component :component="$item['icon']" class="w-5 h-5 {{ $item['color'] }} shrink-0 pointer-events-none" />
+                                            @endif
                                             <span class="truncate max-w-[200px] sm:max-w-md group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" title="{{ $item['name'] }}">
                                                 {{ $item['name'] }}
                                             </span>
@@ -238,4 +248,6 @@
             @endif
         </div>
     </div>
+
+    <x-filament-actions::modals />
 </x-filament-panels::page>

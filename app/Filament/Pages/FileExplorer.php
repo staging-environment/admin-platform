@@ -142,6 +142,23 @@ class FileExplorer extends Page
 
                 $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                 [$icon, $color] = $this->getFileIconAndColor($extension);
+                
+                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']);
+                $url = null;
+
+                if ($isImage) {
+                    if ($this->selectedDisk === 'public') {
+                        $url = Storage::disk('public')->url($file);
+                    } elseif ($disk->size($file) < 500 * 1024) { // Max 500KB for private thumbnails to keep list load fast
+                        try {
+                            $fileData = $disk->get($file);
+                            $mime = ($extension === 'svg') ? 'image/svg+xml' : 'image/' . $extension;
+                            $url = 'data:' . $mime . ';base64,' . base64_encode($fileData);
+                        } catch (\Exception $e) {
+                            $url = null;
+                        }
+                    }
+                }
 
                 $items[] = [
                     'name' => $name,
@@ -152,6 +169,7 @@ class FileExplorer extends Page
                     'extension' => $extension,
                     'icon' => $icon,
                     'color' => $color,
+                    'url' => $url,
                 ];
             }
 
@@ -260,80 +278,81 @@ class FileExplorer extends Page
         ];
     }
 
-    protected function getActions(): array
+    public function deleteItemAction(): Action
     {
-        return [
-            Action::make('deleteItem')
-                ->label('Eliminar')
-                ->requiresConfirmation()
-                ->action(function (array $arguments) {
-                    try {
-                        $path = $this->sanitizePath($arguments['path']);
-                        $type = $arguments['type'];
-                        $disk = Storage::disk($this->selectedDisk);
-                        
-                        if ($type === 'folder') {
-                            $disk->deleteDirectory($path);
-                        } else {
-                            $disk->delete($path);
-                        }
-                        
-                        Notification::make()->title('Eliminado correctamente')->success()->send();
-                    } catch (\Exception $e) {
-                        Notification::make()->title('Error al eliminar')->body($e->getMessage())->danger()->send();
+        return Action::make('deleteItem')
+            ->label('Eliminar')
+            ->requiresConfirmation()
+            ->action(function (array $arguments) {
+                try {
+                    $path = $this->sanitizePath($arguments['path']);
+                    $type = $arguments['type'];
+                    $disk = Storage::disk($this->selectedDisk);
+                    
+                    if ($type === 'folder') {
+                        $disk->deleteDirectory($path);
+                    } else {
+                        $disk->delete($path);
                     }
-                }),
+                    
+                    Notification::make()->title('Eliminado correctamente')->success()->send();
+                } catch (\Exception $e) {
+                    Notification::make()->title('Error al eliminar')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
 
-            Action::make('previewFile')
-                ->label('Previsualizar')
-                ->modalContent(function (array $arguments) {
-                    try {
-                        $path = $this->sanitizePath($arguments['path']);
-                        $disk = Storage::disk($this->selectedDisk);
-                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                        
-                        $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']);
-                        $isPdf = $extension === 'pdf';
-                        
-                        $canReadText = in_array($extension, ['txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'php', 'log']);
-                        $textContent = null;
-                        
-                        if ($canReadText && $disk->size($path) < 1024 * 1024) { // Max 1MB
-                            $textContent = $disk->get($path);
-                        }
-                        
-                        $url = null;
-                        if ($this->selectedDisk === 'public') {
-                            $url = Storage::disk('public')->url($path);
-                        } else {
-                            if ($isImage && $disk->size($path) < 10 * 1024 * 1024) {
-                                $fileData = $disk->get($path);
-                                $mime = ($extension === 'svg') ? 'image/svg+xml' : 'image/' . $extension;
-                                $url = 'data:' . $mime . ';base64,' . base64_encode($fileData);
-                            } elseif ($isPdf && $disk->size($path) < 5 * 1024 * 1024) {
-                                $fileData = $disk->get($path);
-                                $url = 'data:application/pdf;base64,' . base64_encode($fileData);
-                            }
-                        }
-
-                        return view('filament.pages.file-preview', [
-                            'name' => basename($path),
-                            'path' => $path,
-                            'url' => $url,
-                            'isImage' => $isImage,
-                            'isPdf' => $isPdf,
-                            'canReadText' => $canReadText,
-                            'textContent' => $textContent,
-                            'extension' => $extension,
-                            'size' => $this->formatSize($disk->size($path)),
-                            'last_modified' => date('d/m/Y H:i', $disk->lastModified($path)),
-                        ]);
-                    } catch (\Exception $e) {
-                        return view('filament.pages.file-preview-error', ['error' => $e->getMessage()]);
+    public function previewFileAction(): Action
+    {
+        return Action::make('previewFile')
+            ->label('Previsualizar')
+            ->modalContent(function (array $arguments) {
+                try {
+                    $path = $this->sanitizePath($arguments['path']);
+                    $disk = Storage::disk($this->selectedDisk);
+                    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                    
+                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']);
+                    $isPdf = $extension === 'pdf';
+                    
+                    $canReadText = in_array($extension, ['txt', 'md', 'json', 'xml', 'html', 'css', 'js', 'php', 'log']);
+                    $textContent = null;
+                    
+                    if ($canReadText && $disk->size($path) < 1024 * 1024) { // Max 1MB
+                        $textContent = $disk->get($path);
                     }
-                })
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Cerrar'),
-        ];
+                    
+                    $url = null;
+                    if ($this->selectedDisk === 'public') {
+                        $url = Storage::disk('public')->url($path);
+                    } else {
+                        if ($isImage && $disk->size($path) < 10 * 1024 * 1024) {
+                            $fileData = $disk->get($path);
+                            $mime = ($extension === 'svg') ? 'image/svg+xml' : 'image/' . $extension;
+                            $url = 'data:' . $mime . ';base64,' . base64_encode($fileData);
+                        } elseif ($isPdf && $disk->size($path) < 5 * 1024 * 1024) {
+                            $fileData = $disk->get($path);
+                            $url = 'data:application/pdf;base64,' . base64_encode($fileData);
+                        }
+                    }
+
+                    return view('filament.pages.file-preview', [
+                        'name' => basename($path),
+                        'path' => $path,
+                        'url' => $url,
+                        'isImage' => $isImage,
+                        'isPdf' => $isPdf,
+                        'canReadText' => $canReadText,
+                        'textContent' => $textContent,
+                        'extension' => $extension,
+                        'size' => $this->formatSize($disk->size($path)),
+                        'last_modified' => date('d/m/Y H:i', $disk->lastModified($path)),
+                    ]);
+                } catch (\Exception $e) {
+                    return view('filament.pages.file-preview-error', ['error' => $e->getMessage()]);
+                }
+            })
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Cerrar');
     }
 }
