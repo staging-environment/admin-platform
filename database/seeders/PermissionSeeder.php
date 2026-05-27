@@ -17,48 +17,46 @@ class PermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()['cache']->forget('spatie.permission.cache');
 
+        // Clean out old permissions and roles completely
+        \Illuminate\Support\Facades\DB::table('model_has_permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('model_has_roles')->delete();
+        \Illuminate\Support\Facades\DB::table('role_has_permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('roles')->delete();
+
         // Crear permisos
         $permissions = [
-            'view-dashboard',
-            'view-reports',
-            'create-filter',
-            'edit-filter',
-            'delete-filter',
-            'view-all-data',
-            'export-data',
-            'manage-users',
-            'manage-roles',
+            'ver_dashboard',
+            'gestion_usuarios_roles',
+            'utilizar_explorador',
+            'ver_informes',
+            'gestion_gasolineras',
+            'gestion_portada',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission);
+            Permission::create(['name' => $permission]);
         }
 
         // Crear roles
-        $adminRole = Role::findOrCreate('Admin');
-        $managerRole = Role::findOrCreate('Manager');
-        $userRole = Role::findOrCreate('User');
+        $adminRole = Role::create(['name' => 'Admin']);
+        $gestorRole = Role::create(['name' => 'Gestor']);
 
         // Asignar permisos a roles
+        // Admin gets everything
         $adminRole->syncPermissions(Permission::all());
 
-        $managerRole->syncPermissions([
-            'view-dashboard',
-            'view-reports',
-            'create-filter',
-            'edit-filter',
-            'delete-filter',
-            'view-all-data',
-            'export-data',
+        // Gestor gets a subset by default (can be customized in the UI later)
+        $gestorRole->syncPermissions([
+            'ver_dashboard',
+            'ver_informes',
         ]);
-
-        $userRole->syncPermissions([
-            'view-dashboard',
-            'view-reports',
-            'create-filter',
-            'edit-filter',
-            'delete-filter',
-        ]);
+        
+        // Re-assign 'Admin' role to the first user if exists to not lock us out
+        $firstUser = \App\Models\User::first();
+        if ($firstUser) {
+            $firstUser->assignRole('Admin');
+        }
     }
 }
 

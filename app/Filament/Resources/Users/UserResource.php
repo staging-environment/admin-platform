@@ -25,6 +25,14 @@ class UserResource extends Resource
     protected static ?string $pluralLabel = 'Usuarios';
 
     protected static ?string $modelLabel = 'Usuario';
+    
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
+        return $user->hasRole('Admin') || $user->can('gestion_usuarios_roles');
+    }
     // ------------------------------
 
     public static function form(Schema $schema): Schema

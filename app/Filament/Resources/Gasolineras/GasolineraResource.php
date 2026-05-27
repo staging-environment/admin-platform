@@ -27,6 +27,14 @@ class GasolineraResource extends Resource
 
     protected static ?string $modelLabel = 'Gasolinera';
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
+        return $user->hasRole('Admin') || $user->can('gestion_gasolineras');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return GasolineraForm::configure($schema);

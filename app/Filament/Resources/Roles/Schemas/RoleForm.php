@@ -22,6 +22,15 @@ class RoleForm
                 CheckboxList::make('permissions')
                     ->label('Permisos')
                     ->relationship('permissions', 'name')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
+                        'ver_dashboard' => 'Ver Dashboard',
+                        'gestion_usuarios_roles' => 'Gestión de Usuarios y Roles',
+                        'utilizar_explorador' => 'Utilizar Explorador de Archivos',
+                        'ver_informes' => 'Ver Informes y Estadísticas',
+                        'gestion_gasolineras' => 'Gestión de Gasolineras',
+                        'gestion_portada' => 'Configuración de Portada',
+                        default => $record->name,
+                    })
                     ->columns(3)
                     ->searchable(),
 

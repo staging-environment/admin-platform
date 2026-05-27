@@ -44,7 +44,18 @@
                 @foreach($permissions as $permission)
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
                         <td class="p-4 text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {{ $permission->name }}
+                            @php
+                                $n = $permission->name;
+                                $f = [
+                                    'ver_dashboard' => 'Ver Dashboard',
+                                    'gestion_usuarios_roles' => 'Gestión de Usuarios y Roles',
+                                    'utilizar_explorador' => 'Utilizar Explorador de Archivos',
+                                    'ver_informes' => 'Ver Informes y Estadísticas',
+                                    'gestion_gasolineras' => 'Gestión de Gasolineras',
+                                    'gestion_portada' => 'Configuración de Portada',
+                                ];
+                            @endphp
+                            {{ $f[$n] ?? $n }}
                         </td>
                         @foreach($roles as $role)
                             <td class="p-4">

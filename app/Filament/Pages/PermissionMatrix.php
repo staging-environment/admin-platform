@@ -18,6 +18,19 @@ class PermissionMatrix extends Page
     protected static ?string $navigationLabel = 'Permisos';
     protected static ?string $title = 'Matriz de Permisos';
 
+    public static function canAccess(): bool
+    {
+        app()['cache']->forget('spatie.permission.cache');
+        $user = auth()->user();
+        if (!$user) return false;
+        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
+        
+        // Reload relationships to bypass session/memory stale data
+        $user->load('roles', 'permissions');
+        
+        return $user->hasRole('Admin') || $user->can('gestion_usuarios_roles');
+    }
+
     protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
 
     public function getBreadcrumbs(): array
