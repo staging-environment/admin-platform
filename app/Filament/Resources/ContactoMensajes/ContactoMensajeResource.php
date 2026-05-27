@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
 
 class ContactoMensajeResource extends Resource
 {
@@ -37,6 +39,29 @@ class ContactoMensajeResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return ContactoMensajeForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                Section::make('Detalles del Mensaje')
+                    ->schema([
+                        TextEntry::make('gasolinera.Nombre')
+                            ->label('Gasolinera / Origen')
+                            ->default('Página Principal'),
+                        TextEntry::make('created_at')
+                            ->label('Fecha')
+                            ->dateTime('d/m/Y H:i'),
+                        TextEntry::make('nombre')
+                            ->label('Remitente'),
+                        TextEntry::make('email')
+                            ->label('Correo Electrónico'),
+                        TextEntry::make('mensaje')
+                            ->label('Mensaje')
+                            ->columnSpanFull(),
+                    ])->columns(2)
+            ]);
     }
 
     public static function table(Table $table): Table

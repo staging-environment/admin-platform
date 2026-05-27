@@ -22,7 +22,14 @@ class ViewContactoMensaje extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            \Filament\Actions\Action::make('back_list')
+                ->label('Volver a Mensajes')
+                ->url(ContactoMensajeResource::getUrl('index'))
+                ->color('gray'),
+            \Filament\Actions\Action::make('back_dashboard')
+                ->label('Volver al Dashboard')
+                ->url('/admin/dashboard')
+                ->color('primary'),
         ];
     }
 }
