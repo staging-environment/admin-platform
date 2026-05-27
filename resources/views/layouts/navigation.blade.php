@@ -41,12 +41,6 @@
                                     </x-dropdown-link>
                                     @endif
                                     
-                                    @if(auth()->user()->hasRole('Admin') || auth()->user()->can('ver_dashboard'))
-                                    <x-dropdown-link href="/admin/contacto-mensajes">
-                                        {{ __('Mensajes de Contacto') }}
-                                    </x-dropdown-link>
-                                    @endif
-                                    
                                     @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_gasolineras'))
                                     <x-dropdown-link href="/admin/gasolineras">
                                         {{ __('Gasolineras') }}
@@ -68,9 +62,6 @@
                                     @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_usuarios_roles'))
                                     <x-dropdown-link href="/admin/permission-matrix">
                                         {{ __('Matriz de Permisos') }}
-                                    </x-dropdown-link>
-                                    <x-dropdown-link href="/admin/roles">
-                                        {{ __('Roles') }}
                                     </x-dropdown-link>
 
                                     @endif

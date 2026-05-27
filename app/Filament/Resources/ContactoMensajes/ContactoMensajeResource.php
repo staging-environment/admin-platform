@@ -23,6 +23,8 @@ class ContactoMensajeResource extends Resource
     protected static ?string $navigationLabel = 'Mensajes de Contacto';
     protected static ?string $pluralLabel = 'Mensajes de Contacto';
     protected static ?string $modelLabel = 'Mensaje';
+    
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function canAccess(): bool
     {

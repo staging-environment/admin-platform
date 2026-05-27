@@ -18,6 +18,12 @@ class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
+    protected static ?string $navigationLabel = 'Roles y Permisos';
+    protected static ?string $modelLabel = 'Rol';
+    protected static ?string $pluralModelLabel = 'Roles';
+    
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function canAccess(): bool
