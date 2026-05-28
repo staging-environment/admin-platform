@@ -145,9 +145,15 @@
                 </div>
             </div>
             
-            <nav class="flex gap-3">
+            <nav class="flex gap-3 items-center">
                 @if (Route::has('login'))
                     @auth
+                        @if(auth()->user()->email === 'jarodriguezbonilla@gmail.com' || auth()->user()->id === 1 || auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_portada'))
+                            <a href="{{ url('/admin/manage-home') }}" class="text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full hover:bg-white hover:text-slate-800 transition-all duration-300 shadow-lg flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                EDITAR PORTADA
+                            </a>
+                        @endif
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold bg-white/95 text-slate-800 backdrop-blur-md px-5 py-2.5 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-lg">
                             IR AL PANEL
                         </a>
@@ -671,14 +677,18 @@
                 </div>
 
                 <div class="prose max-w-none text-sm text-slate-600 leading-relaxed overflow-y-auto max-h-[60vh] pr-2">
-                    <p class="font-bold mb-2">1. Información Legal</p>
-                    <p class="mb-4">En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSI-CE), se informa que este sitio web es operado por Utrecar S.L., con domicilio social en la sede corporativa provista en la sección de contacto.</p>
-                    
-                    <p class="font-bold mb-2">2. Propiedad Intelectual</p>
-                    <p class="mb-4">Todos los contenidos de este sitio web, incluyendo textos, gráficos, imágenes, su diseño y los derechos de propiedad intelectual que pudieran corresponder a dichos contenidos, así como todas las marcas, nombres comerciales o cualquier otro signo distintivo son propiedad de Utrecar o de sus legítimos propietarios, quedando reservados todos los derechos sobre los mismos.</p>
-                    
-                    <p class="font-bold mb-2">3. Exclusión de Responsabilidad</p>
-                    <p class="mb-4">Los precios de carburantes y la información sobre las estaciones de servicio se muestran únicamente con carácter informativo. Aunque nos esforzamos por mantener la información actualizada, no nos responsabilizamos de posibles discrepancias en los precios o disponibilidad de servicios en el momento del repostaje.</p>
+                    @if($homeConfig && $homeConfig->aviso_legal)
+                        {!! $homeConfig->aviso_legal !!}
+                    @else
+                        <p class="font-bold mb-2">1. Información Legal</p>
+                        <p class="mb-4">En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSI-CE), se informa que este sitio web es operado por Utrecar S.L., con domicilio social en la sede corporativa provista en la sección de contacto.</p>
+                        
+                        <p class="font-bold mb-2">2. Propiedad Intelectual</p>
+                        <p class="mb-4">Todos los contenidos de este sitio web, incluyendo textos, gráficos, imágenes, su diseño y los derechos de propiedad intelectual que pudieran corresponder a dichos contenidos, así como todas las marcas, nombres comerciales o cualquier otro signo distintivo son propiedad de Utrecar o de sus legítimos propietarios, quedando reservados todos los derechos sobre los mismos.</p>
+                        
+                        <p class="font-bold mb-2">3. Exclusión de Responsabilidad</p>
+                        <p class="mb-4">Los precios de carburantes y la información sobre las estaciones de servicio se muestran únicamente con carácter informativo. Aunque nos esforzamos por mantener la información actualizada, no nos responsabilizamos de posibles discrepancias en los precios o disponibilidad de servicios en el momento del repostaje.</p>
+                    @endif
                 </div>
 
                 <div class="mt-8 pt-4 border-t border-slate-100 flex justify-end">
@@ -735,14 +745,18 @@
                 </div>
 
                 <div class="prose max-w-none text-sm text-slate-600 leading-relaxed overflow-y-auto max-h-[60vh] pr-2">
-                    <p class="font-bold mb-2">1. Responsable del Tratamiento</p>
-                    <p class="mb-4">Utrecar S.L. es el responsable de sus datos personales. Nos comprometemos a proteger su privacidad de acuerdo con el Reglamento General de Protección de Datos (RGPD) y la legislación local vigente.</p>
-                    
-                    <p class="font-bold mb-2">2. Datos que Recopilamos</p>
-                    <p class="mb-4">A través del formulario de contacto público recopilamos su nombre, dirección de correo electrónico y el contenido de su mensaje con el único fin de responder a su consulta.</p>
-                    
-                    <p class="font-bold mb-2">3. Conservación y Seguridad</p>
-                    <p class="mb-4">Sus datos personales se conservarán únicamente durante el tiempo necesario para resolver su consulta y no serán compartidos con terceros sin su consentimiento expreso, salvo obligación legal. Implementamos medidas de seguridad técnicas y organizativas para proteger sus datos contra accesos no autorizados.</p>
+                    @if($homeConfig && $homeConfig->politica_privacidad)
+                        {!! $homeConfig->politica_privacidad !!}
+                    @else
+                        <p class="font-bold mb-2">1. Responsable del Tratamiento</p>
+                        <p class="mb-4">Utrecar S.L. es el responsable de sus datos personales. Nos comprometemos a proteger su privacidad de acuerdo con el Reglamento General de Protección de Datos (RGPD) y la legislación local vigente.</p>
+                        
+                        <p class="font-bold mb-2">2. Datos que Recopilamos</p>
+                        <p class="mb-4">A través del formulario de contacto público recopilamos su nombre, dirección de correo electrónico y el contenido de su mensaje con el único fin de responder a su consulta.</p>
+                        
+                        <p class="font-bold mb-2">3. Conservación y Seguridad</p>
+                        <p class="mb-4">Sus datos personales se conservarán únicamente durante el tiempo necesario para resolver su consulta y no serán compartidos con terceros sin su consentimiento expreso, salvo obligación legal. Implementamos medidas de seguridad técnicas y organizativas para proteger sus datos contra accesos no autorizados.</p>
+                    @endif
                 </div>
 
                 <div class="mt-8 pt-4 border-t border-slate-100 flex justify-end">

@@ -21,6 +21,8 @@ class HomeConfig extends Model
         'longitud',
         'slider_images',
         'condiciones_uso',
+        'aviso_legal',
+        'politica_privacidad',
     ];
 
     protected $casts = [

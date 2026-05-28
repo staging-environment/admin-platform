@@ -103,6 +103,14 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->label('Condiciones de Uso (Global)')
                     ->helperText('Configura los términos legales y condiciones de uso del portal público.')
                     ->columnSpanFull(),
+                RichEditor::make('aviso_legal')
+                    ->label('Aviso Legal (Global)')
+                    ->helperText('Configura la sección de Aviso Legal del portal público.')
+                    ->columnSpanFull(),
+                RichEditor::make('politica_privacidad')
+                    ->label('Política de Privacidad (Global)')
+                    ->helperText('Configura la sección de Política de Privacidad del portal público.')
+                    ->columnSpanFull(),
                 TextInput::make('contacto_email')
                     ->label('Email de Contacto (Global)')
                     ->email()
