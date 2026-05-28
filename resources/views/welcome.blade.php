@@ -61,9 +61,9 @@
     @endphp
 
     <!-- Cinematic Alpine.js Header Slider (Identical to details page slider) -->
-    <div class="relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-slate-900" 
-         x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }} }" 
-         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 5000)">
+    <div class="relative w-full overflow-hidden bg-slate-900" style="height: 55vh; min-height: 450px;" 
+         x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" 
+         x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
         
         <template x-for="(slide, index) in slides" :key="index">
             <div x-show="activeSlide === index" 
@@ -74,10 +74,47 @@
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-105"
                  class="absolute inset-0 w-full h-full">
-                <img :src="slide" class="w-full h-full object-cover" alt="Slider image">
+                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" style="object-position: center 38%;" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
             </div>
         </template>
+
+        <!-- Lightbox Modal -->
+        <div x-show="lightboxOpen" 
+             class="fixed inset-0 z-50 overflow-hidden bg-slate-950/95 flex flex-col items-center justify-center p-4 md:p-10 select-none" 
+             style="display: none;" 
+             x-cloak
+             @keydown.window.escape="lightboxOpen = false"
+             @keydown.window.arrow-left="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1"
+             @keydown.window.arrow-right="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1">
+            
+            <!-- Close Button -->
+            <button @click="lightboxOpen = false" class="absolute top-6 right-6 text-white/70 hover:text-white transition p-2 rounded-full hover:bg-white/10 z-50">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Prev Button -->
+            <button @click="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1" 
+                    class="absolute left-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <!-- Next Button -->
+            <button @click="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1" 
+                    class="absolute right-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+
+            <!-- Image Container -->
+            <div class="relative max-w-5xl max-h-[80vh] flex items-center justify-center" @click.away="lightboxOpen = false">
+                <img :src="slides[lightboxIndex]" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" alt="Full image">
+            </div>
+
+            <!-- Counter / Caption -->
+            <div class="mt-6 text-white/60 text-sm font-semibold tracking-wider">
+                Imagen <span x-text="lightboxIndex + 1"></span> de <span x-text="slides.length"></span>
+            </div>
+        </div>
         
         <!-- Navbar Overlay -->
         <header class="absolute top-0 left-0 right-0 z-10 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
