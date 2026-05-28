@@ -140,23 +140,129 @@ class GasolineraForm
                                     ->action(function ($set, $state) {
                                         if (empty($state)) return;
                                         
-                                        $response = \Illuminate\Support\Facades\Http::withHeaders([
-                                            'User-Agent' => 'AdminPlatform/1.0',
-                                        ])->get('https://nominatim.openstreetmap.org/search', [
-                                            'q' => $state,
-                                            'format' => 'json',
-                                            'limit' => 1,
-                                        ]);
-                                        
-                                        $data = $response->json();
-                                        if (!empty($data) && isset($data[0])) {
-                                            $set('location', [
-                                                'lat' => (float) $data[0]['lat'],
-                                                'lng' => (float) $data[0]['lon'],
-                                            ]);
-                                            $set('latitud', $data[0]['lat']);
-                                            $set('longitud', $data[0]['lon']);
+                                        // 1. Try Google Maps Geocoding API if key is present
+                                        $googleKey = env('GOOGLE_MAPS_API_KEY');
+                                        if ($googleKey) {
+                                            try {
+                                                $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                                                    'address' => $state,
+                                                    'key' => $googleKey,
+                                                    'language' => 'es',
+                                                    'region' => 'es',
+                                                ]);
+                                                
+                                                if ($response->successful()) {
+                                                    $data = $response->json();
+                                                    if (!empty($data['results']) && isset($data['results'][0]['geometry']['location'])) {
+                                                        $loc = $data['results'][0]['geometry']['location'];
+                                                        $lat = (float) $loc['lat'];
+                                                        $lng = (float) $loc['lng'];
+                                                        $formattedAddress = $data['results'][0]['formatted_address'] ?? $state;
+                                                        
+                                                        $set('location', [
+                                                            'lat' => $lat,
+                                                            'lng' => $lng,
+                                                        ]);
+                                                        $set('latitud', $lat);
+                                                        $set('longitud', $lng);
+                                                        
+                                                        \Filament\Notifications\Notification::make()
+                                                            ->title('Dirección encontrada (Google)')
+                                                            ->body($formattedAddress)
+                                                            ->success()
+                                                            ->send();
+                                                        return;
+                                                    }
+                                                }
+                                            } catch (\Exception $e) {
+                                                // Fail silently and fall through to free providers
+                                            }
                                         }
+
+                                        // 2. Try Photon API (Elasticsearch over OSM, fuzzy & keyless, biased to Spain)
+                                        try {
+                                            $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://photon.komoot.io/api/', [
+                                                'q' => $state,
+                                                'limit' => 1,
+                                                'lang' => 'es',
+                                                'lat' => 40.4168,
+                                                'lon' => -3.7038,
+                                            ]);
+                                            
+                                            if ($response->successful()) {
+                                                $data = $response->json();
+                                                if (!empty($data['features']) && isset($data['features'][0])) {
+                                                    $feature = $data['features'][0];
+                                                    $lon = (float) $feature['geometry']['coordinates'][0];
+                                                    $lat = (float) $feature['geometry']['coordinates'][1];
+                                                    
+                                                    $props = $feature['properties'] ?? [];
+                                                    $name = $props['name'] ?? '';
+                                                    $city = $props['city'] ?? '';
+                                                    $stateName = $props['state'] ?? '';
+                                                    $label = trim(implode(', ', array_filter([$name, $city, $stateName])));
+                                                    if (empty($label)) $label = $state;
+
+                                                    $set('location', [
+                                                        'lat' => $lat,
+                                                        'lng' => $lon,
+                                                    ]);
+                                                    $set('latitud', $lat);
+                                                    $set('longitud', $lon);
+                                                    
+                                                    \Filament\Notifications\Notification::make()
+                                                        ->title('Dirección encontrada (Fuzzy)')
+                                                        ->body($label)
+                                                        ->success()
+                                                        ->send();
+                                                    return;
+                                                }
+                                            }
+                                        } catch (\Exception $e) {
+                                            // Fall through to Nominatim
+                                        }
+
+                                        // 3. Fallback to raw Nominatim
+                                        try {
+                                            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                                                'User-Agent' => 'AdminPlatform/1.0',
+                                            ])->timeout(5)->get('https://nominatim.openstreetmap.org/search', [
+                                                'q' => $state,
+                                                'format' => 'json',
+                                                'limit' => 1,
+                                            ]);
+                                            
+                                            if ($response->successful()) {
+                                                $data = $response->json();
+                                                if (!empty($data) && isset($data[0])) {
+                                                    $lat = (float) $data[0]['lat'];
+                                                    $lon = (float) $data[0]['lon'];
+                                                    $displayName = $data[0]['display_name'] ?? $state;
+
+                                                    $set('location', [
+                                                        'lat' => $lat,
+                                                        'lng' => $lon,
+                                                    ]);
+                                                    $set('latitud', $lat);
+                                                    $set('longitud', $lon);
+                                                    
+                                                    \Filament\Notifications\Notification::make()
+                                                        ->title('Dirección encontrada')
+                                                        ->body($displayName)
+                                                        ->success()
+                                                        ->send();
+                                                    return;
+                                                }
+                                            }
+                                        } catch (\Exception $e) {
+                                            // Handled by final notification
+                                        }
+
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('No se pudo encontrar la dirección')
+                                            ->body('Intente con una dirección más simple o haga clic directamente en el mapa.')
+                                            ->danger()
+                                            ->send();
                                     })
                             ),
 
