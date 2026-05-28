@@ -1,4 +1,30 @@
 <x-filament-panels::page>
+    <style>
+        .disk-tab-active {
+            background-color: #d97706 !important; /* Amber 600 */
+            color: #ffffff !important;
+        }
+        .dark .disk-tab-active {
+            background-color: #f59e0b !important; /* Amber 500 */
+            color: #ffffff !important;
+        }
+        .btn-quick-action-primary:hover {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+        }
+        .dark .btn-quick-action-primary:hover {
+            background-color: #f59e0b !important;
+            color: #ffffff !important;
+        }
+        .btn-quick-action-danger:hover {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
+        .dark .btn-quick-action-danger:hover {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+        }
+    </style>
     @php
         $items = $this->getItems();
         $allItemsSerialized = collect($items)->map(fn($item) => $item['path'] . '|' . $item['type'])->toArray();
@@ -12,7 +38,7 @@
                 @foreach($this->getDisks() as $diskKey => $diskName)
                     <button
                         wire:click="selectDisk('{{ $diskKey }}')"
-                        class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 {{ $selectedDisk === $diskKey ? 'bg-white dark:bg-white/10 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
+                        class="px-4 py-2 text-xs font-bold rounded-lg transition-all duration-200 {{ $selectedDisk === $diskKey ? 'disk-tab-active shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
                     >
                         {{ $diskName }}
                     </button>
@@ -345,14 +371,14 @@
                                     @if ($item['type'] === 'file')
                                         <button
                                             wire:click="mountAction('previewFile', { path: '{{ addslashes($item['path']) }}' })"
-                                            class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-primary-600 dark:hover:bg-primary-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                            class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 btn-quick-action-primary hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
                                             title="Previsualizar"
                                         >
                                             <x-heroicon-o-eye class="w-3.5 h-3.5" />
                                         </button>
                                         <button
                                             wire:click="downloadFile('{{ addslashes($item['path']) }}')"
-                                            class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-primary-600 dark:hover:bg-primary-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                            class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 btn-quick-action-primary hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
                                             title="Descargar"
                                         >
                                             <x-heroicon-o-arrow-down-tray class="w-3.5 h-3.5" />
@@ -361,7 +387,7 @@
 
                                     <button
                                         wire:click="mountAction('moveItem', { path: '{{ addslashes($item['path']) }}' })"
-                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-primary-600 dark:hover:bg-primary-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 btn-quick-action-primary hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
                                         title="Mover"
                                     >
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -371,7 +397,7 @@
 
                                     <button
                                         wire:click="mountAction('deleteItem', { path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' })"
-                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-danger-600 dark:hover:bg-danger-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 btn-quick-action-danger hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
                                         title="Eliminar"
                                     >
                                         <x-heroicon-o-trash class="w-3.5 h-3.5" />
