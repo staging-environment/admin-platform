@@ -59,9 +59,16 @@ class GasolineraForm
 
                         FileUpload::make('slider_images')
                             ->label('Imágenes para el Slider')
-                            ->helperText('Sube imágenes atractivas para el carrusel superior. Se redimensionarán automáticamente.')
+                            ->helperText('Se recomienda subir imágenes de alta resolución. El editor forzará un recorte en proporción 3.5:1 para coincidir con el banner del portal público.')
                             ->multiple()
                             ->image()
+                            ->imageEditor()
+                            ->imageEditorViewportWidth(1400)
+                            ->imageEditorViewportHeight(400)
+                            ->imageEditorAspectRatios([
+                                '3.5:1',
+                            ])
+                            ->itemPanelAspectRatio('1:3.5')
                             ->disk('public')
                             ->directory('gasolineras/sliders')
                             ->columnSpanFull()

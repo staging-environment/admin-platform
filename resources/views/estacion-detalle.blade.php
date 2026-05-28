@@ -50,8 +50,22 @@
         $lng = $contenido->longitud ?? -3.7038;
     @endphp
 
+    <style>
+        .slider-container-dynamic {
+            width: 100%;
+            aspect-ratio: 3.5 / 1;
+        }
+        @media (max-width: 767px) {
+            .slider-container-dynamic {
+                height: 45vh !important;
+                min-height: 300px !important;
+                aspect-ratio: auto !important;
+            }
+        }
+    </style>
+
     <!-- Slider Header -->
-    <div class="relative w-full overflow-hidden bg-slate-900" style="height: 55vh; min-height: 450px;" x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
+    <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic" x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
         <template x-for="(slide, index) in slides" :key="index">
             <div x-show="activeSlide === index" 
                  x-transition:enter="transition ease-out duration-1000"
@@ -61,8 +75,8 @@
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-105"
                  class="absolute inset-0 w-full h-full">
-                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" style="object-position: center 38%;" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
             </div>
         </template>
 
@@ -127,11 +141,13 @@
 
         <!-- Titulo en el Slider -->
         <div class="absolute bottom-12 left-0 right-0 z-10 max-w-7xl mx-auto px-6">
-            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white drop-shadow-2xl mb-4 leading-tight">{{ $estacion->Nombre }}</h1>
-            <p class="text-lg md:text-2xl text-blue-300 font-medium drop-shadow-md flex items-center gap-2">
-                <svg class="w-6 h-6 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span class="truncate">{{ $estacion->Direccion }}, {{ $estacion->Poblacion }}</span>
-            </p>
+            <div class="inline-block bg-slate-950/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl max-w-2xl">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white drop-shadow-2xl mb-4 leading-tight">{{ $estacion->Nombre }}</h1>
+                <p class="text-lg md:text-2xl text-blue-300 font-medium drop-shadow-md flex items-center gap-2">
+                    <svg class="w-6 h-6 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span class="truncate">{{ $estacion->Direccion }}, {{ $estacion->Poblacion }}</span>
+                </p>
+            </div>
         </div>
     </div>
 

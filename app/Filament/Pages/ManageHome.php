@@ -77,8 +77,16 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->required(),
                 FileUpload::make('slider_images')
                     ->label('Imágenes del Carrusel Principal (Home)')
+                    ->helperText('Se recomienda subir imágenes de alta resolución. El editor forzará un recorte en proporción 3.5:1 para coincidir con el banner del portal público.')
                     ->multiple()
                     ->image()
+                    ->imageEditor()
+                    ->imageEditorViewportWidth(1400)
+                    ->imageEditorViewportHeight(400)
+                    ->imageEditorAspectRatios([
+                        '3.5:1',
+                    ])
+                    ->itemPanelAspectRatio('1:3.5')
                     ->disk('public')
                     ->directory('home/slider')
                     ->reorderable()
@@ -183,6 +191,14 @@ class ManageHome extends Page implements HasForms, HasTable
         }
         $config->fill($this->form->getState());
         $config->save();
+
+        // Auto-crop images to 3.5:1 aspect ratio centered if not cropped manually
+        if (!empty($config->slider_images) && is_array($config->slider_images)) {
+            foreach ($config->slider_images as $image) {
+                $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($image);
+                \App\Services\ImageHelper::autoCropImageToRatio($fullPath, 3.5);
+            }
+        }
 
         Notification::make()
             ->title('Configuración guardada correctamente')

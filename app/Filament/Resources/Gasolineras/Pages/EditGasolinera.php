@@ -40,4 +40,19 @@ class EditGasolinera extends EditRecord
                 ->color('danger'),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $record = $this->getRecord();
+        $contenido = $record->contenido;
+        if ($contenido && !empty($contenido->slider_images)) {
+            $images = is_string($contenido->slider_images) ? json_decode($contenido->slider_images, true) : $contenido->slider_images;
+            if (is_array($images)) {
+                foreach ($images as $image) {
+                    $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($image);
+                    \App\Services\ImageHelper::autoCropImageToRatio($fullPath, 3.5);
+                }
+            }
+        }
+    }
 }

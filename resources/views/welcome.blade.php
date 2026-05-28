@@ -60,8 +60,22 @@
         }
     @endphp
 
+    <style>
+        .slider-container-dynamic {
+            width: 100%;
+            aspect-ratio: 3.5 / 1;
+        }
+        @media (max-width: 767px) {
+            .slider-container-dynamic {
+                height: 45vh !important;
+                min-height: 300px !important;
+                aspect-ratio: auto !important;
+            }
+        }
+    </style>
+
     <!-- Cinematic Alpine.js Header Slider (Identical to details page slider) -->
-    <div class="relative w-full overflow-hidden bg-slate-900" style="height: 55vh; min-height: 450px;" 
+    <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic" 
          x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" 
          x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
         
@@ -74,8 +88,8 @@
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-105"
                  class="absolute inset-0 w-full h-full">
-                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" style="object-position: center 38%;" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
             </div>
         </template>
 
@@ -148,15 +162,17 @@
 
         <!-- Titulo en el Slider -->
         <div class="absolute bottom-12 left-0 right-0 z-10 max-w-7xl mx-auto px-6">
-            <span class="px-3.5 py-1.5 bg-blue-500/20 backdrop-blur-md border border-blue-400/20 rounded-full text-xs font-bold text-blue-300 tracking-wider uppercase">
-                Nuestra Red
-            </span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-2xl mt-4 mb-2 leading-tight">
-                {{ $homeConfig->titulo ?? 'Red de Estaciones de Servicio' }}
-            </h1>
-            <p class="text-sm md:text-base text-slate-300 font-medium drop-shadow-md max-w-2xl">
-                {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación y planifica tu ruta.' }}
-            </p>
+            <div class="inline-block bg-slate-950/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl max-w-2xl">
+                <span class="px-3.5 py-1.5 bg-blue-500/20 backdrop-blur-md border border-blue-400/20 rounded-full text-xs font-bold text-blue-300 tracking-wider uppercase">
+                    Nuestra Red
+                </span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-2xl mt-4 mb-2 leading-tight">
+                    {{ $homeConfig->titulo ?? 'Red de Estaciones de Servicio' }}
+                </h1>
+                <p class="text-sm md:text-base text-slate-300 font-medium drop-shadow-md max-w-2xl">
+                    {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación y planifica tu ruta.' }}
+                </p>
+            </div>
         </div>
     </div>
 
