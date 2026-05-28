@@ -89,7 +89,7 @@
                  x-transition:leave-end="opacity-0 transform scale-105"
                  class="absolute inset-0 w-full h-full">
                 <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent pointer-events-none"></div>
             </div>
         </template>
 
@@ -167,15 +167,15 @@
         </header>
 
         <!-- Titulo en el Slider -->
-        <div class="absolute bottom-12 left-0 right-0 z-10 max-w-7xl mx-auto px-6">
-            <div class="inline-block bg-slate-950/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl max-w-2xl">
-                <span class="px-3.5 py-1.5 bg-blue-500/20 backdrop-blur-md border border-blue-400/20 rounded-full text-xs font-bold text-blue-300 tracking-wider uppercase">
+        <div class="absolute left-0 right-0 z-10 max-w-7xl mx-auto px-6" style="bottom: 24px;">
+            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-lg" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+                <span class="px-2 py-0.5 bg-blue-500/25 backdrop-blur-md border border-blue-400/30 rounded-full text-[9px] font-bold text-blue-300 tracking-wider uppercase">
                     Nuestra Red
                 </span>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-2xl mt-4 mb-2 leading-tight">
+                <h1 class="text-lg md:text-xl lg:text-2xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
                     {{ $homeConfig->titulo ?? 'Red de Estaciones de Servicio' }}
                 </h1>
-                <p class="text-sm md:text-base text-slate-300 font-medium drop-shadow-md max-w-2xl">
+                <p class="text-[11px] md:text-xs text-slate-300 font-medium drop-shadow-md leading-relaxed">
                     {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación y planifica tu ruta.' }}
                 </p>
             </div>
