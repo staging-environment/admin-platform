@@ -14,7 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
 
 class ContactoMensajeResource extends Resource
 {
