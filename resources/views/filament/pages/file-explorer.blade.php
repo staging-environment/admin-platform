@@ -4,7 +4,7 @@
         $allItemsSerialized = collect($items)->map(fn($item) => $item['path'] . '|' . $item['type'])->toArray();
         $allSelected = count($allItemsSerialized) > 0 && collect($allItemsSerialized)->every(fn($i) => in_array($i, $selectedItems));
     @endphp
-    <div class="space-y-6">
+    <div x-data="{ draggedOverFolder: null }" class="space-y-6">
         {{-- Toolbar: Disk switcher, Search input, View selector --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {{-- Tabs for Disks --}}
@@ -91,7 +91,11 @@
                     @else
                         <button
                             wire:click="goToPath('{{ addslashes($breadcrumb['path']) }}')"
-                            class="hover:text-primary-600 dark:hover:text-primary-400 transition font-medium focus:outline-none focus:underline"
+                            x-on:dragover.prevent="draggedOverFolder = 'breadcrumb-{{ $index }}'"
+                            x-on:dragleave="draggedOverFolder === 'breadcrumb-{{ $index }}' && (draggedOverFolder = null)"
+                            x-on:drop.prevent="draggedOverFolder = null; $wire.handleDrop(event.dataTransfer.getData('text/plain'), '{{ addslashes($breadcrumb['path']) }}')"
+                            :class="draggedOverFolder === 'breadcrumb-{{ $index }}' ? 'text-primary-600 dark:text-primary-400 underline font-black scale-105' : ''"
+                            class="hover:text-primary-600 dark:hover:text-primary-400 transition font-medium focus:outline-none focus:underline transition-all duration-150"
                         >
                             {{ $breadcrumb['label'] }}
                         </button>
@@ -117,7 +121,16 @@
                         Desmarcar todos
                     </button>
                 </div>
-                <div>
+                <div class="flex items-center gap-2">
+                    <x-filament::button
+                        wire:click="mountAction('moveSelected')"
+                        color="primary"
+                        size="sm"
+                        icon="heroicon-o-folder"
+                        class="mr-1"
+                    >
+                        Mover seleccionados
+                    </x-filament::button>
                     <x-filament::button
                         wire:click="mountAction('deleteSelected')"
                         color="danger"
@@ -132,7 +145,120 @@
 
         {{-- Items display container --}}
 
-        <div class="relative">
+        <div
+            x-data="{
+                isDragging: false,
+                startX: 0,
+                startY: 0,
+                boxLeft: 0,
+                boxTop: 0,
+                boxWidth: 0,
+                boxHeight: 0,
+                
+                initDrag(e) {
+                    if (e.button !== 0) return;
+                    if (e.target.closest('button, input, a, select, textarea, [onclick], [data-drag-select-item]')) {
+                        return;
+                    }
+                    
+                    const container = this.$el;
+                    const rect = container.getBoundingClientRect();
+                    
+                    this.startX = e.clientX - rect.left + container.scrollLeft;
+                    this.startY = e.clientY - rect.top + container.scrollTop;
+                    
+                    this.isDragging = true;
+                    this.boxLeft = this.startX;
+                    this.boxTop = this.startY;
+                    this.boxWidth = 0;
+                    this.boxHeight = 0;
+                    
+                    const onMouseMove = (moveEvent) => {
+                        if (!this.isDragging) return;
+                        
+                        const currentX = moveEvent.clientX - rect.left + container.scrollLeft;
+                        const currentY = moveEvent.clientY - rect.top + container.scrollTop;
+                        
+                        this.boxLeft = Math.min(this.startX, currentX);
+                        this.boxTop = Math.min(this.startY, currentY);
+                        this.boxWidth = Math.abs(this.startX - currentX);
+                        this.boxHeight = Math.abs(this.startY - currentY);
+                        
+                        this.updateSelection();
+                    };
+                    
+                    const onMouseUp = () => {
+                        this.isDragging = false;
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                        this.applySelection();
+                    };
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                },
+                
+                updateSelection() {
+                    const container = this.$el;
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    const selectBoxRect = {
+                        left: this.boxLeft - container.scrollLeft + containerRect.left,
+                        top: this.boxTop - container.scrollTop + containerRect.top,
+                        right: this.boxLeft - container.scrollLeft + containerRect.left + this.boxWidth,
+                        bottom: this.boxTop - container.scrollTop + containerRect.top + this.boxHeight
+                    };
+                    
+                    const items = container.querySelectorAll('[data-drag-select-item]');
+                    
+                    items.forEach(item => {
+                        const itemRect = item.getBoundingClientRect();
+                        const intersects = (
+                            itemRect.left < selectBoxRect.right &&
+                            itemRect.right > selectBoxRect.left &&
+                            itemRect.top < selectBoxRect.bottom &&
+                            itemRect.bottom > selectBoxRect.top
+                        );
+                        
+                        if (intersects) {
+                            item.setAttribute('data-drag-selected', 'true');
+                            item.classList.add('ring-2', 'ring-primary-500/20', 'bg-primary-500/20', 'border-primary-500');
+                            item.classList.remove('border-gray-200', 'dark:border-white/10', 'bg-white', 'dark:bg-white/5');
+                        } else {
+                            item.removeAttribute('data-drag-selected');
+                            item.classList.remove('ring-2', 'ring-primary-500/20', 'bg-primary-500/20', 'border-primary-500');
+                            item.classList.add('border-gray-200', 'dark:border-white/10', 'bg-white', 'dark:bg-white/5');
+                        }
+                    });
+                },
+                
+                applySelection() {
+                    const container = this.$el;
+                    const items = container.querySelectorAll('[data-drag-select-item]');
+                    
+                    const selected = [];
+                    items.forEach(item => {
+                        const isSelected = item.getAttribute('data-drag-selected') === 'true';
+                        if (isSelected) {
+                            selected.push(item.getAttribute('data-drag-select-item'));
+                        }
+                        item.classList.remove('ring-2', 'ring-primary-500/20', 'bg-primary-500/20', 'border-primary-500');
+                        item.removeAttribute('data-drag-selected');
+                    });
+                    
+                    this.$wire.$set('selectedItems', selected);
+                }
+            }"
+            x-on:mousedown="initDrag($event)"
+            class="relative select-none"
+        >
+            <!-- Selection Box -->
+            <div
+                x-show="isDragging"
+                x-cloak
+                class="absolute bg-primary-500/20 border border-primary-500 pointer-events-none z-50 rounded"
+                :style="'left: ' + boxLeft + 'px; top: ' + boxTop + 'px; width: ' + boxWidth + 'px; height: ' + boxHeight + 'px;'"
+            ></div>
             @if (empty($items))
                 <div class="flex flex-col items-center justify-center py-24 px-4 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-white/10 shadow-sm text-center">
                     <div class="p-4 rounded-full bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 mb-4 animate-pulse">
@@ -165,7 +291,16 @@
                                 $isSelected = in_array($itemSerialized, $selectedItems);
                             @endphp
                             <div
-                                class="group relative flex flex-col items-center justify-between p-4 rounded-2xl {{ $isSelected ? 'bg-primary-500/5 dark:bg-primary-500/10 border-primary-500/50' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' }} shadow-sm hover:shadow-md hover:border-primary-500 dark:hover:border-primary-400/50 hover:bg-gray-50/50 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                                draggable="true"
+                                data-drag-select-item="{{ $itemSerialized }}"
+                                x-on:dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' }))"
+                                @if ($item['type'] === 'folder')
+                                    x-on:dragover.prevent="draggedOverFolder = '{{ addslashes($item['path']) }}'"
+                                    x-on:dragleave="draggedOverFolder === '{{ addslashes($item['path']) }}' && (draggedOverFolder = null)"
+                                    x-on:drop.prevent="draggedOverFolder = null; $wire.handleDrop(event.dataTransfer.getData('text/plain'), '{{ addslashes($item['path']) }}')"
+                                @endif
+                                class="group relative flex flex-col items-center justify-between p-4 rounded-2xl border shadow-sm hover:shadow-md hover:border-primary-500 dark:hover:border-primary-400/50 hover:bg-gray-50/50 dark:hover:bg-white/10 transition-all duration-200 cursor-pointer"
+                                :class="draggedOverFolder === '{{ addslashes($item['path']) }}' ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-500/10 dark:bg-primary-500/20 shadow-md' : '{{ $isSelected ? 'bg-primary-500/20 border-primary-500 ring-2 ring-primary-500/20' : 'bg-white dark:bg-white/5 border-gray-200 dark:border-white/10' }}'"
                                 @if ($item['type'] === 'folder')
                                     wire:click="goToPath('{{ addslashes($item['path']) }}')"
                                 @else
@@ -225,6 +360,16 @@
                                     @endif
 
                                     <button
+                                        wire:click="mountAction('moveItem', { path: '{{ addslashes($item['path']) }}' })"
+                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-primary-600 dark:hover:bg-primary-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                        title="Mover"
+                                    >
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg>
+                                    </button>
+
+                                    <button
                                         wire:click="mountAction('deleteItem', { path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' })"
                                         class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 hover:bg-danger-600 dark:hover:bg-danger-500 hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
                                         title="Eliminar"
@@ -262,7 +407,16 @@
                                         $isSelected = in_array($itemSerialized, $selectedItems);
                                     @endphp
                                     <tr
-                                        class="{{ $isSelected ? 'bg-primary-500/5 dark:bg-primary-500/10' : '' }} hover:bg-gray-50/50 dark:hover:bg-white/10 transition-colors duration-150 text-sm cursor-pointer group"
+                                        draggable="true"
+                                        data-drag-select-item="{{ $itemSerialized }}"
+                                        x-on:dragstart="event.dataTransfer.setData('text/plain', JSON.stringify({ path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' }))"
+                                        @if ($item['type'] === 'folder')
+                                            x-on:dragover.prevent="draggedOverFolder = '{{ addslashes($item['path']) }}'"
+                                            x-on:dragleave="draggedOverFolder === '{{ addslashes($item['path']) }}' && (draggedOverFolder = null)"
+                                            x-on:drop.prevent="draggedOverFolder = null; $wire.handleDrop(event.dataTransfer.getData('text/plain'), '{{ addslashes($item['path']) }}')"
+                                        @endif
+                                        class="hover:bg-gray-50/50 dark:hover:bg-white/10 transition-colors duration-150 text-sm cursor-pointer group"
+                                        :class="draggedOverFolder === '{{ addslashes($item['path']) }}' ? 'bg-primary-500/10 dark:bg-primary-500/20 border-y border-primary-500' : '{{ $isSelected ? 'bg-primary-500/20 border-y border-primary-500' : '' }}'"
                                         @if ($item['type'] === 'folder')
                                             wire:click="goToPath('{{ addslashes($item['path']) }}')"
                                         @else
@@ -317,6 +471,15 @@
                                                         <x-heroicon-o-arrow-down-tray class="w-4 h-4" />
                                                     </button>
                                                 @endif
+                                                <button
+                                                    wire:click="mountAction('moveItem', { path: '{{ addslashes($item['path']) }}' })"
+                                                    class="p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/20 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                    title="Mover"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                                    </svg>
+                                                </button>
                                                 <button
                                                     wire:click="mountAction('deleteItem', { path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' })"
                                                     class="p-1.5 rounded-lg hover:bg-danger-50 dark:hover:bg-danger-950/20 text-gray-500 dark:text-gray-400 hover:text-danger-600 dark:hover:text-danger-400 transition-colors"

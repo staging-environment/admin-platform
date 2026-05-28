@@ -473,4 +473,172 @@ class FileExplorer extends Page
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Cerrar');
     }
+
+    public function moveItems(array $paths, string $targetFolderVirtualPath): void
+    {
+        try {
+            if ($targetFolderVirtualPath === '_root_') {
+                $targetFolderVirtualPath = '';
+            }
+
+            $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+            $targetFolderPhysical = $this->getPhysicalPath($targetFolderVirtualPath);
+
+            // Ensure target is a directory and exists
+            if (!$disk->exists($targetFolderPhysical)) {
+                $disk->makeDirectory($targetFolderPhysical);
+            }
+
+            $movedCount = 0;
+            foreach ($paths as $path) {
+                $path = $this->sanitizePath($path);
+                $physicalSource = $this->getPhysicalPath($path);
+                $fileName = basename($physicalSource);
+                $physicalTarget = trim($targetFolderPhysical . '/' . $fileName, '/');
+
+                if ($physicalSource === $physicalTarget) {
+                    continue; // Can't move onto itself
+                }
+
+                // Check if source exists
+                if (!$disk->exists($physicalSource)) {
+                    continue;
+                }
+
+                // Prevent moving a folder inside itself or its children
+                if ($physicalSource === $targetFolderPhysical || str_starts_with($targetFolderPhysical, $physicalSource . '/')) {
+                    Notification::make()->title('Acción no permitida')->body("No se puede mover la carpeta '{$fileName}' dentro de sí misma o de sus subcarpetas.")->warning()->send();
+                    continue;
+                }
+
+                if ($disk->move($physicalSource, $physicalTarget)) {
+                    $movedCount++;
+                }
+            }
+
+            $this->selectedItems = [];
+            Notification::make()->title("{$movedCount} elementos movidos correctamente")->success()->send();
+        } catch (\Exception $e) {
+            Notification::make()->title('Error al mover elementos')->body($e->getMessage())->danger()->send();
+        }
+    }
+
+    public function handleDrop(string $draggedDataJson, string $targetFolderVirtualPath): void
+    {
+        try {
+            $draggedData = json_decode($draggedDataJson, true);
+            if (!$draggedData || !isset($draggedData['path'])) {
+                return;
+            }
+
+            $sourcePath = $draggedData['path'];
+            $sourceType = $draggedData['type'];
+
+            $pathsToMove = [];
+            $draggedItemSerialized = $sourcePath . '|' . $sourceType;
+
+            if (in_array($draggedItemSerialized, $this->selectedItems)) {
+                foreach ($this->selectedItems as $serialized) {
+                    $parts = explode('|', $serialized);
+                    if (count($parts) >= 1) {
+                        $pathsToMove[] = $parts[0];
+                    }
+                }
+            } else {
+                $pathsToMove[] = $sourcePath;
+            }
+
+            $this->moveItems($pathsToMove, $targetFolderVirtualPath);
+        } catch (\Exception $e) {
+            Notification::make()->title('Error al procesar el arrastre')->body($e->getMessage())->danger()->send();
+        }
+    }
+
+    public function getMoveFolderOptions(): array
+    {
+        try {
+            $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+            $physicalCurrentPath = $this->getPhysicalPath($this->currentPath);
+            
+            $options = [];
+            
+            // Add parent directory option if not in root
+            if (!empty($this->currentPath)) {
+                $parentPath = dirname($this->currentPath);
+                if ($parentPath === '.' || $parentPath === '') {
+                    $parentPath = '_root_';
+                }
+                $options[$parentPath] = '.. (Subir un nivel)';
+                $options['_root_'] = 'Raíz (/)';
+            }
+            
+            // Add subfolders
+            $directories = $disk->directories($physicalCurrentPath);
+            foreach ($directories as $dir) {
+                $virtual = $this->getVirtualPath($dir);
+                $options[$virtual] = '/' . basename($dir);
+            }
+            
+            return $options;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    public function moveItemAction(): Action
+    {
+        return Action::make('moveItem')
+            ->label('Mover')
+            ->modalHeading('Mover elemento')
+            ->modalDescription('Elige la carpeta de destino para este elemento.')
+            ->form([
+                \Filament\Forms\Components\Select::make('targetFolder')
+                    ->label('Carpeta Destino')
+                    ->options(fn() => $this->getMoveFolderOptions())
+                    ->placeholder('Selecciona una carpeta')
+                    ->required(),
+            ])
+            ->action(function (array $data, array $arguments) {
+                try {
+                    $path = $this->sanitizePath($arguments['path']);
+                    $this->moveItems([$path], $data['targetFolder']);
+                } catch (\Exception $e) {
+                    Notification::make()->title('Error al mover')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
+
+    public function moveSelectedAction(): Action
+    {
+        return Action::make('moveSelected')
+            ->label('Mover Seleccionados')
+            ->modalHeading('Mover elementos seleccionados')
+            ->modalDescription('Elige la carpeta de destino para los elementos seleccionados.')
+            ->form([
+                \Filament\Forms\Components\Select::make('targetFolder')
+                    ->label('Carpeta Destino')
+                    ->options(fn() => $this->getMoveFolderOptions())
+                    ->placeholder('Selecciona una carpeta')
+                    ->required(),
+            ])
+            ->action(function (array $data) {
+                try {
+                    if (empty($this->selectedItems)) {
+                        return;
+                    }
+                    
+                    $pathsToMove = [];
+                    foreach ($this->selectedItems as $serialized) {
+                        $parts = explode('|', $serialized);
+                        if (count($parts) >= 1) {
+                            $pathsToMove[] = $parts[0];
+                        }
+                    }
+                    
+                    $this->moveItems($pathsToMove, $data['targetFolder']);
+                } catch (\Exception $e) {
+                    Notification::make()->title('Error al mover')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
 }
