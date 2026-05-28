@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\VirtusgesnetService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -55,6 +58,70 @@ class DashboardController extends Controller
             report($exception);
         }
 
+        // --- WIDGET 1: WEATHER INFO ---
+        // Weather is now fetched client-side to respect user's location and allow search persistence.
+        $weatherInfo = null;
+
+        // --- WIDGET 2: SERVER PERFORMANCE STATS ---
+        $load = function_exists('sys_getloadavg') ? sys_getloadavg() : [0, 0, 0];
+        $cpuLoad = isset($load[0]) ? round($load[0], 2) : 0;
+
+        $diskTotal = @disk_total_space('/') ?: 0;
+        $diskFree = @disk_free_space('/') ?: 0;
+        $diskUsed = $diskTotal - $diskFree;
+        $diskUsedPercent = $diskTotal > 0 ? round(($diskUsed / $diskTotal) * 100, 1) : 0;
+
+        $formatBytes = function($bytes) {
+            $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            $bytes = max($bytes, 0);
+            $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+            $pow = min($pow, count($units) - 1);
+            $bytes /= pow(1024, $pow);
+            return round($bytes, 2) . ' ' . $units[$pow];
+        };
+
+        $ramTotal = 0;
+        $ramFree = 0;
+        if (file_exists('/proc/meminfo')) {
+            $data = @file_get_contents('/proc/meminfo');
+            if ($data) {
+                preg_match('/MemTotal:\s+(\d+)/', $data, $matchesTotal);
+                preg_match('/MemAvailable:\s+(\d+)/', $data, $matchesAvailable);
+                if (isset($matchesTotal[1])) {
+                    $ramTotal = $matchesTotal[1] * 1024;
+                }
+                if (isset($matchesAvailable[1])) {
+                    $ramFree = $matchesAvailable[1] * 1024;
+                }
+            }
+        }
+        $ramUsed = $ramTotal - $ramFree;
+        $ramUsedPercent = $ramTotal > 0 ? round(($ramUsed / $ramTotal) * 100, 1) : 0;
+
+        // DB Status Checks
+        $dbStatus = [];
+        foreach (['Local' => null, 'VirtusGesNet' => 'virtusgesnet', 'SII' => 'sii'] as $name => $conn) {
+            try {
+                DB::connection($conn)->getPdo();
+                $dbStatus[$name] = true;
+            } catch (\Exception $e) {
+                $dbStatus[$name] = false;
+            }
+        }
+
+        $serverStats = [
+            'env' => config('app.env') === 'production' ? 'Producción' : 'Desarrollo/Local',
+            'cpu' => $cpuLoad,
+            'disk_used_percent' => $diskUsedPercent,
+            'disk_free' => $formatBytes($diskFree),
+            'disk_total' => $formatBytes($diskTotal),
+            'ram_used_percent' => $ramUsedPercent,
+            'ram_free' => $formatBytes($ramFree),
+            'ram_total' => $formatBytes($ramTotal),
+            'php_version' => PHP_VERSION,
+            'db_connections' => $dbStatus,
+        ];
+
         return view('dashboard', [
             'tables' => $tables,
             'stations' => $stations,
@@ -66,6 +133,8 @@ class DashboardController extends Controller
             'selectedEndMonth' => $selectedEndMonth,
             'selectedStationCode' => $selectedStationCode,
             'months' => $this->months(),
+            'weatherInfo' => $weatherInfo,
+            'serverStats' => $serverStats,
         ]);
     }
 
