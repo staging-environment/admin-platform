@@ -168,14 +168,14 @@
 
         <!-- Titulo en el Slider -->
         <div class="absolute left-0 right-0 z-10 max-w-7xl mx-auto px-6" style="bottom: 24px;">
-            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-lg" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-xl" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                 <span class="px-2 py-0.5 bg-blue-500/25 backdrop-blur-md border border-blue-400/30 rounded-full text-[9px] font-bold text-blue-300 tracking-wider uppercase">
                     Nuestra Red
                 </span>
-                <h1 class="text-lg md:text-xl lg:text-2xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
+                <h1 class="text-xl md:text-2xl lg:text-3xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
                     {{ $homeConfig->titulo ?? 'Red de Estaciones de Servicio' }}
                 </h1>
-                <p class="text-[11px] md:text-xs text-slate-300 font-medium drop-shadow-md leading-relaxed">
+                <p class="text-xs md:text-sm text-slate-300 font-medium drop-shadow-md leading-relaxed">
                     {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación y planifica tu ruta.' }}
                 </p>
             </div>

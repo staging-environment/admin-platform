@@ -147,14 +147,14 @@
 
         <!-- Titulo en el Slider -->
         <div class="absolute left-0 right-0 z-10 max-w-7xl mx-auto px-6" style="bottom: 24px;">
-            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-lg" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-xl" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                 <span class="px-2 py-0.5 bg-blue-500/25 backdrop-blur-md border border-blue-400/30 rounded-full text-[9px] font-bold text-blue-300 tracking-wider uppercase">
                     Estación de Servicio
                 </span>
-                <h1 class="text-lg md:text-xl lg:text-2xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
+                <h1 class="text-xl md:text-2xl lg:text-3xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
                     {{ $estacion->Nombre }}
                 </h1>
-                <p class="text-[11px] md:text-xs text-blue-300 font-medium drop-shadow-md flex items-center gap-1.5 mt-1.5">
+                <p class="text-xs md:text-sm text-blue-300 font-medium drop-shadow-md flex items-center gap-1.5 mt-1.5">
                     <svg class="w-3.5 h-3.5 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
