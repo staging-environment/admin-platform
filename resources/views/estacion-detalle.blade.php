@@ -76,7 +76,7 @@
                  x-transition:leave-end="opacity-0 transform scale-105"
                  class="absolute inset-0 w-full h-full">
                 <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
             </div>
         </template>
 
@@ -129,12 +129,6 @@
                     <a href="{{ url('/admin/gasolineras/' . $estacion->Codigo . '/edit') }}" class="text-xs font-bold glass-panel text-emerald-600 px-5 py-2.5 rounded-full hover:bg-emerald-50 transition-all shadow-lg flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         EDITAR
-                    </a>
-                    @endif
-                    @if(auth()->user()->email === 'jarodriguezbonilla@gmail.com' || auth()->user()->id === 1 || auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_portada'))
-                    <a href="{{ url('/admin/manage-home') }}" class="text-xs font-bold glass-panel text-slate-700 px-5 py-2.5 rounded-full hover:bg-slate-50 transition-all shadow-lg flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        EDITAR PORTADA
                     </a>
                     @endif
                     <a href="{{ route('dashboard') }}" class="text-xs font-bold glass-panel text-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-50 transition-all shadow-lg flex items-center gap-2">
