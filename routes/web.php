@@ -114,6 +114,61 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/data/schema', [DataQueryController::class, 'getSchema']);
         Route::apiResource('/filters', FilterController::class);
     });
+
+    // Vista previa de tablas (SII, Virtusgesnet, etc.)
+    Route::get('/admin/db-preview/{connection}/{table}', function (Request $request, $connection, $table) {
+        if (!auth()->user()->hasRole('Admin')) {
+            abort(403);
+        }
+
+        // Validar que la conexión esté en nuestra lista de permitidas
+        if (!in_array($connection, ['virtusgesnet', 'sii'])) {
+            abort(400, 'Conexión no válida');
+        }
+        
+        $rowSearch = $request->input('rowSearch', '');
+        $currentPage = (int)$request->input('page', 1);
+        if ($currentPage < 1) $currentPage = 1;
+        $pageSize = 50;
+
+        try {
+            $columnsResult = DB::connection($connection)->select("SHOW COLUMNS FROM `$table` ");
+            $columns = [];
+            foreach ($columnsResult as $col) {
+                $colArray = (array)$col;
+                $columns[] = $colArray['Field'] ?? $colArray['field'] ?? null;
+            }
+            $columns = array_filter($columns);
+
+            $query = DB::connection($connection)->table($table);
+
+            if ($rowSearch !== '') {
+                $query->where(function($q) use ($columns, $rowSearch) {
+                    foreach ($columns as $index => $column) {
+                        if ($index === 0) {
+                            $q->where($column, 'like', '%' . $rowSearch . '%');
+                        } else {
+                            $q->orWhere($column, 'like', '%' . $rowSearch . '%');
+                        }
+                    }
+                });
+            }
+
+            $totalCount = $query->count();
+            $totalPages = (int)ceil($totalCount / $pageSize);
+
+            $rows = $query->offset(($currentPage - 1) * $pageSize)
+                ->limit($pageSize)
+                ->get()
+                ->map(fn($row) => (array)$row)
+                ->toArray();
+
+            return view('admin.db-preview', compact('table', 'columns', 'rows', 'totalCount', 'totalPages', 'currentPage', 'rowSearch'));
+
+        } catch (\Exception $e) {
+            abort(500, $e->getMessage());
+        }
+    })->name('db.preview');
 });
 
 require __DIR__.'/auth.php';

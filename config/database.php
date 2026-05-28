@@ -104,6 +104,20 @@ return [
             'strict' => false,
         ],
 
+        'sii' => [
+            'driver' => 'mysql',
+            'host' => env('DB_SII_HOST', env('DB_VIRTUS_HOST', 'ddev-utrecar3-db')),
+            'port' => env('DB_SII_PORT', env('DB_VIRTUS_PORT', '3306')),
+            'database' => env('DB_SII_DATABASE', 'sii'),
+            'username' => env('DB_SII_USERNAME', env('DB_VIRTUS_USERNAME', 'db')),
+            'password' => env('DB_SII_PASSWORD', env('DB_VIRTUS_PASSWORD', '')),
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => false,
+            'strict' => false,
+        ],
+
     ],
 
     'migrations' => [

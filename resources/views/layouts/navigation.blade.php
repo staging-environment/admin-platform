@@ -22,6 +22,18 @@
                         </x-nav-link>
                     @endif
 
+                    @if(auth()->user()->hasRole('Admin'))
+                        <x-nav-link href="/admin/virtusgesnet" :active="request()->is('admin/virtusgesnet*')">
+                            {{ __('Virtusgesnet') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->hasRole('Admin'))
+                        <x-nav-link href="/admin/sii" :active="request()->is('admin/sii*')">
+                            {{ __('SII') }}
+                        </x-nav-link>
+                    @endif
+
                     @if(auth()->user()->hasRole('Admin') || auth()->user()->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios_roles', 'gestion_portada']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
@@ -137,6 +149,18 @@
                     {{ __('Explorador de Archivos') }}
                 </x-responsive-nav-link>
             @endcan
+
+            @if(auth()->user()->hasRole('Admin'))
+                <x-responsive-nav-link href="/admin/virtusgesnet" :active="request()->is('admin/virtusgesnet*')">
+                    {{ __('Virtusgesnet') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->hasRole('Admin'))
+                <x-responsive-nav-link href="/admin/sii" :active="request()->is('admin/sii*')">
+                    {{ __('SII') }}
+                </x-responsive-nav-link>
+            @endif
 
             @can('manage-users')
                 <div class="pt-4 pb-2 border-t border-gray-200">
