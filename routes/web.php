@@ -29,6 +29,13 @@ Route::get('/', function () {
     return view('welcome', compact('gasolineras', 'homeConfig'));
 });
 
+Route::get('/debug-db', function () {
+    return response()->json([
+        'slider_images' => \App\Models\HomeConfig::find(1)->slider_images ?? null,
+        'raw_db' => \DB::connection('mariadb')->table('home_configs')->where('id', 1)->value('slider_images'),
+    ]);
+});
+
 Route::get('/estacion/{slug}', function ($slug) {
     try {
         $estacion = Gasolinera::with('contenido')->get()->first(function ($e) use ($slug) {
