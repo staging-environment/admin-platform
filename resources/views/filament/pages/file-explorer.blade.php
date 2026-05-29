@@ -353,7 +353,7 @@
                                     </div>
 
                                     <div class="w-full space-y-0.5">
-                                        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 break-words whitespace-normal text-center group-hover:text-primary-600 dark:group-hover:text-primary-400 transition" title="{{ $item['name'] }}">
+                                        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 break-all whitespace-normal text-center group-hover:text-primary-600 dark:group-hover:text-primary-400 transition" title="{{ $item['name'] }}">
                                             {{ $item['name'] }}
                                         </h4>
                                         <p class="text-[10px] text-gray-400 font-mono">
@@ -473,7 +473,7 @@
                                             @else
                                                 <x-dynamic-component :component="$item['icon']" class="w-5 h-5 {{ $item['color'] }} shrink-0 pointer-events-none" />
                                             @endif
-                                            <span class="break-words whitespace-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" title="{{ $item['name'] }}">
+                                            <span class="break-all whitespace-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" title="{{ $item['name'] }}">
                                                 {{ $item['name'] }}
                                             </span>
                                         </td>
