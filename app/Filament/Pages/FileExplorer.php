@@ -89,9 +89,9 @@ class FileExplorer extends Page
     public function getDisks(): array
     {
         return [
-            'local' => 'Almacenamiento Local (App)',
+            'local' => 'Almacenamiento Global',
             'personal' => 'Mis Archivos (Personal)',
-            'public' => 'Almacenamiento Público (Storage)',
+            'public' => 'Archivos públicos',
         ];
     }
 
