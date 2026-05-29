@@ -144,11 +144,11 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            @can('manage-users')
+            @if(auth()->user()->hasRole('Admin') || auth()->user()->can('utilizar_explorador'))
                 <x-responsive-nav-link href="/admin/file-explorer" :active="request()->is('admin/file-explorer*')">
                     {{ __('Explorador de Archivos') }}
                 </x-responsive-nav-link>
-            @endcan
+            @endif
 
             @if(auth()->user()->hasRole('Admin'))
                 <x-responsive-nav-link href="/admin/virtusgesnet" :active="request()->is('admin/virtusgesnet*')">
@@ -162,35 +162,47 @@
                 </x-responsive-nav-link>
             @endif
 
-            @can('manage-users')
+            @if(auth()->user()->hasRole('Admin') || auth()->user()->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios_roles', 'gestion_portada']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
                     </div>
                     <div class="mt-2 space-y-1">
-                        <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
-                            {{ __('Informes') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link href="/admin/gasolineras" :active="request()->is('admin/gasolineras*')">
-                            {{ __('Gasolineras') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link href="/admin/users" :active="request()->is('admin/users*')">
-                            {{ __('Usuarios') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link href="/admin/manage-home" :active="request()->is('admin/manage-home*')">
-                            {{ __('Configuración de Portada') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link href="/admin/permission-matrix" :active="request()->is('admin/permission-matrix*')">
-                            {{ __('Matriz de Permisos') }}
-                        </x-responsive-nav-link>
-                        <x-responsive-nav-link href="/admin/roles" :active="request()->is('admin/roles*')">
-                            {{ __('Roles') }}
-                        </x-responsive-nav-link>
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('ver_informes'))
+                            <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
+                                {{ __('Informes') }}
+                            </x-responsive-nav-link>
+                        @endif
 
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_gasolineras'))
+                            <x-responsive-nav-link href="/admin/gasolineras" :active="request()->is('admin/gasolineras*')">
+                                {{ __('Gasolineras') }}
+                            </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_usuarios_roles'))
+                            <x-responsive-nav-link href="/admin/users" :active="request()->is('admin/users*')">
+                                {{ __('Usuarios') }}
+                            </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_portada'))
+                            <x-responsive-nav-link href="/admin/manage-home" :active="request()->is('admin/manage-home*')">
+                                {{ __('Configuración de Portada') }}
+                            </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_usuarios_roles'))
+                            <x-responsive-nav-link href="/admin/permission-matrix" :active="request()->is('admin/permission-matrix*')">
+                                {{ __('Matriz de Permisos') }}
+                            </x-responsive-nav-link>
+                            <x-responsive-nav-link href="/admin/roles" :active="request()->is('admin/roles*')">
+                                {{ __('Roles') }}
+                            </x-responsive-nav-link>
+                        @endif
                     </div>
                 </div>
-            @endcan
-        </div>
+            @endif
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">

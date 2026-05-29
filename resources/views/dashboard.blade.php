@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Dashboard') }}
@@ -11,8 +11,8 @@
                 </p>
             </div>
 
-            <div class="text-sm text-gray-600">
-                Tablas VirtusGesNet: {{ count($tables) }}
+            <div class="text-sm text-gray-600 shrink-0 font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
+                Tablas VirtusGesNet: <span class="font-bold text-slate-800">{{ count($tables) }}</span>
             </div>
         </div>
     </x-slot>
