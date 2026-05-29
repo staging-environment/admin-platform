@@ -207,13 +207,19 @@ class ManageHome extends Page implements HasForms, HasTable
 
     public function save(): void
     {
+        $state = $this->form->getState();
+        \Log::info('ManageHome save state', ['state' => $state]);
+
         $config = HomeConfig::find(1);
         if (!$config) {
             $config = new HomeConfig();
             $config->id = 1;
         }
-        $config->fill($this->form->getState());
+        $config->fill($state);
+
+        \Log::info('ManageHome before save model slider_images', ['images' => $config->slider_images]);
         $config->save();
+        \Log::info('ManageHome after save model slider_images', ['images' => $config->fresh()->slider_images]);
 
         // Auto-crop images to 3.5:1 aspect ratio centered if not cropped manually
         if (!empty($config->slider_images) && is_array($config->slider_images)) {
