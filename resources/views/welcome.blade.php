@@ -36,6 +36,25 @@
             scrollbar-width: none;
         }
         [x-cloak] { display: none !important; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
     </style>
 </head>
 <body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
@@ -183,25 +202,25 @@
     </div>
 
     <!-- Main Navigation Tabs Bar Below Slider -->
-    <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm mb-12">
+    <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm mb-12 py-3">
         <div class="max-w-5xl mx-auto px-6">
-            <nav class="flex gap-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
+            <div class="bg-slate-100/80 p-1 rounded-2xl inline-flex gap-1 relative overflow-hidden border border-slate-200/50">
                 <button @click="tab = 'inicio'" 
-                        :class="tab === 'inicio' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" 
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
+                        :class="tab === 'inicio' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
+                        class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Inicio
                 </button>
                 <button @click="tab = 'quienes_somos'" 
-                        :class="tab === 'quienes_somos' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" 
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
+                        :class="tab === 'quienes_somos' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
+                        class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Quiénes Somos
                 </button>
                 <button @click="tab = 'contacto'" 
-                        :class="tab === 'contacto' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" 
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
+                        :class="tab === 'contacto' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
+                        class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Contacto
                 </button>
-            </nav>
+            </div>
         </div>
     </div>
 
@@ -219,7 +238,11 @@
         @endif
 
         <!-- Tab 1: Inicio (Gas Stations Accordion List) -->
-        <div x-show="tab === 'inicio'" class="space-y-4">
+        <div x-show="tab === 'inicio'" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="space-y-4">
             @if($homeConfig && $homeConfig->texto_inicio)
                 <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-slate-100 prose max-w-none text-slate-600 leading-relaxed mb-6">
                     {!! $homeConfig->texto_inicio !!}
@@ -253,8 +276,9 @@
                         : ($gasolinera->Direccion . ' — ' . $gasolinera->Poblacion . ' (' . $gasolinera->Provincia . ')');
                 @endphp
 
-                <!-- Station Card Container -->
-                <div class="group bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-blue-500/20 transition-all duration-300 overflow-hidden">
+                <!-- Station Card Container with Staggered Entrance and Hover Effects -->
+                <div class="group bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] hover:-translate-y-1 hover:scale-[1.005] transition-all duration-500 overflow-hidden animate-fade-in-up"
+                     style="animation-delay: {{ $loop->index * 0.08 }}s;">
                      
                     <!-- Card Body -->
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-5 gap-5">
@@ -265,7 +289,7 @@
                             <!-- Small format Thumbnail (Square) -->
                             @if($mainImage)
                                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 shadow-sm relative">
-                                    <img src="{{ $mainImage }}" alt="{{ $gasolinera->Nombre }}" class="w-full h-full object-cover">
+                                    <img src="{{ $mainImage }}" alt="{{ $gasolinera->Nombre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </div>
                             @else
                                 <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-50 border border-slate-200/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 shrink-0">
@@ -302,13 +326,13 @@
 
                                 <!-- Prices block (increased font size) -->
                                 <div class="flex gap-2.5 mb-3">
-                                    <div class="bg-slate-50 border border-slate-200/60 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+                                    <div class="bg-slate-50 border border-slate-200/60 px-3.5 py-1.5 rounded-xl flex items-center gap-2 transition-transform duration-300 hover:scale-105">
                                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Diesel</span>
                                         <span class="text-lg md:text-xl font-black text-slate-900 leading-none">
                                             {{ $gasolinera->diesel ? number_format($gasolinera->diesel, 3) : '---' }}€
                                         </span>
                                     </div>
-                                    <div class="bg-blue-50/40 border border-blue-200/40 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+                                    <div class="bg-blue-50/40 border border-blue-200/40 px-3.5 py-1.5 rounded-xl flex items-center gap-2 transition-transform duration-300 hover:scale-105">
                                         <span class="text-[9px] font-bold text-blue-500 uppercase tracking-wider">SP 95</span>
                                         <span class="text-lg md:text-xl font-black text-blue-600 leading-none">
                                             {{ $gasolinera->gasolina95 ? number_format($gasolinera->gasolina95, 3) : '---' }}€
@@ -318,11 +342,14 @@
 
                                 <!-- CTA Ficha Completa Button Directly Below Prices -->
                                 <div class="mb-4">
-                                    <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5 uppercase tracking-wider">
-                                        Ver Ficha Completa
-                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                        </svg>
+                                    <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="relative overflow-hidden inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5 uppercase tracking-wider group/btn">
+                                        <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-[shimmer_1.5s_ease-in-out_infinite]"></span>
+                                        <span class="relative z-10 flex items-center gap-1.5">
+                                            Ver Ficha Completa
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            </svg>
+                                        </span>
                                     </a>
                                 </div>
 
