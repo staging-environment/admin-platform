@@ -70,6 +70,7 @@
         if ($homeConfig && !empty($homeConfig->slider_images)) {
             $images = is_string($homeConfig->slider_images) ? json_decode($homeConfig->slider_images, true) : $homeConfig->slider_images;
             if (is_array($images) && count($images) > 0) {
+                $images = array_values($images);
                 foreach ($images as $img) {
                     $sliderImages[] = Storage::disk('public')->url($img);
                 }
@@ -272,6 +273,7 @@
                     elseif ($contenido && !empty($contenido->slider_images)) {
                         $images = is_string($contenido->slider_images) ? json_decode($contenido->slider_images, true) : $contenido->slider_images;
                         if (is_array($images) && count($images) > 0) {
+                            $images = array_values($images);
                             $mainImage = Storage::disk('public')->url($images[0]);
                         }
                     }

@@ -31,6 +31,15 @@ class GasolineraContenido extends Model
         'longitud' => 'float',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if (is_array($model->slider_images)) {
+                $model->slider_images = array_values($model->slider_images);
+            }
+        });
+    }
+
     public function gasolinera()
     {
         return $this->belongsTo(Gasolinera::class, 'gasolinera_codigo', 'Codigo');
