@@ -41,10 +41,36 @@ Route::get('/debug-logs', function () {
     if (!file_exists($logPath)) {
         return response()->json(['message' => 'No log file found']);
     }
-    $lines = file($logPath);
-    $lastLines = array_slice($lines, -50);
+    
+    $handle = fopen($logPath, "r");
+    if (!$handle) {
+        return response()->json(['message' => 'Cannot open log file']);
+    }
+    
+    $lines = [];
+    fseek($handle, 0, SEEK_END);
+    $pos = ftell($handle);
+    $lastLine = "";
+    
+    while ($pos > 0 && count($lines) < 50) {
+        fseek($handle, --$pos);
+        $char = fgetc($handle);
+        if ($char === "\n") {
+            if ($lastLine !== "") {
+                $lines[] = strrev($lastLine);
+            }
+            $lastLine = "";
+        } else {
+            $lastLine .= $char;
+        }
+    }
+    if ($lastLine !== "") {
+        $lines[] = strrev($lastLine);
+    }
+    fclose($handle);
+    
     return response()->json([
-        'logs' => $lastLines
+        'logs' => array_reverse($lines)
     ]);
 });
 
