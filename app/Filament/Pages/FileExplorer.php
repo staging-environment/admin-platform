@@ -644,4 +644,57 @@ class FileExplorer extends Page
                 }
             });
     }
+
+    public function renameItemAction(): Action
+    {
+        return Action::make('renameItem')
+            ->label('Renombrar')
+            ->modalHeading('Renombrar elemento')
+            ->form([
+                TextInput::make('newName')
+                    ->label('Nuevo nombre')
+                    ->required()
+                    ->maxLength(255)
+                    ->rules(['regex:/^[a-zA-Z0-9_\-\s\.\(\)\[\]áéíóúÁÉÍÓÚñÑüÜ]+$/u'])
+                    ->validationMessages([
+                        'regex' => 'El nombre solo puede contener letras, números, espacios, guiones, puntos y paréntesis.',
+                    ]),
+            ])
+            ->fillForm(fn (array $arguments) => [
+                'newName' => basename($arguments['path']),
+            ])
+            ->action(function (array $data, array $arguments) {
+                try {
+                    $oldPath = $this->sanitizePath($arguments['path']);
+                    $disk = Storage::disk($this->selectedDisk === 'personal' ? 'local' : $this->selectedDisk);
+                    
+                    $dir = dirname($oldPath);
+                    if ($dir === '.' || $dir === '/') {
+                        $dir = '';
+                    }
+                    
+                    $newPath = trim($dir . '/' . $data['newName'], '/');
+                    
+                    $physicalOldPath = $this->getPhysicalPath($oldPath);
+                    $physicalNewPath = $this->getPhysicalPath($newPath);
+                    
+                    if ($physicalOldPath === $physicalNewPath) {
+                        return; // Nothing changed
+                    }
+                    
+                    if ($disk->exists($physicalNewPath)) {
+                        Notification::make()->title('Un elemento con este nombre ya existe')->danger()->send();
+                        return;
+                    }
+                    
+                    if ($disk->move($physicalOldPath, $physicalNewPath)) {
+                        Notification::make()->title('Renombrado correctamente')->success()->send();
+                    } else {
+                        throw new \Exception("No se pudo renombrar el archivo/carpeta.");
+                    }
+                } catch (\Exception $e) {
+                    Notification::make()->title('Error al renombrar')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
 }

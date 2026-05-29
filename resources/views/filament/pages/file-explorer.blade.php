@@ -353,7 +353,7 @@
                                     </div>
 
                                     <div class="w-full space-y-0.5">
-                                        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition" title="{{ $item['name'] }}">
+                                        <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200 break-words whitespace-normal text-center group-hover:text-primary-600 dark:group-hover:text-primary-400 transition" title="{{ $item['name'] }}">
                                             {{ $item['name'] }}
                                         </h4>
                                         <p class="text-[10px] text-gray-400 font-mono">
@@ -384,6 +384,14 @@
                                             <x-heroicon-o-arrow-down-tray class="w-3.5 h-3.5" />
                                         </button>
                                     @endif
+
+                                    <button
+                                        wire:click="mountAction('renameItem', { path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' })"
+                                        class="p-1.5 rounded-lg bg-gray-100 dark:bg-white/10 btn-quick-action-primary hover:text-white text-gray-500 dark:text-gray-400 transition-colors"
+                                        title="Renombrar"
+                                    >
+                                        <x-heroicon-o-pencil class="w-3.5 h-3.5" />
+                                    </button>
 
                                     <button
                                         wire:click="mountAction('moveItem', { path: '{{ addslashes($item['path']) }}' })"
@@ -465,7 +473,7 @@
                                             @else
                                                 <x-dynamic-component :component="$item['icon']" class="w-5 h-5 {{ $item['color'] }} shrink-0 pointer-events-none" />
                                             @endif
-                                            <span class="truncate max-w-[200px] sm:max-w-md group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" title="{{ $item['name'] }}">
+                                            <span class="break-words whitespace-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors" title="{{ $item['name'] }}">
                                                 {{ $item['name'] }}
                                             </span>
                                         </td>
@@ -497,6 +505,14 @@
                                                         <x-heroicon-o-arrow-down-tray class="w-4 h-4" />
                                                     </button>
                                                 @endif
+                                                <button
+                                                    wire:click="mountAction('renameItem', { path: '{{ addslashes($item['path']) }}', type: '{{ $item['type'] }}' })"
+                                                    class="p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/20 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                                                    title="Renombrar"
+                                                >
+                                                    <x-heroicon-o-pencil class="w-4 h-4" />
+                                                </button>
+
                                                 <button
                                                     wire:click="mountAction('moveItem', { path: '{{ addslashes($item['path']) }}' })"
                                                     class="p-1.5 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-950/20 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
