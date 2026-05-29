@@ -8,7 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\RichEditor;
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 
 class GasolineraForm
 {
@@ -74,26 +74,20 @@ class GasolineraForm
                             ->columnSpanFull()
                             ->reorderable(),
 
-                        \Filament\Forms\Components\RichEditor::make('texto_inicio')
+                        TinyEditor::make('texto_inicio')
                             ->label('Texto Principal (Pestaña Inicio)')
                             ->helperText('Este texto aparecerá en la página principal (Inicio) de la gasolinera.')
-                            ->toolbarButtons([
-                                'bold',
-                                'italic',
-                                'strike',
-                                'link',
-                                'h2',
-                                'h3',
-                                'bulletList',
-                                'orderedList',
-                                'redo',
-                                'undo',
-                            ])
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('gasolineras/attachments')
+                            ->showMenuBar()
                             ->columnSpanFull(),
 
-                        RichEditor::make('quienes_somos')
+                        TinyEditor::make('quienes_somos')
                             ->label('Sección: Quiénes Somos')
                             ->helperText('Redacta un texto introductorio sobre la historia o el equipo de esta gasolinera.')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('gasolineras/attachments')
+                            ->showMenuBar()
                             ->columnSpanFull(),
 
                         Textarea::make('donde_estamos_texto')

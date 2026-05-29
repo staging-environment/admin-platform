@@ -1,4 +1,11 @@
 <?php return array (
+  'amidesfahani/filament-tinyeditor' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'AmidEsfahani\\FilamentTinyEditor\\TinyeditorServiceProvider',
+    ),
+  ),
   'blade-ui-kit/blade-heroicons' => 
   array (
     'providers' => 

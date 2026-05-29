@@ -6,7 +6,7 @@ use App\Models\HomeConfig;
 use App\Models\ContactoMensaje;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\RichEditor;
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 use Filament\Pages\Page;
@@ -91,25 +91,40 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->directory('home/slider')
                     ->reorderable()
                     ->columnSpanFull(),
-                RichEditor::make('texto_inicio')
+                TinyEditor::make('texto_inicio')
                     ->label('Presentación de Inicio (Global)')
                     ->helperText('Texto introductorio que se mostrará en la pestaña Inicio de la página principal.')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('home/attachments')
+                    ->showMenuBar()
                     ->columnSpanFull(),
-                RichEditor::make('quienes_somos')
+                TinyEditor::make('quienes_somos')
                     ->label('Quiénes Somos (Global)')
                     ->helperText('Redacta la información institucional y la historia de la empresa.')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('home/attachments')
+                    ->showMenuBar()
                     ->columnSpanFull(),
-                RichEditor::make('condiciones_uso')
+                TinyEditor::make('condiciones_uso')
                     ->label('Condiciones de Uso (Global)')
                     ->helperText('Configura los términos legales y condiciones de uso del portal público.')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('home/attachments')
+                    ->showMenuBar()
                     ->columnSpanFull(),
-                RichEditor::make('aviso_legal')
+                TinyEditor::make('aviso_legal')
                     ->label('Aviso Legal (Global)')
                     ->helperText('Configura la sección de Aviso Legal del portal público.')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('home/attachments')
+                    ->showMenuBar()
                     ->columnSpanFull(),
-                RichEditor::make('politica_privacidad')
+                TinyEditor::make('politica_privacidad')
                     ->label('Política de Privacidad (Global)')
                     ->helperText('Configura la sección de Política de Privacidad del portal público.')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('home/attachments')
+                    ->showMenuBar()
                     ->columnSpanFull(),
                 TextInput::make('contacto_email')
                     ->label('Email de Contacto (Global)')
