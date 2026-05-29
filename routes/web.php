@@ -30,9 +30,9 @@ Route::get('/', function () {
 });
 
 Route::get('/debug-db', function () {
+    $configs = \DB::connection('mariadb')->table('home_configs')->get();
     return response()->json([
-        'slider_images' => \App\Models\HomeConfig::find(1)->slider_images ?? null,
-        'raw_db' => \DB::connection('mariadb')->table('home_configs')->where('id', 1)->value('slider_images'),
+        'configs' => $configs
     ]);
 });
 
