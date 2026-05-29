@@ -295,7 +295,10 @@ class FileExplorer extends Page
                         ->label('Nombre de la carpeta')
                         ->required()
                         ->maxLength(255)
-                        ->rules(['regex:/^[a-zA-Z0-9_\-\s]+$/']),
+                        ->rules(['regex:/^[a-zA-Z0-9_\-\s\.\(\)\[\]áéíóúÁÉÍÓÚñÑüÜ]+$/u'])
+                        ->validationMessages([
+                            'regex' => 'El nombre de la carpeta solo puede contener letras, números, espacios, guiones, puntos y paréntesis.',
+                        ]),
                 ])
                 ->action(function (array $data) {
                     try {
