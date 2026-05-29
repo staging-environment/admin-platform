@@ -36,6 +36,18 @@ Route::get('/debug-db', function () {
     ]);
 });
 
+Route::get('/debug-logs', function () {
+    $logPath = storage_path('logs/laravel.log');
+    if (!file_exists($logPath)) {
+        return response()->json(['message' => 'No log file found']);
+    }
+    $lines = file($logPath);
+    $lastLines = array_slice($lines, -50);
+    return response()->json([
+        'logs' => $lastLines
+    ]);
+});
+
 Route::get('/estacion/{slug}', function ($slug) {
     try {
         $estacion = Gasolinera::with('contenido')->get()->first(function ($e) use ($slug) {
