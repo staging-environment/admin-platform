@@ -57,7 +57,13 @@
         }
     </style>
 </head>
-<body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+<body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen relative overflow-x-hidden" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+
+    <!-- Glowing background orbs for modern depth -->
+    <div class="absolute top-[40vh] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[120vh] pointer-events-none overflow-hidden z-0 opacity-40">
+        <div class="absolute top-10 left-10 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan-400/10 rounded-full blur-[120px]"></div>
+    </div>
 
     @php
         $sliderImages = [];
@@ -202,9 +208,9 @@
     </div>
 
     <!-- Main Navigation Tabs Bar Below Slider -->
-    <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm mb-12 py-3">
+    <div class="sticky top-0 z-40 bg-white/75 backdrop-blur-xl border-b border-slate-200/40 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.015)] mb-12 py-3.5">
         <div class="max-w-5xl mx-auto px-6">
-            <div class="bg-slate-100/80 p-1 rounded-2xl inline-flex gap-1 relative overflow-hidden border border-slate-200/50">
+            <div class="bg-slate-100/80 p-1 rounded-2xl inline-flex gap-1.5 relative overflow-hidden border border-slate-200/40 shadow-inner">
                 <button @click="tab = 'inicio'" 
                         :class="tab === 'inicio' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
                         class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
@@ -242,10 +248,14 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0"
-             class="space-y-4">
+             class="space-y-6 relative z-10">
             @if($homeConfig && $homeConfig->texto_inicio)
-                <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-slate-100 prose max-w-none text-slate-600 leading-relaxed mb-6">
-                    {!! $homeConfig->texto_inicio !!}
+                <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-10 rounded-[2rem] border border-slate-200/60 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.015)] border-l-4 border-l-blue-600 mb-8">
+                    <!-- Subtle background decoration pattern -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="prose max-w-none text-slate-600 leading-relaxed">
+                        {!! $homeConfig->texto_inicio !!}
+                    </div>
                 </div>
             @endif
 
@@ -277,7 +287,7 @@
                 @endphp
 
                 <!-- Station Card Container with Staggered Entrance and Hover Effects -->
-                <div class="group bg-white rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] hover:-translate-y-1 hover:scale-[1.005] transition-all duration-500 overflow-hidden animate-fade-in-up"
+                <div class="group bg-white rounded-3xl border border-slate-200/60 border-l-4 border-l-blue-600/80 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] hover:-translate-y-1 hover:scale-[1.005] transition-all duration-500 overflow-hidden animate-fade-in-up"
                      style="animation-delay: {{ $loop->index * 0.08 }}s;">
                      
                     <!-- Card Body -->
@@ -288,11 +298,11 @@
                             
                             <!-- Small format Thumbnail (Square) -->
                             @if($mainImage)
-                                <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 shadow-sm relative">
-                                    <img src="{{ $mainImage }}" alt="{{ $gasolinera->Nombre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 shadow-sm relative border border-slate-200/40">
+                                    <img src="{{ $mainImage }}" alt="{{ $gasolinera->Nombre }}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500">
                                 </div>
                             @else
-                                <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-50 border border-slate-200/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 shrink-0">
+                                <div class="w-16 h-16 md:w-20 md:h-20 bg-slate-50 border border-slate-200/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 shrink-0 shadow-sm">
                                     <svg class="w-7 h-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
@@ -302,14 +312,14 @@
 
                             <!-- Details (Uses Custom Address and Displays Brand & Prices) -->
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
+                                <div class="flex items-center gap-2 mb-1.5">
                                     <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="hover:text-blue-600 transition-colors duration-300">
                                         <h3 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors duration-300 truncate">
                                             {{ $gasolinera->Nombre }}
                                         </h3>
                                     </a>
                                     @if($gasolinera->marca)
-                                        <span class="px-2 py-0.5 bg-slate-100 border border-slate-200/40 text-[7px] font-extrabold uppercase tracking-widest text-slate-600 rounded-full shrink-0">
+                                        <span class="px-2.5 py-0.5 bg-blue-50/80 text-blue-700 border border-blue-100/40 text-[7px] font-extrabold uppercase tracking-widest rounded-full shrink-0">
                                             {{ $gasolinera->marca }}
                                         </span>
                                     @endif
@@ -324,19 +334,25 @@
                                     </span>
                                 </p>
 
-                                <!-- Prices block (increased font size) -->
-                                <div class="flex gap-2.5 mb-3">
-                                    <div class="bg-slate-50 border border-slate-200/60 px-3.5 py-1.5 rounded-xl flex items-center gap-2 transition-transform duration-300 hover:scale-105">
-                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Diesel</span>
-                                        <span class="text-lg md:text-xl font-black text-slate-900 leading-none">
-                                            {{ $gasolinera->diesel ? number_format($gasolinera->diesel, 3) : '---' }}€
-                                        </span>
+                                <!-- Prices block (dashboard style) -->
+                                <div class="flex flex-wrap gap-3 mb-4">
+                                    <div class="bg-slate-50/80 backdrop-blur-sm border border-slate-200/50 px-4 py-2 rounded-2xl flex items-center gap-3 transition-all duration-300 hover:scale-[1.03] hover:shadow-sm">
+                                        <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
+                                        <div>
+                                            <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Diesel</span>
+                                            <span class="text-lg md:text-xl font-black text-slate-900 leading-none">
+                                                {{ $gasolinera->diesel ? number_format($gasolinera->diesel, 3) : '---' }}<span class="text-xs font-semibold ml-0.5 text-slate-500">€/L</span>
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="bg-blue-50/40 border border-blue-200/40 px-3.5 py-1.5 rounded-xl flex items-center gap-2 transition-transform duration-300 hover:scale-105">
-                                        <span class="text-[9px] font-bold text-blue-500 uppercase tracking-wider">SP 95</span>
-                                        <span class="text-lg md:text-xl font-black text-blue-600 leading-none">
-                                            {{ $gasolinera->gasolina95 ? number_format($gasolinera->gasolina95, 3) : '---' }}€
-                                        </span>
+                                    <div class="bg-gradient-to-br from-blue-50/80 to-indigo-50/50 border border-blue-100 px-4 py-2 rounded-2xl flex items-center gap-3 transition-all duration-300 hover:scale-[1.03] hover:shadow-sm">
+                                        <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                                        <div>
+                                            <span class="block text-[8px] font-bold text-blue-500 uppercase tracking-widest leading-none mb-1">SP 95</span>
+                                            <span class="text-lg md:text-xl font-black text-blue-600 leading-none">
+                                                {{ $gasolinera->gasolina95 ? number_format($gasolinera->gasolina95, 3) : '---' }}<span class="text-xs font-semibold ml-0.5 text-blue-500">€/L</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -358,21 +374,26 @@
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach(array_slice($contenido->servicios, 0, 4) as $servicio)
                                             @php
-                                                $badgeClasses = 'bg-slate-50 text-slate-500 border-slate-200/50';
+                                                $badgeClasses = 'bg-slate-50/80 text-slate-600 border-slate-200/50';
+                                                $dotColor = 'bg-slate-400';
                                                 if (in_array($servicio, ['Tienda', 'Cafeteria', 'Restaurante'])) {
-                                                    $badgeClasses = 'bg-emerald-50 text-emerald-700 border-emerald-100/50';
+                                                    $badgeClasses = 'bg-emerald-50/80 text-emerald-700 border-emerald-100/50';
+                                                    $dotColor = 'bg-emerald-500';
                                                 } elseif (in_array($servicio, ['GLP', 'Electrico'])) {
-                                                    $badgeClasses = 'bg-amber-50 text-amber-700 border-amber-100/50';
+                                                    $badgeClasses = 'bg-amber-50/80 text-amber-700 border-amber-100/50';
+                                                    $dotColor = 'bg-amber-500';
                                                 } elseif (in_array($servicio, ['Lavado'])) {
-                                                    $badgeClasses = 'bg-indigo-50/70 text-indigo-700 border-indigo-100/70';
+                                                    $badgeClasses = 'bg-indigo-50/80 text-indigo-700 border-indigo-100/60';
+                                                    $dotColor = 'bg-indigo-500';
                                                 }
                                             @endphp
-                                            <span class="px-2.5 py-1 border rounded-full text-[10px] font-bold tracking-wide {{ $badgeClasses }}">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-[10px] font-bold tracking-wider uppercase {{ $badgeClasses }}">
+                                                <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }}"></span>
                                                 {{ $servicio }}
                                             </span>
                                         @endforeach
                                         @if(count($contenido->servicios) > 4)
-                                            <span class="px-2 py-1 bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-400 rounded-full">
+                                            <span class="inline-flex items-center px-3 py-1 bg-slate-50/80 border border-slate-200 text-[10px] font-bold text-slate-400 rounded-full">
                                                 +{{ count($contenido->servicios) - 4 }}
                                             </span>
                                         @endif
@@ -421,10 +442,16 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform translate-y-4"
              x-transition:enter-end="opacity-100 transform translate-y-0"
-             class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-slate-100 max-w-4xl mx-auto"
+             class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600 max-w-4xl mx-auto"
              style="display: none;">
-            <h2 class="text-3xl font-black text-slate-900 mb-6">Quiénes Somos</h2>
-            <div class="prose max-w-none text-slate-600 leading-relaxed">
+            <!-- Subtle background decoration pattern -->
+            <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <h2 class="text-3xl font-black text-slate-900 mb-6 relative pb-2 border-b border-slate-100">
+                Quiénes Somos
+                <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+            </h2>
+            <div class="prose max-w-none text-slate-600 leading-relaxed mt-6">
                 @if($homeConfig && $homeConfig->quienes_somos)
                     {!! $homeConfig->quienes_somos !!}
                 @else
@@ -438,10 +465,16 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform translate-y-4"
              x-transition:enter-end="opacity-100 transform translate-y-0"
-             class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-slate-100 max-w-4xl mx-auto"
+             class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600 max-w-4xl mx-auto"
              style="display: none;">
-            <h2 class="text-3xl font-black text-slate-900 mb-2">Contacto</h2>
-            <p class="text-slate-500 mb-8 text-base">¿Tienes alguna duda o sugerencia? Completa el formulario a continuación y nos pondremos en contacto contigo lo antes posible.</p>
+            <!-- Subtle background decoration pattern -->
+            <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <h2 class="text-3xl font-black text-slate-900 mb-2 relative pb-2 border-b border-slate-100">
+                Contacto
+                <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+            </h2>
+            <p class="text-slate-500 mb-8 text-base mt-6">¿Tienes alguna duda o sugerencia? Completa el formulario a continuación y nos pondremos en contacto contigo lo antes posible.</p>
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <!-- Form (Col 1-7) -->
@@ -467,7 +500,7 @@
                 </form>
 
                 <!-- Sidebar (Col 8-12) -->
-                <div class="lg:col-span-5 bg-slate-50 border border-slate-100 p-6 rounded-2xl space-y-6">
+                <div class="lg:col-span-5 bg-gradient-to-br from-slate-50 to-blue-50/30 border border-slate-200/60 p-6 rounded-2xl space-y-6 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.01)]">
                     <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-2">Oficinas Centrales</h3>
                     
                     @if($homeConfig && $homeConfig->contacto_direccion)

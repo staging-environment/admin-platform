@@ -26,7 +26,13 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased relative overflow-x-hidden" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+
+    <!-- Glowing background orbs for modern depth -->
+    <div class="absolute top-[40vh] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[120vh] pointer-events-none overflow-hidden z-0 opacity-40">
+        <div class="absolute top-10 left-10 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan-400/10 rounded-full blur-[120px]"></div>
+    </div>
 
     @php
         $contenido = $estacion->contenido;
@@ -160,7 +166,7 @@
     </div>
 
     <!-- Navegación de Pestañas -->
-    <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm">
+    <div class="sticky top-0 z-40 bg-white/75 backdrop-blur-xl border-b border-slate-200/40 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.015)]">
         <div class="max-w-7xl mx-auto px-6">
             <nav class="flex gap-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
                 <button @click="tab = 'inicio'" :class="tab === 'inicio' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
@@ -203,26 +209,49 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative items-start">
             
             <!-- Area de Contenido (2/3) -->
-            <div class="lg:col-span-2 relative min-h-[500px]">
+            <div class="lg:col-span-2 relative min-h-[500px] z-10">
                 
                 <!-- Pestaña: Inicio -->
                 <div x-show="tab === 'inicio'" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
-                    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                        <h2 class="text-3xl font-black text-slate-900 mb-6">Bienvenido a {{ $estacion->Nombre }}</h2>
-                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed">
+                    <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
+                        <!-- Subtle background decoration pattern -->
+                        <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <h2 class="text-3xl font-black text-slate-900 mb-6 relative pb-2 border-b border-slate-100">
+                            Bienvenido a {{ $estacion->Nombre }}
+                            <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+                        </h2>
+                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6">
                             @if($contenido && $contenido->texto_inicio)
                                 {!! $contenido->texto_inicio !!}
                             @else
-                                <p>Encuentra los mejores precios y el mejor servicio en nuestra estación. Abierto para ofrecerte la máxima calidad en carburantes y servicios adicionales para tu vehículo.</p>
+                                <p>Encuentra los mejores precios and el mejor servicio en nuestra estación. Abierto para ofrecerte la máxima calidad en carburantes y servicios adicionales para tu vehículo.</p>
                             @endif
                         </div>
                         
                         @if($contenido && $contenido->servicios && count($contenido->servicios) > 0)
                         <div class="mt-10">
-                            <h3 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-4">Servicios Disponibles</h3>
+                            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4">Servicios Disponibles</h3>
                             <div class="flex flex-wrap gap-3">
                                 @foreach($contenido->servicios as $servicio)
-                                    <span class="px-5 py-2 bg-blue-50 border border-blue-100 rounded-full text-sm font-medium text-blue-800 shadow-sm">{{ $servicio }}</span>
+                                    @php
+                                        $badgeClasses = 'bg-slate-50/80 text-slate-600 border-slate-200/50';
+                                        $dotColor = 'bg-slate-400';
+                                        if (in_array($servicio, ['Tienda', 'Cafeteria', 'Restaurante'])) {
+                                            $badgeClasses = 'bg-emerald-50/80 text-emerald-700 border-emerald-100/50';
+                                            $dotColor = 'bg-emerald-500';
+                                        } elseif (in_array($servicio, ['GLP', 'Electrico'])) {
+                                            $badgeClasses = 'bg-amber-50/80 text-amber-700 border-amber-100/50';
+                                            $dotColor = 'bg-amber-500';
+                                        } elseif (in_array($servicio, ['Lavado'])) {
+                                            $badgeClasses = 'bg-indigo-50/80 text-indigo-700 border-indigo-100/60';
+                                            $dotColor = 'bg-indigo-500';
+                                        }
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1.5 px-4 py-2 border rounded-full text-xs font-bold tracking-wider uppercase {{ $badgeClasses }} shadow-sm">
+                                        <span class="w-2 h-2 rounded-full {{ $dotColor }}"></span>
+                                        {{ $servicio }}
+                                    </span>
                                 @endforeach
                             </div>
                         </div>
@@ -232,9 +261,15 @@
 
                 <!-- Pestaña: Quiénes Somos -->
                 <div x-show="tab === 'quienes_somos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
-                    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                        <h2 class="text-3xl font-black text-slate-900 mb-6">Sobre Nosotros</h2>
-                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed">
+                    <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
+                        <!-- Subtle background decoration pattern -->
+                        <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <h2 class="text-3xl font-black text-slate-900 mb-6 relative pb-2 border-b border-slate-100">
+                            Sobre Nosotros
+                            <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+                        </h2>
+                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6">
                             @if($contenido && $contenido->quienes_somos)
                                 {!! $contenido->quienes_somos !!}
                             @else
@@ -246,9 +281,15 @@
 
                 <!-- Pestaña: Dónde Estamos -->
                 <div x-show="tab === 'donde_estamos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
-                    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                            <h2 class="text-3xl font-black text-slate-900">Ubicación</h2>
+                    <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
+                        <!-- Subtle background decoration pattern -->
+                        <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 relative pb-2 border-b border-slate-100">
+                            <h2 class="text-3xl font-black text-slate-900 relative">
+                                Ubicación
+                                <span class="absolute -bottom-2 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+                            </h2>
                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ $lat }},{{ $lng }}" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all transform hover:-translate-y-0.5">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                                 Cómo llegar en GPS
@@ -256,7 +297,7 @@
                         </div>
                         
                         @if($contenido && $contenido->donde_estamos_texto)
-                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mb-8">
+                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mb-8 mt-6">
                             {!! $contenido->donde_estamos_texto !!}
                         </div>
                         @endif
@@ -335,9 +376,15 @@
                      x-transition:leave-end="opacity-0 transform translate-y-4" 
                      class="absolute inset-x-0 top-0">
                      
-                    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                        <h2 class="text-3xl font-black text-slate-900 mb-2">Contacta con Nosotros</h2>
-                        <p class="text-slate-500 mb-8 text-lg">Rellena el siguiente formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                    <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
+                        <!-- Subtle background decoration pattern -->
+                        <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <h2 class="text-3xl font-black text-slate-900 mb-2 relative pb-2 border-b border-slate-100">
+                            Contacta con Nosotros
+                            <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
+                        </h2>
+                        <p class="text-slate-500 mb-8 text-lg mt-6">Rellena el siguiente formulario y nos pondremos en contacto contigo lo antes posible.</p>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                             <!-- Form (Col 1-7) -->
@@ -363,7 +410,7 @@
                             </form>
 
                             <!-- Sidebar (Col 8-12) -->
-                            <div class="lg:col-span-5 bg-slate-50 border border-slate-100 p-6 rounded-2xl space-y-6">
+                            <div class="lg:col-span-5 bg-gradient-to-br from-slate-50 to-blue-50/30 border border-slate-200/60 p-6 rounded-2xl space-y-6 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.01)]">
                                 <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-2">Datos de la Estación</h3>
                                 
                                 @php
@@ -430,21 +477,30 @@
             </div>
 
             <!-- Area de Sidebar (1/3) -->
-            <div class="space-y-6 w-full max-w-md mx-auto lg:max-w-none">
+            <div class="space-y-6 w-full max-w-md mx-auto lg:max-w-none z-10">
                 <!-- Panel de Precios -->
-                <div class="bg-white p-8 rounded-[2rem] sticky top-32 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 border-t-4 border-t-blue-500">
-                    <h4 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 rounded-[2rem] sticky top-32 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-t-4 border-t-blue-500">
+                    <!-- Subtle background decoration pattern -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <h4 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-2 relative">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         Precios Hoy
                     </h4>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-500 font-bold uppercase text-xs">Diesel A</span>
-                            <span class="text-3xl font-black text-slate-900">{{ number_format($estacion->diesel ?? 0, 3) }}<span class="text-xl text-slate-400 ml-1">€</span></span>
+                    <div class="space-y-4 relative">
+                        <div class="flex justify-between items-center p-5 bg-white border border-slate-200/60 rounded-2xl shadow-sm transition-transform duration-300 hover:scale-[1.02]">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
+                                <span class="text-slate-500 font-bold uppercase text-xs">Diesel</span>
+                            </div>
+                            <span class="text-3xl font-black text-slate-900">{{ number_format($estacion->diesel ?? 0, 3) }}<span class="text-xs font-semibold ml-0.5 text-slate-400">€/L</span></span>
                         </div>
-                        <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-500 font-bold uppercase text-xs">Sin Plomo 95</span>
-                            <span class="text-3xl font-black text-blue-600">{{ number_format($estacion->gasolina95 ?? 0, 3) }}<span class="text-xl text-blue-300 ml-1">€</span></span>
+                        <div class="flex justify-between items-center p-5 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 border border-blue-100/80 rounded-2xl shadow-sm transition-transform duration-300 hover:scale-[1.02]">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                                <span class="text-blue-600 font-bold uppercase text-xs">SP 95</span>
+                            </div>
+                            <span class="text-3xl font-black text-blue-600">{{ number_format($estacion->gasolina95 ?? 0, 3) }}<span class="text-xs font-semibold ml-0.5 text-blue-400">€/L</span></span>
                         </div>
                     </div>
 
