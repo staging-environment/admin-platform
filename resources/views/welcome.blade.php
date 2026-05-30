@@ -74,6 +74,7 @@
                 foreach ($images as $img) {
                     $sliderImages[] = Storage::disk('public')->url($img);
                 }
+                $sliderImages = array_reverse($sliderImages);
             }
         }
         
@@ -100,64 +101,30 @@
         }
     </style>
 
-    <!-- Cinematic Alpine.js Header Slider (Identical to details page slider) -->
+    <!-- Cinematic Alpine.js Header Slider -->
     <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic" 
-         x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" 
-         x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
+         x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }} }" 
+         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 5000)">
         
-        <template x-for="(slide, index) in slides" :key="index">
-            <div x-show="activeSlide === index" 
+        @foreach ($sliderImages as $index => $slide)
+            <div x-show="activeSlide === {{ $index }}" 
                  x-transition:enter="transition ease-out duration-1000"
                  x-transition:enter-start="opacity-0 transform scale-105"
                  x-transition:enter-end="opacity-100 transform scale-100"
                  x-transition:leave="transition ease-in duration-1000"
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-105"
-                 class="absolute inset-0 w-full h-full">
-                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
+                 class="absolute inset-0 w-full h-full"
+                 style="display: {{ $index === 0 ? 'block' : 'none' }};"
+                 :class="activeSlide === {{ $index }} ? 'z-10 pointer-events-auto' : 'z-0 pointer-events-none'">
+                <img src="{{ $slide }}" class="w-full h-full object-cover object-center" alt="Slider image">
+                <!-- Soft gradient for branding overlay readability -->
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
             </div>
-        </template>
-
-        <!-- Lightbox Modal -->
-        <div x-show="lightboxOpen" 
-             class="fixed inset-0 z-50 overflow-hidden bg-slate-950/95 flex flex-col items-center justify-center p-4 md:p-10 select-none" 
-             style="display: none;" 
-             x-cloak
-             @keydown.window.escape="lightboxOpen = false"
-             @keydown.window.arrow-left="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1"
-             @keydown.window.arrow-right="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1">
-            
-            <!-- Close Button -->
-            <button @click="lightboxOpen = false" class="absolute top-6 right-6 text-white/70 hover:text-white transition p-2 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-
-            <!-- Prev Button -->
-            <button @click="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1" 
-                    class="absolute left-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-
-            <!-- Next Button -->
-            <button @click="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1" 
-                    class="absolute right-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-
-            <!-- Image Container -->
-            <div class="relative max-w-5xl max-h-[80vh] flex items-center justify-center" @click.away="lightboxOpen = false">
-                <img :src="slides[lightboxIndex]" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" alt="Full image">
-            </div>
-
-            <!-- Counter / Caption -->
-            <div class="mt-6 text-white/60 text-sm font-semibold tracking-wider">
-                Imagen <span x-text="lightboxIndex + 1"></span> de <span x-text="slides.length"></span>
-            </div>
-        </div>
+        @endforeach
         
         <!-- Navbar Overlay -->
-        <header class="absolute top-0 left-0 right-0 z-10 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+        <header class="absolute top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
             <div class="flex items-center gap-3 bg-slate-950/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10">
                 <div class="bg-gradient-to-tr from-blue-600 to-cyan-500 text-white w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg shadow-lg">
                     U
@@ -192,9 +159,31 @@
             </nav>
         </header>
 
-        <!-- Titulo en el Slider -->
-        <div class="absolute left-0 right-0 z-10 max-w-7xl mx-auto px-6" style="bottom: 24px;">
-            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-xl" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+        <!-- Left Navigation Arrow (Inside Slider) -->
+        <template x-if="slides.length > 1">
+            <button @click="activeSlide = activeSlide === 0 ? slides.length - 1 : activeSlide - 1" 
+                    class="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-slate-950/60 hover:bg-blue-600 text-white p-2.5 md:p-3 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 hover:scale-110 focus:outline-none flex items-center justify-center pointer-events-auto border border-white/10"
+                    title="Anterior">
+                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+        </template>
+
+        <!-- Right Navigation Arrow (Inside Slider) -->
+        <template x-if="slides.length > 1">
+            <button @click="activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1" 
+                    class="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-slate-950/60 hover:bg-blue-600 text-white p-2.5 md:p-3 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 hover:scale-110 focus:outline-none flex items-center justify-center pointer-events-auto border border-white/10"
+                    title="Siguiente">
+                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </template>
+
+        <!-- Title Card Overlay (Inside Slider) -->
+        <div class="absolute left-0 right-0 z-20 max-w-7xl mx-auto px-6 pointer-events-none" style="bottom: 24px;">
+            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-xl pointer-events-auto" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
                 <span class="px-2 py-0.5 bg-blue-500/25 backdrop-blur-md border border-blue-400/30 rounded-full text-[9px] font-bold text-blue-300 tracking-wider uppercase">
                     Nuestra Red
                 </span>
@@ -202,7 +191,7 @@
                     {{ $homeConfig->titulo ?? 'Red de Estaciones de Servicio' }}
                 </h1>
                 <p class="text-xs md:text-sm text-slate-300 font-medium drop-shadow-md leading-relaxed">
-                    {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación y planifica tu ruta.' }}
+                    {{ $homeConfig->subtitulo ?? 'Precios en tiempo real y servicios premium en carretera. Consulta los combustibles de cada estación and planifica tu ruta.' }}
                 </p>
             </div>
         </div>

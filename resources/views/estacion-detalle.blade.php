@@ -44,6 +44,7 @@
                 foreach ($images as $img) {
                     $sliderImages[] = Storage::disk('public')->url($img);
                 }
+                $sliderImages = array_reverse($sliderImages);
             }
         }
         
@@ -71,97 +72,94 @@
         }
     </style>
 
-    <!-- Slider Header -->
-    <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic" x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }}, lightboxOpen: false, lightboxIndex: 0 }" x-init="setInterval(() => { if (!lightboxOpen) { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 } }, 5000)">
-        <template x-for="(slide, index) in slides" :key="index">
-            <div x-show="activeSlide === index" 
-                 x-transition:enter="transition ease-out duration-1000"
-                 x-transition:enter-start="opacity-0 transform scale-105"
-                 x-transition:enter-end="opacity-100 transform scale-100"
-                 x-transition:leave="transition ease-in duration-1000"
-                 x-transition:leave-start="opacity-100 transform scale-100"
-                 x-transition:leave-end="opacity-0 transform scale-105"
-                 class="absolute inset-0 w-full h-full">
-                <img :src="slide" class="w-full h-full object-cover object-center cursor-zoom-in" alt="Slider image" @click="lightboxOpen = true; lightboxIndex = index">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent pointer-events-none"></div>
-            </div>
-        </template>
-
-        <!-- Lightbox Modal -->
-        <div x-show="lightboxOpen" 
-             class="fixed inset-0 z-50 overflow-hidden bg-slate-950/95 flex flex-col items-center justify-center p-4 md:p-10 select-none" 
-             style="display: none;" 
-             x-cloak
-             @keydown.window.escape="lightboxOpen = false"
-             @keydown.window.arrow-left="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1"
-             @keydown.window.arrow-right="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1">
-            
-            <!-- Close Button -->
-            <button @click="lightboxOpen = false" class="absolute top-6 right-6 text-white/70 hover:text-white transition p-2 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-
-            <!-- Prev Button -->
-            <button @click="lightboxIndex = lightboxIndex === 0 ? slides.length - 1 : lightboxIndex - 1" 
-                    class="absolute left-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-
-            <!-- Next Button -->
-            <button @click="lightboxIndex = lightboxIndex === slides.length - 1 ? 0 : lightboxIndex + 1" 
-                    class="absolute right-6 text-white/70 hover:text-white transition p-3 rounded-full hover:bg-white/10 z-50">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-
-            <!-- Image Container -->
-            <div class="relative max-w-5xl max-h-[80vh] flex items-center justify-center" @click.away="lightboxOpen = false">
-                <img :src="slides[lightboxIndex]" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" alt="Full image">
-            </div>
-
-            <!-- Counter / Caption -->
-            <div class="mt-6 text-white/60 text-sm font-semibold tracking-wider">
-                Imagen <span x-text="lightboxIndex + 1"></span> de <span x-text="slides.length"></span>
-            </div>
-        </div>
+    <!-- Wrapper to share Alpine.js state between Slider and Control Bar -->
+    <div x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }} }" 
+         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 5000)">
         
-        <!-- Navbar Overlay -->
-        <header class="absolute top-0 left-0 right-0 z-10 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-            <a href="/" class="glass-panel text-slate-800 hover:bg-white px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold text-sm shadow-lg">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Volver a la página principal
-            </a>
-            <div class="flex gap-3 items-center">
-                @auth
-                    @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_gasolineras') || auth()->user()->id === 1)
-                    <a href="{{ url('/admin/gasolineras/' . $estacion->Codigo . '/edit') }}" class="text-xs font-bold glass-panel text-emerald-600 px-5 py-2.5 rounded-full hover:bg-emerald-50 transition-all shadow-lg flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        EDITAR
-                    </a>
-                    @endif
-                    <a href="{{ route('dashboard') }}" class="text-xs font-bold glass-panel text-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-50 transition-all shadow-lg flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        PANEL
-                    </a>
-                @endauth
-            </div>
-        </header>
+        <!-- Slider Header -->
+        <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic">
+            
+            @foreach ($sliderImages as $index => $slide)
+                <div x-show="activeSlide === {{ $index }}" 
+                     x-transition:enter="transition ease-out duration-1000"
+                     x-transition:enter-start="opacity-0 transform scale-105"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     x-transition:leave="transition ease-in duration-1000"
+                     x-transition:leave-start="opacity-100 transform scale-100"
+                     x-transition:leave-end="opacity-0 transform scale-105"
+                     class="absolute inset-0 w-full h-full"
+                     style="display: {{ $index === 0 ? 'block' : 'none' }};"
+                     :class="activeSlide === {{ $index }} ? 'z-10 pointer-events-auto' : 'z-0 pointer-events-none'">
+                    <img src="{{ $slide }}" class="w-full h-full object-cover object-center" alt="Slider image">
+                    <!-- Soft gradient for branding overlay readability -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none"></div>
+                </div>
+            @endforeach
+            
+            <!-- Navbar Overlay -->
+            <header class="absolute top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+                <a href="/" class="glass-panel text-slate-800 hover:bg-white px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold text-sm shadow-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Volver a la página principal
+                </a>
+                <div class="flex gap-3 items-center">
+                    @auth
+                        @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_gasolineras') || auth()->user()->id === 1)
+                        <a href="{{ url('/admin/gasolineras/' . $estacion->Codigo . '/edit') }}" class="text-xs font-bold glass-panel text-emerald-600 px-5 py-2.5 rounded-full hover:bg-emerald-50 transition-all shadow-lg flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            EDITAR
+                        </a>
+                        @endif
+                        <a href="{{ route('dashboard') }}" class="text-xs font-bold glass-panel text-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-50 transition-all shadow-lg flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            PANEL
+                        </a>
+                    @endauth
+                </div>
+            </header>
 
-        <!-- Titulo en el Slider -->
-        <div class="absolute left-0 right-0 z-10 max-w-7xl mx-auto px-6" style="bottom: 24px;">
-            <div class="inline-block border border-white/15 p-3.5 md:p-5 rounded-2xl shadow-2xl max-w-xl" style="background-color: rgba(2, 6, 23, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
-                <span class="px-2 py-0.5 bg-blue-500/25 backdrop-blur-md border border-blue-400/30 rounded-full text-[9px] font-bold text-blue-300 tracking-wider uppercase">
-                    Estación de Servicio
-                </span>
-                <h1 class="text-xl md:text-2xl lg:text-3xl font-black text-white drop-shadow-2xl mt-2 mb-1 leading-tight">
-                    {{ $estacion->Nombre }}
-                </h1>
-                <p class="text-xs md:text-sm text-blue-300 font-medium drop-shadow-md flex items-center gap-1.5 mt-1.5">
-                    <svg class="w-3.5 h-3.5 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <!-- Left Navigation Arrow (Inside Slider) -->
+            <template x-if="slides.length > 1">
+                <button @click="activeSlide = activeSlide === 0 ? slides.length - 1 : activeSlide - 1" 
+                        class="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-slate-950/60 hover:bg-blue-600 text-white p-2.5 md:p-3 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 hover:scale-110 focus:outline-none flex items-center justify-center pointer-events-auto border border-white/10"
+                        title="Anterior">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
                     </svg>
-                    <span class="truncate">{{ $estacion->Direccion }}, {{ $estacion->Poblacion }}</span>
-                </p>
+                </button>
+            </template>
+
+            <!-- Right Navigation Arrow (Inside Slider) -->
+            <template x-if="slides.length > 1">
+                <button @click="activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1" 
+                        class="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-slate-950/60 hover:bg-blue-600 text-white p-2.5 md:p-3 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 hover:scale-110 focus:outline-none flex items-center justify-center pointer-events-auto border border-white/10"
+                        title="Siguiente">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </template>
+        </div>
+
+        <!-- Title and Details Bar (Below Slider) -->
+        <div class="bg-white border-b border-slate-200/60 py-6 relative z-30">
+            <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <!-- Left: Title & Subtitle -->
+                <div class="max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold uppercase tracking-wider rounded-full">
+                        Estación de Servicio
+                    </span>
+                    <h1 class="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 mt-2 mb-1">
+                        {{ $estacion->Nombre }}
+                    </h1>
+                    <p class="text-xs md:text-sm text-blue-600 font-medium flex items-center gap-1.5 mt-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="truncate">{{ $estacion->Direccion }}, {{ $estacion->Poblacion }}</span>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

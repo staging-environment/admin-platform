@@ -55,7 +55,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => \Illuminate\Support\Facades\Blade::render("@vite(['resources/css/filament-nav.css'])"),
+                fn (): string => \Illuminate\Support\Facades\Blade::render("
+                    @vite(['resources/css/filament-nav.css'])
+                    @include('filament.custom-filepond')
+                "),
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::BODY_START,

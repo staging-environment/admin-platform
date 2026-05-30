@@ -71,8 +71,8 @@ class GasolineraForm
                             ->itemPanelAspectRatio('1:3.5')
                             ->disk('public')
                             ->directory('gasolineras/sliders')
-                            ->columnSpanFull()
-                            ->reorderable(),
+                            ->reorderable()
+                            ->columnSpanFull(),
 
                         TinyEditor::make('texto_inicio')
                             ->label('Texto Principal (Pestaña Inicio)')
