@@ -104,7 +104,7 @@
     <!-- Cinematic Alpine.js Header Slider -->
     <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic" 
          x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }} }" 
-         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 5000)">
+         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 10000)">
         
         @foreach ($sliderImages as $index => $slide)
             <div x-show="activeSlide === {{ $index }}" 

@@ -74,7 +74,7 @@
 
     <!-- Wrapper to share Alpine.js state between Slider and Control Bar -->
     <div x-data="{ activeSlide: 0, slides: {{ json_encode($sliderImages) }} }" 
-         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 5000)">
+         x-init="setInterval(() => { activeSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1 }, 10000)">
         
         <!-- Slider Header -->
         <div class="relative w-full overflow-hidden bg-slate-900 slider-container-dynamic">
