@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::connection('mariadb')->table('home_configs', function (Blueprint $table) {
-            $table->decimal('latitud', 10, 8)->nullable()->after('contacto_direccion');
-            $table->decimal('longitud', 11, 8)->nullable()->after('latitud');
+            if (!Schema::connection('mariadb')->hasColumn('home_configs', 'latitud')) {
+                $table->decimal('latitud', 10, 8)->nullable()->after('contacto_direccion');
+            }
+            if (!Schema::connection('mariadb')->hasColumn('home_configs', 'longitud')) {
+                $table->decimal('longitud', 11, 8)->nullable()->after('latitud');
+            }
         });
     }
 
@@ -23,7 +27,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::connection('mariadb')->table('home_configs', function (Blueprint $table) {
-            $table->dropColumn(['latitud', 'longitud']);
+            $cols = [];
+            if (Schema::connection('mariadb')->hasColumn('home_configs', 'latitud')) {
+                $cols[] = 'latitud';
+            }
+            if (Schema::connection('mariadb')->hasColumn('home_configs', 'longitud')) {
+                $cols[] = 'longitud';
+            }
+            if (!empty($cols)) {
+                $table->dropColumn($cols);
+            }
         });
     }
 };
