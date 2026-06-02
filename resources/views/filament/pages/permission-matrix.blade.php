@@ -53,6 +53,7 @@
                                     'ver_informes' => 'Ver Informes y Estadísticas',
                                     'gestion_gasolineras' => 'Gestión de Gasolineras',
                                     'gestion_portada' => 'Configuración de Portada',
+                                    'gestion_ofertas' => 'Gestión de Ofertas de Trabajo',
                                 ];
                             @endphp
                             {{ $f[$n] ?? $n }}
