@@ -32,6 +32,7 @@ class PermissionSeeder extends Seeder
             'ver_informes',
             'gestion_gasolineras',
             'gestion_portada',
+            'gestion_ofertas',
         ];
 
         foreach ($permissions as $permission) {

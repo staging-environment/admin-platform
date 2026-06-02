@@ -60,6 +60,14 @@ return [
             'report' => false,
         ],
 
+        'private_cvs' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private_cvs'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*
@@ -76,5 +84,4 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
-
 ];

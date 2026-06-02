@@ -27,7 +27,7 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     public function canAccessPanel(Panel $panel): bool
     {
         // Te da acceso absoluto si eres tú o si tienes el rol admin en la BD
-        return $this->hasRole('admin') || $this->email === 'jarodriguezbonilla@gmail.com';
+        return $this->hasRole('Admin') || $this->hasRole('admin') || $this->email === 'jarodriguezbonilla@gmail.com';
     }
 
     /**

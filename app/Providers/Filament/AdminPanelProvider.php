@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\JobOffers\JobOfferResource; // <-- Importamos tu recurso manualmente
+use App\Filament\Resources\JobApplications\JobApplicationResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -34,7 +36,15 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::Red,
                 'success' => Color::Green,
             ])
+            // Devolvemos el discoverResources a su estado original sin inventos
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            
+            // Registramos tu recurso de Ofertas de Empleo a mano para saltarnos la limitación de la subcarpeta
+            ->resources([
+                JobOfferResource::class,
+                JobApplicationResource::class,
+            ])
+            
             ->pages([])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')

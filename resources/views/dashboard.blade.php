@@ -56,6 +56,37 @@
                 </div>
             @endif
 
+            @php
+                $unreadApplications = \App\Models\JobApplication::with('jobOffer')->where('is_read', false)->orderBy('created_at', 'desc')->get();
+            @endphp
+            @if($unreadApplications->count() > 0)
+                <div class="flex flex-col gap-4">
+                    @foreach($unreadApplications as $app)
+                        <div class="bg-blue-600 rounded-lg p-3 shadow flex flex-col md:flex-row md:items-center justify-between text-white border border-blue-700" style="background-color: #2563eb;">
+                            <div class="flex items-center gap-3 mb-3 md:mb-0">
+                                <div class="bg-white/20 p-1.5 rounded-full">
+                                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold uppercase tracking-wider text-white">
+                                        ¡NUEVA INSCRIPCIÓN A: {{ $app->jobOffer->title ?? 'OFERTA DE EMPLEO' }}!
+                                    </h3>
+                                    <p class="text-xs text-blue-100">
+                                        Candidato: {{ $app->first_name }} {{ $app->last_name }} ({{ $app->email }}) - Hace {{ str_replace('hace ', '', $app->created_at->diffForHumans()) }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <a href="{{ url('/admin/job-applications/' . $app->id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 rounded-md font-bold shadow hover:bg-gray-50 transition-all text-xs" style="color: #2563eb;">
+                                VER CANDIDATURA
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             {{-- Modern Widgets: Weather & Server Monitor --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Weather Widget --}}

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Gasolinera;
 use App\Models\PreciosProducto;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Public\JobOfferController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserManagementController;
@@ -73,6 +74,11 @@ Route::get('/debug-logs', function () {
         'logs' => array_reverse($lines)
     ]);
 });
+
+// Job offers routes
+Route::get('/ofertas', [JobOfferController::class, 'index'])->name('offers.index');
+Route::get('/ofertas/{id}', [JobOfferController::class, 'show'])->name('offers.show');
+Route::post('/ofertas/{id}/apply', [JobOfferController::class, 'apply'])->name('offers.apply');
 
 Route::get('/estacion/{slug}', function ($slug) {
     try {

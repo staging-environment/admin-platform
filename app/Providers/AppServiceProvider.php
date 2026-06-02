@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\HomeConfig;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,5 +39,11 @@ class AppServiceProvider extends ServiceProvider
                 'x_forwarded_host' => request()->header('X-Forwarded-Host'),
             ]);
         }
+
+
+        // Share global data for all views
+        \Illuminate\Support\Facades\View::share('homeConfig', HomeConfig::first());
+        \Illuminate\Support\Facades\View::share('gasolineras', []);
+
     }
 }
