@@ -29,6 +29,7 @@ class RoleForm
                         'ver_informes' => 'Ver Informes y Estadísticas',
                         'gestion_gasolineras' => 'Gestión de Gasolineras',
                         'gestion_portada' => 'Configuración de Portada',
+                        'gestion_ofertas' => 'Gestión de Ofertas de Trabajo',
                         default => $record->name,
                     })
                     ->columns(3)
