@@ -180,6 +180,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/admin/candidaturas/{id}/descargar-cv', function ($id) {
+        $application = \App\Models\JobApplication::findOrFail($id);
+        $disk = \Illuminate\Support\Facades\Storage::disk('private_cvs');
+        if (!$disk->exists($application->cv_path)) {
+            abort(404, 'Archivo no encontrado');
+        }
+        return $disk->download($application->cv_path);
+    })->name('admin.cv.download');
+
 
 
     // Gestión de usuarios de la plataforma y del repositorio FTP

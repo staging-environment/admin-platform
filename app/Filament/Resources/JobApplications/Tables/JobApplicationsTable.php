@@ -20,9 +20,6 @@ class JobApplicationsTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->sortable(),
-
                 TextColumn::make('jobOffer.title')
                     ->label('Oferta de Empleo')
                     ->searchable()

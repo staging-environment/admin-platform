@@ -55,8 +55,17 @@ class JobApplicationForm
                 ->rows(3)
                 ->columnSpanFull(),
 
+            \Filament\Forms\Components\Placeholder::make('cv_download_link')
+                ->label('Currículum Actual')
+                ->content(function ($record) {
+                    if (!$record || !$record->cv_path) {
+                        return 'No hay currículum adjunto.';
+                    }
+                    return new \Illuminate\Support\HtmlString('<a href="' . route('admin.cv.download', $record->id) . '" target="_blank" style="color: #d97706; font-weight: bold; text-decoration: underline;">Descargar Currículum Actual (' . basename($record->cv_path) . ')</a>');
+                }),
+
             FileUpload::make('cv_path')
-                ->label('Currículum (PDF/DOC)')
+                ->label('Reemplazar Currículum (PDF/DOC)')
                 ->disk('private_cvs')
                 ->visibility('private')
                 ->required(),

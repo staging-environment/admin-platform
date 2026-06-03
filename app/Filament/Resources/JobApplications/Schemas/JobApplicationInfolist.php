@@ -29,6 +29,13 @@ class JobApplicationInfolist
                             ->label('Correo Electrónico'),
                         TextEntry::make('phone')
                             ->label('Teléfono'),
+                        TextEntry::make('cv_path')
+                            ->label('Currículum Adjunto')
+                            ->formatStateUsing(fn () => 'Descargar Currículum (PDF/DOC)')
+                            ->url(fn (\App\Models\JobApplication $record) => route('admin.cv.download', $record->id))
+                            ->openUrlInNewTab()
+                            ->color('primary')
+                            ->weight('bold'),
                         TextEntry::make('profile_description')
                             ->label('Mensaje / Carta de Presentación')
                             ->columnSpanFull(),

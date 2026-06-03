@@ -17,9 +17,6 @@ class JobOffersTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->sortable(),
-
                 TextColumn::make('title')
                     ->label('Título')
                     ->searchable()
