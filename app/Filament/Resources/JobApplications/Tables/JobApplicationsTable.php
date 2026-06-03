@@ -5,6 +5,7 @@ namespace App\Filament\Resources\JobApplications\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -51,16 +52,34 @@ class JobApplicationsTable
                     ->boolean()
                     ->sortable(),
 
+                SelectColumn::make('status')
+                    ->label('Estado')
+                    ->options([
+                        'Nueva petición' => 'Nueva petición',
+                        'En estudio' => 'En estudio',
+                        'Aceptada' => 'Aceptada',
+                        'Rechazada' => 'Rechazada',
+                    ])
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('Fecha de Inscripción')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('jobOffer')
-                    ->relationship('jobOffer', 'title')
+                SelectFilter::make('job_offer_id')
+                    ->options(fn () => \App\Models\JobOffer::pluck('title', 'id')->toArray())
                     ->label('Oferta de Empleo'),
-            ])
+                SelectFilter::make('status')
+                    ->options([
+                        'Nueva petición' => 'Nueva petición',
+                        'En estudio' => 'En estudio',
+                        'Aceptada' => 'Aceptada',
+                        'Rechazada' => 'Rechazada',
+                    ])
+                    ->label('Estado'),
+            ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 ViewAction::make()
                     ->before(function (JobApplication $record) {

@@ -68,6 +68,19 @@
 
                     <form action="{{ route('offers.apply', $offer->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                         @csrf
+                        
+                        {{-- Honeypot (Campo oculto para robots) --}}
+                        <div style="display: none;">
+                            <input type="text" name="website_url_check" tabindex="-1" autocomplete="off" placeholder="No rellenar">
+                        </div>
+
+                        @php
+                            $num1 = rand(1, 9);
+                            $num2 = rand(1, 9);
+                            $sum = $num1 + $num2;
+                            $captcha_token = encrypt($sum);
+                        @endphp
+
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nombre *</label>
                             <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm" placeholder="Tu nombre">
@@ -110,6 +123,13 @@
                                     <p id="cv-filename" class="text-xs text-emerald-600 font-bold hidden"></p>
                                 </div>
                             </div>
+                        </div>
+
+                        {{-- Captcha Matemático --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Verificación de seguridad: ¿Cuánto es {{ $num1 }} + {{ $num2 }}? *</label>
+                            <input type="number" name="captcha_answer" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm" placeholder="Escribe el resultado aquí">
+                            <input type="hidden" name="captcha_token" value="{{ $captcha_token }}">
                         </div>
 
                         <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/35 transition-all duration-300 uppercase tracking-widest">

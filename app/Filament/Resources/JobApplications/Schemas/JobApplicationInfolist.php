@@ -16,6 +16,8 @@ class JobApplicationInfolist
                     ->schema([
                         TextEntry::make('jobOffer.title')
                             ->label('Oferta de Empleo'),
+                        TextEntry::make('status')
+                            ->label('Estado'),
                         TextEntry::make('created_at')
                             ->label('Fecha de Inscripción')
                             ->dateTime('d/m/Y H:i'),

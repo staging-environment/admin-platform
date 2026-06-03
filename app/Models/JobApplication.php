@@ -21,6 +21,7 @@ class JobApplication extends Model
         'cv_path',
         'cover_letter',
         'is_read',
+        'status',
     ];
 
     protected $casts = [

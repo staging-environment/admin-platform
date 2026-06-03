@@ -105,12 +105,28 @@ Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
     
     if (!$estacion) abort(404);
     
+    // Honeypot check: if filled, silently succeed without saving to DB
+    if ($request->filled('website_url_check')) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
+    
     $codigo = $estacion->Codigo;
     $request->validate([
         'nombre' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'mensaje' => 'required|string',
+        'captcha_answer' => 'required|numeric',
+        'captcha_token' => 'required|string',
     ]);
+
+    try {
+        $correctAnswer = decrypt($request->captcha_token);
+        if ((int)$request->captcha_answer !== (int)$correctAnswer) {
+            return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
+    }
 
     ContactoMensaje::create([
         'gasolinera_codigo' => $codigo,
@@ -123,11 +139,27 @@ Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
 })->name('estacion.contacto');
 
 Route::post('/contacto', function (Request $request) {
+    // Honeypot check: if filled, silently succeed without saving to DB
+    if ($request->filled('website_url_check')) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
+
     $request->validate([
         'nombre' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'mensaje' => 'required|string',
+        'captcha_answer' => 'required|numeric',
+        'captcha_token' => 'required|string',
     ]);
+
+    try {
+        $correctAnswer = decrypt($request->captcha_token);
+        if ((int)$request->captcha_answer !== (int)$correctAnswer) {
+            return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
+    }
 
     ContactoMensaje::create([
         'gasolinera_codigo' => null,

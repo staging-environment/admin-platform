@@ -71,6 +71,12 @@ class JobOfferController extends Controller
     {
         $offer = JobOffer::where('active', true)->findOrFail($id);
 
+        // Honeypot check: if filled, silently succeed without saving to DB
+        if ($request->filled('website_url_check')) {
+            return redirect()->route('offers.show', $offer->id)
+                ->with('success', '¡Tu candidatura se ha enviado correctamente! Muchas gracias por tu interés.');
+        }
+
         $request->validate([
             'first_name'          => 'required|string|max:255',
             'last_name'           => 'required|string|max:255',
@@ -78,7 +84,18 @@ class JobOfferController extends Controller
             'phone'               => 'required|string|max:50',
             'profile_description' => 'nullable|string',
             'cv'                  => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'captcha_answer'      => 'required|numeric',
+            'captcha_token'       => 'required|string',
         ]);
+
+        try {
+            $correctAnswer = decrypt($request->captcha_token);
+            if ((int)$request->captcha_answer !== (int)$correctAnswer) {
+                return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
+        }
 
         // Guardar el CV en el disco privado configurado para candidaturas
         $cvPath = $request->file('cv')->store('cvs', 'private_cvs');

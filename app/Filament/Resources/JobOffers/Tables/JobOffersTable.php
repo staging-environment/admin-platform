@@ -52,11 +52,7 @@ class JobOffersTable
                     ->icon('heroicon-o-users')
                     ->color('info')
                     ->url(fn (JobOffer $record): string => route('filament.admin.resources.job-applications.index', [
-                        'tableFilters' => [
-                            'jobOffer' => [
-                                'value' => $record->id,
-                            ],
-                        ],
+                        'job_offer_id' => $record->id,
                     ])),
             ])
             ->bulkActions([

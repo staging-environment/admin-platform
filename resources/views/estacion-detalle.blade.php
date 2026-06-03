@@ -211,7 +211,7 @@
             <div class="lg:col-span-2 relative min-h-[500px] z-10">
                 
                 <!-- Pestaña: Inicio -->
-                <div x-show="tab === 'inicio'" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
+                <div x-show="tab === 'inicio'" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="w-full relative">
                     <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
                         <!-- Subtle background decoration pattern -->
                         <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -259,7 +259,7 @@
                 </div>
 
                 <!-- Pestaña: Quiénes Somos -->
-                <div x-show="tab === 'quienes_somos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
+                <div x-show="tab === 'quienes_somos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="w-full relative">
                     <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
                         <!-- Subtle background decoration pattern -->
                         <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -279,7 +279,7 @@
                 </div>
 
                 <!-- Pestaña: Dónde Estamos -->
-                <div x-show="tab === 'donde_estamos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="absolute inset-x-0 top-0">
+                <div x-show="tab === 'donde_estamos'" style="display: none;" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-4" class="w-full relative">
                     <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
                         <!-- Subtle background decoration pattern -->
                         <div class="absolute top-0 right-0 w-44 h-44 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -373,7 +373,7 @@
                      x-transition:leave="transition ease-in duration-200" 
                      x-transition:leave-start="opacity-100 transform translate-y-0" 
                      x-transition:leave-end="opacity-0 transform translate-y-4" 
-                     class="absolute inset-x-0 top-0">
+                     class="w-full relative">
                      
                     <div class="relative overflow-hidden bg-gradient-to-b from-white to-slate-50/40 p-8 md:p-12 rounded-[2rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.02)] border border-slate-200/60 border-l-4 border-l-blue-600">
                         <!-- Subtle background decoration pattern -->
@@ -389,6 +389,19 @@
                             <!-- Form (Col 1-7) -->
                             <form action="{{ route('estacion.contacto', $estacion->Codigo) }}" method="POST" class="lg:col-span-7 space-y-6">
                                 @csrf
+                                
+                                {{-- Honeypot (Campo oculto para robots) --}}
+                                <div style="display: none;">
+                                    <input type="text" name="website_url_check" tabindex="-1" autocomplete="off" placeholder="No rellenar">
+                                </div>
+
+                                @php
+                                    $num1 = rand(1, 9);
+                                    $num2 = rand(1, 9);
+                                    $sum = $num1 + $num2;
+                                    $captcha_token = encrypt($sum);
+                                @endphp
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Tu Nombre</label>
@@ -403,6 +416,14 @@
                                     <label class="block text-sm font-bold text-slate-700 mb-2">Mensaje</label>
                                     <textarea name="mensaje" rows="5" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                                 </div>
+
+                                {{-- Captcha Matemático --}}
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Verificación de seguridad: ¿Cuánto es {{ $num1 }} + {{ $num2 }}?</label>
+                                    <input type="number" name="captcha_answer" required class="w-full md:w-1/2 bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm" placeholder="Escribe el resultado aquí">
+                                    <input type="hidden" name="captcha_token" value="{{ $captcha_token }}">
+                                </div>
+
                                 <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30 uppercase tracking-wider">
                                     Enviar Mensaje
                                 </button>

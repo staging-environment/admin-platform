@@ -7,6 +7,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
@@ -86,10 +88,27 @@ class ApplicationsRelationManager extends RelationManager
 
                 TextColumn::make('phone')
                     ->label('Teléfono'),
+
+                SelectColumn::make('status')
+                    ->label('Estado')
+                    ->options([
+                        'Nueva petición' => 'Nueva petición',
+                        'En estudio' => 'En estudio',
+                        'Aceptada' => 'Aceptada',
+                        'Rechazada' => 'Rechazada',
+                    ])
+                    ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options([
+                        'Nueva petición' => 'Nueva petición',
+                        'En estudio' => 'En estudio',
+                        'Aceptada' => 'Aceptada',
+                        'Rechazada' => 'Rechazada',
+                    ])
+                    ->label('Estado'),
             ])
             ->headerActions([
                 // No permitimos crear inscripciones directamente desde el panel

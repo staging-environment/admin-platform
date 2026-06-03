@@ -233,6 +233,16 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if ($errors->any())
+            <div class="mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 flex flex-col gap-2">
+                @foreach ($errors->all() as $error)
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-sm">{{ $error }}</span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
 
         <!-- Tab 1: Inicio (Gas Stations Accordion List) -->
         <div x-show="tab === 'inicio'" 
@@ -472,6 +482,19 @@
                 <!-- Form (Col 1-7) -->
                 <form action="{{ route('home.contacto') }}" method="POST" class="lg:col-span-7 space-y-6">
                     @csrf
+                    
+                    {{-- Honeypot (Campo oculto para robots) --}}
+                    <div style="display: none;">
+                        <input type="text" name="website_url_check" tabindex="-1" autocomplete="off" placeholder="No rellenar">
+                    </div>
+
+                    @php
+                        $num1 = rand(1, 9);
+                        $num2 = rand(1, 9);
+                        $sum = $num1 + $num2;
+                        $captcha_token = encrypt($sum);
+                    @endphp
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tu Nombre</label>
@@ -486,6 +509,14 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mensaje</label>
                         <textarea name="mensaje" rows="5" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                     </div>
+
+                    {{-- Captcha Matemático --}}
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Verificación de seguridad: ¿Cuánto es {{ $num1 }} + {{ $num2 }}?</label>
+                        <input type="number" name="captcha_answer" required class="w-full md:w-1/2 bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm" placeholder="Escribe el resultado aquí">
+                        <input type="hidden" name="captcha_token" value="{{ $captcha_token }}">
+                    </div>
+
                     <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30 uppercase tracking-wider">
                         Enviar Mensaje
                     </button>

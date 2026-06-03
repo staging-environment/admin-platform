@@ -18,6 +18,17 @@ class JobApplicationForm
                 ->label('Oferta de Empleo')
                 ->required(),
 
+            Select::make('status')
+                ->label('Estado')
+                ->options([
+                    'Nueva petición' => 'Nueva petición',
+                    'En estudio' => 'En estudio',
+                    'Aceptada' => 'Aceptada',
+                    'Rechazada' => 'Rechazada',
+                ])
+                ->default('Nueva petición')
+                ->required(),
+
             TextInput::make('first_name')
                 ->label('Nombre')
                 ->required()
