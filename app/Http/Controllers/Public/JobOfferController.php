@@ -83,6 +83,9 @@ class JobOfferController extends Controller
             'email'               => 'required|email|max:255',
             'phone'               => 'required|string|max:50',
             'profile_description' => 'nullable|string',
+            'years_of_experience' => 'nullable|string|max:255',
+            'incorporation_time'  => 'nullable|string|max:255',
+            'travel_possibility'  => 'nullable|boolean',
             'cv'                  => 'required|file|mimes:pdf,doc,docx|max:5120',
             'captcha_answer'      => 'required|numeric',
             'captcha_token'       => 'required|string',
@@ -107,6 +110,9 @@ class JobOfferController extends Controller
             'email'               => $request->input('email'),
             'phone'               => $request->input('phone'),
             'profile_description' => $request->input('profile_description'),
+            'years_of_experience' => $request->input('years_of_experience'),
+            'incorporation_time'  => $request->input('incorporation_time'),
+            'travel_possibility'  => $request->has('travel_possibility'),
             'cv_path'             => $cvPath,
         ]);
 

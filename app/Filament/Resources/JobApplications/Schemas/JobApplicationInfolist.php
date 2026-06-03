@@ -29,6 +29,15 @@ class JobApplicationInfolist
                             ->label('Correo Electrónico'),
                         TextEntry::make('phone')
                             ->label('Teléfono'),
+                        TextEntry::make('years_of_experience')
+                            ->label('Años de experiencia'),
+                        TextEntry::make('incorporation_time')
+                            ->label('Tiempo de incorporación'),
+                        TextEntry::make('travel_possibility')
+                            ->label('¿Posibilidad de viajar?')
+                            ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                            ->badge()
+                            ->color(fn ($state) => $state ? 'success' : 'danger'),
                         TextEntry::make('cv_path')
                             ->label('Currículum Adjunto')
                             ->formatStateUsing(fn () => 'Descargar Currículum (PDF/DOC)')

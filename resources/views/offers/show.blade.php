@@ -102,6 +102,21 @@
                         </div>
 
                         <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Años de experiencia</label>
+                            <input type="text" name="years_of_experience" value="{{ old('years_of_experience') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm" placeholder="Ej: 3 años o Sin experiencia">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Tiempo de incorporación</label>
+                            <input type="text" name="incorporation_time" value="{{ old('incorporation_time') }}" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm" placeholder="Ej: Inmediata, 15 días, 1 mes">
+                        </div>
+
+                        <div class="flex items-center gap-2.5 py-1.5">
+                            <input type="checkbox" id="travel_possibility" name="travel_possibility" value="1" {{ old('travel_possibility') ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500/20 focus:ring-offset-0 transition-all">
+                            <label for="travel_possibility" class="text-xs font-bold text-slate-700 uppercase tracking-wider cursor-pointer select-none">¿Tiene posibilidad de viajar?</label>
+                        </div>
+
+                        <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Carta de presentación / Mensaje</label>
                             <textarea name="profile_description" rows="3" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm resize-none" placeholder="Háblanos un poco sobre ti..."></textarea>
                         </div>

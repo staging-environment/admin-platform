@@ -4,8 +4,9 @@ namespace App\Filament\Resources\JobOffers\Schemas;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\RichEditor;
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 
 class JobOfferForm
 {
@@ -18,9 +19,20 @@ class JobOfferForm
                 ->required()
                 ->maxLength(255),
 
-            RichEditor::make('description')
+            TinyEditor::make('description')
                 ->label('Descripción del puesto')
                 ->required(),
+
+            Grid::make(2)
+                ->schema([
+                    TextInput::make('min_experience')
+                        ->label('Experiencia mínima')
+                        ->maxLength(255),
+
+                    TextInput::make('salary_range')
+                        ->label('Rango salarial')
+                        ->maxLength(255),
+                ]),
 
             Toggle::make('active')
                 ->label('Oferta Activa / Publicada')

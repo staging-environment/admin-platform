@@ -47,6 +47,18 @@ class ApplicationsRelationManager extends RelationManager
                     ->label('Teléfono')
                     ->disabled(),
 
+                TextInput::make('years_of_experience')
+                    ->label('Años de experiencia')
+                    ->disabled(),
+
+                TextInput::make('incorporation_time')
+                    ->label('Tiempo de incorporación')
+                    ->disabled(),
+
+                \Filament\Forms\Components\Toggle::make('travel_possibility')
+                    ->label('Posibilidad de viajar')
+                    ->disabled(),
+
                 Textarea::make('profile_description')
                     ->label('Descripción / Perfil')
                     ->disabled()
@@ -57,6 +69,16 @@ class ApplicationsRelationManager extends RelationManager
                     ->label('Carta de Presentación')
                     ->disabled()
                     ->rows(3)
+                    ->columnSpanFull(),
+
+                \Filament\Forms\Components\Placeholder::make('cv_download_link')
+                    ->label('Currículum Adjunto')
+                    ->content(function ($record) {
+                        if (!$record || !$record->cv_path) {
+                            return 'No hay currículum adjunto.';
+                        }
+                        return new \Illuminate\Support\HtmlString('<a href="' . route('admin.cv.download', $record->id) . '" target="_blank" style="color: #d97706; font-weight: bold; text-decoration: underline;">Descargar Currículum (' . basename($record->cv_path) . ')</a>');
+                    })
                     ->columnSpanFull(),
             ]);
     }
@@ -88,6 +110,21 @@ class ApplicationsRelationManager extends RelationManager
 
                 TextColumn::make('phone')
                     ->label('Teléfono'),
+
+                TextColumn::make('years_of_experience')
+                    ->label('Años de experiencia')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('incorporation_time')
+                    ->label('Tiempo de incorporación')
+                    ->searchable()
+                    ->sortable(),
+
+                \Filament\Tables\Columns\IconColumn::make('travel_possibility')
+                    ->label('Viajar')
+                    ->boolean()
+                    ->sortable(),
 
                 SelectColumn::make('status')
                     ->label('Estado')

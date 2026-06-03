@@ -19,6 +19,9 @@ class JobOfferResource extends Resource
 {
     protected static ?string $model = JobOffer::class;
 
+    protected static ?string $modelLabel = 'Oferta de Empleo';
+    protected static ?string $pluralModelLabel = 'Ofertas de Empleo';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function canAccess(): bool

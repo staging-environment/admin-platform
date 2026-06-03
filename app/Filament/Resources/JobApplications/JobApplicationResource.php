@@ -23,7 +23,7 @@ class JobApplicationResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationLabel = 'Inscritos a Ofertas';
-    protected static ?string $pluralLabel = 'Inscripciones a Ofertas';
+    protected static ?string $pluralModelLabel = 'Inscripciones a Ofertas';
     protected static ?string $modelLabel = 'Inscripción';
 
     public static function getNavigationGroup(): ?string

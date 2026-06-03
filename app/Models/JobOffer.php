@@ -17,6 +17,8 @@ class JobOffer extends Model
         'location',
         'expires_at',
         'active',
+        'min_experience',
+        'salary_range',
     ];
 
     /**

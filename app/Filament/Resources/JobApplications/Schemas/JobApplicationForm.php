@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Toggle;
 
 class JobApplicationForm
 {
@@ -49,6 +50,18 @@ class JobApplicationForm
                 ->label('Teléfono')
                 ->required()
                 ->maxLength(255),
+
+            TextInput::make('years_of_experience')
+                ->label('Años de experiencia')
+                ->maxLength(255),
+
+            TextInput::make('incorporation_time')
+                ->label('Tiempo de incorporación')
+                ->maxLength(255),
+
+            Toggle::make('travel_possibility')
+                ->label('Posibilidad de viajar')
+                ->default(false),
 
             Textarea::make('profile_description')
                 ->label('Descripción / Mensaje')

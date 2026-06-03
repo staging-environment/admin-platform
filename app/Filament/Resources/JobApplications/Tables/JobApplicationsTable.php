@@ -44,6 +44,21 @@ class JobApplicationsTable
                 TextColumn::make('phone')
                     ->label('Teléfono'),
 
+                TextColumn::make('years_of_experience')
+                    ->label('Años de experiencia')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('incorporation_time')
+                    ->label('Tiempo de incorporación')
+                    ->searchable()
+                    ->sortable(),
+
+                IconColumn::make('travel_possibility')
+                    ->label('Viajar')
+                    ->boolean()
+                    ->sortable(),
+
                 IconColumn::make('is_read')
                     ->label('Leído')
                     ->boolean()

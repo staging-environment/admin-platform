@@ -22,10 +22,14 @@ class JobApplication extends Model
         'cover_letter',
         'is_read',
         'status',
+        'years_of_experience',
+        'incorporation_time',
+        'travel_possibility',
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
+        'travel_possibility' => 'boolean',
     ];
 
     /**
