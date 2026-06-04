@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\JobOffers\JobOfferResource; // <-- Importamos tu recurso manualmente
 use App\Filament\Resources\JobApplications\JobApplicationResource;
+use App\Filament\Resources\Empleados\EmpleadoResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -43,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->resources([
                 JobOfferResource::class,
                 JobApplicationResource::class,
+                EmpleadoResource::class,
             ])
             
             ->pages([])
