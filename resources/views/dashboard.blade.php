@@ -85,6 +85,8 @@
                         </div>
                     @endforeach
                 </div>
+            @endif
+
             @php
                 $pendingVacations = [];
                 if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestor')) {
