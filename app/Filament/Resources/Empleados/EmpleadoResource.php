@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Empleados;
 use App\Filament\Resources\Empleados\Pages\CreateEmpleado;
 use App\Filament\Resources\Empleados\Pages\EditEmpleado;
 use App\Filament\Resources\Empleados\Pages\ListEmpleados;
+use App\Filament\Resources\Empleados\Pages\ViewEmpleado;
 use App\Filament\Resources\Empleados\Schemas\EmpleadoForm;
 use App\Filament\Resources\Empleados\Tables\EmpleadosTable;
 use App\Models\Empleado;
@@ -65,6 +66,7 @@ class EmpleadoResource extends Resource
         return [
             'index' => ListEmpleados::route('/'),
             'create' => CreateEmpleado::route('/create'),
+            'view' => ViewEmpleado::route('/{record}'),
             'edit' => EditEmpleado::route('/{record}/edit'),
         ];
     }
