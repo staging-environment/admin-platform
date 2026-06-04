@@ -26,8 +26,13 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Te da acceso absoluto si eres tú o si tienes el rol admin en la BD
-        return $this->hasRole('Admin') || $this->hasRole('admin') || $this->email === 'jarodriguezbonilla@gmail.com';
+        // Da acceso si es Admin, Gestor, si tiene el permiso ver_dashboard, o si es el email del creador
+        return $this->hasRole('Admin') 
+            || $this->hasRole('admin') 
+            || $this->hasRole('Gestor') 
+            || $this->hasRole('gestor') 
+            || $this->email === 'jarodriguezbonilla@gmail.com'
+            || $this->can('ver_dashboard');
     }
 
     /**
