@@ -15,6 +15,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TimePicker;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -32,23 +33,31 @@ class HorariosRelationManager extends RelationManager
         return auth()->user()->can('gestion_horarios_empleados');
     }
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                 Select::make('tipo_jornada')
-                    ->label('Tipo de Jornada')
-                    ->options([
-                        'Completa' => 'Jornada Completa',
-                        'Parcial' => 'Jornada Parcial',
-                        'Reducida' => 'Jornada Reducida',
-                        'Otros' => 'Otros',
-                    ])
-                    ->required(),
-                TextInput::make('turnos')
-                    ->label('Turnos asignados (Opcional)')
-                    ->placeholder('Mañana / Tarde / Rotativo')
-                    ->maxLength(255),
+                Grid::make(2)
+                    ->schema([
+                        Select::make('tipo_jornada')
+                            ->label('Tipo de Jornada')
+                            ->options([
+                                'Completa' => 'Jornada Completa',
+                                'Parcial' => 'Jornada Parcial',
+                                'Reducida' => 'Jornada Reducida',
+                                'Otros' => 'Otros',
+                            ])
+                            ->required(),
+                        TextInput::make('turnos')
+                            ->label('Turnos Asignados (Opcional)')
+                            ->placeholder('Ej. Mañana, Tarde, Rotativo...')
+                            ->maxLength(255),
+                    ]),
                 CheckboxList::make('dias_laborales')
                     ->label('Días Laborales')
                     ->options([
@@ -63,15 +72,18 @@ class HorariosRelationManager extends RelationManager
                     ->columns(7)
                     ->columnSpan('full')
                     ->required(),
-                TimePicker::make('hora_inicio')
-                    ->label('Hora de Inicio')
-                    ->required(),
-                TimePicker::make('hora_fin')
-                    ->label('Hora de Fin')
-                    ->required(),
+                Grid::make(2)
+                    ->schema([
+                        TimePicker::make('hora_inicio')
+                            ->label('Hora de Inicio')
+                            ->required(),
+                        TimePicker::make('hora_fin')
+                            ->label('Hora de Fin')
+                            ->required(),
+                    ]),
                 Textarea::make('horarios')
                     ->label('Detalles del Horario')
-                    ->placeholder('Lunes a Viernes de 9:00 a 18:00...')
+                    ->placeholder('Ej. Lunes a Viernes de 9:00 a 18:00...')
                     ->required()
                     ->rows(3)
                     ->columnSpan('full'),
@@ -113,13 +125,16 @@ class HorariosRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
             ])
-            ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+            ->actions([
+                EditAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
+                DeleteAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

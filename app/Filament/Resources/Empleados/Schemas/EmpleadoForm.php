@@ -144,26 +144,29 @@ class EmpleadoForm
                             ->columns(3)
                             ->label('Documentos')
                             ->createItemButtonLabel('Añadir otro documento')
-                    ]),
-
-                Section::make('Horario Laboral Inicial')
+                             Section::make('Horario Laboral Inicial')
                     ->description('Configurar la jornada y horario inicial del empleado')
                     ->visible(fn ($context) => $context === 'create')
                     ->schema([
                         Repeater::make('horarios')
                             ->relationship('horarios')
                             ->schema([
-                                Select::make('tipo_jornada')
-                                    ->label('Tipo de Jornada')
-                                    ->options([
-                                        'Completa' => 'Jornada Completa',
-                                        'Parcial' => 'Jornada Parcial',
-                                        'Reducida' => 'Jornada Reducida',
-                                        'Otros' => 'Otros',
-                                    ])
-                                    ->required(),
-                                TextInput::make('turnos')
-                                    ->label('Turnos (Opcional)'),
+                                Grid::make(2)
+                                    ->schema([
+                                        Select::make('tipo_jornada')
+                                            ->label('Tipo de Jornada')
+                                            ->options([
+                                                'Completa' => 'Jornada Completa',
+                                                'Parcial' => 'Jornada Parcial',
+                                                'Reducida' => 'Jornada Reducida',
+                                                'Otros' => 'Otros',
+                                            ])
+                                            ->required(),
+                                        TextInput::make('turnos')
+                                            ->label('Turnos Asignados (Opcional)')
+                                            ->placeholder('Ej. Mañana, Tarde, Rotativo...')
+                                            ->maxLength(255),
+                                    ]),
                                 CheckboxList::make('dias_laborales')
                                     ->label('Días Laborales')
                                     ->options([
@@ -178,23 +181,28 @@ class EmpleadoForm
                                     ->columns(7)
                                     ->columnSpan('full')
                                     ->required(),
-                                TimePicker::make('hora_inicio')
-                                    ->label('Hora de Inicio')
-                                    ->required(),
-                                TimePicker::make('hora_fin')
-                                    ->label('Hora de Fin')
-                                    ->required(),
+                                Grid::make(2)
+                                    ->schema([
+                                        TimePicker::make('hora_inicio')
+                                            ->label('Hora de Inicio')
+                                            ->required(),
+                                        TimePicker::make('hora_fin')
+                                            ->label('Hora de Fin')
+                                            ->required(),
+                                    ]),
                                 Textarea::make('horarios')
                                     ->label('Detalles del Horario')
+                                    ->placeholder('Ej. Lunes a Viernes de 9:00 a 18:00...')
                                     ->required()
-                                    ->rows(2)
+                                    ->rows(3)
                                     ->columnSpan('full'),
                                 FileUpload::make('calendario_laboral_path')
-                                    ->label('Calendario Laboral')
+                                    ->label('Calendario Laboral (PDF/Imagen)')
                                     ->directory('empleados/calendarios')
+                                    ->disk('local')
                                     ->columnSpan('full'),
                             ])
-                            ->columns(2)
+                            ->columnSpan('full')
                             ->label('Horarios')
                             ->createItemButtonLabel('Añadir horario/turno')
                     ]),
