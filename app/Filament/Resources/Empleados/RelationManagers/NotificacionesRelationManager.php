@@ -21,7 +21,7 @@ class NotificacionesRelationManager extends RelationManager
 {
     protected static string $relationship = 'notificaciones';
 
-    protected static ?string $title = 'Avisos y Notificaciones';
+    protected static ?string $title = 'Notificaciones';
     protected static ?string $modelLabel = 'Aviso';
     protected static ?string $pluralModelLabel = 'Avisos y Notificaciones';
 

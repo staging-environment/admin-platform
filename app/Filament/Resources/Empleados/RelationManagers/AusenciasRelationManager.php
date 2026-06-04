@@ -20,7 +20,7 @@ class AusenciasRelationManager extends RelationManager
 {
     protected static string $relationship = 'ausencias';
 
-    protected static ?string $title = 'Ausencias y Bajas';
+    protected static ?string $title = 'Ausencias';
     protected static ?string $modelLabel = 'Ausencia';
     protected static ?string $pluralModelLabel = 'Ausencias y Bajas';
 

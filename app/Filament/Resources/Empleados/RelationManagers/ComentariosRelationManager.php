@@ -20,7 +20,7 @@ class ComentariosRelationManager extends RelationManager
 {
     protected static string $relationship = 'comentarios';
 
-    protected static ?string $title = 'Comentarios sobre el empleado';
+    protected static ?string $title = 'Histórico';
     protected static ?string $modelLabel = 'Comentario';
     protected static ?string $pluralModelLabel = 'Comentarios';
 

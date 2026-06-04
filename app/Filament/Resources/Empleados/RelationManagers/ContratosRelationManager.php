@@ -23,7 +23,7 @@ class ContratosRelationManager extends RelationManager
 {
     protected static string $relationship = 'contratos';
 
-    protected static ?string $title = 'Contratos Laborales';
+    protected static ?string $title = 'Contratos';
     protected static ?string $modelLabel = 'Contrato';
     protected static ?string $pluralModelLabel = 'Contratos Laborales';
 
