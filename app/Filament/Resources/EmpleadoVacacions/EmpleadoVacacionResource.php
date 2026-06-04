@@ -23,7 +23,7 @@ class EmpleadoVacacionResource extends Resource
     protected static ?string $pluralModelLabel = 'Solicitudes de Vacaciones';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
-    protected static ?string $navigationGroup = 'Recursos humanos';
+    protected static string|\UnitEnum|null $navigationGroup = 'Recursos humanos';
     protected static ?int $navigationSort = 3;
 
     public static function canAccess(): bool
