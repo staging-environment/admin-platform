@@ -189,7 +189,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return $disk->download($application->cv_path);
     })->name('admin.cv.download');
 
-    Route::get('/admin/recursos-humanos/descargar-archivo', function (Request $request) {
+    Route::get('/admin/recursos-humanos-adjuntos/descargar-archivo', function (Request $request) {
         $path = $request->query('path');
         if (!$path) {
             abort(400, 'Ruta no especificada');
@@ -207,7 +207,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return $disk->download($path);
     })->name('admin.recursos_humanos.descargar_archivo');
 
-    Route::get('/admin/recursos-humanos/ver-archivo', function (Request $request) {
+    Route::get('/admin/recursos-humanos-adjuntos/ver-archivo', function (Request $request) {
         $path = $request->query('path');
         if (!$path) {
             abort(400, 'Ruta no especificada');
