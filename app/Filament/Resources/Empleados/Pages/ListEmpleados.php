@@ -33,15 +33,12 @@ class ListEmpleados extends ListRecords
                         $nombre = array_shift($parts);
                         $apellidos = count($parts) > 0 ? implode(' ', $parts) : null;
                         
-                        // Generate dummy DNI since virtus doesn't have it
-                        $dummyDni = 'VIRTUS-' . str_pad($exp->Codigo, 4, '0', STR_PAD_LEFT);
-
                         \App\Models\Empleado::updateOrCreate(
                             ['virtus_codigo' => $exp->Codigo],
                             [
                                 'nombre' => $nombre,
                                 'apellidos' => $apellidos,
-                                'dni' => $dummyDni,
+                                'dni' => null,
                                 'telefono_principal' => $exp->Telefono ?? $exp->Movil,
                                 'telefono_secundario' => ($exp->Telefono && $exp->Movil) ? $exp->Movil : null,
                                 'direccion' => $exp->Domicilio,
