@@ -32,6 +32,21 @@ class ContratosRelationManager extends RelationManager
         return auth()->user()->can('gestion_contratos_empleados');
     }
 
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('gestion_contratos_empleados');
+    }
+
+    protected function canEdit(Model $record): bool
+    {
+        return auth()->user()->can('gestion_contratos_empleados');
+    }
+
+    protected function canDelete(Model $record): bool
+    {
+        return auth()->user()->can('gestion_contratos_empleados');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
