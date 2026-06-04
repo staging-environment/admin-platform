@@ -58,6 +58,7 @@ class EmpleadoResource extends Resource
             RelationManagers\AusenciasRelationManager::class,
             RelationManagers\VacacionesRelationManager::class,
             RelationManagers\ContratosRelationManager::class,
+            RelationManagers\ComentariosRelationManager::class,
         ];
     }
 

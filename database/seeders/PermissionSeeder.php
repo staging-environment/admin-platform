@@ -40,6 +40,7 @@ class PermissionSeeder extends Seeder
             'gestion_ausencias_empleados',
             'gestion_vacaciones_empleados',
             'gestion_contratos_empleados',
+            'gestion_comentarios_empleados',
         ];
 
         foreach ($permissions as $permission) {

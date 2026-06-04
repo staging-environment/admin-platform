@@ -42,4 +42,9 @@ class Empleado extends Model
     {
         return $this->hasMany(EmpleadoContrato::class);
     }
+
+    public function comentarios()
+    {
+        return $this->hasMany(EmpleadoComentario::class);
+    }
 }
