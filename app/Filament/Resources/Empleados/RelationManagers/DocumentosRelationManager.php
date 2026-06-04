@@ -102,6 +102,7 @@ class DocumentosRelationManager extends RelationManager
                     ->label('Previsualizar')
                     ->icon('heroicon-o-eye')
                     ->color('info')
+                    ->modalWidth('7xl')
                     ->modalHeading(fn ($record) => "Previsualización: {$record->nombre}")
                     ->modalSubmitAction(false)
                     ->modalContent(function ($record) {
@@ -124,7 +125,7 @@ class DocumentosRelationManager extends RelationManager
                         } elseif ($extension === 'pdf') {
                             return new HtmlString("
                                 <div class='flex flex-col items-center space-y-4'>
-                                    <div class='w-full h-[600px] border rounded-lg overflow-hidden'>
+                                    <div class='w-full h-[75vh] min-h-[600px] border rounded-lg overflow-hidden'>
                                         <iframe src='{$url}' class='w-full h-full' style='border: none;'></iframe>
                                     </div>
                                     <div class='flex justify-end w-full'>
