@@ -97,8 +97,10 @@ class ComentariosRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados')),
+                DeleteAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
