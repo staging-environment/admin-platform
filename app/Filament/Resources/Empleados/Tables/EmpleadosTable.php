@@ -51,7 +51,7 @@ class EmpleadosTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('apellidos', 'asc')
+            ->defaultSort('apellidos', 'desc')
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('provincia')
                     ->label('Provincia')
@@ -59,8 +59,31 @@ class EmpleadosTable
                         return \App\Models\Empleado::query()
                             ->select('provincia')
                             ->whereNotNull('provincia')
+                            ->where('provincia', '!=', '')
                             ->distinct()
                             ->pluck('provincia', 'provincia')
+                            ->toArray();
+                    }),
+                \Filament\Tables\Filters\SelectFilter::make('localidad')
+                    ->label('Localidad')
+                    ->options(function () {
+                        return \App\Models\Empleado::query()
+                            ->select('localidad')
+                            ->whereNotNull('localidad')
+                            ->where('localidad', '!=', '')
+                            ->distinct()
+                            ->pluck('localidad', 'localidad')
+                            ->toArray();
+                    }),
+                \Filament\Tables\Filters\SelectFilter::make('contratos.centro_trabajo')
+                    ->label('Centro de Trabajo (Empresa)')
+                    ->options(function () {
+                        return \App\Models\EmpleadoContrato::query()
+                            ->select('centro_trabajo')
+                            ->whereNotNull('centro_trabajo')
+                            ->where('centro_trabajo', '!=', '')
+                            ->distinct()
+                            ->pluck('centro_trabajo', 'centro_trabajo')
                             ->toArray();
                     }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
