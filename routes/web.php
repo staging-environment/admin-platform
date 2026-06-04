@@ -18,27 +18,6 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
-Route::get('/test-perms', function () {
-    $user = \App\Models\User::find(1);
-    if (!$user) return 'No user 1';
-    
-    // Auto-seed missing permissions just in case
-    \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'gestion_comentarios_empleados']);
-    \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'gestion_contratos_empleados']);
-    
-    \Spatie\Permission\Models\Role::findByName('Admin')->givePermissionTo('gestion_comentarios_empleados');
-    \Spatie\Permission\Models\Role::findByName('Admin')->givePermissionTo('gestion_contratos_empleados');
-    
-    // Also give them to user 1 directly just in case the role isn't assigned properly
-    $user->givePermissionTo('gestion_comentarios_empleados');
-    $user->givePermissionTo('gestion_contratos_empleados');
-    
-    return [
-        'roles' => $user->getRoleNames(),
-        'permissions' => $user->getAllPermissions()->pluck('name')
-    ];
-});
-
 Route::get('/home', function () {
     $gasolineras = [];
     $homeConfig = null;
