@@ -89,7 +89,8 @@ class DocumentosRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
             ])
             ->actions([
                 Action::make('preview')
@@ -149,8 +150,10 @@ class DocumentosRelationManager extends RelationManager
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->url(fn ($record) => route('admin.recursos_humanos.descargar_archivo', ['path' => $record->file_path]), true),
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
+                DeleteAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
