@@ -18,6 +18,20 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+Route::get('/debug-users', function () {
+    $users = \App\Models\User::all()->map(function($u) {
+        return [
+            'id' => $u->id,
+            'name' => $u->name,
+            'email' => $u->email,
+            'roles' => $u->getRoleNames(),
+            'can_contratos' => $u->can('gestion_contratos_empleados'),
+            'can_comentarios' => $u->can('gestion_comentarios_empleados'),
+        ];
+    });
+    return response()->json($users);
+});
+
 Route::get('/home', function () {
     $gasolineras = [];
     $homeConfig = null;
