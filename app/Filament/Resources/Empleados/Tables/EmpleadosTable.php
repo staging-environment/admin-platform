@@ -86,16 +86,6 @@ class EmpleadosTable
                             ->pluck('centro_trabajo', 'centro_trabajo')
                             ->toArray();
                     }),
-                \Filament\Tables\Filters\TernaryFilter::make('origen')
-                    ->label('Origen del Empleado')
-                    ->placeholder('Todos')
-                    ->trueLabel('Importados de Virtus')
-                    ->falseLabel('Creados Manualmente')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('virtus_codigo'),
-                        false: fn ($query) => $query->whereNull('virtus_codigo'),
-                        blank: fn ($query) => $query,
-                    ),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 \Filament\Actions\ViewAction::make(),
