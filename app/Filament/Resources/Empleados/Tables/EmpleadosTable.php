@@ -47,7 +47,8 @@ class EmpleadosTable
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
+                \Filament\Actions\ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
