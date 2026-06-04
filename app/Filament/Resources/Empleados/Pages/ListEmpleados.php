@@ -28,12 +28,20 @@ class ListEmpleados extends ListRecords
 
                     $count = 0;
                     foreach ($expendedores as $exp) {
-                        $exists = \App\Models\Empleado::where('virtus_codigo', $exp->Codigo)->exists();
-                        if (!$exists) {
-                            \App\Models\Empleado::create([
-                                'virtus_codigo' => $exp->Codigo,
-                                'nombre' => $exp->Nombre,
-                                'apellidos' => null,
+                        // Split full name into nombre and apellidos
+                        $parts = explode(' ', trim($exp->Nombre));
+                        $nombre = array_shift($parts);
+                        $apellidos = count($parts) > 0 ? implode(' ', $parts) : null;
+                        
+                        // Generate dummy DNI since virtus doesn't have it
+                        $dummyDni = 'VIRTUS-' . str_pad($exp->Codigo, 4, '0', STR_PAD_LEFT);
+
+                        \App\Models\Empleado::updateOrCreate(
+                            ['virtus_codigo' => $exp->Codigo],
+                            [
+                                'nombre' => $nombre,
+                                'apellidos' => $apellidos,
+                                'dni' => $dummyDni,
                                 'telefono_principal' => $exp->Telefono ?? $exp->Movil,
                                 'telefono_secundario' => ($exp->Telefono && $exp->Movil) ? $exp->Movil : null,
                                 'direccion' => $exp->Domicilio,
@@ -41,9 +49,9 @@ class ListEmpleados extends ListRecords
                                 'provincia' => $exp->Provincia,
                                 'codigo_postal' => $exp->DP,
                                 'email' => $exp->Email,
-                            ]);
-                            $count++;
-                        }
+                            ]
+                        );
+                        $count++;
                     }
 
                     \Filament\Notifications\Notification::make()
