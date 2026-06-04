@@ -104,7 +104,7 @@ class VacacionesRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
-                \Filament\Tables\Actions\Action::make('aprobar')
+                \Filament\Actions\Action::make('aprobar')
                     ->label('Aprobar')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -131,7 +131,7 @@ class VacacionesRelationManager extends RelationManager
                             ->send();
                     }),
 
-                \Filament\Tables\Actions\Action::make('denegar')
+                \Filament\Actions\Action::make('denegar')
                     ->label('Denegar')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
