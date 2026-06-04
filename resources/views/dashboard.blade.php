@@ -121,6 +121,61 @@
                 </div>
             @endif
 
+            @php
+                $empleado = \App\Models\Empleado::where('email', auth()->user()->email)->first();
+                $myResolvedVacations = [];
+                if ($empleado) {
+                    $myResolvedVacations = \App\Models\EmpleadoVacacion::where('empleado_id', $empleado->id)
+                        ->whereIn('estado', ['Aceptada', 'Rechazada'])
+                        ->orderBy('updated_at', 'desc')
+                        ->limit(5)
+                        ->get();
+                }
+            @endphp
+            @if(count($myResolvedVacations) > 0)
+                <div class="flex flex-col gap-4">
+                    @foreach($myResolvedVacations as $vac)
+                        @if($vac->estado === 'Aceptada')
+                            <div class="bg-green-600 rounded-lg p-3 shadow flex items-center justify-between text-white border border-green-700 mb-4" style="background-color: #16a34a;">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-white/20 p-1.5 rounded-full">
+                                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-bold uppercase tracking-wider text-white">
+                                            ¡SOLICITUD DE VACACIONES APROBADA!
+                                        </h3>
+                                        <p class="text-xs text-green-100">
+                                            Tu solicitud de {{ $vac->tipo }} de {{ $vac->dias_solicitados }} de días (del {{ \Carbon\Carbon::parse($vac->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($vac->fecha_fin)->format('d/m/Y') }}) ha sido **APROBADA**.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="bg-red-600 rounded-lg p-3 shadow flex items-center justify-between text-white border border-red-700 mb-4" style="background-color: #e11d48;">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-white/20 p-1.5 rounded-full">
+                                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-bold uppercase tracking-wider text-white">
+                                            ¡SOLICITUD DE VACACIONES RECHAZADA!
+                                        </h3>
+                                        <p class="text-xs text-red-100">
+                                            Tu solicitud de {{ $vac->tipo }} de {{ $vac->dias_solicitados }} de días (del {{ \Carbon\Carbon::parse($vac->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($vac->fecha_fin)->format('d/m/Y') }}) ha sido **RECHAZADA**.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
+
             {{-- Modern Widgets: Weather & Server Monitor --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Weather Widget --}}
