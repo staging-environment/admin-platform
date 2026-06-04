@@ -58,7 +58,9 @@ class VacacionesRelationManager extends RelationManager
                         'Rechazada' => 'Rechazada',
                     ])
                     ->default('Pendiente')
-                    ->required(),
+                    ->required()
+                    ->disabled(fn () => !auth()->user()->hasRole('Admin') && !auth()->user()->hasRole('Gestor') && !auth()->user()->hasRole('admin') && !auth()->user()->hasRole('gestor'))
+                    ->dehydrated(true),
                 TextInput::make('dias_disponibles')
                     ->label('Días Disponibles Restantes (Opcional)')
                     ->numeric(),

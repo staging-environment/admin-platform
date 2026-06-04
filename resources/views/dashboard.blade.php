@@ -85,6 +85,40 @@
                         </div>
                     @endforeach
                 </div>
+            @php
+                $pendingVacations = [];
+                if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestor')) {
+                    $pendingVacations = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', 'Pendiente')->orderBy('created_at', 'desc')->get();
+                }
+            @endphp
+            @if(count($pendingVacations) > 0)
+                <div class="flex flex-col gap-4">
+                    @foreach($pendingVacations as $vac)
+                        @if($vac->empleado)
+                            <div class="bg-amber-600 rounded-lg p-3 shadow flex flex-col md:flex-row md:items-center justify-between text-white border border-amber-700 mb-4" style="background-color: #d97706;">
+                                <div class="flex items-center gap-3 mb-3 md:mb-0">
+                                    <div class="bg-white/20 p-1.5 rounded-full">
+                                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-bold uppercase tracking-wider text-white">
+                                            ¡SOLICITUD DE VACACIONES PENDIENTE!
+                                        </h3>
+                                        <p class="text-xs text-amber-100">
+                                            Empleado: {{ $vac->empleado->nombre }} {{ $vac->empleado->apellidos }} - Tipo: {{ $vac->tipo }} ({{ $vac->dias_solicitados }} días: del {{ \Carbon\Carbon::parse($vac->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($vac->fecha_fin)->format('d/m/Y') }})
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <a href="{{ url('/admin/recursos-humanos/' . $vac->empleado_id . '/edit') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white text-amber-700 rounded-md font-bold shadow hover:bg-gray-50 transition-all text-xs" style="color: #b45309;">
+                                    REVISAR SOLICITUD
+                                </a>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
             @endif
 
             {{-- Modern Widgets: Weather & Server Monitor --}}
