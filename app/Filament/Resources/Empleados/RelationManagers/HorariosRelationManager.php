@@ -36,7 +36,7 @@ class HorariosRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                Select::make('tipo_jornada')
+                 Select::make('tipo_jornada')
                     ->label('Tipo de Jornada')
                     ->options([
                         'Completa' => 'Jornada Completa',
@@ -45,6 +45,10 @@ class HorariosRelationManager extends RelationManager
                         'Otros' => 'Otros',
                     ])
                     ->required(),
+                TextInput::make('turnos')
+                    ->label('Turnos asignados (Opcional)')
+                    ->placeholder('Mañana / Tarde / Rotativo')
+                    ->maxLength(255),
                 CheckboxList::make('dias_laborales')
                     ->label('Días Laborales')
                     ->options([
@@ -56,7 +60,8 @@ class HorariosRelationManager extends RelationManager
                         'Sábado' => 'Sábado',
                         'Domingo' => 'Domingo',
                     ])
-                    ->columns(4)
+                    ->columns(7)
+                    ->columnSpan('full')
                     ->required(),
                 TimePicker::make('hora_inicio')
                     ->label('Hora de Inicio')
@@ -68,14 +73,12 @@ class HorariosRelationManager extends RelationManager
                     ->label('Detalles del Horario')
                     ->placeholder('Lunes a Viernes de 9:00 a 18:00...')
                     ->required()
-                    ->rows(3),
-                TextInput::make('turnos')
-                    ->label('Turnos asignados (Opcional)')
-                    ->placeholder('Mañana / Tarde / Rotativo')
-                    ->maxLength(255),
+                    ->rows(3)
+                    ->columnSpan('full'),
                 FileUpload::make('calendario_laboral_path')
                     ->label('Calendario Laboral (PDF/Imagen)')
-                    ->directory('empleados/calendarios'),
+                    ->directory('empleados/calendarios')
+                    ->columnSpan('full'),
             ]);
     }
 

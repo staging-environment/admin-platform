@@ -160,6 +160,8 @@ class EmpleadoForm
                                         'Otros' => 'Otros',
                                     ])
                                     ->required(),
+                                TextInput::make('turnos')
+                                    ->label('Turnos (Opcional)'),
                                 CheckboxList::make('dias_laborales')
                                     ->label('Días Laborales')
                                     ->options([
@@ -171,7 +173,8 @@ class EmpleadoForm
                                         'Sábado' => 'Sábado',
                                         'Domingo' => 'Domingo',
                                     ])
-                                    ->columns(4)
+                                    ->columns(7)
+                                    ->columnSpan('full')
                                     ->required(),
                                 TimePicker::make('hora_inicio')
                                     ->label('Hora de Inicio')
@@ -182,12 +185,12 @@ class EmpleadoForm
                                 Textarea::make('horarios')
                                     ->label('Detalles del Horario')
                                     ->required()
-                                    ->rows(2),
-                                TextInput::make('turnos')
-                                    ->label('Turnos (Opcional)'),
+                                    ->rows(2)
+                                    ->columnSpan('full'),
                                 FileUpload::make('calendario_laboral_path')
                                     ->label('Calendario Laboral')
-                                    ->directory('empleados/calendarios'),
+                                    ->directory('empleados/calendarios')
+                                    ->columnSpan('full'),
                             ])
                             ->columns(2)
                             ->label('Horarios')
