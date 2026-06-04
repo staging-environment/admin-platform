@@ -207,6 +207,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return $disk->download($path);
     })->name('admin.recursos_humanos.descargar_archivo');
 
+    Route::get('/admin/recursos-humanos/ver-archivo', function (Request $request) {
+        $path = $request->query('path');
+        if (!$path) {
+            abort(400, 'Ruta no especificada');
+        }
+        
+        // Evitar Directory Traversal
+        if (str_contains($path, '..')) {
+            abort(403, 'Acceso denegado');
+        }
+        
+        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+        if (!$disk->exists($path)) {
+            abort(404, 'Archivo no encontrado');
+        }
+        
+        $mimeType = $disk->mimeType($path);
+        
+        return response()->file($disk->path($path), [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline'
+        ]);
+    })->name('admin.recursos_humanos.ver_archivo');
+
 
 
     // Gestión de usuarios de la plataforma y del repositorio FTP
