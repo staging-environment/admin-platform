@@ -63,7 +63,7 @@ class EmpleadosTable
                             ->pluck('provincia', 'provincia')
                             ->toArray();
                     }),
-            ])
+            ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 \Filament\Actions\ViewAction::make(),
                 EditAction::make(),
