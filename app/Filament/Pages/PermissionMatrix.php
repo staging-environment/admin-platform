@@ -89,6 +89,9 @@ class PermissionMatrix extends Page
             $role->givePermissionTo($permissionId);
         }
 
+        // Limpiar la caché de permisos de Spatie
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         // Refrescamos la colección de roles para actualizar los checks en la vista
         $this->roles = Role::with('permissions')->get();
     }
