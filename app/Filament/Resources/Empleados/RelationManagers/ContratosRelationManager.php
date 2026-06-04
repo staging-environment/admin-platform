@@ -122,7 +122,8 @@ class ContratosRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_contratos_empleados')),
             ])
             ->recordActions([
                 Action::make('preview')

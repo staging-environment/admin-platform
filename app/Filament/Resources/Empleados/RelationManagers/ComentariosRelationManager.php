@@ -90,6 +90,7 @@ class ComentariosRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
                         return $data;
