@@ -104,6 +104,59 @@ class VacacionesRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
+                \Filament\Tables\Actions\Action::make('aprobar')
+                    ->label('Aprobar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->estado === 'Pendiente' && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor')))
+                    ->action(function ($record) {
+                        $record->update(['estado' => 'Aceptada']);
+                        
+                        // Enviar notificación al empleado
+                        if ($record->empleado && $record->empleado->email) {
+                            $user = \App\Models\User::where('email', $record->empleado->email)->first();
+                            if ($user) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Solicitud Aceptada')
+                                    ->body("Tu solicitud de {$record->tipo} ha sido Aceptada.")
+                                    ->success()
+                                    ->sendToDatabase($user);
+                            }
+                        }
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Solicitud Aprobada')
+                            ->success()
+                            ->send();
+                    }),
+
+                \Filament\Tables\Actions\Action::make('denegar')
+                    ->label('Denegar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->estado === 'Pendiente' && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor')))
+                    ->action(function ($record) {
+                        $record->update(['estado' => 'Rechazada']);
+                        
+                        // Enviar notificación al empleado
+                        if ($record->empleado && $record->empleado->email) {
+                            $user = \App\Models\User::where('email', $record->empleado->email)->first();
+                            if ($user) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Solicitud Rechazada')
+                                    ->body("Tu solicitud de {$record->tipo} ha sido Rechazada.")
+                                    ->danger()
+                                    ->sendToDatabase($user);
+                            }
+                        }
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Solicitud Rechazada')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
