@@ -102,18 +102,18 @@ class DocumentosRelationManager extends RelationManager
                     ->label('Previsualizar')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->modalWidth('7xl')
+                    ->modalWidth(\Filament\Support\Enums\MaxWidth::SevenExtraLarge)
                     ->modalHeading(fn ($record) => "Previsualización: {$record->nombre}")
                     ->modalSubmitAction(false)
                     ->modalContent(function ($record) {
                         $extension = strtolower(pathinfo($record->file_path, PATHINFO_EXTENSION));
                         $url = route('admin.recursos_humanos.ver_archivo', ['path' => $record->file_path]);
                         
-                        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
+                        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                             return new HtmlString("
                                 <div class='flex flex-col items-center space-y-4'>
-                                    <div class='flex justify-center items-center p-2 bg-gray-50 border rounded-lg max-h-[60vh] overflow-y-auto w-full'>
-                                        <img src='{$url}' alt='{$record->nombre}' class='max-w-full h-auto rounded shadow-sm' />
+                                    <div class='flex justify-center items-center p-2 bg-gray-50 border rounded-lg h-[75vh] min-h-[600px] overflow-auto w-full'>
+                                        <img src='{$url}' alt='{$record->nombre}' class='object-contain w-full h-full rounded shadow-sm' />
                                     </div>
                                     <div class='flex justify-end w-full'>
                                         <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $record->file_path]) . "' class='inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-xs font-bold transition-all shadow-sm' target='_blank'>
