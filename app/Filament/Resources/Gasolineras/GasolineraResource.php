@@ -27,6 +27,11 @@ class GasolineraResource extends Resource
 
     protected static ?string $modelLabel = 'Gasolinera';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();

@@ -18,12 +18,12 @@ class FileExplorer extends Page
     protected static ?string $title = 'Explorador de Archivos';
     protected string $view = 'filament.pages.file-explorer';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => 'Administración de la plataforma',
+            '#' => 'Administración',
             static::getNavigationLabel(),
         ];
     }

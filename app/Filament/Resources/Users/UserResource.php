@@ -25,6 +25,11 @@ class UserResource extends Resource
     protected static ?string $pluralLabel = 'Usuarios';
 
     protected static ?string $modelLabel = 'Usuario';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
     
     public static function canAccess(): bool
     {

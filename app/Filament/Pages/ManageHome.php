@@ -40,12 +40,12 @@ class ManageHome extends Page implements HasForms, HasTable
     protected static ?string $title = 'Configuración de Portada';
     protected string $view = 'filament.pages.manage-home';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => 'Administración de la plataforma',
+            '#' => 'Administración',
             static::getNavigationLabel(),
         ];
     }

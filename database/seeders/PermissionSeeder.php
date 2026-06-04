@@ -24,7 +24,6 @@ class PermissionSeeder extends Seeder
         \Illuminate\Support\Facades\DB::table('permissions')->delete();
         \Illuminate\Support\Facades\DB::table('roles')->delete();
 
-        // Crear permisos
         $permissions = [
             'ver_dashboard',
             'gestion_usuarios_roles',
@@ -33,6 +32,14 @@ class PermissionSeeder extends Seeder
             'gestion_gasolineras',
             'gestion_portada',
             'gestion_ofertas',
+            'gestion_recursos_humanos',
+            'gestion_documentacion_empleados',
+            'gestion_cursos_empleados',
+            'gestion_notificaciones_empleados',
+            'gestion_horarios_empleados',
+            'gestion_ausencias_empleados',
+            'gestion_vacaciones_empleados',
+            'gestion_contratos_empleados',
         ];
 
         foreach ($permissions as $permission) {
@@ -42,6 +49,7 @@ class PermissionSeeder extends Seeder
         // Crear roles
         $adminRole = Role::create(['name' => 'Admin']);
         $gestorRole = Role::create(['name' => 'Gestor']);
+        $empleadoRole = Role::create(['name' => 'Empleado']);
 
         // Asignar permisos a roles
         // Admin gets everything

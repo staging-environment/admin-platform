@@ -31,12 +31,12 @@ class PermissionMatrix extends Page
         return $user->hasRole('Admin') || $user->can('gestion_usuarios_roles');
     }
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => 'Administración de la plataforma',
+            '#' => 'Administración',
             static::getNavigationLabel(),
         ];
     }

@@ -54,6 +54,14 @@
                                     'gestion_gasolineras' => 'Gestión de Gasolineras',
                                     'gestion_portada' => 'Configuración de Portada',
                                     'gestion_ofertas' => 'Gestión de Ofertas de Trabajo',
+                                    'gestion_recursos_humanos' => 'Recursos humanos',
+                                    'gestion_documentacion_empleados' => 'Documentación de Empleados',
+                                    'gestion_cursos_empleados' => 'Formación/Cursos de Empleados',
+                                    'gestion_notificaciones_empleados' => 'Notificaciones de Empleados',
+                                    'gestion_horarios_empleados' => 'Horario Laboral de Empleados',
+                                    'gestion_ausencias_empleados' => 'Ausencias y Bajas de Empleados',
+                                    'gestion_vacaciones_empleados' => 'Vacaciones y Permisos de Empleados',
+                                    'gestion_contratos_empleados' => 'Contratos de Empleados',
                                 ];
                             @endphp
                             {{ $f[$n] ?? $n }}

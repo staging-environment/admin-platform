@@ -25,7 +25,7 @@ class Informes extends Page implements HasForms
     public ?array $chartData = null;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administración de la plataforma';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
     protected static ?string $title = 'Informes';
 

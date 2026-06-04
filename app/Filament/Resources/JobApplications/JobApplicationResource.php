@@ -28,7 +28,7 @@ class JobApplicationResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Administración';
+        return 'Recursos Humanos';
     }
 
     public static function getNavigationSort(): ?int
