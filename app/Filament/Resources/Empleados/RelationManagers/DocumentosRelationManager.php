@@ -31,6 +31,21 @@ class DocumentosRelationManager extends RelationManager
         return auth()->user()->can('gestion_documentacion_empleados');
     }
 
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('gestion_documentacion_empleados');
+    }
+
+    protected function canEdit(Model $record): bool
+    {
+        return auth()->user()->can('gestion_documentacion_empleados');
+    }
+
+    protected function canDelete(Model $record): bool
+    {
+        return auth()->user()->can('gestion_documentacion_empleados');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -53,6 +68,7 @@ class DocumentosRelationManager extends RelationManager
                 FileUpload::make('file_path')
                     ->label('Archivo')
                     ->directory('empleados/documentos')
+                    ->disk('local')
                     ->required(),
             ]);
     }

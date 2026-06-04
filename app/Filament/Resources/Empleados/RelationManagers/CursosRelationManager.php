@@ -52,7 +52,8 @@ class CursosRelationManager extends RelationManager
                     ->required(),
                 FileUpload::make('certificado_path')
                     ->label('Certificado (PDF/Imagen)')
-                    ->directory('empleados/certificados'),
+                    ->directory('empleados/certificados')
+                    ->disk('local'),
             ]);
     }
 

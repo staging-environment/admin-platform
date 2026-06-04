@@ -109,6 +109,7 @@ class EmpleadoForm
                                 FileUpload::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad (Archivo)')
                                     ->directory('empleados/resoluciones')
+                                    ->disk('local')
                                     ->acceptedFileTypes(['application/pdf', 'image/*']),
                             ]),
                     ]),
@@ -137,6 +138,7 @@ class EmpleadoForm
                                 FileUpload::make('file_path')
                                     ->label('Archivo')
                                     ->directory('empleados/documentos')
+                                    ->disk('local')
                                     ->required(),
                             ])
                             ->columns(3)

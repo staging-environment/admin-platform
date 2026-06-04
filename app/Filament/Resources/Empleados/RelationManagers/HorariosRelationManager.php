@@ -76,9 +76,10 @@ class HorariosRelationManager extends RelationManager
                     ->rows(3)
                     ->columnSpan('full'),
                 FileUpload::make('calendario_laboral_path')
-                    ->label('Calendario Laboral (PDF/Imagen)')
-                    ->directory('empleados/calendarios')
-                    ->columnSpan('full'),
+                     ->label('Calendario Laboral (PDF/Imagen)')
+                     ->directory('empleados/calendarios')
+                     ->disk('local')
+                     ->columnSpan('full'),
             ]);
     }
 

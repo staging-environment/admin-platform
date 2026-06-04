@@ -48,9 +48,10 @@ class AusenciasRelationManager extends RelationManager
                     ->required(),
                 DatePicker::make('fecha_fin')
                     ->label('Fecha de Fin'),
-                FileUpload::make('justificante_path')
+                 FileUpload::make('justificante_path')
                     ->label('Justificante / Documento médico')
-                    ->directory('empleados/justificantes'),
+                    ->directory('empleados/justificantes')
+                    ->disk('local'),
             ]);
     }
 
