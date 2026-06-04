@@ -94,6 +94,14 @@ class ContratosRelationManager extends RelationManager
                     ->money('EUR'),
                 TextColumn::make('centro_trabajo')
                     ->label('Centro de Trabajo'),
+                \Filament\Tables\Columns\IconColumn::make('file_path')
+                    ->label('Adjunto')
+                    ->icon(fn (string $state): string => 'heroicon-o-document-text')
+                    ->color(fn (string $state): string => 'success')
+                    ->default(false)
+                    ->boolean()
+                    ->trueIcon('heroicon-o-paper-clip')
+                    ->falseIcon('heroicon-o-x-mark'),
             ])
             ->filters([
                 //
