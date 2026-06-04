@@ -46,6 +46,11 @@ class DocumentosRelationManager extends RelationManager
         return auth()->user()->can('gestion_documentacion_empleados');
     }
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
