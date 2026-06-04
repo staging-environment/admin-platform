@@ -42,10 +42,27 @@ class EmpleadosTable
 
                 TextColumn::make('provincia')
                     ->label('Provincia')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                
+                TextColumn::make('contratos.centro_trabajo')
+                    ->label('Centro de Trabajo')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('apellidos', 'asc')
             ->filters([
-                //
+                \Filament\Tables\Filters\SelectFilter::make('provincia')
+                    ->label('Provincia')
+                    ->options(function () {
+                        return \App\Models\Empleado::query()
+                            ->select('provincia')
+                            ->whereNotNull('provincia')
+                            ->distinct()
+                            ->pluck('provincia', 'provincia')
+                            ->toArray();
+                    }),
             ])
             ->actions([
                 \Filament\Actions\ViewAction::make(),
