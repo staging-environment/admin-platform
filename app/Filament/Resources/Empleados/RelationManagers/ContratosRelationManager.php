@@ -47,6 +47,11 @@ class ContratosRelationManager extends RelationManager
         return auth()->user()->can('gestion_contratos_empleados');
     }
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema

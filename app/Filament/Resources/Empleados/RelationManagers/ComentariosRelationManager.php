@@ -44,6 +44,11 @@ class ComentariosRelationManager extends RelationManager
         return auth()->user()->can('gestion_comentarios_empleados');
     }
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
