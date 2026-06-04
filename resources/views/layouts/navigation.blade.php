@@ -94,6 +94,12 @@
                                         {{ __('Matriz de Permisos') }}
                                     </x-dropdown-link>
                                     @endif
+
+                                    @if(auth()->user()->hasRole('Admin') || auth()->user()->can('gestion_usuarios_roles'))
+                                    <x-dropdown-link href="/admin/roles">
+                                        {{ __('Roles') }}
+                                    </x-dropdown-link>
+                                    @endif
                                 </x-slot>
                             </x-dropdown>
                         </div>
