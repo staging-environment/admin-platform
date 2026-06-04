@@ -160,8 +160,8 @@ class FileExplorer extends Page
                     continue;
                 }
 
-                // Hide the 'users' directory from the root of the 'local' disk
-                if ($this->selectedDisk === 'local' && $this->currentPath === '' && $name === 'users') {
+                // Hide the 'users' and 'empleados' directories from the root of the 'local' disk
+                if ($this->selectedDisk === 'local' && $this->currentPath === '' && in_array($name, ['users', 'empleados'])) {
                     continue;
                 }
 
