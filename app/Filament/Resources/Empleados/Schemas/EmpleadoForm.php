@@ -143,7 +143,7 @@ class EmpleadoForm
                             ])
                             ->columns(3)
                             ->label('Documentos')
-                            ->createItemButtonLabel('Añadir otro documento')
+                            ->createItemButtonLabel('Añadir otro documento'),
                              Section::make('Horario Laboral Inicial')
                     ->description('Configurar la jornada y horario inicial del empleado')
                     ->visible(fn ($context) => $context === 'create')
