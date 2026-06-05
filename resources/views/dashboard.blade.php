@@ -315,6 +315,7 @@
                         <span>Laravel v{{ app()->version() }}</span>
                     </div>
                 </div>
+            </div>
             {{-- Radius Selector --}}
             <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2">
