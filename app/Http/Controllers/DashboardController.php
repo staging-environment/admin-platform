@@ -14,8 +14,10 @@ class DashboardController extends Controller
     public function index(Request $request, VirtusgesnetService $virtusgesnetService)
     {
         $user = auth()->user();
-        if ($user && ($user->hasRole('Gestor') || $user->hasRole('gestor'))) {
-            return redirect()->to('/admin/recursos-humanos');
+        if ($user) {
+            if ($user->hasRole('Admin') && $user->can('gestion_recursos_humanos')) {
+                return redirect()->to('/admin/recursos-humanos');
+            }
         }
         $tables = [];
         $stations = [];

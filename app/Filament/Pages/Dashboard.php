@@ -7,8 +7,13 @@ class Dashboard extends \Filament\Pages\Dashboard
     public function mount()
     {
         $user = auth()->user();
-        if ($user && ($user->hasRole('Gestor') || $user->hasRole('gestor'))) {
-            return redirect()->to('/admin/recursos-humanos');
+        if ($user) {
+            if ($user->hasRole('Admin') && $user->can('gestion_recursos_humanos')) {
+                return redirect()->to('/admin/recursos-humanos');
+            }
+            if ($user->hasRole('Gestor') || $user->hasRole('gestor')) {
+                return redirect()->to('/admin/dashboard');
+            }
         }
         return redirect()->to('/admin/dashboard');
     }
