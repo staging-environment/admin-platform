@@ -177,13 +177,13 @@
 
             {{-- Locality & Fuel Selector with Search --}}
             <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-200 p-6">
-                <form id="filterForm" method="GET" action="{{ route('dashboard') }}" class="w-full flex flex-col gap-5">
+                <form id="filterForm" method="GET" action="{{ route('dashboard') }}" class="w-full flex flex-col gap-6">
                     {{-- Row 1: Locality and Fuel (Centered side-by-side) --}}
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
                         {{-- Locality Selector --}}
                         <div class="flex flex-col gap-1 w-full sm:w-1/2 max-w-xs">
-                            <label for="locality" class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Localidad</label>
-                            <select name="locality" id="locality" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-xs px-3.5 py-2.5 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-semibold text-slate-700 cursor-pointer">
+                            <label for="locality" class="text-xs sm:text-sm font-black uppercase tracking-wider text-blue-600 text-center block w-full">Localidad</label>
+                            <select name="locality" id="locality" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-sm sm:text-base px-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-extrabold text-slate-700 cursor-pointer text-center">
                                 @foreach($localityMapping as $key => $loc)
                                     <option value="{{ $key }}" @selected($selectedLocality === $key)>{{ $loc['name'] }}</option>
                                 @endforeach
@@ -192,8 +192,8 @@
 
                         {{-- Sort By Selector --}}
                         <div class="flex flex-col gap-1 w-full sm:w-1/2 max-w-xs">
-                            <label for="sort_by" class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Combustible</label>
-                            <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-xs px-3.5 py-2.5 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-semibold text-slate-700 cursor-pointer">
+                            <label for="sort_by" class="text-xs sm:text-sm font-black uppercase tracking-wider text-blue-600 text-center block w-full">Combustible</label>
+                            <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-sm sm:text-base px-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-extrabold text-slate-700 cursor-pointer text-center">
                                 <option value="diesel" @selected($sortBy === 'diesel')>Diésel A</option>
                                 <option value="gas95" @selected($sortBy === 'gas95')>Gasolina 95 E5</option>
                             </select>
@@ -202,10 +202,10 @@
 
                     {{-- Row 2: Search Name (Large text input field) --}}
                     <div class="flex flex-col gap-1 w-full max-w-xl mx-auto">
-                        <label for="search_name" class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Buscar por nombre de gasolinera</label>
+                        <label for="search_name" class="text-sm sm:text-base font-black uppercase tracking-wider text-blue-600 text-center block w-full">Buscar por nombre de gasolinera</label>
                         <div class="relative w-full">
-                            <input type="text" name="search_name" id="search_name" value="{{ $searchName }}" placeholder="Ej. Repsol, Cepsa, Petroprix..." class="w-full rounded-xl border-gray-200 text-sm pl-10 pr-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-semibold text-slate-700 placeholder-slate-400 shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <input type="text" name="search_name" id="search_name" value="{{ $searchName }}" placeholder="Ej. Repsol, Cepsa, Petroprix..." class="w-full rounded-xl border-gray-200 text-base sm:text-lg pl-12 pr-4 py-3.5 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-extrabold text-slate-700 placeholder-slate-400 shadow-sm text-center">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
