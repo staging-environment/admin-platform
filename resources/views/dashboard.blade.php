@@ -316,21 +316,33 @@
                     </div>
                 </div>
             </div>
-            {{-- Radius Selector --}}
+            {{-- Radius & Limit Selector --}}
             <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                     <span class="text-sm font-semibold text-gray-800">Comparativa de Precios con la Competencia</span>
                 </div>
-                <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
-                    <label for="radius" class="text-xs font-bold uppercase tracking-wider text-gray-500">Radio a la redonda:</label>
-                    <select name="radius" id="radius" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
-                        <option value="30" @selected($selectedRadius == 30)>30 Kilómetros</option>
-                        <option value="50" @selected($selectedRadius == 50)>50 Kilómetros</option>
-                        <option value="100" @selected($selectedRadius == 100)>100 Kilómetros</option>
-                    </select>
+                <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="radius" class="text-xs font-bold uppercase tracking-wider text-gray-500">Radio:</label>
+                        <select name="radius" id="radius" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
+                            <option value="30" @selected($selectedRadius == 30)>30 Kilómetros</option>
+                            <option value="50" @selected($selectedRadius == 50)>50 Kilómetros</option>
+                            <option value="100" @selected($selectedRadius == 100)>100 Kilómetros</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="limit" class="text-xs font-bold uppercase tracking-wider text-gray-500">Mostrar:</label>
+                        <select name="limit" id="limit" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
+                            <option value="5" @selected($selectedLimit == 5)>5 Competidores</option>
+                            <option value="10" @selected($selectedLimit == 10)>10 Competidores</option>
+                            <option value="15" @selected($selectedLimit == 15)>15 Competidores</option>
+                            <option value="20" @selected($selectedLimit == 20)>20 Competidores</option>
+                        </select>
+                    </div>
                 </form>
             </div>
+
 
             {{-- Competitor Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -368,7 +380,7 @@
 
                             <div class="mb-3 flex items-center justify-between">
                                 <span class="text-xs uppercase tracking-wider font-extrabold text-slate-500">Competidores Cercanos:</span>
-                                <span class="text-[10px] font-medium text-slate-400">Radio: {{ $selectedRadius }} km</span>
+                                <span class="text-[10px] font-medium text-slate-400">Radio: {{ $selectedRadius }} km | Límite: {{ $selectedLimit }}</span>
                             </div>
 
                             <div class="space-y-3">

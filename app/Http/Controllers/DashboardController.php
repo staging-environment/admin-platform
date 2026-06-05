@@ -128,7 +128,12 @@ class DashboardController extends Controller
             $selectedRadius = 30;
         }
 
-        $competitorsData = Cache::remember('competitors_prices_' . $selectedRadius, 21600, function () use ($selectedRadius) {
+        $selectedLimit = (int) $request->input('limit', 5);
+        if (!in_array($selectedLimit, [5, 10, 15, 20], true)) {
+            $selectedLimit = 5;
+        }
+
+        $competitorsData = Cache::remember('competitors_prices_' . $selectedRadius . '_' . $selectedLimit, 21600, function () use ($selectedRadius, $selectedLimit) {
             $fallbacks = [
                 1 => ['lat' => 37.1824, 'lng' => -5.7954, 'name' => 'E.S. VISTALEGRE'],
                 2 => ['lat' => 37.1944, 'lng' => -5.7770, 'name' => 'RONDA NORTE'],
@@ -189,7 +194,7 @@ class DashboardController extends Controller
                         'station_name' => $origName,
                         'own_diesel' => $ownDiesel ? (float) $ownDiesel : null,
                         'own_gas95' => $ownGas95 ? (float) $ownGas95 : null,
-                        'competitors' => array_slice($list, 0, 5) // Show up to 5 closest
+                        'competitors' => array_slice($list, 0, $selectedLimit) // Show up to the selected limit
                     ];
                 }
 
@@ -215,6 +220,7 @@ class DashboardController extends Controller
             'serverStats' => $serverStats,
             'competitorsData' => $competitorsData,
             'selectedRadius' => $selectedRadius,
+            'selectedLimit' => $selectedLimit,
         ]);
     }
 
