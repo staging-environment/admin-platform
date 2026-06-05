@@ -77,9 +77,12 @@
                 @endphp
 
                 @foreach($groups as $groupName => $groupPermissions)
-                    <tr class="bg-gray-100/60 dark:bg-white/5">
-                        <td colspan="{{ count($roles) + 1 }}" class="p-3 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">
-                            {{ $groupName }}
+                    <tr class="bg-blue-50/80 dark:bg-indigo-950/40 border-l-4 border-blue-600 dark:border-blue-500">
+                        <td colspan="{{ count($roles) + 1 }}" class="p-4 text-sm font-black uppercase tracking-wider text-blue-900 dark:text-blue-200">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+                                {{ $groupName }}
+                            </div>
                         </td>
                     </tr>
                     @foreach($groupPermissions as $permissionName => $label)
@@ -107,9 +110,12 @@
                 @endforeach
 
                 @if($otherPermissions->count() > 0)
-                    <tr class="bg-gray-100/60 dark:bg-white/5">
-                        <td colspan="{{ count($roles) + 1 }}" class="p-3 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">
-                            Otros
+                    <tr class="bg-gray-100/80 dark:bg-gray-800/40 border-l-4 border-gray-500 dark:border-gray-400">
+                        <td colspan="{{ count($roles) + 1 }}" class="p-4 text-sm font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
+                                Otros
+                            </div>
                         </td>
                     </tr>
                     @foreach($otherPermissions as $permission)
