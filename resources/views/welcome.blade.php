@@ -207,6 +207,11 @@
                         class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Inicio
                 </button>
+                <button @click="tab = 'gasolineras'" 
+                        :class="tab === 'gasolineras' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
+                        class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
+                    Gasolineras
+                </button>
                 <button @click="tab = 'quienes_somos'" 
                         :class="tab === 'quienes_somos' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
                         class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
@@ -244,7 +249,7 @@
             </div>
         @endif
 
-        <!-- Tab 1: Inicio (Gas Stations Accordion List) -->
+        <!-- Tab 1: Inicio -->
         <div x-show="tab === 'inicio'" 
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4"
@@ -259,7 +264,15 @@
                     </div>
                 </div>
             @endif
+        </div>
 
+        <!-- Tab: Gasolineras -->
+        <div x-show="tab === 'gasolineras'" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="space-y-6 relative z-10"
+             style="display: none;">
             @forelse($gasolineras as $gasolinera)
                 @php
                     $contenido = $gasolinera->contenido;
@@ -612,6 +625,9 @@
                     <ul class="space-y-2.5">
                         <li>
                             <a href="#" @click.prevent="tab = 'inicio'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Inicio</a>
+                        </li>
+                        <li>
+                            <a href="#" @click.prevent="tab = 'gasolineras'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Gasolineras</a>
                         </li>
                         <li>
                             <a href="#" @click.prevent="tab = 'quienes_somos'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Quiénes Somos</a>
