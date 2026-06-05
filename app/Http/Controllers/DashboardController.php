@@ -122,88 +122,130 @@ class DashboardController extends Controller
             'db_connections' => $dbStatus,
         ];
 
-        // --- COMPONENT: COMPETITORS PRICE INDEX (MINETUR API) ---
-        $selectedRadius = (int) $request->input('radius', 30);
-        if (!in_array($selectedRadius, [30, 50, 100], true)) {
-            $selectedRadius = 30;
+        // --- COMPONENT: COMPETITORS PRICE INDEX BY LOCALITY (MINETUR API) ---
+        $selectedLocality = $request->input('locality', 'utrera');
+        $sortBy = $request->input('sort_by', 'diesel');
+
+        $localityMapping = [
+            'utrera' => [
+                'name' => 'Utrera',
+                'match' => 'UTRERA',
+                'own_station_id' => 1,
+                'own_name' => 'E.S. VISTALEGRE',
+                'own_code' => '1',
+            ],
+            'sevilla' => [
+                'name' => 'Sevilla',
+                'match' => 'SEVILLA',
+                'own_station_id' => 2,
+                'own_name' => 'RONDA NORTE',
+                'own_code' => '2',
+            ],
+            'el_cuervo' => [
+                'name' => 'El Cuervo de Sevilla',
+                'match' => 'CUERVO DE SEVILLA (EL)',
+                'own_station_id' => 3,
+                'own_name' => 'E.S RODALABOTA',
+                'own_code' => '3',
+            ],
+            'lebrija' => [
+                'name' => 'Lebrija',
+                'match' => 'LEBRIJA',
+                'own_station_id' => 4,
+                'own_name' => 'E.S. ATENAS',
+                'own_code' => '4',
+            ],
+        ];
+
+        if (!array_key_exists($selectedLocality, $localityMapping)) {
+            $selectedLocality = 'utrera';
         }
 
-        $selectedLimit = (int) $request->input('limit', 5);
-        if (!in_array($selectedLimit, [5, 10, 15, 20], true)) {
-            $selectedLimit = 5;
+        if (!in_array($sortBy, ['diesel', 'gas95'], true)) {
+            $sortBy = 'diesel';
         }
 
-        $competitorsData = Cache::remember('competitors_prices_' . $selectedRadius . '_' . $selectedLimit, 21600, function () use ($selectedRadius, $selectedLimit) {
-            $fallbacks = [
-                1 => ['lat' => 37.1824, 'lng' => -5.7954, 'name' => 'E.S. VISTALEGRE'],
-                2 => ['lat' => 37.1944, 'lng' => -5.7770, 'name' => 'RONDA NORTE'],
-                3 => ['lat' => 36.8480, 'lng' => -5.9224, 'name' => 'E.S RODALABOTA'],
-                4 => ['lat' => 37.5348, 'lng' => -5.0934, 'name' => 'E.S. ATENAS'],
-            ];
+        $targetLoc = $localityMapping[$selectedLocality];
 
+        // Fetch all stations in Sevilla province (41) with cache of 6 hours
+        $sevillaStations = Cache::remember('minetur_sevilla_stations_raw', 21600, function () {
             try {
                 $response = Http::timeout(10)->get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/41');
                 if ($response->failed()) {
                     return [];
                 }
                 $data = $response->json();
-                $stations = $data['ListaEESSPrecio'] ?? [];
-
-                $result = [];
-                foreach ($fallbacks as $id => $orig) {
-                    $dbStation = \App\Models\Gasolinera::with('contenido')->find($id);
-                    $origLat = ($dbStation && $dbStation->contenido && $dbStation->contenido->latitud) ? $dbStation->contenido->latitud : $orig['lat'];
-                    $origLng = ($dbStation && $dbStation->contenido && $dbStation->contenido->longitud) ? $dbStation->contenido->longitud : $orig['lng'];
-                    $origName = $dbStation ? $dbStation->Nombre : $orig['name'];
-
-                    $list = [];
-                    foreach ($stations as $s) {
-                        $lat = (float) str_replace(',', '.', $s['Latitud']);
-                        $lng = (float) str_replace(',', '.', $s['Longitud (WGS84)']);
-                        
-                        if (!$lat || !$lng) continue;
-
-                        // Calculate distance (Haversine formula inline)
-                        $theta = $origLng - $lng;
-                        $dist = sin(deg2rad($origLat)) * sin(deg2rad($lat)) +  cos(deg2rad($origLat)) * cos(deg2rad($lat)) * cos(deg2rad($theta));
-                        $dist = acos($dist);
-                        $dist = rad2deg($dist);
-                        $kms = $dist * 60 * 1.1515 * 1.609344;
-                        
-                        if ($kms < 0.05) continue;
-                        if ($kms > $selectedRadius) continue; // Filter by radius
-                        
-                        $list[] = [
-                            'name' => $s['Rótulo'],
-                            'address' => $s['Dirección'],
-                            'distance' => $kms,
-                            'diesel' => (float) str_replace(',', '.', $s['Precio Gasoleo A'] ?? 0),
-                            'gas95' => (float) str_replace(',', '.', $s['Precio Gasolina 95 E5'] ?? 0),
-                        ];
-                    }
-                    
-                    usort($list, function($a, $b) {
-                        return $a['distance'] <=> $b['distance'];
-                    });
-
-                    $stationCode = $dbStation ? $dbStation->Codigo : (string)$id;
-                    $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $stationCode)->where('CodigoProducto', '1')->value('PVP');
-                    $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $stationCode)->where('CodigoProducto', '2')->value('PVP');
-
-                    $result[$id] = [
-                        'station_name' => $origName,
-                        'own_diesel' => $ownDiesel ? (float) $ownDiesel : null,
-                        'own_gas95' => $ownGas95 ? (float) $ownGas95 : null,
-                        'competitors' => array_slice($list, 0, $selectedLimit) // Show up to the selected limit
-                    ];
-                }
-
-                return $result;
+                return $data['ListaEESSPrecio'] ?? [];
             } catch (\Exception $e) {
                 report($e);
                 return [];
             }
         });
+
+        $filteredStations = [];
+        foreach ($sevillaStations as $s) {
+            $mun = strtoupper($s['Municipio'] ?? '');
+            
+            $matched = false;
+            if ($selectedLocality === 'el_cuervo') {
+                $matched = (strpos($mun, 'CUERVO') !== false);
+            } else {
+                $matched = ($mun === $targetLoc['match']);
+            }
+
+            if ($matched) {
+                $dieselPrice = (float) str_replace(',', '.', $s['Precio Gasoleo A'] ?? '0');
+                $gas95Price = (float) str_replace(',', '.', $s['Precio Gasolina 95 E5'] ?? '0');
+
+                // Identify if it matches our own station in this locality
+                $isOurs = false;
+                $rotulo = strtoupper($s['Rótulo'] ?? '');
+                $direccion = strtoupper($s['Dirección'] ?? '');
+                
+                if ($selectedLocality === 'utrera' && (strpos($rotulo, 'VISTALEGRE') !== false || strpos($rotulo, 'UTRECAR') !== false || strpos($direccion, 'ECIJA-JEREZ') !== false)) {
+                    $isOurs = true;
+                } elseif ($selectedLocality === 'sevilla' && (strpos($rotulo, 'RONDA NORTE') !== false || strpos($direccion, 'CALONGE') !== false)) {
+                    $isOurs = true;
+                } elseif ($selectedLocality === 'el_cuervo' && (strpos($rotulo, 'RODALABOTA') !== false || strpos($direccion, 'TORNERO') !== false)) {
+                    $isOurs = true;
+                } elseif ($selectedLocality === 'lebrija' && (strpos($rotulo, 'ATENAS') !== false || strpos($direccion, 'ATENAS') !== false)) {
+                    $isOurs = true;
+                }
+
+                $filteredStations[] = [
+                    'name' => $s['Rótulo'] ?? 'SIN RÓTULO',
+                    'address' => $s['Dirección'] ?? 'Sin Dirección',
+                    'diesel' => $dieselPrice,
+                    'gas95' => $gas95Price,
+                    'is_ours' => $isOurs,
+                    'ideess' => $s['IDEESS'] ?? null,
+                ];
+            }
+        }
+
+        // Sort by the selected fuel type from lowest to highest
+        usort($filteredStations, function ($a, $b) use ($sortBy) {
+            $priceA = $a[$sortBy];
+            $priceB = $b[$sortBy];
+
+            if ($priceA <= 0) $priceA = 999999;
+            if ($priceB <= 0) $priceB = 999999;
+
+            return $priceA <=> $priceB;
+        });
+
+        // Compute rank of our station
+        $ourRank = null;
+        foreach ($filteredStations as $index => $station) {
+            if ($station['is_ours']) {
+                $ourRank = $index + 1;
+                break;
+            }
+        }
+
+        // Real-time own prices from the local database
+        $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '1')->value('PVP');
+        $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '2')->value('PVP');
 
         return view('dashboard', [
             'tables' => $tables,
@@ -218,9 +260,14 @@ class DashboardController extends Controller
             'months' => $this->months(),
             'weatherInfo' => $weatherInfo,
             'serverStats' => $serverStats,
-            'competitorsData' => $competitorsData,
-            'selectedRadius' => $selectedRadius,
-            'selectedLimit' => $selectedLimit,
+            'filteredStations' => $filteredStations,
+            'selectedLocality' => $selectedLocality,
+            'sortBy' => $sortBy,
+            'localityMapping' => $localityMapping,
+            'ownDiesel' => $ownDiesel ? (float) $ownDiesel : null,
+            'ownGas95' => $ownGas95 ? (float) $ownGas95 : null,
+            'ourRank' => $ourRank,
+            'ourStationName' => $targetLoc['own_name'],
         ]);
     }
 

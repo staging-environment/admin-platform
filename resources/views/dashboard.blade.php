@@ -316,115 +316,155 @@
                     </div>
                 </div>
             </div>
-            {{-- Radius & Limit Selector --}}
+            {{-- Locality & Fuel Selector --}}
             <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                    <span class="text-sm font-semibold text-gray-800">Comparativa de Precios con la Competencia</span>
+                    <span class="text-sm font-semibold text-gray-800">Comparativa de Precios por Localidad</span>
                 </div>
                 <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col sm:flex-row items-center gap-4">
                     <div class="flex items-center gap-2">
-                        <label for="radius" class="text-xs font-bold uppercase tracking-wider text-gray-500">Radio:</label>
-                        <select name="radius" id="radius" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
-                            <option value="30" @selected($selectedRadius == 30)>30 Kilómetros</option>
-                            <option value="50" @selected($selectedRadius == 50)>50 Kilómetros</option>
-                            <option value="100" @selected($selectedRadius == 100)>100 Kilómetros</option>
+                        <label for="locality" class="text-xs font-bold uppercase tracking-wider text-gray-500">Localidad:</label>
+                        <select name="locality" id="locality" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
+                            @foreach($localityMapping as $key => $loc)
+                                <option value="{{ $key }}" @selected($selectedLocality === $key)>{{ $loc['name'] }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="limit" class="text-xs font-bold uppercase tracking-wider text-gray-500">Mostrar:</label>
-                        <select name="limit" id="limit" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
-                            <option value="5" @selected($selectedLimit == 5)>5 Competidores</option>
-                            <option value="10" @selected($selectedLimit == 10)>10 Competidores</option>
-                            <option value="15" @selected($selectedLimit == 15)>15 Competidores</option>
-                            <option value="20" @selected($selectedLimit == 20)>20 Competidores</option>
+                        <label for="sort_by" class="text-xs font-bold uppercase tracking-wider text-gray-500">Ordenar por:</label>
+                        <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
+                            <option value="diesel" @selected($sortBy === 'diesel')>Menor Precio Diésel A</option>
+                            <option value="gas95" @selected($sortBy === 'gas95')>Menor Precio Gasolina 95 E5</option>
                         </select>
                     </div>
                 </form>
             </div>
 
-
-            {{-- Competitor Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach($competitorsData as $id => $orig)
-                    <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-6 flex flex-col justify-between">
+            {{-- Rank & Info Alert --}}
+            @if($ourRank)
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl p-4 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white/20 p-2 rounded-xl">
+                            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
                         <div>
-                            <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
-                                <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                                    {{ $orig['station_name'] }}
-                                </h3>
-                                <span class="text-xs uppercase tracking-wider font-extrabold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
-                                    Nuestra Estación
-                                </span>
+                            <h3 class="text-base font-bold uppercase tracking-wider">
+                                Posicionamiento en {{ $localityMapping[$selectedLocality]['name'] }}
+                            </h3>
+                            <p class="text-sm text-blue-100">
+                                Nuestra estación <span class="font-extrabold underline">{{ $ourStationName }}</span> se encuentra en el puesto <span class="font-extrabold text-white text-lg">#{{ $ourRank }}</span> de <span class="font-semibold text-white">{{ count($filteredStations) }}</span> estaciones.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 px-4 py-2 rounded-xl text-center shrink-0 border border-white/10">
+                        <span class="text-xs uppercase tracking-wider block font-bold text-blue-200">Comparando por</span>
+                        <span class="text-sm font-black">{{ $sortBy === 'diesel' ? 'Diésel A' : 'Gasolina 95 E5' }}</span>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Own Station Realtime Prices vs Locality --}}
+            <div class="bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                        <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Precios de Nuestra Estación (Tiempo Real)</h4>
+                        <p class="text-xs text-slate-500">Datos obtenidos localmente de la base de datos de surtidores.</p>
+                    </div>
+                    <span class="text-xs font-bold text-blue-600 bg-blue-100/60 px-3 py-1 rounded-full border border-blue-200">
+                        {{ $ourStationName }}
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-xl p-4 border border-slate-200 flex items-center justify-between shadow-xs">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Diésel A</span>
+                            <span class="text-3xl font-black text-slate-800 font-mono">
+                                {{ $ownDiesel ? number_format($ownDiesel, 3, ',', '.') . ' €' : '---' }}
+                            </span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 border border-slate-200 flex items-center justify-between shadow-xs">
+                        <div>
+                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block">Gasolina 95 E5</span>
+                            <span class="text-3xl font-black text-blue-600 font-mono">
+                                {{ $ownGas95 ? number_format($ownGas95, 3, ',', '.') . ' €' : '---' }}
+                            </span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Competitor Leaderboard List --}}
+            <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-200 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 class="text-base font-extrabold text-slate-800">
+                        Listado de Gasolineras en {{ $localityMapping[$selectedLocality]['name'] }} ({{ count($filteredStations) }})
+                    </h3>
+                    <span class="text-xs text-slate-500">Ordenado de menor a mayor precio</span>
+                </div>
+
+                <div class="divide-y divide-gray-150">
+                    @forelse($filteredStations as $index => $station)
+                        <div class="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition duration-150 {{ $station['is_ours'] ? 'bg-blue-50/70 border-l-4 border-blue-500' : 'hover:bg-slate-50/50' }}">
+                            {{-- Station Info & Rank --}}
+                            <div class="flex items-center gap-4 min-w-0 flex-1">
+                                {{-- Rank Badge --}}
+                                <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-sm
+                                    @if($index === 0) bg-amber-100 text-amber-800 border border-amber-200
+                                    @elseif($index === 1) bg-slate-100 text-slate-700 border border-slate-200
+                                    @elseif($index === 2) bg-amber-50 text-amber-700 border border-amber-100
+                                    @else bg-gray-50 text-gray-500 border border-gray-100 @endif">
+                                    #{{ $index + 1 }}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-tight truncate max-w-xs md:max-w-md">
+                                            {{ $station['name'] }}
+                                        </h4>
+                                        @if($station['is_ours'])
+                                            <span class="text-[9px] uppercase tracking-wider font-extrabold text-blue-600 bg-blue-100 px-2.5 py-0.5 rounded-full border border-blue-200 animate-pulse">
+                                                Nuestra Estación
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs text-slate-500 truncate mt-0.5" title="{{ $station['address'] }}">
+                                        {{ $station['address'] }}
+                                    </p>
+                                </div>
                             </div>
 
-                            {{-- Our own prices (bien grandote) --}}
-                            <div class="bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200/80 rounded-2xl p-4 mb-5 shadow-sm">
-                                <span class="text-[10px] uppercase tracking-wider font-extrabold text-slate-500 block mb-2.5">Precios en nuestra estación:</span>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-white rounded-xl p-3 border border-slate-100 flex flex-col justify-center shadow-xs">
-                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Diesel A</span>
-                                        <span class="text-2xl font-black text-slate-800 font-mono">
-                                            {{ isset($orig['own_diesel']) && $orig['own_diesel'] ? number_format($orig['own_diesel'], 3, ',', '.') . ' €' : '---' }}
+                            {{-- Fuel Prices --}}
+                            <div class="flex items-center gap-6 shrink-0 w-full md:w-auto justify-between md:justify-end border-t border-slate-100 pt-3 md:pt-0 md:border-0">
+                                <div class="flex items-center gap-6">
+                                    {{-- Diesel Price --}}
+                                    <div class="text-right {{ $sortBy === 'diesel' ? 'bg-amber-50/60 p-2 rounded-lg border border-amber-100/50' : '' }}">
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Diésel A</span>
+                                        <span class="font-mono text-base font-black {{ $sortBy === 'diesel' ? 'text-amber-700' : 'text-slate-700' }}">
+                                            {{ $station['diesel'] > 0 ? number_format($station['diesel'], 3, ',', '.') . ' €' : '---' }}
                                         </span>
                                     </div>
-                                    <div class="bg-white rounded-xl p-3 border border-slate-100 flex flex-col justify-center shadow-xs">
-                                        <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-0.5">Gasolina 95 E5</span>
-                                        <span class="text-2xl font-black text-blue-600 font-mono">
-                                            {{ isset($orig['own_gas95']) && $orig['own_gas95'] ? number_format($orig['own_gas95'], 3, ',', '.') . ' €' : '---' }}
+
+                                    {{-- Gasoline 95 Price --}}
+                                    <div class="text-right {{ $sortBy === 'gas95' ? 'bg-blue-50/60 p-2 rounded-lg border border-blue-100/50' : '' }}">
+                                        <span class="text-[9px] font-bold text-blue-400 uppercase tracking-wider block">SP 95 E5</span>
+                                        <span class="font-mono text-base font-black {{ $sortBy === 'gas95' ? 'text-blue-600 font-extrabold' : 'text-slate-600' }}">
+                                            {{ $station['gas95'] > 0 ? number_format($station['gas95'], 3, ',', '.') . ' €' : '---' }}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="mb-3 flex items-center justify-between">
-                                <span class="text-xs uppercase tracking-wider font-extrabold text-slate-500">Competidores Cercanos:</span>
-                                <span class="text-[10px] font-medium text-slate-400">Radio: {{ $selectedRadius }} km | Límite: {{ $selectedLimit }}</span>
-                            </div>
-
-                            <div class="space-y-3">
-                                @forelse($orig['competitors'] as $comp)
-                                    <div class="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:bg-slate-50 transition duration-150">
-                                        <div class="flex justify-between items-start gap-2 mb-2.5">
-                                            <div class="min-w-0 flex-1">
-                                                <h4 class="text-sm font-bold text-slate-800 truncate uppercase tracking-tight">
-                                                    {{ $comp['name'] }}
-                                                </h4>
-                                                <p class="text-xs text-slate-500 truncate mt-0.5" title="{{ $comp['address'] }}">
-                                                    {{ $comp['address'] }}
-                                                </p>
-                                            </div>
-                                            <span class="shrink-0 inline-flex items-center gap-1 text-xs font-bold text-indigo-600 bg-indigo-50/80 px-2.5 py-1 rounded-full">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                                {{ number_format($comp['distance'], 2, ',', '.') }} km
-                                            </span>
-                                        </div>
-
-                                        <div class="grid grid-cols-2 gap-3 text-sm border-t border-slate-100/60 pt-2.5">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-slate-500 text-xs uppercase font-bold tracking-wider">Diesel:</span>
-                                                <span class="font-mono text-base font-black text-slate-700">
-                                                    {{ $comp['diesel'] ? number_format($comp['diesel'], 3, ',', '.') . ' €' : '---' }}
-                                                </span>
-                                            </div>
-                                            <div class="flex items-center justify-between pl-4 border-l border-slate-200/60">
-                                                <span class="text-blue-500 text-xs uppercase font-bold tracking-wider">SP 95:</span>
-                                                <span class="font-mono text-base font-black text-blue-600">
-                                                    {{ $comp['gas95'] ? number_format($comp['gas95'], 3, ',', '.') . ' €' : '---' }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="py-8 text-center text-gray-400 text-sm">
-                                        No se encontraron gasolineras competidoras en un radio de {{ $selectedRadius }} km.
-                                    </div>
-                                @endforelse
-                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @empty
+                        <div class="py-12 text-center text-gray-400 text-sm">
+                            No se encontraron gasolineras en la localidad de {{ $localityMapping[$selectedLocality]['name'] }}.
+                        </div>
+                    @endforelse
+                </div>
             </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
