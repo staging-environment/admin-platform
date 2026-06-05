@@ -315,7 +315,24 @@
                         <span>Laravel v{{ app()->version() }}</span>
                     </div>
                 </div>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- Radius Selector --}}
+            <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                    <span class="text-sm font-semibold text-gray-800">Comparativa de Precios con la Competencia</span>
+                </div>
+                <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
+                    <label for="radius" class="text-xs font-bold uppercase tracking-wider text-gray-500">Radio a la redonda:</label>
+                    <select name="radius" id="radius" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-xs px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 font-medium text-slate-700 cursor-pointer">
+                        <option value="30" @selected($selectedRadius == 30)>30 Kilómetros</option>
+                        <option value="50" @selected($selectedRadius == 50)>50 Kilómetros</option>
+                        <option value="100" @selected($selectedRadius == 100)>100 Kilómetros</option>
+                    </select>
+                </form>
+            </div>
+
+            {{-- Competitor Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach($competitorsData as $id => $orig)
                     <div class="bg-white shadow-sm sm:rounded-lg border border-gray-200 p-6 flex flex-col justify-between">
                         <div>
@@ -325,53 +342,46 @@
                                     {{ $orig['station_name'] }}
                                 </h3>
                                 <span class="text-[10px] uppercase tracking-wider font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                                    Competencia cercana
+                                    Competidores cercanos
                                 </span>
                             </div>
 
-                            <div class="divide-y divide-gray-100">
+                            <div class="space-y-3">
                                 @forelse($orig['competitors'] as $comp)
-                                    <div class="py-3.5 first:pt-0 last:pb-0">
-                                        <div class="flex justify-between items-start gap-3 mb-2">
-                                            <div class="min-w-0">
-                                                <h4 class="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">
+                                    <div class="bg-slate-50/70 border border-slate-100 rounded-xl p-3.5 hover:bg-slate-50 transition duration-150">
+                                        <div class="flex justify-between items-start gap-2 mb-2">
+                                            <div class="min-w-0 flex-1">
+                                                <h4 class="text-xs font-bold text-slate-800 truncate uppercase tracking-tight">
                                                     {{ $comp['name'] }}
                                                 </h4>
-                                                <p class="text-[10px] text-gray-400 truncate mt-0.5" title="{{ $comp['address'] }}">
+                                                <p class="text-[10px] text-slate-400 truncate mt-0.5" title="{{ $comp['address'] }}">
                                                     {{ $comp['address'] }}
                                                 </p>
                                             </div>
-                                            <span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                                            <span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50/80 px-2 py-0.5 rounded-full">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                                                 {{ number_format($comp['distance'], 2, ',', '.') }} km
                                             </span>
                                         </div>
 
-                                        <div class="flex gap-4">
-                                            <div class="bg-gray-50/80 border border-gray-100 px-3 py-1.5 rounded-xl flex-1 flex items-center justify-between">
-                                                <div class="flex items-center gap-1.5">
-                                                    <span class="w-1 h-3.5 bg-gray-400 rounded-full"></span>
-                                                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Diesel</span>
-                                                </div>
-                                                <span class="text-xs font-black text-gray-700 font-mono">
+                                        <div class="grid grid-cols-2 gap-2 text-xs border-t border-slate-100/60 pt-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Diesel:</span>
+                                                <span class="font-mono font-black text-slate-700">
                                                     {{ $comp['diesel'] ? number_format($comp['diesel'], 3, ',', '.') . ' €' : '---' }}
                                                 </span>
                                             </div>
-
-                                            <div class="bg-blue-50/40 border border-blue-100/50 px-3 py-1.5 rounded-xl flex-1 flex items-center justify-between">
-                                                <div class="flex items-center gap-1.5">
-                                                    <span class="w-1 h-3.5 bg-blue-500 rounded-full"></span>
-                                                    <span class="text-[9px] font-bold text-blue-500 uppercase tracking-wider">SP 95</span>
-                                                </div>
-                                                <span class="text-xs font-black text-blue-600 font-mono">
+                                            <div class="flex items-center justify-between pl-3 border-l border-slate-200/60">
+                                                <span class="text-blue-500 text-[10px] uppercase font-bold tracking-wider">SP 95:</span>
+                                                <span class="font-mono font-black text-blue-600">
                                                     {{ $comp['gas95'] ? number_format($comp['gas95'], 3, ',', '.') . ' €' : '---' }}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 @empty
-                                    <div class="py-6 text-center text-gray-500 text-xs">
-                                        No se encontraron gasolineras competidoras cercanas en los datos del Ministerio.
+                                    <div class="py-8 text-center text-gray-400 text-xs">
+                                        No se encontraron gasolineras competidoras en un radio de {{ $selectedRadius }} km.
                                     </div>
                                 @endforelse
                             </div>

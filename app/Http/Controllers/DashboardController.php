@@ -123,7 +123,12 @@ class DashboardController extends Controller
         ];
 
         // --- COMPONENT: COMPETITORS PRICE INDEX (MINETUR API) ---
-        $competitorsData = Cache::remember('competitors_prices', 21600, function () {
+        $selectedRadius = (int) $request->input('radius', 30);
+        if (!in_array($selectedRadius, [30, 50, 100], true)) {
+            $selectedRadius = 30;
+        }
+
+        $competitorsData = Cache::remember('competitors_prices_' . $selectedRadius, 21600, function () use ($selectedRadius) {
             $fallbacks = [
                 1 => ['lat' => 37.1824, 'lng' => -5.7954, 'name' => 'E.S. VISTALEGRE'],
                 2 => ['lat' => 37.1944, 'lng' => -5.7770, 'name' => 'RONDA NORTE'],
@@ -161,6 +166,7 @@ class DashboardController extends Controller
                         $kms = $dist * 60 * 1.1515 * 1.609344;
                         
                         if ($kms < 0.05) continue;
+                        if ($kms > $selectedRadius) continue; // Filter by radius
                         
                         $list[] = [
                             'name' => $s['Rótulo'],
@@ -177,7 +183,7 @@ class DashboardController extends Controller
 
                     $result[$id] = [
                         'station_name' => $origName,
-                        'competitors' => array_slice($list, 0, 3)
+                        'competitors' => array_slice($list, 0, 5) // Show up to 5 closest
                     ];
                 }
 
@@ -202,6 +208,7 @@ class DashboardController extends Controller
             'weatherInfo' => $weatherInfo,
             'serverStats' => $serverStats,
             'competitorsData' => $competitorsData,
+            'selectedRadius' => $selectedRadius,
         ]);
     }
 
