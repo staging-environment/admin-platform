@@ -8,11 +8,22 @@ class Dashboard extends \Filament\Pages\Dashboard
     {
         $user = auth()->user();
         if ($user) {
-            if ($user->hasRole('Admin') && $user->can('gestion_recursos_humanos')) {
-                return redirect()->to('/admin/recursos-humanos');
+            if ($user->hasRole('Admin')) {
+                if ($user->can('ver_dashboard')) {
+                    return redirect()->to('/admin/dashboard');
+                }
+                if ($user->can('gestion_recursos_humanos')) {
+                    return redirect()->to('/admin/recursos-humanos');
+                }
             }
+
             if ($user->hasRole('Gestor') || $user->hasRole('gestor')) {
-                return redirect()->to('/admin/dashboard');
+                if ($user->can('gestion_recursos_humanos')) {
+                    return redirect()->to('/admin/recursos-humanos');
+                }
+                if ($user->can('ver_dashboard')) {
+                    return redirect()->to('/admin/dashboard');
+                }
             }
         }
         return redirect()->to('/admin/dashboard');

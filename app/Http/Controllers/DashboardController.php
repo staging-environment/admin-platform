@@ -15,8 +15,10 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         if ($user) {
-            if ($user->hasRole('Admin') && $user->can('gestion_recursos_humanos')) {
-                return redirect()->to('/admin/recursos-humanos');
+            if (($user->hasRole('Gestor') || $user->hasRole('gestor')) && !$user->hasRole('Admin')) {
+                if ($user->can('gestion_recursos_humanos')) {
+                    return redirect()->to('/admin/recursos-humanos');
+                }
             }
         }
         $tables = [];
