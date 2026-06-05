@@ -43,20 +43,20 @@ class EmpleadoResource extends Resource
         return EmpleadoForm::configure($schema);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos Personales')
+                \Filament\Schemas\Components\Section::make('Datos Personales')
                     ->description('Información básica de identificación')
                     ->schema([
-                        \Filament\Infolists\Components\Grid::make(3)
+                        \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
                                     ->label('Foto de perfil')
                                     ->circular()
                                     ->columnSpan(1),
-                                \Filament\Infolists\Components\Grid::make(2)
+                                \Filament\Schemas\Components\Grid::make(2)
                                     ->schema([
                                         \Filament\Infolists\Components\TextEntry::make('nombre')
                                             ->label('Nombre')
@@ -74,9 +74,9 @@ class EmpleadoResource extends Resource
                             ]),
                     ]),
 
-                \Filament\Infolists\Components\Section::make('Contacto y Dirección')
+                \Filament\Schemas\Components\Section::make('Contacto y Dirección')
                     ->schema([
-                        \Filament\Infolists\Components\Grid::make(3)
+                        \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('direccion')
                                     ->label('Dirección'),
@@ -97,10 +97,10 @@ class EmpleadoResource extends Resource
                             ]),
                     ]),
 
-                \Filament\Infolists\Components\Section::make('Discapacidad / Incapacidad')
+                \Filament\Schemas\Components\Section::make('Discapacidad / Incapacidad')
                     ->description('Información sobre discapacidad o incapacidades')
                     ->schema([
-                        \Filament\Infolists\Components\Grid::make(2)
+                        \Filament\Schemas\Components\Grid::make(2)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
