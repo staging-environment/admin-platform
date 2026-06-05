@@ -186,6 +186,14 @@ class DashboardController extends Controller
             return !$station['is_ours'];
         }));
 
+        // Filter by name (rótulo) if search query is provided
+        $searchName = trim($request->input('search_name', ''));
+        if ($searchName !== '') {
+            $filteredStations = array_values(array_filter($filteredStations, function ($station) use ($searchName) {
+                return (strpos(strtoupper($station['name']), strtoupper($searchName)) !== false);
+            }));
+        }
+
         // Real-time own prices from the local database
         $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '1')->value('PVP');
         $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '2')->value('PVP');
@@ -204,6 +212,7 @@ class DashboardController extends Controller
             'filteredStations' => $filteredStations,
             'selectedLocality' => $selectedLocality,
             'sortBy' => $sortBy,
+            'searchName' => $searchName,
             'localityMapping' => $localityMapping,
             'ownDiesel' => $ownDiesel ? (float) $ownDiesel : null,
             'ownGas95' => $ownGas95 ? (float) $ownGas95 : null,
