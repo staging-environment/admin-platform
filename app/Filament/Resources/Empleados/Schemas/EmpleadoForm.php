@@ -115,8 +115,8 @@ class EmpleadoForm
                                             ->maxLength(255),
                                         Slider::make('porcentaje_discapacidad')
                                             ->label('Porcentaje de Discapacidad')
-                                            ->min(0)
-                                            ->max(100)
+                                            ->minValue(0)
+                                            ->maxValue(100)
                                             ->default(0)
                                             ->live(),
                                         TextInput::make('incapacidad')
