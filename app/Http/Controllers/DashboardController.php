@@ -181,8 +181,13 @@ class DashboardController extends Controller
                         return $a['distance'] <=> $b['distance'];
                     });
 
+                    $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $id)->where('CodigoProducto', '1')->value('PVP');
+                    $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $id)->where('CodigoProducto', '2')->value('PVP');
+
                     $result[$id] = [
                         'station_name' => $origName,
+                        'own_diesel' => $ownDiesel ? (float) $ownDiesel : null,
+                        'own_gas95' => $ownGas95 ? (float) $ownGas95 : null,
                         'competitors' => array_slice($list, 0, 5) // Show up to 5 closest
                     ];
                 }
