@@ -47,7 +47,7 @@
                             @php
                                 $n = $permission->name;
                                 $f = [
-                                    'ver_dashboard' => 'Ver Dashboard',
+                                    'ver_dashboard' => 'Ver Comparador de Precios',
                                     'gestion_usuarios_roles' => 'Gestión de Usuarios y Roles',
                                     'utilizar_explorador' => 'Utilizar Explorador de Archivos',
                                     'ver_informes' => 'Ver Informes y Estadísticas',
@@ -62,6 +62,7 @@
                                     'gestion_ausencias_empleados' => 'Ausencias y Bajas de Empleados',
                                     'gestion_vacaciones_empleados' => 'Vacaciones y Permisos de Empleados',
                                     'gestion_contratos_empleados' => 'Contratos de Empleados',
+                                    'gestion_comentarios_empleados' => 'Gestionar comentarios de empleados',
                                 ];
                             @endphp
                             {{ $f[$n] ?? $n }}
