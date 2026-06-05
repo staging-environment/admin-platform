@@ -116,10 +116,11 @@ class EmpleadoForm
                                             ->label('Tipo de Discapacidad')
                                             ->maxLength(255),
                                         Slider::make('porcentaje_discapacidad')
-                                            ->label(fn (Get $get) => 'Porcentaje de Discapacidad: ' . ($get('porcentaje_discapacidad') ?? 0) . '%')
+                                            ->label(fn (Get $get) => 'Porcentaje de Discapacidad: ' . round($get('porcentaje_discapacidad') ?? 0) . '%')
                                             ->minValue(0)
                                             ->maxValue(100)
                                             ->default(0)
+                                            ->step(1)
                                             ->live(),
                                         TextInput::make('incapacidad')
                                             ->label('Incapacidad')
@@ -364,6 +365,16 @@ class EmpleadoForm
         }
 
         return <<<HTML
+<style>
+    .noUi-handle, [role="slider"], .noUi-origin .noUi-handle {
+        background: #3b82f6 !important;
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6) !important;
+    }
+    .noUi-connect {
+        background: #3b82f6 !important;
+    }
+</style>
 <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-xl max-w-sm mx-auto transition-all duration-300">
     <div class="relative w-48 h-48 mb-4">
         <svg viewBox="0 0 80 80" class="w-full h-full drop-shadow-[0_0_15px_rgba(99,102,241,0.25)]">
