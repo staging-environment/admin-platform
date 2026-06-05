@@ -181,8 +181,9 @@ class DashboardController extends Controller
                         return $a['distance'] <=> $b['distance'];
                     });
 
-                    $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $id)->where('CodigoProducto', '1')->value('PVP');
-                    $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $id)->where('CodigoProducto', '2')->value('PVP');
+                    $stationCode = $dbStation ? $dbStation->Codigo : (string)$id;
+                    $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $stationCode)->where('CodigoProducto', '1')->value('PVP');
+                    $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $stationCode)->where('CodigoProducto', '2')->value('PVP');
 
                     $result[$id] = [
                         'station_name' => $origName,
