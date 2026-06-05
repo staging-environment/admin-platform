@@ -40,13 +40,13 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
-                                        <div x-show="openSub" class="bg-gray-50 border-l-2 border-indigo-400/50 my-1 py-1" style="display: none;">
-                                            <a href="/admin/job-offers" class="flex items-center gap-2 w-full pl-6 pr-4 py-1.5 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-offers*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 {{ request()->is('admin/job-offers*') ? 'bg-indigo-500' : '' }}"></span>
+                                        <div x-show="openSub" style="display: none; border-left: 4px solid #6366f1 !important; background-color: #f9fafb !important; margin: 4px 0; padding: 4px 0;">
+                                            <a href="/admin/job-offers" class="flex items-center w-full pr-4 py-2 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-offers*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}" style="padding-left: 2rem !important;">
+                                                <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
                                                 {{ __('Ver Ofertas') }}
                                             </a>
-                                            <a href="/admin/job-applications" class="flex items-center gap-2 w-full pl-6 pr-4 py-1.5 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-applications*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 {{ request()->is('admin/job-applications*') ? 'bg-indigo-500' : '' }}"></span>
+                                            <a href="/admin/job-applications" class="flex items-center w-full pr-4 py-2 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-applications*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}" style="padding-left: 2rem !important;">
+                                                <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
                                                 {{ __('Inscritos a Ofertas') }}
                                             </a>
                                         </div>
