@@ -264,7 +264,7 @@
                     </div>
 
                     @forelse($filteredStations as $index => $station)
-                        <div class="station-item p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition duration-150 {{ $station['is_ours'] ? 'bg-blue-50/70 border-l-4 border-blue-500' : 'hover:bg-slate-50/50' }}" data-name="{{ $station['name'] }}" data-address="{{ $station['address'] }}">
+                        <div class="station-item p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition duration-150 {{ $station['is_ours'] ? 'bg-blue-50/70 border-l-4 border-blue-500' : 'hover:bg-slate-50/50' }}" data-name="{{ $station['name'] }}" data-address="{{ $station['address'] }} {{ $station['postal_code'] }} {{ $station['locality_name'] }}">
                             {{-- Station Info & Rank --}}
                             <div class="flex items-center gap-4 min-w-0 flex-1">
                                 {{-- Rank Badge --}}
@@ -275,7 +275,7 @@
                                     @else bg-gray-50 text-gray-500 border border-gray-100 @endif">
                                     #{{ $index + 1 }}
                                 </div>
-                                <div class="min-w-0">
+                                <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-tight truncate max-w-xs md:max-w-md">
                                             {{ $station['name'] }}
@@ -286,9 +286,28 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <p class="text-xs text-slate-500 truncate mt-0.5" title="{{ $station['address'] }}">
-                                        {{ $station['address'] }}
-                                    </p>
+                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
+                                        <p class="text-xs text-slate-500" title="{{ $station['address'] }} @if($station['postal_code'] || $station['locality_name']) ({{ $station['postal_code'] }} {{ $station['locality_name'] }}) @endif">
+                                            {{ $station['address'] }}@if($station['postal_code'] || $station['locality_name']) <span class="text-slate-400">({{ $station['postal_code'] }} {{ $station['locality_name'] }})</span>@endif
+                                        </p>
+                                        @if($station['latitude'] && $station['longitude'])
+                                            <a href="https://www.google.com/maps/search/?api=1&query={{ $station['latitude'] }},{{ $station['longitude'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 text-[10px] font-extrabold uppercase tracking-wider text-blue-500 hover:text-blue-700 bg-blue-50/50 hover:bg-blue-50 px-2 py-0.5 rounded border border-blue-100/60 transition shadow-2xs" title="Ver ubicación en Google Maps">
+                                                <svg class="h-3 w-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                <span>Mapa</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                    @if($station['horario'])
+                                        <div class="flex items-center gap-1 mt-1 text-[10px] font-medium text-slate-400">
+                                            <svg class="h-3.5 w-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>Horario: {{ $station['horario'] }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

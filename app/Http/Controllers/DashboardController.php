@@ -150,9 +150,17 @@ class DashboardController extends Controller
                     $isOurs = true;
                 }
 
+                $latVal = str_replace(',', '.', $s['Latitud'] ?? '');
+                $lngVal = str_replace(',', '.', $s['Longitud (WGS84)'] ?? '');
+
                 $filteredStations[] = [
                     'name' => $s['Rótulo'] ?? 'SIN RÓTULO',
                     'address' => $s['Dirección'] ?? 'Sin Dirección',
+                    'postal_code' => $s['C.P.'] ?? '',
+                    'locality_name' => $s['Localidad'] ?? '',
+                    'latitude' => $latVal,
+                    'longitude' => $lngVal,
+                    'horario' => $s['Horario'] ?? '',
                     'diesel' => $dieselPrice,
                     'gas95' => $gas95Price,
                     'is_ours' => $isOurs,
