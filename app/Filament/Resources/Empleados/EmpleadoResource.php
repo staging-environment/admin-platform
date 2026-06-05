@@ -118,6 +118,36 @@ class EmpleadoResource extends Resource
                                     ->placeholder('Sin documento adjunto'),
                             ]),
                     ]),
+
+                \Filament\Schemas\Components\Section::make('Jornada y Horarios Laborales')
+                    ->description('Configuración de horarios y jornada asignada')
+                    ->schema([
+                        \Filament\Infolists\Components\RepeatableEntry::make('horarios')
+                            ->label('')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('tipo_jornada')
+                                    ->label('Tipo de Jornada')
+                                    ->badge()
+                                    ->color('info'),
+                                \Filament\Infolists\Components\TextEntry::make('turnos')
+                                    ->label('Turnos Asignados')
+                                    ->placeholder('Sin turnos específicos'),
+                                \Filament\Infolists\Components\TextEntry::make('dias_laborales')
+                                    ->label('Días Laborales')
+                                    ->badge()
+                                    ->separator(','),
+                                \Filament\Infolists\Components\TextEntry::make('hora_inicio')
+                                    ->label('Hora de Inicio')
+                                    ->time('H:i'),
+                                \Filament\Infolists\Components\TextEntry::make('hora_fin')
+                                    ->label('Hora de Fin')
+                                    ->time('H:i'),
+                                \Filament\Infolists\Components\TextEntry::make('horarios')
+                                    ->label('Detalles del Horario')
+                                    ->columnSpan(2),
+                            ])
+                            ->columns(2)
+                    ]),
             ]);
     }
 
