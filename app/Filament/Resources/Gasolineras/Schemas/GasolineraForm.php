@@ -79,6 +79,7 @@ class GasolineraForm
                             ->helperText('Este texto aparecerá en la página principal (Inicio) de la gasolinera.')
                             ->fileAttachmentsDisk('public')
                             ->fileAttachmentsDirectory('gasolineras/attachments')
+                            ->fileAttachmentsRules(['image', 'max:51200'])
                             ->showMenuBar()
                             ->columnSpanFull(),
 
@@ -87,6 +88,7 @@ class GasolineraForm
                             ->helperText('Redacta un texto introductorio sobre la historia o el equipo de esta gasolinera.')
                             ->fileAttachmentsDisk('public')
                             ->fileAttachmentsDirectory('gasolineras/attachments')
+                            ->fileAttachmentsRules(['image', 'max:51200'])
                             ->showMenuBar()
                             ->columnSpanFull(),
 
