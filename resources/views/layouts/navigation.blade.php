@@ -40,13 +40,15 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
-                                        <div x-show="openSub" class="bg-gray-50 py-1" style="display: none;">
-                                            <x-dropdown-link href="/admin/job-offers" :active="request()->is('admin/job-offers*')" class="ps-8">
+                                        <div x-show="openSub" class="bg-gray-50 border-l-2 border-indigo-400/50 my-1 py-1" style="display: none;">
+                                            <a href="/admin/job-offers" class="flex items-center gap-2 w-full pl-6 pr-4 py-1.5 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-offers*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 {{ request()->is('admin/job-offers*') ? 'bg-indigo-500' : '' }}"></span>
                                                 {{ __('Ver Ofertas') }}
-                                            </x-dropdown-link>
-                                            <x-dropdown-link href="/admin/job-applications" :active="request()->is('admin/job-applications*')" class="ps-8">
+                                            </a>
+                                            <a href="/admin/job-applications" class="flex items-center gap-2 w-full pl-6 pr-4 py-1.5 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-applications*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 {{ request()->is('admin/job-applications*') ? 'bg-indigo-500' : '' }}"></span>
                                                 {{ __('Inscritos a Ofertas') }}
-                                            </x-dropdown-link>
+                                            </a>
                                         </div>
                                     </div>
                                 </x-slot>
@@ -191,7 +193,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </button>
-                            <div x-show="openSub" class="ps-4 space-y-1 bg-gray-50" style="display: none;">
+                            <div x-show="openSub" class="ps-4 border-l-2 border-indigo-400/50 space-y-1 bg-gray-50/50" style="display: none;">
                                 <x-responsive-nav-link href="/admin/job-offers" :active="request()->is('admin/job-offers*')">
                                     {{ __('Ver Ofertas') }}
                                 </x-responsive-nav-link>
