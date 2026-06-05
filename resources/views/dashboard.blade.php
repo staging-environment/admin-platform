@@ -179,9 +179,9 @@
             <div class="bg-white shadow-sm sm:rounded-2xl border border-gray-200 p-6">
                 <form id="filterForm" method="GET" action="{{ route('dashboard') }}" class="w-full flex flex-col gap-6">
                     {{-- Row 1: Locality and Fuel (Centered side-by-side) --}}
-                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                    <div class="flex flex-row gap-4 sm:gap-6 justify-center items-center">
                         {{-- Locality Selector --}}
-                        <div class="flex flex-col gap-1 w-full sm:w-1/2 max-w-xs">
+                        <div class="flex flex-col gap-1 w-1/2 max-w-xs">
                             <label for="locality" class="text-xs sm:text-sm font-black uppercase tracking-wider text-blue-600 text-center block w-full">Localidad</label>
                             <select name="locality" id="locality" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-sm sm:text-base px-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-extrabold text-slate-700 cursor-pointer text-center">
                                 @foreach($localityMapping as $key => $loc)
@@ -191,7 +191,7 @@
                         </div>
 
                         {{-- Sort By Selector --}}
-                        <div class="flex flex-col gap-1 w-full sm:w-1/2 max-w-xs">
+                        <div class="flex flex-col gap-1 w-1/2 max-w-xs">
                             <label for="sort_by" class="text-xs sm:text-sm font-black uppercase tracking-wider text-blue-600 text-center block w-full">Combustible</label>
                             <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="w-full rounded-xl border-gray-200 text-sm sm:text-base px-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-slate-50 font-extrabold text-slate-700 cursor-pointer text-center">
                                 <option value="diesel" @selected($sortBy === 'diesel')>Diésel A</option>
