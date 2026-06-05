@@ -13,7 +13,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Slider;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
