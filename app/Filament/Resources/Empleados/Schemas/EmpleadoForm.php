@@ -57,7 +57,9 @@ class EmpleadoForm
                                             ->options([
                                                 'Masculino' => 'Masculino',
                                                 'Femenino' => 'Femenino',
-                                                'Otro' => 'Otro',
+                                                'No binario' => 'No binario',
+                                                'Género fluido' => 'Género fluido',
+                                                'Queer' => 'Queer',
                                             ])
                                             ->required()
                                             ->live(),
@@ -114,7 +116,7 @@ class EmpleadoForm
                                             ->label('Tipo de Discapacidad')
                                             ->maxLength(255),
                                         Slider::make('porcentaje_discapacidad')
-                                            ->label('Porcentaje de Discapacidad')
+                                            ->label(fn (Get $get) => 'Porcentaje de Discapacidad: ' . ($get('porcentaje_discapacidad') ?? 0) . '%')
                                             ->minValue(0)
                                             ->maxValue(100)
                                             ->default(0)
