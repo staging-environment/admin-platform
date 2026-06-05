@@ -11,8 +11,12 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, VirtusgesnetService $virtusgesnetService): View
+    public function index(Request $request, VirtusgesnetService $virtusgesnetService)
     {
+        $user = auth()->user();
+        if ($user && ($user->hasRole('Gestor') || $user->hasRole('gestor'))) {
+            return redirect()->to('/admin/recursos-humanos');
+        }
         $tables = [];
         $stations = [];
         $monthlySales = [];

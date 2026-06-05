@@ -6,6 +6,10 @@ class Dashboard extends \Filament\Pages\Dashboard
 {
     public function mount()
     {
+        $user = auth()->user();
+        if ($user && ($user->hasRole('Gestor') || $user->hasRole('gestor'))) {
+            return redirect()->to('/admin/recursos-humanos');
+        }
         return redirect()->to('/admin/dashboard');
     }
 
