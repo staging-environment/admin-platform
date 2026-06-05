@@ -3,16 +3,12 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ __('Dashboard') }}
+                    Comparador de Precios de Competencia
                 </h2>
 
                 <p class="mt-1 text-sm text-gray-600">
-                    Panel de informes basado principalmente en la base de datos VirtusGesNet.
+                    Análisis comparativo de precios de combustibles frente a competidores de la zona en tiempo real.
                 </p>
-            </div>
-
-            <div class="text-sm text-gray-600 shrink-0 font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
-                Tablas VirtusGesNet: <span class="font-bold text-slate-800">{{ count($tables) }}</span>
             </div>
         </div>
     </x-slot>
