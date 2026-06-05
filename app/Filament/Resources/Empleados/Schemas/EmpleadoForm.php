@@ -243,106 +243,143 @@ class EmpleadoForm
         $sexo = $sexo ?? 'Masculino';
 
         // Choose color palette
-        $bgStart = '#1e1b4b'; // Sleek dark indigo base
-        $bgEnd = '#311042';
+        $bgStart = '#0f172a'; // Deep slate base
+        $bgEnd = '#1e1b4b';
         
         $skinColor = '#fed7aa'; // Light warm peach
         $hairColor = $sexo === 'Femenino' ? '#f43f5e' : '#f59e0b'; // Rose vs Amber
         
-        // Determine state
+        $hairSvg = '';
+        $faceDetails = '';
+        $accessories = '';
+        $bodySvg = '<path d="M15 75 C15 65 25 58 40 58 C55 58 65 65 65 75 Z" fill="#312e81" />'; // Standard shoulders
+        
         if ($porcentaje === 0) {
-            $stateTitle = "Estado Base (Óptimo)";
-            $stateDesc = $sexo === 'Femenino' ? "Femenino - Aspecto Elegante" : ($sexo === 'Masculino' ? "Masculino - Aspecto Atractivo" : "Otro - Aspecto Radiante");
+            $stateTitle = "Aspecto Perfecto (0%)";
+            $stateDesc = $sexo === 'Femenino' ? "Femenino - Muy Atractiva" : ($sexo === 'Masculino' ? "Masculino - Muy Atractivo" : "Otro - Aspecto Radiante");
             
-            // Draw State 1 (Base: handsome/beautiful)
+            // State 1: Symmetrical, clean hair, beautiful eyes, bright smile
             $hairSvg = $sexo === 'Femenino' 
-                ? '<path d="M40 22 C30 22 20 32 20 52 C20 67 25 82 25 92 C30 92 35 87 40 77 C45 87 50 92 55 92 C55 82 60 67 60 52 C60 32 50 22 40 22 Z" fill="' . $hairColor . '" />'
-                : '<path d="M30 28 C25 18 35 8 50 13 C60 18 58 28 55 33 C52 33 48 31 45 33 Z" fill="' . $hairColor . '" />';
+                ? '<path d="M40 16 C25 16 15 28 15 50 C15 68 22 82 22 92 C28 92 34 85 40 75 C46 85 52 92 58 92 C58 82 65 68 65 50 C65 28 55 16 40 16 Z" fill="' . $hairColor . '" />'
+                : '<path d="M28 24 C22 14 34 4 52 9 C62 14 60 25 56 30 C52 30 48 28 44 30 Z" fill="' . $hairColor . '" />';
             
             $faceDetails = $sexo === 'Femenino'
-                ? '<circle cx="35" cy="48" r="2.5" fill="#0f172a" /><circle cx="45" cy="48" r="2.5" fill="#0f172a" />
-                   <path d="M 33 45 Q 35 43 37 45" stroke="#0f172a" stroke-width="1" fill="none" />
-                   <path d="M 43 45 Q 45 43 47 45" stroke="#0f172a" stroke-width="1" fill="none" />
-                   <path d="M37 57 Q40 60 43 57" stroke="#f43f5e" stroke-width="2" fill="none" stroke-linecap="round" />'
-                : '<circle cx="35" cy="48" r="2.5" fill="#0f172a" /><circle cx="45" cy="48" r="2.5" fill="#0f172a" />
-                   <path d="M37 57 Q40 61 43 57" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" />';
-
+                ? '<circle cx="34" cy="46" r="3" fill="#0f172a" />
+                   <circle cx="46" cy="46" r="3" fill="#0f172a" />
+                   <path d="M 31 42 Q 34 39 37 42" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                   <path d="M 43 42 Q 46 39 49 42" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                   <path d="M36 56 Q40 60 44 56" stroke="#f43f5e" stroke-width="2.5" fill="none" stroke-linecap="round" />'
+                : '<circle cx="34" cy="46" r="3" fill="#0f172a" />
+                   <circle cx="46" cy="46" r="3" fill="#0f172a" />
+                   <path d="M 31 41 Q 34 39 37 41" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                   <path d="M 43 41 Q 46 39 49 41" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                   <path d="M35 56 Q40 61 45 56" stroke="#0f172a" stroke-width="2.5" fill="none" stroke-linecap="round" />';
+                   
             $accessories = $sexo === 'Femenino'
-                ? '<path d="M22 48 Q20 51 22 54" stroke="#fbbf24" stroke-width="2.5" fill="none" />
-                   <path d="M58 48 Q60 51 58 54" stroke="#fbbf24" stroke-width="2.5" fill="none" />' // Gold earrings
-                : '<path d="M 28 43 L 52 43" stroke="#0284c7" stroke-width="2.5" />
-                   <path d="M 28 41 L 38 47 L 38 41 Z" fill="#0284c7" />
-                   <path d="M 42 41 L 52 47 L 52 41 Z" fill="#0284c7" />'; // Cool sunglasses
+                ? '<circle cx="19" cy="50" r="2" fill="#fbbf24" /><circle cx="61" cy="50" r="2" fill="#fbbf24" />' // Cute earrings
+                : '<path d="M 28 42 L 52 42" stroke="#0284c7" stroke-width="2" />
+                   <path d="M 28 40 L 36 45 L 36 40 Z" fill="#0284c7" />
+                   <path d="M 44 40 L 52 45 L 52 40 Z" fill="#0284c7" />'; // Cool glasses
         } elseif ($porcentaje <= 33) {
-            $stateTitle = "Estado Táctico (1-33%)";
-            $stateDesc = "Héroe en Combate (Vendaje y Cicatriz)";
+            $stateTitle = "Afectación Leve (1-33%)";
+            $stateDesc = "Pequeño Vendaje y Cara Goofy";
             
-            $hairSvg = $sexo === 'Femenino'
-                ? '<path d="M40 22 C30 22 20 32 20 52 C20 67 25 82 25 92 C30 92 35 87 40 77 C45 87 50 92 55 92 C55 82 60 67 60 52 C60 32 50 22 40 22 Z" fill="' . $hairColor . '" />'
-                : '<path d="M30 28 C25 18 35 8 50 13 C60 18 58 28 55 33 C52 33 48 31 45 33 Z" fill="' . $hairColor . '" />';
+            // State 2: Slightly messy hair, small head bandage, one eye lower, crooked mouth
+            $hairSvg = $sexo === 'Femenino' 
+                ? '<path d="M40 16 C25 16 15 28 15 50 C15 68 22 82 22 92 Z" fill="' . $hairColor . '" />'
+                : '<path d="M26 24 C20 15 32 6 48 10 C58 15 54 28 50 32 Z" fill="' . $hairColor . '" />';
             
-            $faceDetails = '<circle cx="35" cy="48" r="2.5" fill="#0f172a" />
-                            <path d="M42 45 L48 51 M48 45 L42 51" stroke="#ef4444" stroke-width="1.5" />
-                            <path d="M37 57 Q40 60 43 57" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" />'; // Eye scratch
+            $faceDetails = '<circle cx="34" cy="45" r="2.5" fill="#0f172a" />
+                            <circle cx="47" cy="48" r="1.5" fill="#0f172a" /> <!-- Smaller/asymmetric eye -->
+                            <path d="M 31 41 Q 34 38 37 41" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                            <path d="M 44 45 Q 47 43 50 45" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                            <path d="M34 58 Q42 54 44 60" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" /> <!-- Crooked smile -->
+                            <path d="M25 52 L31 52 M28 49 L28 55" stroke="#ef4444" stroke-width="1.5" />'; // Red band-aid on cheek
             
-            $accessories = '<path d="M23 38 L57 32" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
-                            <path d="M25 41 L35 39" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" opacity="0.9"/>'; // Headband/bandage
+            $accessories = '<path d="M21 28 L59 36" stroke="#f8fafc" stroke-width="4.5" stroke-linecap="round" opacity="0.95" />'; // Head band-aid
         } elseif ($porcentaje <= 66) {
-            $stateTitle = "Cyber-Héroe (34-66%)";
-            $stateDesc = "Mejora Cibernética (Visor Láser)";
+            $stateTitle = "Afectación Moderada (34-66%)";
+            $stateDesc = "Parche en Ojo, Vendaje y Cabestrillo";
             
-            $hairSvg = $sexo === 'Femenino'
-                ? '<path d="M40 22 C30 22 20 32 20 52 C20 67 25 82 25 92 C30 92 35 87 40 77 C45 87 50 92 55 92 C55 82 60 67 60 52 C60 32 50 22 40 22 Z" fill="' . $hairColor . '" />'
-                : '<path d="M30 28 C25 18 35 8 50 13 C60 18 58 28 55 33 C52 33 48 31 45 33 Z" fill="' . $hairColor . '" />';
+            // State 3: Messy spiky hair, eye patch, spiral eye, missing tooth, shoulder cast/cabestrillo
+            $hairSvg = '<path d="M23 26 L20 18 L28 22 L34 14 L38 23 L46 12 L50 22 Z" fill="' . $hairColor . '" />';
             
-            $faceDetails = '<circle cx="35" cy="48" r="2.5" fill="#0f172a" />
-                            <path d="M37 57 Q40 60 43 57" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" />';
+            $faceDetails = '<!-- Goofy spiral eye -->
+                            <circle cx="33" cy="47" r="3" stroke="#0f172a" stroke-width="1" fill="none" />
+                            <path d="M31 47 Q33 45 35 47 Q33 49 31 47" stroke="#0f172a" stroke-width="1.5" fill="none" />
+                            <!-- Eye patch on the right eye -->
+                            <path d="M40 38 L54 52" stroke="#0f172a" stroke-width="2" />
+                            <rect x="42" y="42" width="10" height="10" fill="#0f172a" rx="2" />
+                            <!-- Missing tooth smile -->
+                            <path d="M33 58 Q40 63 46 56" stroke="#0f172a" stroke-width="2.5" fill="none" />
+                            <rect x="38" y="58" width="3" height="3" fill="#ffffff" />
+                            <rect x="43" y="57" width="2" height="3" fill="#ffffff" />';
             
-            $accessories = '<rect x="40" y="42" width="16" height="8" rx="2" fill="#10b981" opacity="0.85" />
-                            <line x1="22" y1="46" x2="40" y2="46" stroke="#94a3b8" stroke-width="1.5" />
-                            <circle cx="48" cy="46" r="2.5" fill="#f43f5e" />
-                            <line x1="48" y1="46" x2="75" y2="46" stroke="#f43f5e" stroke-width="1" stroke-dasharray="1 1" />'; // Laser sight targeting target
+            $accessories = '<!-- Big head wrap -->
+                            <path d="M21 22 Q40 18 59 26" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round" />
+                            <path d="M23 27 Q40 24 57 31" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round" />';
+            
+            $bodySvg = '<!-- Body with arm cast/cabestrillo -->
+                        <path d="M15 75 C15 65 25 58 40 58 C55 58 65 65 65 75 Z" fill="#312e81" />
+                        <path d="M20 65 L48 75 L18 75 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1" /> <!-- Arm cast -->';
         } else {
-            $stateTitle = "Héroe Cósmico (67-100%)";
-            $stateDesc = "Armadura y Aura de Energía";
+            $stateTitle = "Afectación Severa (67-100%)";
+            $stateDesc = "Cara Deformada, Yeso Total y Silla de Ruedas";
             
-            $hairSvg = $sexo === 'Femenino'
-                ? '<path d="M40 22 C30 22 20 32 20 52 C20 67 25 82 25 92 C30 92 35 87 40 77 C45 87 50 92 55 92 C55 82 60 67 60 52 C60 32 50 22 40 22 Z" fill="#38bdf8" />'
-                : '<path d="M30 28 C25 18 35 8 50 13 C60 18 58 28 55 33 C52 33 48 31 45 33 Z" fill="#38bdf8" />';
+            // State 4: Crazy wild hair, fully wrapped head, crossed dizzy eyes, drool drop, wheelchair backing
+            $hairSvg = '<path d="M 18 25 L 12 18 L 22 22 L 30 10 L 38 21 L 52 8 L 56 22 L 68 15 Z" fill="' . $hairColor . '" />';
             
-            $faceDetails = '<circle cx="34" cy="48" r="2.5" fill="#38bdf8" />
-                            <circle cx="46" cy="48" r="2.5" fill="#38bdf8" />
-                            <path d="M37 57 Q40 60 43 57" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round" />';
+            $faceDetails = '<!-- Crossed dizzy eyes of different sizes -->
+                            <circle cx="31" cy="45" r="4.5" fill="#f8fafc" stroke="#0f172a" />
+                            <line x1="29" y1="43" x2="33" y2="47" stroke="#ef4444" stroke-width="1.5" />
+                            <line x1="33" y1="43" x2="29" y2="47" stroke="#ef4444" stroke-width="1.5" />
+                            
+                            <circle cx="49" cy="49" r="2.5" fill="#f8fafc" stroke="#0f172a" />
+                            <line x1="48" y1="48" x2="50" y2="50" stroke="#ef4444" stroke-width="1" />
+                            <line x1="50" y1="48" x2="48" y2="50" stroke="#ef4444" stroke-width="1" />
+                            
+                            <!-- Goofy drooling mouth -->
+                            <path d="M31 58 Q38 66 48 57" stroke="#0f172a" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                            <path d="M44 60 C44 63 42 66 40 66 C38 66 38 63 38 60 Z" fill="#38bdf8" opacity="0.8" /> <!-- Drool -->
+                            <path d="M26 40 L34 38 M46 42 L54 40" stroke="#0f172a" stroke-width="1.5" />'; // Confused eyebrows
             
-            $accessories = '<path d="M22 20 L58 20 L65 35 L15 35 Z" fill="url(#cosmicArmor)" opacity="0.9" />
-                            <circle cx="40" cy="27" r="4" fill="#f43f5e" />
-                            <!-- Cosmic aura -->
-                            <circle cx="40" cy="45" r="34" stroke="#38bdf8" stroke-width="1.5" fill="none" opacity="0.5" stroke-dasharray="3 3"/>';
+            $accessories = '<!-- Mummy-like total head cast wrapping -->
+                            <path d="M 23 20 L 57 20" stroke="#f8fafc" stroke-width="8" />
+                            <path d="M 21 28 L 59 34" stroke="#f8fafc" stroke-width="6" />
+                            <path d="M 20 38 L 28 42" stroke="#f8fafc" stroke-width="6" />
+                            <path d="M 52 42 L 60 38" stroke="#f8fafc" stroke-width="6" />
+                            <!-- Neck brace cast -->
+                            <rect x="31" y="51" width="18" height="6" fill="#e2e8f0" rx="1" stroke="#cbd5e1" stroke-width="1" />';
+            
+            $bodySvg = '<!-- Body + Wheelchair background -->
+                        <!-- Wheelchair handles and backing -->
+                        <rect x="10" y="52" width="6" height="23" fill="#475569" rx="1" />
+                        <rect x="64" y="52" width="6" height="23" fill="#475569" rx="1" />
+                        <path d="M 8 58 L 72 58" stroke="#64748b" stroke-width="4" stroke-linecap="round" />
+                        <!-- Body -->
+                        <path d="M15 75 C15 65 25 58 40 58 C55 58 65 65 65 75 Z" fill="#312e81" />
+                        <path d="M18 64 L50 75 L16 75 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1.5" /> <!-- Body cast wrap -->';
         }
 
         return <<<HTML
 <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-xl max-w-sm mx-auto transition-all duration-300">
     <div class="relative w-48 h-48 mb-4">
-        <svg viewBox="0 0 80 80" class="w-full h-full drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+        <svg viewBox="0 0 80 80" class="w-full h-full drop-shadow-[0_0_15px_rgba(99,102,241,0.25)]">
             <defs>
                 <linearGradient id="avatarBg" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="{$bgStart}" />
                     <stop offset="100%" stop-color="{$bgEnd}" />
-                </linearGradient>
-                <linearGradient id="cosmicArmor" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#3b82f6" />
-                    <stop offset="100%" stop-color="#1d4ed8" />
                 </linearGradient>
             </defs>
             
             <!-- Background Circular Badge -->
             <circle cx="40" cy="40" r="38" fill="url(#avatarBg)" stroke="#4f46e5" stroke-width="2" />
             
-            <!-- Back Hair (if Femenino) -->
+            <!-- Back Hair (if Femenino & 0-33%) -->
             {$hairSvg}
             
             <!-- Body / Shoulders -->
-            <path d="M15 75 C15 65 25 58 40 58 C55 58 65 65 65 75 Z" fill="#312e81" />
+            {$bodySvg}
             
             <!-- Head / Neck -->
             <rect x="35" y="44" width="10" height="15" fill="{$skinColor}" />
