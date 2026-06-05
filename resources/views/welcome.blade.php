@@ -349,28 +349,6 @@
                                     </span>
                                 </p>
 
-                                <!-- Prices block (dashboard style) -->
-                                <div class="flex flex-wrap gap-3 mb-4">
-                                    <div class="bg-slate-50/80 backdrop-blur-sm border border-slate-200/50 px-4 py-2 rounded-2xl flex items-center gap-3 transition-all duration-300 hover:scale-[1.03] hover:shadow-sm">
-                                        <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
-                                        <div>
-                                            <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Diesel</span>
-                                            <span class="text-lg md:text-xl font-black text-slate-900 leading-none">
-                                                {{ $gasolinera->diesel ? number_format($gasolinera->diesel, 3) : '---' }}<span class="text-xs font-semibold ml-0.5 text-slate-500">€/L</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="bg-gradient-to-br from-blue-50/80 to-indigo-50/50 border border-blue-100 px-4 py-2 rounded-2xl flex items-center gap-3 transition-all duration-300 hover:scale-[1.03] hover:shadow-sm">
-                                        <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-                                        <div>
-                                            <span class="block text-[8px] font-bold text-blue-500 uppercase tracking-widest leading-none mb-1">SP 95</span>
-                                            <span class="text-lg md:text-xl font-black text-blue-600 leading-none">
-                                                {{ $gasolinera->gasolina95 ? number_format($gasolinera->gasolina95, 3) : '---' }}<span class="text-xs font-semibold ml-0.5 text-blue-500">€/L</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- CTA Ficha Completa Button Directly Below Prices -->
                                 <div class="mb-4">
                                     <a href="{{ route('estacion.show', \Illuminate\Support\Str::slug($gasolinera->Nombre)) }}" class="relative overflow-hidden inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-blue-500/10 hover:shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-0.5 uppercase tracking-wider group/btn">
