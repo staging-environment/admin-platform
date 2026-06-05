@@ -243,6 +243,11 @@ class DashboardController extends Controller
             }
         }
 
+        // Exclude our own station from the list of stations to display
+        $filteredStations = array_values(array_filter($filteredStations, function ($station) {
+            return !$station['is_ours'];
+        }));
+
         // Real-time own prices from the local database
         $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '1')->value('PVP');
         $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '2')->value('PVP');
