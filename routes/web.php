@@ -15,7 +15,23 @@ use Illuminate\Http\Request;
 
 // --- SECCIÓN PÚBLICA ---
 Route::get('/', function () {
-    return redirect('/admin');
+    $gasolineras = [];
+    $homeConfig = null;
+    try {
+        $homeConfig = \App\Models\HomeConfig::find(1);
+        $gasolineras = Gasolinera::with('contenido')->get()->map(function ($estacion) {
+            $estacion->diesel = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
+                ->where('CodigoProducto', '1')->value('PVP');
+            $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
+                ->where('CodigoProducto', '2')->value('PVP');
+            return $estacion;
+        });
+    } catch (\Exception $e) { report($e); }
+    return view('welcome', compact('gasolineras', 'homeConfig'));
+});
+
+Route::get('/home', function () {
+    return redirect('/');
 });
 
 Route::get('/debug-users', function () {
@@ -30,22 +46,6 @@ Route::get('/debug-users', function () {
         ];
     });
     return response()->json($users);
-});
-
-Route::get('/home', function () {
-    $gasolineras = [];
-    $homeConfig = null;
-    try {
-        $homeConfig = \App\Models\HomeConfig::find(1);
-        $gasolineras = Gasolinera::with('contenido')->get()->map(function ($estacion) {
-            $estacion->diesel = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
-                ->where('CodigoProducto', '1')->value('PVP');
-            $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
-                ->where('CodigoProducto', '2')->value('PVP');
-            return $estacion;
-        });
-    } catch (\Exception $e) { report($e); }
-    return view('welcome', compact('gasolineras', 'homeConfig'));
 });
 
 Route::get('/debug-db', function () {
