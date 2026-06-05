@@ -4,6 +4,11 @@ namespace App\Filament\Pages;
 
 class Dashboard extends \Filament\Pages\Dashboard
 {
+    public function mount()
+    {
+        return redirect()->to('/admin/dashboard');
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
