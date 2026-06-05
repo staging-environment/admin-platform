@@ -513,9 +513,22 @@
                 snow: `<svg class="w-12 h-12 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/><path d="M8 20h.01M12 20h.01M16 20h.01" stroke-width="3" stroke-linecap="round"/></svg>`
             };
 
-            function fetchWeather(lat, lon, cityName) {
+            function fetchWeather(lat, lon, cityName, isFallback = false) {
+                if (isNaN(lat) || isNaN(lon) || lat === null || lon === null) {
+                    console.error('Coordenadas inválidas para clima:', lat, lon);
+                    if (!isFallback) {
+                        loadDefaultOrIPWeather();
+                    } else {
+                        showWeatherError();
+                    }
+                    return;
+                }
+
                 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) throw new Error('Response not ok');
+                        return res.json();
+                    })
                     .then(data => {
                         if (data && data.current_weather) {
                             const weather = data.current_weather;
@@ -533,16 +546,36 @@
                             
                             const iconSvg = icons[mapping.icon] || icons.sun;
                             iconContainer.innerHTML = iconSvg;
+                        } else {
+                            throw new Error('No current weather data');
                         }
                     })
                     .catch(err => {
                         console.error('Error fetching weather data:', err);
+                        if (!isFallback) {
+                            console.log('Intentando cargar clima de Sevilla como alternativa...');
+                            fetchWeather(37.3891, -5.9845, 'Sevilla, España (Predeterminado)', true);
+                        } else {
+                            showWeatherError();
+                        }
                     });
+            }
+
+            function showWeatherError() {
+                tempEl.textContent = '--°C';
+                descEl.textContent = 'Clima no disponible';
+                windEl.textContent = 'Error de conexión';
+                tempEl.classList.remove('animate-pulse');
+                descEl.classList.remove('animate-pulse');
+                iconContainer.innerHTML = `<svg class="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
             }
 
             function reverseGeocode(lat, lon, callback) {
                 fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=es`)
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) throw new Error('Geocode response not ok');
+                        return res.json();
+                    })
                     .then(data => {
                         const cityName = data.city || data.locality || data.principalSubdivision || 'Ubicación GPS';
                         const country = data.countryName ? `, ${data.countryName}` : '';
@@ -576,11 +609,14 @@
             function loadDefaultOrIPWeather() {
                 // Get coordinates by IP Geolocation first
                 fetch('https://ipapi.co/json/')
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) throw new Error('IP lookup response not ok');
+                        return res.json();
+                    })
                     .then(data => {
-                        if (data && data.latitude && data.longitude) {
+                        if (data && data.latitude && data.longitude && !isNaN(parseFloat(data.latitude)) && !isNaN(parseFloat(data.longitude))) {
                             const cityName = data.city ? `${data.city}, ${data.country_name || 'España'}` : 'Ubicación actual';
-                            fetchWeather(data.latitude, data.longitude, cityName);
+                            fetchWeather(parseFloat(data.latitude), parseFloat(data.longitude), cityName);
                         } else {
                             // Fallback to Seville
                             fetchWeather(37.3891, -5.9845, 'Sevilla, España (Predeterminado)');
@@ -597,7 +633,7 @@
             const savedLon = localStorage.getItem('weather_lon');
             const savedName = localStorage.getItem('weather_name');
 
-            if (savedLat && savedLon && savedName) {
+            if (savedLat && savedLon && savedName && !isNaN(parseFloat(savedLat)) && !isNaN(parseFloat(savedLon))) {
                 fetchWeather(parseFloat(savedLat), parseFloat(savedLon), savedName);
             } else {
                 // Try precise GPS automatically first on initial load
