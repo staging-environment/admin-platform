@@ -122,6 +122,72 @@ class DashboardController extends Controller
             'db_connections' => $dbStatus,
         ];
 
+        // --- COMPONENT: COMPETITORS PRICE INDEX (MINETUR API) ---
+        $competitorsData = Cache::remember('competitors_prices', 21600, function () {
+            $fallbacks = [
+                1 => ['lat' => 37.1824, 'lng' => -5.7954, 'name' => 'E.S. VISTALEGRE'],
+                2 => ['lat' => 37.1944, 'lng' => -5.7770, 'name' => 'RONDA NORTE'],
+                3 => ['lat' => 36.8480, 'lng' => -5.9224, 'name' => 'E.S RODALABOTA'],
+                4 => ['lat' => 37.5348, 'lng' => -5.0934, 'name' => 'E.S. ATENAS'],
+            ];
+
+            try {
+                $response = Http::timeout(10)->get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/41');
+                if ($response->failed()) {
+                    return [];
+                }
+                $data = $response->json();
+                $stations = $data['ListaEESSPrecio'] ?? [];
+
+                $result = [];
+                foreach ($fallbacks as $id => $orig) {
+                    $dbStation = \App\Models\Gasolinera::with('contenido')->find($id);
+                    $origLat = ($dbStation && $dbStation->contenido && $dbStation->contenido->latitud) ? $dbStation->contenido->latitud : $orig['lat'];
+                    $origLng = ($dbStation && $dbStation->contenido && $dbStation->contenido->longitud) ? $dbStation->contenido->longitud : $orig['lng'];
+                    $origName = $dbStation ? $dbStation->Nombre : $orig['name'];
+
+                    $list = [];
+                    foreach ($stations as $s) {
+                        $lat = (float) str_replace(',', '.', $s['Latitud']);
+                        $lng = (float) str_replace(',', '.', $s['Longitud (WGS84)']);
+                        
+                        if (!$lat || !$lng) continue;
+
+                        // Calculate distance (Haversine formula inline)
+                        $theta = $origLng - $lng;
+                        $dist = sin(deg2rad($origLat)) * sin(deg2rad($lat)) +  cos(deg2rad($origLat)) * cos(deg2rad($lat)) * cos(deg2rad($theta));
+                        $dist = acos($dist);
+                        $dist = rad2deg($dist);
+                        $kms = $dist * 60 * 1.1515 * 1.609344;
+                        
+                        if ($kms < 0.05) continue;
+                        
+                        $list[] = [
+                            'name' => $s['Rótulo'],
+                            'address' => $s['Dirección'],
+                            'distance' => $kms,
+                            'diesel' => (float) str_replace(',', '.', $s['Precio Gasoleo A'] ?? 0),
+                            'gas95' => (float) str_replace(',', '.', $s['Precio Gasolina 95 E5'] ?? 0),
+                        ];
+                    }
+                    
+                    usort($list, function($a, $b) {
+                        return $a['distance'] <=> $b['distance'];
+                    });
+
+                    $result[$id] = [
+                        'station_name' => $origName,
+                        'competitors' => array_slice($list, 0, 3)
+                    ];
+                }
+
+                return $result;
+            } catch (\Exception $e) {
+                report($e);
+                return [];
+            }
+        });
+
         return view('dashboard', [
             'tables' => $tables,
             'stations' => $stations,
@@ -135,6 +201,7 @@ class DashboardController extends Controller
             'months' => $this->months(),
             'weatherInfo' => $weatherInfo,
             'serverStats' => $serverStats,
+            'competitorsData' => $competitorsData,
         ]);
     }
 
