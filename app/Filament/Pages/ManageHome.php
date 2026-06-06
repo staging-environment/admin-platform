@@ -96,7 +96,8 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->helperText('Texto introductorio que se mostrará en la pestaña Inicio de la página principal.')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('home/attachments')
-                    ->fileAttachmentsRules(['image', 'max:51200'])
+                    ->fileAttachmentsVisibility('public')
+                    ->fileAttachmentsMaxSize(51200)
                     ->showMenuBar()
                     ->columnSpanFull(),
                 TinyEditor::make('quienes_somos')
@@ -104,7 +105,8 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->helperText('Redacta la información institucional y la historia de la empresa.')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('home/attachments')
-                    ->fileAttachmentsRules(['image', 'max:51200'])
+                    ->fileAttachmentsVisibility('public')
+                    ->fileAttachmentsMaxSize(51200)
                     ->showMenuBar()
                     ->columnSpanFull(),
                 TinyEditor::make('condiciones_uso')
@@ -112,7 +114,8 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->helperText('Configura los términos legales y condiciones de uso del portal público.')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('home/attachments')
-                    ->fileAttachmentsRules(['image', 'max:51200'])
+                    ->fileAttachmentsVisibility('public')
+                    ->fileAttachmentsMaxSize(51200)
                     ->showMenuBar()
                     ->columnSpanFull(),
                 TinyEditor::make('aviso_legal')
@@ -120,7 +123,8 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->helperText('Configura la sección de Aviso Legal del portal público.')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('home/attachments')
-                    ->fileAttachmentsRules(['image', 'max:51200'])
+                    ->fileAttachmentsVisibility('public')
+                    ->fileAttachmentsMaxSize(51200)
                     ->showMenuBar()
                     ->columnSpanFull(),
                 TinyEditor::make('politica_privacidad')
@@ -128,7 +132,8 @@ class ManageHome extends Page implements HasForms, HasTable
                     ->helperText('Configura la sección de Política de Privacidad del portal público.')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('home/attachments')
-                    ->fileAttachmentsRules(['image', 'max:51200'])
+                    ->fileAttachmentsVisibility('public')
+                    ->fileAttachmentsMaxSize(51200)
                     ->showMenuBar()
                     ->columnSpanFull(),
                 TextInput::make('contacto_email')
