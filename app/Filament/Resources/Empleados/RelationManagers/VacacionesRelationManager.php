@@ -26,7 +26,27 @@ class VacacionesRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_vacaciones_empleados');
+        return auth()->user()->can('ver_vacaciones_empleados');
+    }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('editar_vacaciones_empleados');
+    }
+
+    protected function canEdit(Model $record): bool
+    {
+        return auth()->user()->can('editar_vacaciones_empleados');
+    }
+
+    protected function canDelete(Model $record): bool
+    {
+        return auth()->user()->can('editar_vacaciones_empleados');
+    }
+
+    public function isReadOnly(): bool
+    {
+        return !auth()->user()->can('editar_vacaciones_empleados');
     }
 
     public function form(Schema $schema): Schema
@@ -109,7 +129,7 @@ class VacacionesRelationManager extends RelationManager
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->estado === 'Pendiente' && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor')))
+                    ->visible(fn ($record) => $record->estado === 'Pendiente' && auth()->user()->can('editar_vacaciones_empleados'))
                     ->action(function ($record) {
                         $record->update(['estado' => 'Aceptada']);
                         
@@ -136,7 +156,7 @@ class VacacionesRelationManager extends RelationManager
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => $record->estado === 'Pendiente' && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor')))
+                    ->visible(fn ($record) => $record->estado === 'Pendiente' && auth()->user()->can('editar_vacaciones_empleados'))
                     ->action(function ($record) {
                         $record->update(['estado' => 'Rechazada']);
                         

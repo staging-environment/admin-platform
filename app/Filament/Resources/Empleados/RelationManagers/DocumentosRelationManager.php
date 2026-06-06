@@ -28,27 +28,27 @@ class DocumentosRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_documentacion_empleados');
+        return auth()->user()->can('ver_documentacion_empleados');
     }
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('gestion_documentacion_empleados');
+        return auth()->user()->can('editar_documentacion_empleados');
     }
 
     protected function canEdit(Model $record): bool
     {
-        return auth()->user()->can('gestion_documentacion_empleados');
+        return auth()->user()->can('editar_documentacion_empleados');
     }
 
     protected function canDelete(Model $record): bool
     {
-        return auth()->user()->can('gestion_documentacion_empleados');
+        return auth()->user()->can('editar_documentacion_empleados');
     }
 
     public function isReadOnly(): bool
     {
-        return false;
+        return !auth()->user()->can('editar_documentacion_empleados');
     }
 
     public function form(Schema $schema): Schema
@@ -95,7 +95,7 @@ class DocumentosRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_documentacion_empleados')),
             ])
             ->actions([
                 Action::make('preview')
@@ -157,9 +157,9 @@ class DocumentosRelationManager extends RelationManager
                     ->color('success')
                     ->url(fn ($record) => route('admin.recursos_humanos.descargar_archivo', ['path' => $record->file_path]), true),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_documentacion_empleados')),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_documentacion_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_documentacion_empleados')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

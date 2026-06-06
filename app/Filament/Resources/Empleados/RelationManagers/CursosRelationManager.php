@@ -27,7 +27,27 @@ class CursosRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_cursos_empleados');
+        return auth()->user()->can('ver_cursos_empleados');
+    }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('editar_cursos_empleados');
+    }
+
+    protected function canEdit(Model $record): bool
+    {
+        return auth()->user()->can('editar_cursos_empleados');
+    }
+
+    protected function canDelete(Model $record): bool
+    {
+        return auth()->user()->can('editar_cursos_empleados');
+    }
+
+    public function isReadOnly(): bool
+    {
+        return !auth()->user()->can('editar_cursos_empleados');
     }
 
     public function form(Schema $schema): Schema

@@ -30,12 +30,27 @@ class HorariosRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_horarios_empleados');
+        return auth()->user()->can('ver_horarios_empleados');
+    }
+
+    protected function canCreate(): bool
+    {
+        return auth()->user()->can('editar_horarios_empleados');
+    }
+
+    protected function canEdit(Model $record): bool
+    {
+        return auth()->user()->can('editar_horarios_empleados');
+    }
+
+    protected function canDelete(Model $record): bool
+    {
+        return auth()->user()->can('editar_horarios_empleados');
     }
 
     public function isReadOnly(): bool
     {
-        return false;
+        return !auth()->user()->can('editar_horarios_empleados');
     }
 
     public function form(Schema $schema): Schema
@@ -126,13 +141,13 @@ class HorariosRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_horarios_empleados')),
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_horarios_empleados')),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_horarios_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_horarios_empleados')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

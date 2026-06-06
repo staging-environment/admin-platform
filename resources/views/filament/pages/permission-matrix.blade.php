@@ -60,14 +60,30 @@
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
-                            'gestion_documentacion_empleados' => 'Documentación de Empleados',
-                            'gestion_cursos_empleados' => 'Formación/Cursos de Empleados',
-                            'gestion_notificaciones_empleados' => 'Notificaciones de Empleados',
-                            'gestion_horarios_empleados' => 'Horario Laboral de Empleados',
-                            'gestion_ausencias_empleados' => 'Ausencias y Bajas de Empleados',
-                            'gestion_vacaciones_empleados' => 'Vacaciones y Permisos de Empleados',
-                            'gestion_contratos_empleados' => 'Contratos de Empleados',
-                            'gestion_comentarios_empleados' => 'Gestionar comentarios de empleados',
+                            
+                            'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
+                            'editar_documentacion_empleados' => 'Editar Documentación de Empleados',
+                            
+                            'ver_cursos_empleados' => 'Ver Formación/Cursos de Empleados',
+                            'editar_cursos_empleados' => 'Editar Formación/Cursos de Empleados',
+                            
+                            'ver_notificaciones_empleados' => 'Ver Notificaciones de Empleados',
+                            'editar_notificaciones_empleados' => 'Editar Notificaciones de Empleados',
+                            
+                            'ver_horarios_empleados' => 'Ver Horario Laboral de Empleados',
+                            'editar_horarios_empleados' => 'Editar Horario Laboral de Empleados',
+                            
+                            'ver_ausencias_empleados' => 'Ver Ausencias y Bajas de Empleados',
+                            'editar_ausencias_empleados' => 'Editar Ausencias y Bajas de Empleados',
+                            
+                            'ver_vacaciones_empleados' => 'Ver Vacaciones y Permisos de Empleados',
+                            'editar_vacaciones_empleados' => 'Editar Vacaciones y Permisos de Empleados',
+                            
+                            'ver_contratos_empleados' => 'Ver Contratos de Empleados',
+                            'editar_contratos_empleados' => 'Editar Contratos de Empleados',
+                            
+                            'ver_comentarios_empleados' => 'Ver Comentarios de Empleados',
+                            'editar_comentarios_empleados' => 'Editar Comentarios de Empleados',
                         ]
                     ];
 

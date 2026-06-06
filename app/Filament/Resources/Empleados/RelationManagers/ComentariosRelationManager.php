@@ -26,27 +26,27 @@ class ComentariosRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_comentarios_empleados');
+        return auth()->user()->can('ver_comentarios_empleados');
     }
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('gestion_comentarios_empleados');
+        return auth()->user()->can('editar_comentarios_empleados');
     }
 
     protected function canEdit(Model $record): bool
     {
-        return auth()->user()->can('gestion_comentarios_empleados');
+        return auth()->user()->can('editar_comentarios_empleados');
     }
 
     protected function canDelete(Model $record): bool
     {
-        return auth()->user()->can('gestion_comentarios_empleados');
+        return auth()->user()->can('editar_comentarios_empleados');
     }
 
     public function isReadOnly(): bool
     {
-        return false;
+        return !auth()->user()->can('editar_comentarios_empleados');
     }
 
     public function form(Schema $schema): Schema
@@ -95,7 +95,7 @@ class ComentariosRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados'))
+                    ->visible(fn () => auth()->user()->can('editar_comentarios_empleados'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
                         return $data;
@@ -103,9 +103,9 @@ class ComentariosRelationManager extends RelationManager
             ])
             ->recordActions([
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_comentarios_empleados')),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_comentarios_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_comentarios_empleados')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

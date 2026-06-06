@@ -29,27 +29,27 @@ class ContratosRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
-        return auth()->user()->can('gestion_contratos_empleados');
+        return auth()->user()->can('ver_contratos_empleados');
     }
 
     protected function canCreate(): bool
     {
-        return auth()->user()->can('gestion_contratos_empleados');
+        return auth()->user()->can('editar_contratos_empleados');
     }
 
     protected function canEdit(Model $record): bool
     {
-        return auth()->user()->can('gestion_contratos_empleados');
+        return auth()->user()->can('editar_contratos_empleados');
     }
 
     protected function canDelete(Model $record): bool
     {
-        return auth()->user()->can('gestion_contratos_empleados');
+        return auth()->user()->can('editar_contratos_empleados');
     }
 
     public function isReadOnly(): bool
     {
-        return false;
+        return !auth()->user()->can('editar_contratos_empleados');
     }
 
     public function form(Schema $schema): Schema
@@ -128,7 +128,7 @@ class ContratosRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->visible(fn () => auth()->user()->can('gestion_contratos_empleados')),
+                    ->visible(fn () => auth()->user()->can('editar_contratos_empleados')),
             ])
             ->recordActions([
                 Action::make('preview')
