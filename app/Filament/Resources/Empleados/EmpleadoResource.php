@@ -37,14 +37,14 @@ class EmpleadoResource extends Resource
     {
         $user = auth()->user();
         if (!$user) return false;
-        return $user->hasRole('Admin') || $user->can('gestion_alta_empleados');
+        return $user->can('gestion_alta_empleados');
     }
 
     public static function canEdit(mixed $record): bool
     {
         $user = auth()->user();
         if (!$user) return false;
-        return $user->hasRole('Admin') || $user->can('gestion_editar_empleados');
+        return $user->can('gestion_editar_empleados');
     }
 
     public static function getNavigationLabel(): string
