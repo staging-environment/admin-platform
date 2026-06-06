@@ -24,7 +24,8 @@ class RoleForm
                     ->relationship('permissions', 'name')
                     ->getOptionLabelFromRecordUsing(fn ($record) => match ($record->name) {
                         'ver_dashboard' => 'Ver Comparador de Precios',
-                        'gestion_usuarios_roles' => 'Gestión de Usuarios y Roles',
+                        'gestion_usuarios' => 'Gestión de Usuarios',
+                        'gestion_roles' => 'Gestión de Roles y Matriz de Permisos',
                         'utilizar_explorador' => 'Utilizar Explorador de Archivos',
                         'ver_informes' => 'Ver Informes y Estadísticas',
                         'gestion_gasolineras' => 'Gestión de Gasolineras',

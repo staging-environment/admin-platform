@@ -28,7 +28,7 @@ class PermissionMatrix extends Page
         // Reload relationships to bypass session/memory stale data
         $user->load('roles', 'permissions');
         
-        return $user->hasRole('Admin') || $user->can('gestion_usuarios_roles');
+        return $user->hasRole('Admin') || $user->can('gestion_roles');
     }
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';

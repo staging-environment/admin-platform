@@ -64,7 +64,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios_roles', 'gestion_portada']))
+                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
@@ -89,7 +89,7 @@
                                     </x-dropdown-link>
                                     @endif
 
-                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios_roles'))
+                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios'))
                                     <x-dropdown-link href="/admin/users">
                                         {{ __('Usuarios') }}
                                     </x-dropdown-link>
@@ -101,13 +101,13 @@
                                     </x-dropdown-link>
                                     @endif
 
-                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios_roles'))
+                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_roles'))
                                     <x-dropdown-link href="/admin/permission-matrix">
                                         {{ __('Matriz de Permisos') }}
                                     </x-dropdown-link>
                                     @endif
 
-                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios_roles'))
+                                    @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_roles'))
                                     <x-dropdown-link href="/admin/roles">
                                         {{ __('Roles') }}
                                     </x-dropdown-link>
@@ -216,7 +216,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->hasRole('Admin') || auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios_roles', 'gestion_portada']))
+            @if(auth()->user()?->hasRole('Admin') || auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
@@ -234,7 +234,7 @@
                             </x-responsive-nav-link>
                         @endif
 
-                        @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios_roles'))
+                        @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios'))
                             <x-responsive-nav-link href="/admin/users" :active="request()->is('admin/users*')">
                                 {{ __('Usuarios') }}
                             </x-responsive-nav-link>
@@ -246,7 +246,7 @@
                             </x-responsive-nav-link>
                         @endif
 
-                        @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_usuarios_roles'))
+                        @if(auth()->user()?->hasRole('Admin') || auth()->user()?->can('gestion_roles'))
                             <x-responsive-nav-link href="/admin/permission-matrix" :active="request()->is('admin/permission-matrix*')">
                                 {{ __('Matriz de Permisos') }}
                             </x-responsive-nav-link>
