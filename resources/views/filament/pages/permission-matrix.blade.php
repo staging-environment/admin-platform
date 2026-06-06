@@ -96,10 +96,10 @@
                 @endphp
 
                 @foreach($groups as $groupName => $groupPermissions)
-                    <tr class="bg-blue-50/80 dark:bg-indigo-950/40 border-l-4 border-blue-600 dark:border-blue-500">
+                    <tr class="{{ $groupName === 'SUBSECCIONES' ? 'bg-blue-50/40 dark:bg-indigo-950/20 border-l-4 border-blue-400 dark:border-blue-700 ml-4' : 'bg-blue-50/80 dark:bg-indigo-950/40 border-l-4 border-blue-600 dark:border-blue-500' }}">
                         <td colspan="{{ count($roles) + 1 }}" class="p-4 text-sm font-black uppercase tracking-wider text-blue-900 dark:text-blue-200">
-                            <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+                            <div class="flex items-center gap-2 {{ $groupName === 'SUBSECCIONES' ? 'pl-8' : '' }}">
+                                <span class="h-2 w-2 rounded-full {{ $groupName === 'SUBSECCIONES' ? 'bg-blue-400 dark:bg-blue-600' : 'bg-blue-600 dark:bg-blue-400' }}"></span>
                                 {{ $groupName }}
                             </div>
                         </td>
@@ -110,7 +110,7 @@
                         @endphp
                         @if($permission)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                <td class="p-4 pl-8 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                <td class="p-4 {{ $groupName === 'SUBSECCIONES' ? 'pl-16' : 'pl-8' }} text-sm font-medium text-gray-700 dark:text-gray-200">
                                     {{ $label }}
                                 </td>
                                 @foreach($roles as $role)
