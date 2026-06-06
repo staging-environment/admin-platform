@@ -33,20 +33,6 @@ class EmpleadoResource extends Resource
         return $user->can('gestion_recursos_humanos');
     }
 
-    public static function canCreate(): bool
-    {
-        $user = auth()->user();
-        if (!$user) return false;
-        return $user->can('gestion_alta_empleados');
-    }
-
-    public static function canEdit(mixed $record): bool
-    {
-        $user = auth()->user();
-        if (!$user) return false;
-        return $user->can('gestion_editar_empleados');
-    }
-
     public static function getNavigationLabel(): string
     {
         return 'Recursos humanos';
