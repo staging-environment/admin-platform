@@ -33,6 +33,8 @@ class PermissionSeeder extends Seeder
             'gestion_portada',
             'gestion_ofertas',
             'gestion_recursos_humanos',
+            'gestion_alta_empleados',
+            'gestion_editar_empleados',
             'gestion_documentacion_empleados',
             'gestion_cursos_empleados',
             'gestion_notificaciones_empleados',

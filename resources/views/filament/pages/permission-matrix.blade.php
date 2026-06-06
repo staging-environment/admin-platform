@@ -58,6 +58,8 @@
                         ],
                         'Recursos Humanos / Empleados' => [
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
+                            'gestion_alta_empleados' => 'Alta de nuevos empleados',
+                            'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_documentacion_empleados' => 'Documentación de Empleados',
                             'gestion_cursos_empleados' => 'Formación/Cursos de Empleados',
                             'gestion_notificaciones_empleados' => 'Notificaciones de Empleados',
