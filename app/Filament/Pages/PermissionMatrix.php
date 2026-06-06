@@ -23,12 +23,11 @@ class PermissionMatrix extends Page
         app()['cache']->forget('spatie.permission.cache');
         $user = auth()->user();
         if (!$user) return false;
-        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
         
         // Reload relationships to bypass session/memory stale data
         $user->load('roles', 'permissions');
         
-        return $user->hasRole('Admin') || $user->can('gestion_roles');
+        return $user->can('gestion_roles');
     }
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';

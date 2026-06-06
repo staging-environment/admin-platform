@@ -27,8 +27,7 @@ class PermissionResource extends Resource
     {
         $user = auth()->user();
         if (!$user) return false;
-        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('gestion_roles');
+        return $user->can('gestion_roles');
     }
 
     public static function form(Schema $schema): Schema
