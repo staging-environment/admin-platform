@@ -110,7 +110,7 @@
                         @endphp
                         @if($permission)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                <td class="p-4 {{ $groupName === 'SUBSECCIONES' ? 'pl-16' : 'pl-8' }} text-sm font-medium text-gray-700 dark:text-gray-200">
+                                <td class="p-4 text-sm font-medium text-gray-700 dark:text-gray-200" style="{{ $groupName === 'SUBSECCIONES' ? 'padding-left: 4.5rem !important;' : 'padding-left: 2rem !important;' }}">
                                     {{ $label }}
                                 </td>
                                 @foreach($roles as $role)
