@@ -99,19 +99,12 @@ class Informes extends Page implements HasForms
                 Select::make('reportType')
                     ->label('Tipo de Informe')
                     ->options([
-                        'margen_mercaderia' => 'Margen Comercial — PVP Tarifa',
-                        'margen_con_ventas' => 'Margen Real Compra vs Venta — Dato Real TPV',
+                        'tienda_margen'     => '🛋️  Tienda — Margen Compra vs Venta (Grupo 3 Alimentación)',
+                        'lavado_margen'     => '🚐  Lavadero — Margen Compra vs Venta (Grupo 4)',
+                        'margen_mercaderia' => '📊  Margen Tarifa — PVP Tarifa vs Precio Compra',
                     ])
                     ->placeholder('Selecciona un informe...')
                     ->live()
-                    ->columnSpanFull(),
-
-                Select::make('groupCodes')
-                    ->label('Grupos de Producto')
-                    ->options($groupOptions)
-                    ->multiple()
-                    ->default(['3', '4'])
-                    ->placeholder('Selecciona grupos...')
                     ->columnSpanFull(),
 
                 Select::make('stationCode')
@@ -182,6 +175,51 @@ class Informes extends Page implements HasForms
 
         switch ($reportType) {
 
+            // ── Tienda (Grupo 3) ─────────────────────────────────────────────
+            case 'tienda_margen':
+            // ── Lavadero (Grupo 4) ───────────────────────────────────────────
+            case 'lavado_margen':
+                $groupCodes = $reportType === 'tienda_margen' ? ['3'] : ['4'];
+                $rows = $reportService->getMargenSimple(
+                    (int) ($data['startMonth'] ?? $this->startMonth),
+                    (int) ($data['startYear']  ?? $this->startYear),
+                    (int) ($data['endMonth']   ?? $this->endMonth),
+                    (int) ($data['endYear']    ?? $this->endYear),
+                    $groupCodes,
+                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null
+                );
+
+                if (empty($rows)) {
+                    $this->errorMsg = 'No se encontraron artículos con compras registradas en el período seleccionado.';
+                    break;
+                }
+
+                $this->tableData  = $rows;
+                $this->resultType = $reportType;
+
+                // Gráfico: Top 20 por % margen (solo los que tienen ventas)
+                $top = array_slice(
+                    array_filter($rows, fn($r) => !$r['sin_ventas'] && $r['margen_pct'] !== null),
+                    0, 20
+                );
+                $top = array_values($top);
+
+                $this->chartData = [
+                    'labels'   => array_map(fn($r) => mb_substr($r['descripcion'], 0, 22), $top),
+                    'margenes' => array_map(fn($r) => $r['margen_pct'], $top),
+                    'colors'   => array_map(fn($r) => $r['margen_pct'] >= 40
+                        ? 'rgba(34,197,94,0.85)'
+                        : ($r['margen_pct'] >= 20 ? 'rgba(234,179,8,0.85)' : 'rgba(239,68,68,0.85)'), $top),
+                    'borders'  => array_map(fn($r) => $r['margen_pct'] >= 40
+                        ? 'rgb(22,163,74)'
+                        : ($r['margen_pct'] >= 20 ? 'rgb(202,138,4)' : 'rgb(220,38,38)'), $top),
+                    'dual'     => false,
+                ];
+
+                $this->dispatch('chart-data-ready', chartData: $this->chartData);
+                break;
+
+            // ── Margen Tarifa (PVP Tarifa vs Precio Compra) ──────────────────
             case 'margen_mercaderia':
                 $rows = $reportService->getMargenMercaderia(
                     (int) ($data['startMonth'] ?? $this->startMonth),
@@ -189,8 +227,9 @@ class Informes extends Page implements HasForms
                     (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
                     !empty($data['stationCode']) ? (int) $data['stationCode'] : null,
-                    !empty($data['groupCodes'])  ? (array) $data['groupCodes'] : null
+                    ['3', '4']
                 );
+
 
                 if (empty($rows)) {
                     $this->errorMsg = 'No se encontraron artículos con compras en el período seleccionado.';

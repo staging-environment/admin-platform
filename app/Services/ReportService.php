@@ -11,7 +11,150 @@ class ReportService
     // Las gráficas se irán añadiendo aquí progresivamente.
 
     /**
-     * Informe de Margen Real Compra vs Venta (Grupo 3).
+     * Informe Simple de Margen Compra vs Venta.
+     *
+     * Para un período y grupos dados, muestra por artículo:
+     *   - precio_compra   : media ponderada de lo pagado al proveedor (sin IVA)
+     *   - precio_venta    : media ponderada de lo cobrado en caja (con IVA)
+     *   - uds_vendidas    : unidades realmente vendidas en TPV
+     *   - total_comprado  : precio_compra × uds_vendidas  (coste de lo vendido)
+     *   - total_facturado : precio_venta  × uds_vendidas  (ingreso bruto)
+     *   - beneficio       : total_facturado - total_comprado
+     *   - margen_pct      : beneficio / total_comprado × 100
+     */
+    public function getMargenSimple(
+        int $startMonth,
+        int $startYear,
+        int $endMonth,
+        int $endYear,
+        array  $groupCodes,
+        ?int   $stationCode = null
+    ): array {
+        $dateFrom = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
+        $dateTo   = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+
+        $db = DB::connection('virtusgesnet');
+
+        // ── Productos de los grupos seleccionados (incluyendo subgrupos) ──────
+        $productosDeGrupo = $db->table('productos')
+            ->where(function ($q) use ($groupCodes) {
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
+            ->pluck('Codigo')
+            ->toArray();
+
+        if (empty($productosDeGrupo)) return [];
+
+        // ── 1. Precio de COMPRA (factura proveedor) por artículo ─────────────
+        $comprasQuery = $db->table('detalledefacturasdecompra as d')
+            ->join('facturasdecompra as f', function ($j) {
+                $j->on('f.CodigoDeEmpresaPropia', '=', 'd.CodigoDeEmpresaPropia')
+                  ->on('f.Serie', '=', 'd.Serie')
+                  ->on('f.Numero', '=', 'd.Numero');
+            })
+            ->select([
+                'd.CodigoDeProducto',
+                DB::raw('SUM(d.Cantidad * d.Precio) / SUM(d.Cantidad) as precio_compra'),
+                DB::raw('SUM(d.Cantidad) as uds_compradas'),
+            ])
+            ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
+            ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
+
+        if ($stationCode !== null) {
+            $comprasQuery->where('f.CodigoDeEstacion', $stationCode);
+        }
+
+        $compras = $comprasQuery->groupBy('d.CodigoDeProducto')->get()->keyBy('CodigoDeProducto');
+
+        if ($compras->isEmpty()) return [];
+
+        $codigosConCompra = $compras->keys()->toArray();
+
+        // ── 2. Precio de VENTA real (TPV) por artículo ───────────────────────
+        $ventasQuery = $db->table('detalledeventasencurso as dv')
+            ->join('ventasencurso as v', 'v.Id', '=', 'dv.IdDeVentaEnCurso')
+            ->select([
+                'dv.CodigoDeProducto',
+                DB::raw('SUM(dv.Cantidad * dv.Precio) / SUM(dv.Cantidad) as precio_venta'),
+                DB::raw('MAX(dv.PorcentajeDeIva) as pct_iva'),
+                DB::raw('SUM(dv.Cantidad) as uds_vendidas'),
+                DB::raw('SUM(dv.Importe) as total_facturado'),
+            ])
+            ->whereIn('dv.CodigoDeProducto', $codigosConCompra)
+            ->whereBetween(DB::raw('DATE(v.FechaYHora)'), [$dateFrom, $dateTo]);
+
+        if ($stationCode !== null) {
+            $ventasQuery->where('v.CoDigoDeEstacion', $stationCode);
+        }
+
+        $ventas = $ventasQuery->groupBy('dv.CodigoDeProducto')->get()->keyBy('CodigoDeProducto');
+
+        // ── 3. Nombre de productos ────────────────────────────────────────────
+        $productos = $db->table('productos as p')
+            ->join('gruposdeproductos as g', 'g.Codigo', '=', 'p.CodigoDeGrupo')
+            ->select(['p.Codigo', 'p.Descripcion', 'g.Nombre as GrupoNombre'])
+            ->whereIn('p.Codigo', $codigosConCompra)
+            ->get()
+            ->keyBy('Codigo');
+
+        // ── 4. Construir resultado ────────────────────────────────────────────
+        $result = [];
+
+        foreach ($compras as $codigo => $compra) {
+            $producto = $productos[$codigo] ?? null;
+            if (!$producto) continue;
+
+            $precioCompra = (float) $compra->precio_compra;
+            if ($precioCompra <= 0) continue;
+
+            $venta          = $ventas[$codigo] ?? null;
+            $precioVenta    = $venta ? (float) $venta->precio_venta    : null;
+            $udsVendidas    = $venta ? (float) $venta->uds_vendidas    : 0;
+            $totalFacturado = $venta ? (float) $venta->total_facturado : 0;
+            $pctIva         = $venta ? (float) $venta->pct_iva         : 0;
+
+            // Coste de lo vendido = precio compra × unidades vendidas
+            $totalComprado  = $udsVendidas > 0 ? $precioCompra * $udsVendidas : 0;
+
+            // Beneficio y margen
+            $beneficio  = $totalFacturado > 0 ? $totalFacturado - $totalComprado : null;
+            $margenPct  = ($beneficio !== null && $totalComprado > 0)
+                ? ($beneficio / $totalComprado) * 100
+                : null;
+
+            $result[] = [
+                'codigo'          => $codigo,
+                'descripcion'     => $producto->Descripcion,
+                'grupo_nombre'    => $producto->GrupoNombre,
+
+                'precio_compra'   => round($precioCompra, 4),
+                'precio_venta'    => $precioVenta !== null ? round($precioVenta, 4) : null,
+                'uds_compradas'   => (float) $compra->uds_compradas,
+                'uds_vendidas'    => $udsVendidas,
+
+                'total_comprado'  => round($totalComprado, 2),
+                'total_facturado' => round($totalFacturado, 2),
+                'beneficio'       => $beneficio !== null ? round($beneficio, 2) : null,
+                'margen_pct'      => $margenPct !== null ? round($margenPct, 2) : null,
+
+                'sin_ventas'      => $venta === null,
+            ];
+        }
+
+        // Ordenar: artículos con ventas primero, luego por beneficio descendente
+        usort($result, function ($a, $b) {
+            if ($a['sin_ventas'] !== $b['sin_ventas']) return $a['sin_ventas'] ? 1 : -1;
+            return ($b['beneficio'] ?? -999999) <=> ($a['beneficio'] ?? -999999);
+        });
+
+        return $result;
+    }
+
+
+    /**
+     * Informe de Margen Real Compra vs Venta.
      *
      * Cruza el precio real de compra (factura de proveedor) con el precio
      * real de venta (ticket de TPV) en el mismo período, artículo a artículo.
@@ -24,6 +167,7 @@ class ReportService
      *  - beneficio_bruto      : (pvp_sin_iva - precio_compra) * uds_vendidas
      *  - uds_compradas / uds_vendidas
      */
+
     public function getMargenConVentas(
         int $startMonth,
         int $startYear,
