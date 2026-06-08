@@ -1,6 +1,17 @@
 <x-filament-panels::page>
-    {{-- Chart.js CDN --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        {{-- Chart.js CDN --}}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+        {{-- Print handler — evita bloqueos CSP en producción (no inline onclick) --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('click', function (e) {
+                    if (e.target && e.target.id === 'btn-print-pdf') {
+                        window.print();
+                    }
+                });
+            });
+        </script>
 
     <div class="space-y-6">
 
@@ -84,9 +95,12 @@
                             Excel
                         </a>
 
-                        {{-- PDF / Imprimir --}}
-                        <button type="button" onclick="window.print()"
-                                class="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+                        {{-- PDF / Imprimir — id para event listener (CSP-safe), style inline anti-purge --}}
+                        <button id="btn-print-pdf" type="button"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                                style="background-color:#374151; border:none; cursor:pointer;"
+                                onmouseover="this.style.backgroundColor='#1f2937'"
+                                onmouseout="this.style.backgroundColor='#374151'">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                             </svg>
