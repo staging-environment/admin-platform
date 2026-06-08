@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "amidesfahani/filament-tinyeditor": "^5.0",
+        "anthropic-ai/sdk": "*",
         "dotswan/filament-map-picker": "^2.3",
         "filament/filament": "^5.6",
         "laravel/breeze": "^2.4",
