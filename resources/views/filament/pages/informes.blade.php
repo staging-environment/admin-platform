@@ -40,6 +40,7 @@
         {{-- RESULTADOS (solo visible si hay datos)                         --}}
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         @if($resultType && $tableData)
+        <div id="print-area" class="space-y-6 w-full">
 
             {{-- CABECERA DE RESULTADOS + BOTONES DE EXPORTACIÓN --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 no-print">
@@ -552,7 +553,7 @@
                 @endif
 
             </div>{{-- fin tabla --}}
-
+        </div>
         @endif {{-- fin resultados --}}
 
     </div>
@@ -560,26 +561,26 @@
     {{-- CSS de impresión --}}
     <style>
         @media print {
-            .no-print { display: none !important; }
-            .fi-sidebar, .fi-topbar, nav, header { display: none !important; }
-            
-            /* Permitir que el contenido fluya en múltiples páginas (Filament usa flex y overflow hidden/auto que rompe la impresión) */
-            html, body, .fi-layout, .fi-main, main, .fi-main-content, .fi-page {
-                display: block !important;
-                height: auto !important;
-                min-height: auto !important;
-                max-height: none !important;
-                overflow: visible !important;
-                position: static !important;
-                background-color: white !important;
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background-color: white !important;
             }
-            
-            /* Asegurar que la tabla o el contenido ocupe el ancho completo sin restricciones */
-            .fi-main {
-                width: 100% !important;
-                max-width: none !important;
+
+            .no-print, .no-print * { 
+                display: none !important; 
+                visibility: hidden !important; 
+                height: 0 !important; 
             }
 
             .print-full-width { 
