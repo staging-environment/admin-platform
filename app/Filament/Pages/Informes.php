@@ -108,7 +108,7 @@ class Informes extends Page implements HasForms
                         ->description('Selecciona el área de negocio o tipo de margen')
                         ->schema([
                             Radio::make('reportType')
-                                ->label('')
+                                ->hiddenLabel()
                                 ->options([
                                     'tienda_margen'     => '🛋️ La Tienda',
                                     'lavado_margen'     => '🚐 El Lavadero',
