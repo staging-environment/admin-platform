@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\Api\DataQueryController;
+use App\Http\Controllers\InformesExportController;
 use App\Http\Controllers\Api\FilterController;
 use App\Models\ContactoMensaje;
 use Illuminate\Http\Request;
@@ -257,6 +258,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     });
+
+    // Exportación de informes
+    Route::get('/admin/informes/export', [InformesExportController::class, 'export'])->name('informes.export');
 
     // Rutas de la API para el panel
     Route::prefix('api')->group(function () {

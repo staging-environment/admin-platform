@@ -16,6 +16,47 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
+            {{-- ══════════════════════════════════════════════════════════════ --}}
+            {{-- WIDGET: PRECIOS DE FUTUROS DE COMBUSTIBLE (Investing.com ref.) --}}
+            {{-- ══════════════════════════════════════════════════════════════ --}}
+            @if(!empty($futuresPrices))
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3 border-b border-gray-100 bg-gray-50/60 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <span class="text-xs font-extrabold text-gray-600 uppercase tracking-wider">Futuros de Combustible</span>
+                        <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">Mercado NY · cache 30min</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400">Fuente: Yahoo Finance</span>
+                </div>
+                <div class="grid grid-cols-2 divide-x divide-gray-100">
+                    @foreach($futuresPrices as $symbol => $future)
+                    <div class="px-5 py-4 flex items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-base">{{ $future['icono'] }}</span>
+                                <span class="text-xs font-bold text-gray-700">{{ $future['nombre'] }}</span>
+                            </div>
+                            <div class="text-[10px] text-gray-400 mt-0.5 font-mono">{{ $symbol }} · {{ $future['unidad'] }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-black text-gray-800 font-mono leading-tight">
+                                {{ number_format($future['precio'], 4, ',', '.') }}
+                                <span class="text-xs font-normal text-gray-400">{{ $future['currency'] }}</span>
+                            </div>
+                            <div class="text-xs font-bold mt-0.5 {{ $future['positivo'] ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $future['positivo'] ? '+' : '' }}{{ number_format($future['cambio'], 4, ',', '.') }}
+                                ({{ $future['positivo'] ? '+' : '' }}{{ number_format($future['cambioPct'], 2, ',', '.') }}%)
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+            {{-- FIN WIDGET FUTUROS --}}
 
             @php
                 $unreadMessages = \App\Models\ContactoMensaje::with('gasolinera')->where('is_read', false)->orderBy('created_at', 'desc')->get();

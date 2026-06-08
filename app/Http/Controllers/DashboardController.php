@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\VirtusgesnetService;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, VirtusgesnetService $virtusgesnetService)
+    public function index(Request $request, VirtusgesnetService $virtusgesnetService, ReportService $reportService)
     {
         $user = auth()->user();
         if ($user) {
@@ -214,6 +215,14 @@ class DashboardController extends Controller
         $ownDiesel = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '1')->value('PVP');
         $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '2')->value('PVP');
 
+        // --- COMPONENT: FUTURES PRICES (commodity reference) ---
+        $futuresPrices = [];
+        try {
+            $futuresPrices = $reportService->getFuturesPrices();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return view('dashboard', [
             'tables' => $tables,
             'stations' => $stations,
@@ -234,6 +243,7 @@ class DashboardController extends Controller
             'ownGas95' => $ownGas95 ? (float) $ownGas95 : null,
             'ourRank' => $ourRank,
             'ourStationName' => $targetLoc['own_name'],
+            'futuresPrices' => $futuresPrices,
         ]);
     }
 
