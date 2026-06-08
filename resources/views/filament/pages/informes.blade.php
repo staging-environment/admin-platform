@@ -22,23 +22,6 @@
             <div class="p-6">
                 <form wire:submit="generateReport" class="space-y-6">
                     {{ $this->form }}
-                    <div class="mt-4 flex justify-end">
-                        <x-filament::button type="submit" color="primary" wire:loading.attr="disabled">
-                            <span wire:loading.remove wire:target="generateReport">
-                                <svg class="inline h-4 w-4 mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                </svg>
-                                Generar Informe
-                            </span>
-                            <span wire:loading wire:target="generateReport" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                </svg>
-                                Generando...
-                            </span>
-                        </x-filament::button>
-                    </div>
                 </form>
             </div>
         </div>

@@ -9,6 +9,10 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Radio;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Blade;
 use App\Services\ReportService;
 
 class Informes extends Page implements HasForms
@@ -96,56 +100,84 @@ class Informes extends Page implements HasForms
 
         return $form
             ->schema([
-                Select::make('reportType')
-                    ->label('Tipo de Informe')
-                    ->options([
-                        'tienda_margen'     => '🛋️  Tienda — Margen Compra vs Venta (Grupo 3 Alimentación)',
-                        'lavado_margen'     => '🚐  Lavadero — Margen Compra vs Venta (Grupo 4)',
-                        'margen_mercaderia' => '📊  Margen Tarifa — PVP Tarifa vs Precio Compra',
-                    ])
-                    ->placeholder('Selecciona un informe...')
-                    ->live()
-                    ->columnSpanFull(),
+                Wizard::make([
+                    Wizard\Step::make('Paso 1: ¿Qué quieres analizar?')
+                        ->description('Selecciona el área de negocio o tipo de margen')
+                        ->schema([
+                            Radio::make('reportType')
+                                ->label('')
+                                ->options([
+                                    'tienda_margen'     => '🛋️ La Tienda',
+                                    'lavado_margen'     => '🚐 El Lavadero',
+                                    'margen_mercaderia' => '📊 Margen Teórico (Toda la mercancía)',
+                                ])
+                                ->descriptions([
+                                    'tienda_margen'     => 'Descubre qué margen real de beneficio te deja cada producto (Precio de venta en caja vs Coste real de factura).',
+                                    'lavado_margen'     => 'Analiza la rentabilidad real de los servicios de lavado.',
+                                    'margen_mercaderia' => 'Compara el precio de Tarifa actual en base de datos con el último precio de coste.',
+                                ])
+                                ->required(),
+                        ]),
 
-                Select::make('stationCode')
-                    ->label('Gasolinera')
-                    ->options($stations)
-                    ->placeholder('Todas las Gasolineras')
-                    ->columnSpanFull(),
+                    Wizard\Step::make('Paso 2: ¿Dónde y Cuándo?')
+                        ->description('Filtra los datos por fechas y gasolinera')
+                        ->schema([
+                            Select::make('stationCode')
+                                ->label('Gasolinera')
+                                ->options($stations)
+                                ->placeholder('Todas las Gasolineras')
+                                ->columnSpanFull(),
 
-                Grid::make(4)
-                    ->schema([
-                        Select::make('startMonth')
-                            ->label('Mes Desde')
-                            ->options([
-                                1 => 'Enero',    2 => 'Febrero',   3 => 'Marzo',
-                                4 => 'Abril',    5 => 'Mayo',      6 => 'Junio',
-                                7 => 'Julio',    8 => 'Agosto',    9 => 'Septiembre',
-                                10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
-                            ])
-                            ->default(1)
-                            ->required(),
-                        TextInput::make('startYear')
-                            ->label('Año Desde')
-                            ->numeric()
-                            ->default(date('Y'))
-                            ->required(),
-                        Select::make('endMonth')
-                            ->label('Mes Hasta')
-                            ->options([
-                                1 => 'Enero',    2 => 'Febrero',   3 => 'Marzo',
-                                4 => 'Abril',    5 => 'Mayo',      6 => 'Junio',
-                                7 => 'Julio',    8 => 'Agosto',    9 => 'Septiembre',
-                                10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
-                            ])
-                            ->default(date('n'))
-                            ->required(),
-                        TextInput::make('endYear')
-                            ->label('Año Hasta')
-                            ->numeric()
-                            ->default(date('Y'))
-                            ->required(),
-                    ]),
+                            Grid::make(4)
+                                ->schema([
+                                    Select::make('startMonth')
+                                        ->label('Mes Desde')
+                                        ->options([
+                                            1 => 'Enero',    2 => 'Febrero',   3 => 'Marzo',
+                                            4 => 'Abril',    5 => 'Mayo',      6 => 'Junio',
+                                            7 => 'Julio',    8 => 'Agosto',    9 => 'Septiembre',
+                                            10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+                                        ])
+                                        ->default(1)
+                                        ->required(),
+                                    TextInput::make('startYear')
+                                        ->label('Año Desde')
+                                        ->numeric()
+                                        ->default(date('Y'))
+                                        ->required(),
+                                    Select::make('endMonth')
+                                        ->label('Mes Hasta')
+                                        ->options([
+                                            1 => 'Enero',    2 => 'Febrero',   3 => 'Marzo',
+                                            4 => 'Abril',    5 => 'Mayo',      6 => 'Junio',
+                                            7 => 'Julio',    8 => 'Agosto',    9 => 'Septiembre',
+                                            10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+                                        ])
+                                        ->default(date('n'))
+                                        ->required(),
+                                    TextInput::make('endYear')
+                                        ->label('Año Hasta')
+                                        ->numeric()
+                                        ->default(date('Y'))
+                                        ->required(),
+                                ]),
+                        ]),
+                ])
+                ->submitAction(new HtmlString(Blade::render(<<<BLADE
+                    <x-filament::button
+                        type="submit"
+                        size="sm"
+                        wire:loading.attr="disabled"
+                    >
+                        <span wire:loading.remove wire:target="generateReport">
+                            Generar Informe
+                        </span>
+                        <span wire:loading wire:target="generateReport">
+                            Generando...
+                        </span>
+                    </x-filament::button>
+                BLADE)))
+                ->columnSpanFull()
             ]);
     }
 
