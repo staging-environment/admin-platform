@@ -346,6 +346,11 @@ class Informes extends Page implements HasForms
 
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 $this->dispatch('chart-ev-data-ready', chartEvolucionData: $this->chartEvolucionData);
+                
+                // Ordenar por defecto por beneficio (menor a mayor)
+                $this->sortColumn = '';
+                $this->sortBy('beneficio');
+                
                 break;
 
             // ── Margen Tarifa (PVP Tarifa vs Precio Compra) ──────────────────
@@ -385,6 +390,11 @@ class Informes extends Page implements HasForms
 
                 // Disparar evento Alpine para re-crear el gráfico
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
+                
+                // Ordenar por defecto por margen_pct (menor a mayor)
+                $this->sortColumn = '';
+                $this->sortBy('margen_pct');
+                
                 break;
 
             case 'margen_con_ventas':
@@ -424,6 +434,11 @@ class Informes extends Page implements HasForms
                     ];
                     $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 }
+                
+                // Ordenar por defecto por margen_real_pct (menor a mayor)
+                $this->sortColumn = '';
+                $this->sortBy('margen_real_pct');
+                
                 break;
 
             default:
