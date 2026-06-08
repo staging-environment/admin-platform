@@ -9,7 +9,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
+use Filament\Schemas\Components\Wizard;
 use Filament\Forms\Components\Radio;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Blade;
