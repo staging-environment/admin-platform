@@ -6,7 +6,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 document.addEventListener('click', function (e) {
-                    if (e.target && e.target.id === 'btn-print-pdf') {
+                    if (e.target && e.target.closest && e.target.closest('#btn-print-pdf')) {
                         window.print();
                     }
                 });
@@ -562,6 +562,15 @@
         @media print {
             .no-print { display: none !important; }
             .fi-sidebar, .fi-topbar, nav, header { display: none !important; }
+            
+            /* Permitir que el contenido fluya en múltiples páginas (Filament usa overflow hidden/auto que rompe la impresión) */
+            body, html, .fi-main, main, .fi-main-content {
+                height: auto !important;
+                overflow: visible !important;
+                position: static !important;
+                background-color: white !important;
+            }
+            
             .print-full-width { width: 100%; box-shadow: none !important; border: none !important; }
             body { font-size: 10px; }
             th, td { padding: 3px 5px !important; font-size: 10px !important; }
