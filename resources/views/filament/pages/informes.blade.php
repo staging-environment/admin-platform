@@ -353,6 +353,9 @@
                                 <th wire:click="sortBy('precio_venta')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Venta<span class="font-normal">{{ $ico('precio_venta') }}</span>
                                 </th>
+                                <th wire:click="sortBy('uds_compradas')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider border-l-2 border-gray-100 {{ $thS }}">
+                                    Uds. Compradas<span class="font-normal">{{ $ico('uds_compradas') }}</span>
+                                </th>
                                 <th wire:click="sortBy('uds_vendidas')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Uds. Vendidas<span class="font-normal">{{ $ico('uds_vendidas') }}</span>
                                 </th>

@@ -326,10 +326,9 @@ class Informes extends Page implements HasForms
                 $this->resultType = $reportType;
 
                 // Gráfico: Top 20 por % margen (solo los que tienen ventas)
-                $top = array_slice(
-                    array_filter($rows, fn($r) => !$r['sin_ventas'] && $r['margen_pct'] !== null),
-                    0, 20
-                );
+                $conVentas = array_filter($rows, fn($r) => !$r['sin_ventas'] && $r['margen_pct'] !== null);
+                usort($conVentas, fn($a, $b) => $b['margen_pct'] <=> $a['margen_pct']);
+                $top = array_slice($conVentas, 0, 20);
                 $top = array_values($top);
 
                 $this->chartData = [
@@ -374,6 +373,7 @@ class Informes extends Page implements HasForms
                 $this->resultType = 'margen_mercaderia';
 
                 // Top 20 para el gráfico
+                usort($rows, fn($a, $b) => $b['margen_pct'] <=> $a['margen_pct']);
                 $top = array_slice($rows, 0, 20);
                 $this->chartData = [
                     'labels'   => array_map(fn($r) => mb_substr($r['descripcion'], 0, 22), $top),
@@ -417,6 +417,7 @@ class Informes extends Page implements HasForms
 
                 // Top 20 con ventas reales para el gráfico (comparativa compra vs venta)
                 $topConVentas = array_filter($rows, fn($r) => !$r['sin_ventas'] && $r['margen_real_pct'] !== null);
+                usort($topConVentas, fn($a, $b) => $b['margen_real_pct'] <=> $a['margen_real_pct']);
                 $top20 = array_slice(array_values($topConVentas), 0, 20);
 
                 if (!empty($top20)) {
