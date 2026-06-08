@@ -78,7 +78,8 @@ class Informes extends Page implements HasForms
                 Select::make('reportType')
                     ->label('Tipo de Informe')
                     ->options([
-                        'margen_mercaderia' => 'Margen Comercial de Mercancía (Grupo 3)',
+                        'margen_mercaderia' => 'Margen Comercial de Mercancía (Grupo 3) — PVP Tarifa',
+                        'margen_con_ventas' => 'Margen Real Compra vs Venta (Grupo 3) — Dato Real TPV',
                     ])
                     ->placeholder('Selecciona un informe...')
                     ->live()
@@ -186,10 +187,49 @@ class Informes extends Page implements HasForms
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 break;
 
+            case 'margen_con_ventas':
+                $rows = $reportService->getMargenConVentas(
+                    (int) ($data['startMonth'] ?? $this->startMonth),
+                    (int) ($data['startYear']  ?? $this->startYear),
+                    (int) ($data['endMonth']   ?? $this->endMonth),
+                    (int) ($data['endYear']    ?? $this->endYear),
+                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null
+                );
+
+                if (empty($rows)) {
+                    $this->errorMsg = 'No se encontraron artículos con compras en el período seleccionado.';
+                    break;
+                }
+
+                $this->tableData  = $rows;
+                $this->resultType = 'margen_con_ventas';
+
+                // Top 20 con ventas reales para el gráfico (comparativa compra vs venta)
+                $topConVentas = array_filter($rows, fn($r) => !$r['sin_ventas'] && $r['margen_real_pct'] !== null);
+                $top20 = array_slice(array_values($topConVentas), 0, 20);
+
+                if (!empty($top20)) {
+                    $this->chartData = [
+                        'labels'          => array_map(fn($r) => mb_substr($r['descripcion'], 0, 22), $top20),
+                        'margenes'        => array_map(fn($r) => $r['margen_real_pct'], $top20),
+                        'margenesTarget'  => array_map(fn($r) => $r['margen_tarifa_pct'], $top20),
+                        'colors'          => array_map(fn($r) => ($r['margen_real_pct'] ?? 0) >= 40
+                            ? 'rgba(34,197,94,0.85)'
+                            : (($r['margen_real_pct'] ?? 0) >= 20 ? 'rgba(234,179,8,0.85)' : 'rgba(239,68,68,0.85)'), $top20),
+                        'borders'         => array_map(fn($r) => ($r['margen_real_pct'] ?? 0) >= 40
+                            ? 'rgb(22,163,74)'
+                            : (($r['margen_real_pct'] ?? 0) >= 20 ? 'rgb(202,138,4)' : 'rgb(220,38,38)'), $top20),
+                        'dual'            => true,
+                    ];
+                    $this->dispatch('chart-data-ready', chartData: $this->chartData);
+                }
+                break;
+
             default:
                 break;
         }
     }
+
 
     // ──────────────────────────────────────────────────────────────────────────
     // Paginación de la tabla

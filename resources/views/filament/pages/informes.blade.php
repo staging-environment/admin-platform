@@ -64,7 +64,11 @@
                     <div>
                         @if($resultType === 'margen_mercaderia')
                             <h2 class="text-base font-bold text-gray-800">
-                                📊 Margen Comercial de Mercancía (Grupo 3)
+                                📊 Margen Comercial de Mercancía (Grupo 3) — PVP Tarifa
+                            </h2>
+                        @elseif($resultType === 'margen_con_ventas')
+                            <h2 class="text-base font-bold text-gray-800">
+                                🔁 Margen Real Compra vs Venta (Grupo 3)
                             </h2>
                         @endif
                         <p class="text-xs text-gray-400 mt-0.5">
@@ -170,8 +174,20 @@
             >
                 <div class="px-6 pt-5 pb-2 flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-bold text-gray-700">Top 20 artículos por % Margen Comercial</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Precio compra = media ponderada del período · PVP sin IVA</p>
+                        <h3 class="text-sm font-bold text-gray-700">
+                            @if($resultType === 'margen_con_ventas')
+                                Top 20 artículos — % Margen Real (precio venta real vs precio compra)
+                            @else
+                                Top 20 artículos por % Margen Comercial
+                            @endif
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            @if($resultType === 'margen_con_ventas')
+                                Compra = media ponderada facturas proveedor · Venta = precio real TPV sin IVA
+                            @else
+                                Precio compra = media ponderada del período · PVP sin IVA
+                            @endif
+                        </p>
                     </div>
                     <div class="flex items-center gap-3 text-[11px] text-gray-500">
                         <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span> ≥ 40%</span>
@@ -213,6 +229,32 @@
                 {{-- Tabla --}}
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
+
+                        {{-- ─── CABECERA ────────────────────────────────────────────── --}}
+                        @if($resultType === 'margen_con_ventas')
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Artículo</th>
+                                {{-- Compra --}}
+                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100">P.Compra s/IVA</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider">Uds.Comp</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider no-print">Coste Total</th>
+                                {{-- Venta real --}}
+                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100">PVP Venta c/IVA</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider">PVP Venta s/IVA</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print">Uds.Vend</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print">Ingreso s/IVA</th>
+                                {{-- Tarifa --}}
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-wider border-l-2 border-gray-100 no-print">PVP Tarifa</th>
+                                {{-- Margen --}}
+                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100">% IVA</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider">Margen Real</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print">M.Tarifa</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print">Beneficio Bruto</th>
+                            </tr>
+                        </thead>
+                        @else
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
@@ -226,9 +268,97 @@
                                 <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider no-print">Uds.</th>
                             </tr>
                         </thead>
+                        @endif
+
+                        {{-- ─── FILAS ───────────────────────────────────────────────── --}}
+                        @php $startIndex = ($tablePage - 1) * $tablePerPage; @endphp
                         <tbody class="bg-white divide-y divide-gray-100">
-                            @php $startIndex = ($tablePage - 1) * $tablePerPage; @endphp
-                            @foreach($this->getPagedTableData() as $i => $row)
+                        @foreach($this->getPagedTableData() as $i => $row)
+                            @if($resultType === 'margen_con_ventas')
+                                {{-- ── Fila Margen Real Compra vs Venta ────────────── --}}
+                                @php
+                                    $sinV   = $row['sin_ventas'] ?? false;
+                                    $mReal  = $row['margen_real_pct'];
+                                    $mTeo   = $row['margen_tarifa_pct'];
+                                    $badgeR = $mReal === null ? 'bg-gray-100 text-gray-400 border-gray-200'
+                                            : ($mReal >= 40 ? 'bg-green-100 text-green-800 border-green-200'
+                                            : ($mReal >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                            : 'bg-red-100 text-red-800 border-red-200'));
+                                @endphp
+                                <tr class="hover:bg-gray-50/60 transition-colors {{ $sinV ? 'opacity-50' : '' }}">
+                                    <td class="px-3 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
+                                    <td class="px-3 py-2.5">
+                                        <div class="font-semibold text-gray-800 text-sm leading-tight">{{ $row['descripcion'] }}</div>
+                                        <div class="text-[11px] text-gray-400 font-mono">{{ $row['codigo'] }}
+                                            @if($sinV) <span class="text-amber-500 ml-1">sin ventas</span>@endif
+                                        </div>
+                                    </td>
+                                    {{-- Compra --}}
+                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-blue-700 border-l-2 border-blue-50">
+                                        {{ number_format($row['precio_compra'], 4, ',', '.') }} €
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right text-xs text-blue-600">
+                                        {{ number_format($row['uds_compradas'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-xs text-blue-500 no-print">
+                                        {{ number_format($row['coste_total'], 2, ',', '.') }} €
+                                    </td>
+                                    {{-- Venta real --}}
+                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-emerald-700 border-l-2 border-emerald-50">
+                                        @if($row['pvp_venta_con_iva'] !== null)
+                                            {{ number_format($row['pvp_venta_con_iva'], 4, ',', '.') }} €
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-emerald-600">
+                                        @if($row['pvp_venta_sin_iva'] !== null)
+                                            {{ number_format($row['pvp_venta_sin_iva'], 4, ',', '.') }} €
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right text-xs text-emerald-500 no-print">
+                                        {{ $row['uds_vendidas'] > 0 ? number_format($row['uds_vendidas'], 0, ',', '.') : '—' }}
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-xs text-emerald-500 no-print">
+                                        @if($row['ingreso_sin_iva'] > 0)
+                                            {{ number_format($row['ingreso_sin_iva'], 2, ',', '.') }} €
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    {{-- PVP Tarifa --}}
+                                    <td class="px-3 py-2.5 text-right font-mono text-xs text-gray-400 border-l-2 border-gray-50 no-print">
+                                        @if($row['pvp_tarifa_con_iva'] !== null)
+                                            {{ number_format($row['pvp_tarifa_con_iva'], 4, ',', '.') }} €
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    {{-- IVA + Márgenes --}}
+                                    <td class="px-3 py-2.5 text-right text-xs text-gray-500 border-l-2 border-amber-50">
+                                        {{ number_format($row['pct_iva'], 0) }}%
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right">
+                                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black border {{ $badgeR }}">
+                                            @if($mReal !== null) {{ number_format($mReal, 2, ',', '.') }}%
+                                            @else —@endif
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right text-xs text-gray-500 no-print">
+                                        @if($mTeo !== null) {{ number_format($mTeo, 2, ',', '.') }}%
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-xs no-print">
+                                        @if($row['beneficio_bruto'] !== null)
+                                            <span class="{{ $row['beneficio_bruto'] >= 0 ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold' }}">
+                                                {{ number_format($row['beneficio_bruto'], 2, ',', '.') }} €
+                                            </span>
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                </tr>
+                            @else
+                                {{-- ── Fila Margen Mercadería (PVP Tarifa) ─────────── --}}
+                                @php
+                                    $m = $row['margen_pct'];
+                                    $badge = $m >= 40
+                                        ? 'bg-green-100 text-green-800 border-green-200'
+                                        : ($m >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                    : 'bg-red-100 text-red-800 border-red-200');
+                                @endphp
                                 <tr class="hover:bg-gray-50/60 transition-colors">
                                     <td class="px-4 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
                                     <td class="px-4 py-2.5">
@@ -249,13 +379,6 @@
                                         {{ number_format($row['pvp_sin_iva'], 4, ',', '.') }} €
                                     </td>
                                     <td class="px-4 py-2.5 text-right">
-                                        @php
-                                            $m = $row['margen_pct'];
-                                            $badge = $m >= 40
-                                                ? 'bg-green-100 text-green-800 border-green-200'
-                                                : ($m >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                                                            : 'bg-red-100 text-red-800 border-red-200');
-                                        @endphp
                                         <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black border {{ $badge }}">
                                             {{ number_format($m, 2, ',', '.') }}%
                                         </span>
@@ -264,10 +387,12 @@
                                         {{ number_format($row['unidades_compradas'], 0, ',', '.') }}
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endif
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
+
 
                 {{-- PAGINACIÓN --}}
                 @php $totalPages = $this->getTableTotalPages(); @endphp
