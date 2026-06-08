@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Wizard;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Blade;
 use App\Services\ReportService;
@@ -118,12 +119,29 @@ class Informes extends Page implements HasForms
                                     'lavado_margen'     => 'Analiza la rentabilidad real de los servicios de lavado.',
                                     'margen_mercaderia' => 'Compara el precio de Tarifa actual en base de datos con el último precio de coste.',
                                 ])
+                                ->live()
+                                ->afterStateUpdated(function (Set $set, $state) {
+                                    if ($state === 'tienda_margen') {
+                                        $set('groupCodes', ['3']);
+                                    } elseif ($state === 'lavado_margen') {
+                                        $set('groupCodes', ['4']);
+                                    } elseif ($state === 'margen_mercaderia') {
+                                        $set('groupCodes', ['3', '4']);
+                                    }
+                                })
                                 ->required(),
                         ]),
 
                     Wizard\Step::make('Paso 2: ¿Dónde y Cuándo?')
                         ->description('Filtra los datos por fechas y gasolinera')
                         ->schema([
+                            Select::make('groupCodes')
+                                ->label('Grupos a Incluir')
+                                ->multiple()
+                                ->options($groupOptions)
+                                ->placeholder('Selecciona uno o más grupos...')
+                                ->columnSpanFull(),
+
                             Select::make('stationCode')
                                 ->label('Gasolinera')
                                 ->options($stations)
@@ -267,13 +285,16 @@ class Informes extends Page implements HasForms
             case 'tienda_margen':
             // ── Lavadero (Grupo 4) ───────────────────────────────────────────
             case 'lavado_margen':
-                $groupCodes = $reportType === 'tienda_margen' ? ['3'] : ['4'];
+                $selectedGroupCodes = !empty($data['groupCodes']) 
+                    ? $data['groupCodes'] 
+                    : ($reportType === 'tienda_margen' ? ['3'] : ['4']);
+                    
                 $rows = $reportService->getMargenSimple(
                     (int) ($data['startMonth'] ?? $this->startMonth),
                     (int) ($data['startYear']  ?? $this->startYear),
                     (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
-                    $groupCodes,
+                    $selectedGroupCodes,
                     !empty($data['stationCode']) ? (int) $data['stationCode'] : null
                 );
 
