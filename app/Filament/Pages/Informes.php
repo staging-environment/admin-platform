@@ -35,6 +35,9 @@ class Informes extends Page implements HasForms
     /** Datos del gráfico (top 20) para Chart.js */
     public ?array  $chartData   = null;
 
+    /** Datos de la evolución mensual */
+    public ?array  $chartEvolucionData = null;
+
     /** Tipo de informe activo */
     public ?string $resultType  = null;
 
