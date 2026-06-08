@@ -81,18 +81,18 @@ class Informes extends Page implements HasForms
         $virtusService = app(\App\Services\VirtusgesnetService::class);
         $stations = collect($virtusService->getStations())->pluck('name', 'code')->toArray();
 
-        // Cargar grupos de productos desde virtusgesnet (solo grupos padre con productos)
+        // Cargar grupos de productos desde virtusgesnet — todos los grupos salvo gastos/combustibles
         $groupOptions = \Illuminate\Support\Facades\DB::connection('virtusgesnet')
-            ->table('gruposdeproductos as g')
-            ->join('productos as p', 'p.CodigoDeGrupo', '=', 'g.Codigo')
-            ->select('g.Codigo', 'g.Nombre')
-            ->where('g.Codigo', 'not like', '9%')   // excluir gastos internos
-            ->where('g.Codigo', 'not like', '0%')   // excluir combustibles
-            ->groupBy('g.Codigo', 'g.Nombre')
-            ->orderBy('g.Codigo')
+            ->table('gruposdeproductos')
+            ->select('Codigo', 'Nombre')
+            ->where('Codigo', 'not like', '9%')    // excluir gastos internos
+            ->where('Codigo', 'not like', '0%')    // excluir combustibles
+            ->where('Codigo', '!=', 'TODOS')
+            ->orderBy('Codigo')
             ->get()
             ->mapWithKeys(fn($g) => [$g->Codigo => "({$g->Codigo}) {$g->Nombre}"])
             ->toArray();
+
 
         return $form
             ->schema([
