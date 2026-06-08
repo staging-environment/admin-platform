@@ -237,6 +237,8 @@ class Informes extends Page implements HasForms
                                 }),
                         ]),
                 ])
+                ->nextAction(fn ($action) => $action->label('Siguiente Paso'))
+                ->previousAction(fn ($action) => $action->label('Atrás'))
                 ->submitAction(new HtmlString(Blade::render(<<<BLADE
                     <x-filament::button
                         type="submit"
