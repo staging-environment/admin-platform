@@ -11,6 +11,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Wizard;
 use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Get;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Blade;
 use App\Services\ReportService;
@@ -161,6 +163,60 @@ class Informes extends Page implements HasForms
                                         ->default(date('Y'))
                                         ->required(),
                                 ]),
+                        ]),
+
+                    Wizard\Step::make('Paso 3: Resumen')
+                        ->description('Verifica la información que se mostrará')
+                        ->schema([
+                            Placeholder::make('resumen_info')
+                                ->label('Información que vas a generar')
+                                ->content(function (Get $get) {
+                                    $type = $get('reportType');
+                                    if ($type === 'tienda_margen') {
+                                        return new HtmlString('
+                                            <div class="space-y-2 text-sm text-gray-700">
+                                                <p><b>📦 Grupo Seleccionado:</b> Grupo 3 (Alimentación) y todos sus subgrupos.</p>
+                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
+                                                <ul class="list-disc pl-5 text-gray-600">
+                                                    <li>Precio de Compra (Coste de mercancía en factura)</li>
+                                                    <li>Precio de Venta (Cobro real en caja)</li>
+                                                    <li>Unidades Totales Vendidas</li>
+                                                    <li>Total Comprado (€ invertidos) y Total Facturado (€ ingresados)</li>
+                                                    <li>Beneficio Neto (€ de ganancia limpia) y % de Margen Real</li>
+                                                </ul>
+                                            </div>
+                                        ');
+                                    }
+                                    if ($type === 'lavado_margen') {
+                                        return new HtmlString('
+                                            <div class="space-y-2 text-sm text-gray-700">
+                                                <p><b>🚐 Grupo Seleccionado:</b> Grupo 4 (Centro de Lavado) y todos sus subgrupos.</p>
+                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
+                                                <ul class="list-disc pl-5 text-gray-600">
+                                                    <li>Precio de Compra (Coste de insumos)</li>
+                                                    <li>Precio de Venta (Cobro real del servicio)</li>
+                                                    <li>Unidades Vendidas</li>
+                                                    <li>Total Comprado (€ invertidos) y Total Facturado (€ ingresados)</li>
+                                                    <li>Beneficio Neto (€ de ganancia limpia) y % de Margen Real</li>
+                                                </ul>
+                                            </div>
+                                        ');
+                                    }
+                                    if ($type === 'margen_mercaderia') {
+                                        return new HtmlString('
+                                            <div class="space-y-2 text-sm text-gray-700">
+                                                <p><b>📦/🚐 Grupos Seleccionados:</b> Grupo 3 (Tienda) y Grupo 4 (Lavadero).</p>
+                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
+                                                <ul class="list-disc pl-5 text-gray-600">
+                                                    <li>Precio de Compra medio</li>
+                                                    <li>PVP de Tarifa (Teórico, no el real de caja)</li>
+                                                    <li>% Margen Comercial Teórico</li>
+                                                </ul>
+                                            </div>
+                                        ');
+                                    }
+                                    return new HtmlString('<p class="text-amber-600">Por favor, vuelve al Paso 1 y selecciona un tipo de informe.</p>');
+                                }),
                         ]),
                 ])
                 ->submitAction(new HtmlString(Blade::render(<<<BLADE
