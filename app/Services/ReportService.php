@@ -29,12 +29,29 @@ class ReportService
         int $startYear,
         int $endMonth,
         int $endYear,
-        ?int $stationCode = null
+        ?int   $stationCode = null,
+        ?array $groupCodes  = null
     ): array {
-        $dateFrom = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
-        $dateTo   = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+        $dateFrom   = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
+        $dateTo     = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+        $groupCodes = $groupCodes ?: ['3', '4'];
 
         $db = DB::connection('virtusgesnet');
+
+        // Productos de los grupos seleccionados
+        $productosDeGrupo = $db->table('productos as p')
+            ->join('gruposdeproductos as g', 'g.Codigo', '=', 'p.CodigoDeGrupo')
+            ->whereIn('p.CodigoDeGrupo', $groupCodes)
+            ->orWhere(function ($q) use ($groupCodes) {
+                // Incluir subgrupos: e.g. si se elige '3', incluir '31x', '311', etc.
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('p.CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
+            ->pluck('p.Codigo')
+            ->toArray();
+
+        if (empty($productosDeGrupo)) return [];
 
         // ── 1. Precios de COMPRA (factura proveedor) en el período ───────────
         $comprasQuery = $db->table('detalledefacturasdecompra as d')
@@ -50,7 +67,7 @@ class ReportService
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
                 DB::raw('SUM(d.Importe) as coste_total'),
             ])
-            ->where('d.CodigoDeProducto', 'like', '3%')
+            ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
 
         if ($stationCode !== null) {
@@ -218,12 +235,26 @@ class ReportService
         int $startYear,
         int $endMonth,
         int $endYear,
-        ?int $stationCode = null
+        ?int   $stationCode = null,
+        ?array $groupCodes  = null
     ): array {
-        $dateFrom = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
-        $dateTo   = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+        $dateFrom   = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
+        $dateTo     = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+        $groupCodes = $groupCodes ?: ['3', '4'];
 
         $db = DB::connection('virtusgesnet');
+
+        // Productos de los grupos seleccionados (incluyendo subgrupos)
+        $productosDeGrupo = $db->table('productos as p')
+            ->where(function ($q) use ($groupCodes) {
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('p.CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
+            ->pluck('p.Codigo')
+            ->toArray();
+
+        if (empty($productosDeGrupo)) return [];
 
         // Precio medio ponderado de compra por artículo en el período
         $comprasQuery = $db->table('detalledefacturasdecompra as d')
@@ -239,8 +270,9 @@ class ReportService
                 DB::raw('SUM(d.Cantidad) as total_unidades'),
                 DB::raw('COUNT(d.ID) as num_lineas'),
             ])
-            ->where('d.CodigoDeProducto', 'like', '3%')
+            ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
+
 
         if ($stationCode !== null) {
             $comprasQuery->where('f.CodigoDeEstacion', $stationCode);

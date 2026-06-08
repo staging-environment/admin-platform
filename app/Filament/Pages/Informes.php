@@ -42,6 +42,9 @@ class Informes extends Page implements HasForms
     public string $sortColumn    = '';
     public string $sortDirection = 'asc';
 
+    /** Grupos de producto seleccionados para el informe */
+    public ?array $groupCodes = null;
+
     protected static string|\BackedEnum|null $navigationIcon  = 'heroicon-o-chart-bar';
     protected static string|\UnitEnum|null   $navigationGroup = 'Administración';
     protected static ?string $title = 'Informes';
@@ -69,6 +72,7 @@ class Informes extends Page implements HasForms
             'endMonth'    => $this->endMonth,
             'endYear'     => $this->endYear,
             'stationCode' => null,
+            'groupCodes'  => ['3', '4'],
         ]);
     }
 
@@ -77,16 +81,37 @@ class Informes extends Page implements HasForms
         $virtusService = app(\App\Services\VirtusgesnetService::class);
         $stations = collect($virtusService->getStations())->pluck('name', 'code')->toArray();
 
+        // Cargar grupos de productos desde virtusgesnet (solo grupos padre con productos)
+        $groupOptions = \Illuminate\Support\Facades\DB::connection('virtusgesnet')
+            ->table('gruposdeproductos as g')
+            ->join('productos as p', 'p.CodigoDeGrupo', '=', 'g.Codigo')
+            ->select('g.Codigo', 'g.Nombre')
+            ->where('g.Codigo', 'not like', '9%')   // excluir gastos internos
+            ->where('g.Codigo', 'not like', '0%')   // excluir combustibles
+            ->groupBy('g.Codigo', 'g.Nombre')
+            ->orderBy('g.Codigo')
+            ->get()
+            ->mapWithKeys(fn($g) => [$g->Codigo => "({$g->Codigo}) {$g->Nombre}"])
+            ->toArray();
+
         return $form
             ->schema([
                 Select::make('reportType')
                     ->label('Tipo de Informe')
                     ->options([
-                        'margen_mercaderia' => 'Margen Comercial de Mercancía (Grupo 3) — PVP Tarifa',
-                        'margen_con_ventas' => 'Margen Real Compra vs Venta (Grupo 3) — Dato Real TPV',
+                        'margen_mercaderia' => 'Margen Comercial — PVP Tarifa',
+                        'margen_con_ventas' => 'Margen Real Compra vs Venta — Dato Real TPV',
                     ])
                     ->placeholder('Selecciona un informe...')
                     ->live()
+                    ->columnSpanFull(),
+
+                Select::make('groupCodes')
+                    ->label('Grupos de Producto')
+                    ->options($groupOptions)
+                    ->multiple()
+                    ->default(['3', '4'])
+                    ->placeholder('Selecciona grupos...')
                     ->columnSpanFull(),
 
                 Select::make('stationCode')
@@ -142,6 +167,8 @@ class Informes extends Page implements HasForms
         $this->resultType = null;
         $this->errorMsg   = null;
         $this->tablePage  = 1;
+        $this->sortColumn    = '';
+        $this->sortDirection = 'asc';
 
         $data = $this->form->getState();
 
@@ -161,7 +188,8 @@ class Informes extends Page implements HasForms
                     (int) ($data['startYear']  ?? $this->startYear),
                     (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
-                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null
+                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null,
+                    !empty($data['groupCodes'])  ? (array) $data['groupCodes'] : null
                 );
 
                 if (empty($rows)) {
@@ -197,7 +225,8 @@ class Informes extends Page implements HasForms
                     (int) ($data['startYear']  ?? $this->startYear),
                     (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
-                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null
+                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null,
+                    !empty($data['groupCodes'])  ? (array) $data['groupCodes'] : null
                 );
 
                 if (empty($rows)) {
