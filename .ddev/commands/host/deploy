@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+## Description: Deploy completo a producción (build assets, git push, SSH al servidor)
+## Usage: deploy [commit-message]
+## Example: ddev deploy "feat: nueva funcionalidad"
+
+set -e
+
+# ─── Configuración ────────────────────────────────────────────────────────────
+PROD_HOST="164.68.101.69"
+PROD_USER="developer"
+PROD_PATH="~/Projects/admin-platform"
+PROD_URL="https://utrecar.com"   # URL pública de producción
+
+# Mensaje de commit: argumento $1 o timestamp automático
+COMMIT_MSG="${1:-deploy: $(date '+%Y-%m-%d %H:%M')}"
+
+# ─── Colores ──────────────────────────────────────────────────────────────────
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# ─── Funciones ────────────────────────────────────────────────────────────────
+step() { echo -e "\n${CYAN}${BOLD}$1${NC}"; }
+ok()   { echo -e "${GREEN}✔ $1${NC}"; }
+warn() { echo -e "${YELLOW}⚠ $1${NC}"; }
+fail() { echo -e "${RED}✖ $1${NC}"; exit 1; }
+
+# ─── Inicio ───────────────────────────────────────────────────────────────────
+echo ""
+echo -e "${BOLD}╔══════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║       🚀  DEPLOY A PRODUCCIÓN            ║${NC}"
+echo -e "${BOLD}╚══════════════════════════════════════════╝${NC}"
+echo -e "   Servidor: ${CYAN}${PROD_USER}@${PROD_HOST}${NC}"
+echo -e "   Commit:   ${YELLOW}\"${COMMIT_MSG}\"${NC}"
+
+# ─── PASO 1: Compilar assets localmente ──────────────────────────────────────
+step "[1/4] 📦 Compilando assets frontend (local)..."
+ddev exec npm run build
+ok "Assets compilados correctamente"
+
+# ─── PASO 2: Git commit & push ────────────────────────────────────────────────
+step "[2/4] 📤 Subiendo cambios al repositorio git..."
+
+git add -A
+
+if git diff --cached --quiet; then
+  warn "No hay cambios nuevos para commitear"
+else
+  git commit -m "$COMMIT_MSG"
+  ok "Commit creado: \"$COMMIT_MSG\""
+fi
+
+git push
+ok "Push realizado con éxito"
+
+# ─── PASO 3: Deploy en producción vía SSH ────────────────────────────────────
+step "[3/4] 🌐 Conectando a producción (${PROD_USER}@${PROD_HOST})..."
+
+ssh "${PROD_USER}@${PROD_HOST}" PROD_URL="${PROD_URL}" bash << 'ENDSSH'
+
+set -e
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+ok()   { echo -e "${GREEN}  ✔ $1${NC}"; }
+
+echo ""
+echo "  → Actualizando código desde git..."
+cd ~/Projects/admin-platform
+git pull
+ok "git pull completado"
+
+# ── Verificar APP_URL en .env de producción ──────────────────────────────────
+echo ""
+echo "  → Verificando APP_URL en .env..."
+CURRENT_URL=$(grep '^APP_URL=' .env | cut -d= -f2 | tr -d '"')
+if [ "$CURRENT_URL" != "$PROD_URL" ]; then
+  echo -e "\033[1;33m  ⚠ APP_URL incorrecto: '$CURRENT_URL'"
+  echo -e "  ⚠ Corrigiendo a: '$PROD_URL'\033[0m"
+  sed -i "s|APP_URL=.*|APP_URL=${PROD_URL}|"\ .env
+fi
+ok "APP_URL=$PROD_URL"
+
+echo ""
+echo "  → Instalando dependencias npm (si hay cambios)..."
+ddev exec npm ci --prefer-offline 2>/dev/null || ddev exec npm install
+ok "npm instalado"
+
+echo ""
+echo "  → Compilando assets en producción..."
+ddev exec npm run build
+ok "Assets compilados"
+
+echo ""
+echo "  → Limpiando cachés de Laravel..."
+ddev exec php artisan cache:clear
+ddev exec php artisan config:clear
+ddev exec php artisan view:clear
+ddev exec php artisan route:clear
+ok "Cachés limpiadas"
+
+echo ""
+echo "  → Optimizando aplicación..."
+ddev exec php artisan optimize
+ok "Aplicación optimizada"
+
+ENDSSH
+
+# ─── PASO 4: Resumen final ────────────────────────────────────────────────────
+step "[4/4] ✅ Deploy completado con éxito"
+echo ""
+echo -e "${BOLD}╔══════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║  ✅  TODO OK — Producción actualizada    ║${NC}"
+echo -e "${BOLD}║     🌐  ${PROD_URL}          ║${NC}"
+echo -e "${BOLD}╚══════════════════════════════════════════╝${NC}"
+echo ""
