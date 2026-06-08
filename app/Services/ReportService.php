@@ -37,11 +37,7 @@ class ReportService
 
         // ── Productos de los grupos seleccionados (incluyendo subgrupos) ──────
         $productosDeGrupo = $db->table('productos')
-            ->where(function ($q) use ($groupCodes) {
-                foreach ($groupCodes as $gc) {
-                    $q->orWhere('CodigoDeGrupo', 'like', $gc . '%');
-                }
-            })
+            ->whereIn('CodigoDeGrupo', $groupCodes)
             ->pluck('Codigo')
             ->toArray();
 
@@ -186,12 +182,6 @@ class ReportService
         $productosDeGrupo = $db->table('productos as p')
             ->join('gruposdeproductos as g', 'g.Codigo', '=', 'p.CodigoDeGrupo')
             ->whereIn('p.CodigoDeGrupo', $groupCodes)
-            ->orWhere(function ($q) use ($groupCodes) {
-                // Incluir subgrupos: e.g. si se elige '3', incluir '31x', '311', etc.
-                foreach ($groupCodes as $gc) {
-                    $q->orWhere('p.CodigoDeGrupo', 'like', $gc . '%');
-                }
-            })
             ->pluck('p.Codigo')
             ->toArray();
 
@@ -555,5 +545,114 @@ class ReportService
 
             return $results;
         });
+    }
+
+    /**
+     * Devuelve la evolución histórica (agrupada por mes) de compras, ventas y beneficio.
+     */
+    public function getEvolucionMensual(
+        int $startMonth,
+        int $startYear,
+        int $endMonth,
+        int $endYear,
+        array $groupCodes,
+        ?int $stationCode = null
+    ): array {
+        $dateFrom = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
+        $dateTo   = Carbon::create($endYear, $endMonth, 1)->endOfMonth()->format('Y-m-d');
+
+        $db = DB::connection('virtusgesnet');
+
+        $productosDeGrupo = $db->table('productos')
+            ->whereIn('CodigoDeGrupo', $groupCodes)
+            ->pluck('Codigo')
+            ->toArray();
+
+        if (empty($productosDeGrupo)) return [];
+
+        // Compras por mes
+        $comprasQuery = $db->table('detalledefacturasdecompra as d')
+            ->join('facturasdecompra as f', function ($j) {
+                $j->on('f.CodigoDeEmpresaPropia', '=', 'd.CodigoDeEmpresaPropia')
+                  ->on('f.Serie', '=', 'd.Serie')
+                  ->on('f.Numero', '=', 'd.Numero');
+            })
+            ->select([
+                DB::raw('YEAR(f.FechaYHoraDeFactura) as anio'),
+                DB::raw('MONTH(f.FechaYHoraDeFactura) as mes'),
+                DB::raw('SUM(d.Importe) as coste_total'),
+            ])
+            ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
+            ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
+
+        if ($stationCode !== null) {
+            $comprasQuery->where('f.CodigoDeEstacion', $stationCode);
+        }
+
+        $compras = $comprasQuery->groupBy('anio', 'mes')->get();
+
+        // Ventas por mes
+        $ventasQuery = $db->table('detalledeventasencurso as dv')
+            ->join('ventasencurso as v', 'v.Id', '=', 'dv.IdDeVentaEnCurso')
+            ->select([
+                DB::raw('YEAR(v.FechaYHora) as anio'),
+                DB::raw('MONTH(v.FechaYHora) as mes'),
+                DB::raw('SUM(dv.Importe) as ingreso_total'),
+            ])
+            ->whereIn('dv.CodigoDeProducto', $productosDeGrupo)
+            ->whereBetween(DB::raw('DATE(v.FechaYHora)'), [$dateFrom, $dateTo]);
+
+        if ($stationCode !== null) {
+            $ventasQuery->where('v.CoDigoDeEstacion', $stationCode);
+        }
+
+        $ventas = $ventasQuery->groupBy('anio', 'mes')->get();
+
+        // Construir evolución
+        $evolucion = [];
+
+        // Generar todos los meses en el rango
+        $current = Carbon::create($startYear, $startMonth, 1)->startOfMonth();
+        $end = Carbon::create($endYear, $endMonth, 1)->startOfMonth();
+        
+        while ($current <= $end) {
+            $key = $current->format('Y-m');
+            $evolucion[$key] = [
+                'mes' => ucfirst($current->translatedFormat('M Y')), // ej: Ene 2024
+                'coste' => 0,
+                'ingreso' => 0,
+                'beneficio' => 0,
+                'margen_pct' => 0,
+            ];
+            $current->addMonth();
+        }
+
+        foreach ($compras as $c) {
+            $key = sprintf('%04d-%02d', $c->anio, $c->mes);
+            if (isset($evolucion[$key])) {
+                $evolucion[$key]['coste'] += (float) $c->coste_total;
+            }
+        }
+
+        foreach ($ventas as $v) {
+            $key = sprintf('%04d-%02d', $v->anio, $v->mes);
+            if (isset($evolucion[$key])) {
+                $evolucion[$key]['ingreso'] += (float) $v->ingreso_total;
+            }
+        }
+
+        // Calcular beneficios y márgenes
+        foreach ($evolucion as $key => &$data) {
+            $data['beneficio'] = $data['ingreso'] - $data['coste'];
+            $data['margen_pct'] = $data['coste'] > 0 ? ($data['beneficio'] / $data['coste']) * 100 : 0;
+            
+            // Rounding
+            $data['coste'] = round($data['coste'], 2);
+            $data['ingreso'] = round($data['ingreso'], 2);
+            $data['beneficio'] = round($data['beneficio'], 2);
+            $data['margen_pct'] = round($data['margen_pct'], 2);
+        }
+
+        return array_values($evolucion);
     }
 }

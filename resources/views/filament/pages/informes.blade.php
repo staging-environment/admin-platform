@@ -101,6 +101,111 @@
                 </div>
             </div>
 
+            {{-- GRÁFICA DE EVOLUCIÓN HISTÓRICA --}}
+            @if($chartEvolucionData)
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 no-print"
+                 wire:ignore
+                 x-data="{
+                     chartEvInstance: null,
+                     buildEvChart(data) {
+                         if (this.chartEvInstance) {
+                             this.chartEvInstance.destroy();
+                             this.chartEvInstance = null;
+                         }
+                         const canvas = document.getElementById('evolucionChartCanvas');
+                         if (!canvas || !data || data.length === 0) return;
+                         
+                         const labels = data.map(d => d.mes);
+                         const ingresos = data.map(d => d.ingreso);
+                         const costes = data.map(d => d.coste);
+                         const beneficios = data.map(d => d.beneficio);
+                         
+                         this.chartEvInstance = new Chart(canvas.getContext('2d'), {
+                             type: 'bar',
+                             data: {
+                                 labels: labels,
+                                 datasets: [
+                                     {
+                                         type: 'line',
+                                         label: 'Beneficio Neto (€)',
+                                         data: beneficios,
+                                         borderColor: '#f59e0b', // amber-500
+                                         backgroundColor: '#f59e0b',
+                                         borderWidth: 3,
+                                         tension: 0.3,
+                                         yAxisID: 'y'
+                                     },
+                                     {
+                                         type: 'bar',
+                                         label: 'Total Facturado (€)',
+                                         data: ingresos,
+                                         backgroundColor: 'rgba(16, 185, 129, 0.7)', // emerald-500
+                                         borderRadius: 4,
+                                         yAxisID: 'y'
+                                     },
+                                     {
+                                         type: 'bar',
+                                         label: 'Total Comprado (€)',
+                                         data: costes,
+                                         backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500
+                                         borderRadius: 4,
+                                         yAxisID: 'y'
+                                     }
+                                 ]
+                             },
+                             options: {
+                                 responsive: true,
+                                 maintainAspectRatio: false,
+                                 interaction: {
+                                     mode: 'index',
+                                     intersect: false,
+                                 },
+                                 plugins: {
+                                     tooltip: {
+                                         callbacks: {
+                                             label: function(ctx) {
+                                                 return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('es-ES') + ' €';
+                                             }
+                                         }
+                                     }
+                                 },
+                                 scales: {
+                                     x: {
+                                         grid: { display: false }
+                                     },
+                                     y: {
+                                         type: 'linear',
+                                         display: true,
+                                         position: 'left',
+                                         ticks: { callback: function(v) { return v + ' €'; } }
+                                     }
+                                 }
+                             }
+                         });
+                     }
+                 }"
+                 x-on:chart-ev-data-ready.window="buildEvChart($event.detail.chartEvolucionData)"
+                 x-init="
+                     const initialEvData = {{ Js::from($chartEvolucionData) }};
+                     $nextTick(() => buildEvChart(initialEvData));
+                 "
+            >
+                <div class="px-6 pt-5 pb-2 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-700">
+                            📈 Evolución Histórica (Mensual)
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            Seguimiento temporal de los Costes, Ingresos y Beneficios reales
+                        </p>
+                    </div>
+                </div>
+                <div class="px-6 pb-6" style="height: 350px; position: relative;">
+                    <canvas id="evolucionChartCanvas"></canvas>
+                </div>
+            </div>
+            @endif
+
             {{-- GRÁFICA DE BARRAS HORIZONTALES (Top 20) --}}
             @if($chartData)
             <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 no-print"

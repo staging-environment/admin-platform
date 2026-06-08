@@ -120,13 +120,14 @@ class Informes extends Page implements HasForms
                                     'margen_mercaderia' => 'Compara el precio de Tarifa actual en base de datos con el último precio de coste.',
                                 ])
                                 ->live()
-                                ->afterStateUpdated(function (Set $set, $state) {
+                                ->afterStateUpdated(function (Set $set, $state) use ($groupOptions) {
+                                    $keys = array_keys($groupOptions);
                                     if ($state === 'tienda_margen') {
-                                        $set('groupCodes', ['3']);
+                                        $set('groupCodes', array_values(array_filter($keys, fn($k) => str_starts_with((string)$k, '3'))));
                                     } elseif ($state === 'lavado_margen') {
-                                        $set('groupCodes', ['4']);
+                                        $set('groupCodes', array_values(array_filter($keys, fn($k) => str_starts_with((string)$k, '4'))));
                                     } elseif ($state === 'margen_mercaderia') {
-                                        $set('groupCodes', ['3', '4']);
+                                        $set('groupCodes', array_values(array_filter($keys, fn($k) => str_starts_with((string)$k, '3') || str_starts_with((string)$k, '4'))));
                                     }
                                 })
                                 ->required(),
@@ -294,6 +295,14 @@ class Informes extends Page implements HasForms
                 $rows = $reportService->getMargenSimple(
                     (int) ($data['startMonth'] ?? $this->startMonth),
                     (int) ($data['startYear']  ?? $this->startYear),
+                    (int) ($data['endYear']    ?? $this->endYear),
+                    $selectedGroupCodes,
+                    !empty($data['stationCode']) ? (int) $data['stationCode'] : null
+                );
+                
+                $this->chartEvolucionData = $reportService->getEvolucionMensual(
+                    (int) ($data['startMonth'] ?? $this->startMonth),
+                    (int) ($data['startYear']  ?? $this->startYear),
                     (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
                     $selectedGroupCodes,
@@ -328,6 +337,7 @@ class Informes extends Page implements HasForms
                 ];
 
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
+                $this->dispatch('chart-ev-data-ready', chartEvolucionData: $this->chartEvolucionData);
                 break;
 
             // ── Margen Tarifa (PVP Tarifa vs Precio Compra) ──────────────────
