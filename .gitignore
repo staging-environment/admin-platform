@@ -1,27 +1,47 @@
-*.log
-.DS_Store
+# ─── Entorno ───────────────────────────────────────────────────────────────────
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
+.env.*.local
+
+# ─── Dependencias ──────────────────────────────────────────────────────────────
 /node_modules
+/vendor
+
+# ─── Assets compilados (generados por Vite/npm run build) ──────────────────────
 /public/build
 /public/hot
 /public/storage
+
+# ─── Bootstrap y caché de Laravel (generados por artisan) ──────────────────────
+/bootstrap/cache/*.php
 /storage/*.key
 /storage/pail
-/vendor
+
+# ─── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+
+# ─── Tests ─────────────────────────────────────────────────────────────────────
+/.phpunit.cache
+.phpunit.result.cache
+
+# ─── IDEs y editores ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/.cursor/
+/.nova
+/.zed
+/.codex
+
+# ─── Herramientas de desarrollo ────────────────────────────────────────────────
 _ide_helper.php
+_ide_helper_models.php
+.phpactor.json
+/auth.json
 Homestead.json
 Homestead.yaml
-Thumbs.db
+
+# ─── Docker / DDEV ─────────────────────────────────────────────────────────────
 docker-compose.network.yaml
