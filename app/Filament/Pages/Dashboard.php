@@ -24,7 +24,7 @@ class Dashboard extends \Filament\Pages\Dashboard
                 if ($user->can('ver_dashboard')) {
                     return redirect()->to('/admin/dashboard');
                 }
-            }
+                }
         }
         return redirect()->to('/admin/dashboard');
     }

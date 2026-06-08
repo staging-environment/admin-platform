@@ -298,6 +298,7 @@ class Informes extends Page implements HasForms
                 $rows = $reportService->getMargenSimple(
                     (int) ($data['startMonth'] ?? $this->startMonth),
                     (int) ($data['startYear']  ?? $this->startYear),
+                    (int) ($data['endMonth']   ?? $this->endMonth),
                     (int) ($data['endYear']    ?? $this->endYear),
                     $selectedGroupCodes,
                     !empty($data['stationCode']) ? (int) $data['stationCode'] : null
