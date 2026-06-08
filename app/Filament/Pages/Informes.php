@@ -35,8 +35,12 @@ class Informes extends Page implements HasForms
     public ?string $errorMsg    = null;
 
     /** Paginación de la tabla */
-    public int $tablePage    = 1;
-    public int $tablePerPage = 30;
+    public int    $tablePage      = 1;
+    public int    $tablePerPage   = 30;
+
+    /** Ordenación de la tabla */
+    public string $sortColumn    = '';
+    public string $sortDirection = 'asc';
 
     protected static string|\BackedEnum|null $navigationIcon  = 'heroicon-o-chart-bar';
     protected static string|\UnitEnum|null   $navigationGroup = 'Administración';
@@ -245,6 +249,43 @@ class Informes extends Page implements HasForms
     {
         if (!$this->tableData) return [];
         return array_slice($this->tableData, ($this->tablePage - 1) * $this->tablePerPage, $this->tablePerPage);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Ordenación de la tabla
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function sortBy(string $column): void
+    {
+        if (!$this->tableData) return;
+
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn    = $column;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->tablePage = 1; // volver a la primera página al ordenar
+
+        $col = $this->sortColumn;
+        $dir = $this->sortDirection;
+
+        usort($this->tableData, function ($a, $b) use ($col, $dir) {
+            $va = $a[$col] ?? null;
+            $vb = $b[$col] ?? null;
+
+            // Nulos siempre al final
+            if ($va === null && $vb === null) return 0;
+            if ($va === null) return 1;
+            if ($vb === null) return -1;
+
+            $cmp = is_numeric($va) && is_numeric($vb)
+                ? ($va <=> $vb)
+                : strcmp((string)$va, (string)$vb);
+
+            return $dir === 'asc' ? $cmp : -$cmp;
+        });
     }
 
     public function nextPage(): void

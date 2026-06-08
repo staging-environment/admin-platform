@@ -232,40 +232,98 @@
 
                         {{-- ─── CABECERA ────────────────────────────────────────────── --}}
                         @if($resultType === 'margen_con_ventas')
+                        @php
+                            $sCol = $sortColumn;
+                            $sDir = $sortDirection;
+                            $ico  = fn($col) => $sCol === $col
+                                ? ($sDir === 'asc' ? ' ↑' : ' ↓')
+                                : ' ↕';
+                            $thS  = 'cursor-pointer select-none hover:bg-gray-100 transition-colors';
+                        @endphp
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Artículo</th>
+                                <th wire:click="sortBy('descripcion')" class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
+                                </th>
                                 {{-- Compra --}}
-                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100">P.Compra s/IVA</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider">Uds.Comp</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider no-print">Coste Total</th>
+                                <th wire:click="sortBy('precio_compra')" class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100 {{ $thS }}">
+                                    P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('uds_compradas')" class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider {{ $thS }}">
+                                    Uds.Comp<span class="font-normal">{{ $ico('uds_compradas') }}</span>
+                                </th>
+                                <th wire:click="sortBy('coste_total')" class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider no-print {{ $thS }}">
+                                    Coste Total<span class="font-normal">{{ $ico('coste_total') }}</span>
+                                </th>
                                 {{-- Venta real --}}
-                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100">PVP Venta c/IVA</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider">PVP Venta s/IVA</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print">Uds.Vend</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print">Ingreso s/IVA</th>
+                                <th wire:click="sortBy('pvp_venta_con_iva')" class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100 {{ $thS }}">
+                                    PVP Venta c/IVA<span class="font-normal">{{ $ico('pvp_venta_con_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pvp_venta_sin_iva')" class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider {{ $thS }}">
+                                    PVP Venta s/IVA<span class="font-normal">{{ $ico('pvp_venta_sin_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('uds_vendidas')" class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print {{ $thS }}">
+                                    Uds.Vend<span class="font-normal">{{ $ico('uds_vendidas') }}</span>
+                                </th>
+                                <th wire:click="sortBy('ingreso_sin_iva')" class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider no-print {{ $thS }}">
+                                    Ingreso s/IVA<span class="font-normal">{{ $ico('ingreso_sin_iva') }}</span>
+                                </th>
                                 {{-- Tarifa --}}
-                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-wider border-l-2 border-gray-100 no-print">PVP Tarifa</th>
+                                <th wire:click="sortBy('pvp_tarifa_con_iva')" class="px-3 py-3 text-right text-xs font-bold text-gray-400 uppercase tracking-wider border-l-2 border-gray-100 no-print {{ $thS }}">
+                                    PVP Tarifa<span class="font-normal">{{ $ico('pvp_tarifa_con_iva') }}</span>
+                                </th>
                                 {{-- Margen --}}
-                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100">% IVA</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider">Margen Real</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print">M.Tarifa</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print">Beneficio Bruto</th>
+                                <th wire:click="sortBy('pct_iva')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100 {{ $thS }}">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('margen_real_pct')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider {{ $thS }}">
+                                    Margen Real<span class="font-normal">{{ $ico('margen_real_pct') }}</span>
+                                </th>
+                                <th wire:click="sortBy('margen_tarifa_pct')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print {{ $thS }}">
+                                    M.Tarifa<span class="font-normal">{{ $ico('margen_tarifa_pct') }}</span>
+                                </th>
+                                <th wire:click="sortBy('beneficio_bruto')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider no-print {{ $thS }}">
+                                    Beneficio Bruto<span class="font-normal">{{ $ico('beneficio_bruto') }}</span>
+                                </th>
                             </tr>
                         </thead>
                         @else
+                        @php
+                            $sCol = $sCol ?? $sortColumn;
+                            $sDir = $sDir ?? $sortDirection;
+                            $ico  = $ico ?? fn($col) => $sCol === $col
+                                ? ($sDir === 'asc' ? ' ↑' : ' ↓')
+                                : ' ↕';
+                            $thS  = $thS ?? 'cursor-pointer select-none hover:bg-gray-100 transition-colors';
+                        @endphp
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Artículo</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Grupo</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">P.Compra</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">PVP c/IVA</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">% IVA</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">PVP s/IVA</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">% Margen</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider no-print">Uds.</th>
+                                <th wire:click="sortBy('descripcion')" class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
+                                </th>
+                                <th wire:click="sortBy('grupo_nombre')" class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    Grupo<span class="text-gray-400 font-normal">{{ $ico('grupo_nombre') }}</span>
+                                </th>
+                                <th wire:click="sortBy('precio_compra')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    P.Compra<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pvp_con_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    PVP c/IVA<span class="font-normal">{{ $ico('pvp_con_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pct_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pvp_sin_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    PVP s/IVA<span class="font-normal">{{ $ico('pvp_sin_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('margen_pct')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
+                                </th>
+                                <th wire:click="sortBy('unidades_compradas')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider no-print {{ $thS }}">
+                                    Uds.<span class="font-normal">{{ $ico('unidades_compradas') }}</span>
+                                </th>
                             </tr>
                         </thead>
                         @endif
