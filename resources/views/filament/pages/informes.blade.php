@@ -563,19 +563,40 @@
             .no-print { display: none !important; }
             .fi-sidebar, .fi-topbar, nav, header { display: none !important; }
             
-            /* Permitir que el contenido fluya en múltiples páginas (Filament usa overflow hidden/auto que rompe la impresión) */
-            body, html, .fi-main, main, .fi-main-content {
+            /* Permitir que el contenido fluya en múltiples páginas (Filament usa flex y overflow hidden/auto que rompe la impresión) */
+            html, body, .fi-layout, .fi-main, main, .fi-main-content, .fi-page {
+                display: block !important;
                 height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
                 overflow: visible !important;
                 position: static !important;
                 background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
-            .print-full-width { width: 100%; box-shadow: none !important; border: none !important; }
-            body { font-size: 10px; }
-            th, td { padding: 3px 5px !important; font-size: 10px !important; }
+            /* Asegurar que la tabla o el contenido ocupe el ancho completo sin restricciones */
+            .fi-main {
+                width: 100% !important;
+                max-width: none !important;
+            }
+
+            .print-full-width { 
+                width: 100% !important; 
+                max-width: 100% !important;
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0 !important;
+            }
+            body { font-size: 10px; color: black !important; }
+            th, td { padding: 3px 5px !important; font-size: 10px !important; color: black !important; }
             a[href]::after { content: none !important; }
             .rounded-full { border-radius: 4px !important; }
+            
+            /* Evitar cortes feos en medio de filas */
+            tr { page-break-inside: avoid; }
+            thead { display: table-header-group; }
         }
     </style>
 
