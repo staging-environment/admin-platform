@@ -44,6 +44,9 @@ class Informes extends Page implements HasForms
     /** Error / aviso */
     public ?string $errorMsg    = null;
 
+    /** Búsqueda en la tabla de resultados */
+    public string $searchQuery  = '';
+
     /** Paginación de la tabla */
     public int    $tablePage      = 1;
     public int    $tablePerPage   = 30;
@@ -272,6 +275,7 @@ class Informes extends Page implements HasForms
         $this->resultType = null;
         $this->errorMsg   = null;
         $this->tablePage  = 1;
+        $this->searchQuery = '';
         $this->sortColumn    = '';
         $this->sortDirection = 'asc';
 
@@ -429,19 +433,42 @@ class Informes extends Page implements HasForms
 
 
     // ──────────────────────────────────────────────────────────────────────────
-    // Paginación de la tabla
+    // Paginación y Filtrado de la tabla
     // ──────────────────────────────────────────────────────────────────────────
+
+    public function updatedSearchQuery()
+    {
+        $this->tablePage = 1;
+    }
+
+    protected function getFilteredTableData(): array
+    {
+        if (!$this->tableData) return [];
+        
+        $data = $this->tableData;
+        if (!empty($this->searchQuery)) {
+            $q = mb_strtolower($this->searchQuery);
+            $data = array_filter($data, function($row) use ($q) {
+                return str_contains(mb_strtolower($row['descripcion'] ?? ''), $q)
+                    || str_contains(mb_strtolower($row['codigo'] ?? ''), $q)
+                    || str_contains(mb_strtolower($row['grupo_nombre'] ?? ''), $q);
+            });
+        }
+        return $data;
+    }
 
     public function getTableTotalPages(): int
     {
-        if (!$this->tableData) return 0;
-        return (int) ceil(count($this->tableData) / $this->tablePerPage);
+        $data = $this->getFilteredTableData();
+        if (empty($data)) return 0;
+        return (int) ceil(count($data) / $this->tablePerPage);
     }
 
     public function getPagedTableData(): array
     {
-        if (!$this->tableData) return [];
-        return array_slice($this->tableData, ($this->tablePage - 1) * $this->tablePerPage, $this->tablePerPage);
+        $data = $this->getFilteredTableData();
+        if (empty($data)) return [];
+        return array_slice($data, ($this->tablePage - 1) * $this->tablePerPage, $this->tablePerPage);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
