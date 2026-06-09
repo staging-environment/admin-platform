@@ -67,6 +67,23 @@ class Informes extends Page implements HasForms
     protected static ?string $title = 'Informes';
     protected string $view          = 'filament.pages.informes';
 
+    public function getTitle(): string
+    {
+        $type = $this->resultType ?: $this->reportType;
+
+        if ($type === 'tienda_margen') {
+            return 'Informe: La Tienda';
+        }
+        if ($type === 'lavado_margen') {
+            return 'Informe: El Lavadero';
+        }
+        if ($type === 'margen_mercaderia') {
+            return 'Informe: Margen Teórico';
+        }
+
+        return 'Informes';
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
