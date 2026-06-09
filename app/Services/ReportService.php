@@ -703,22 +703,26 @@ class ReportService
             }
 
             // 4. Predicción de tendencia a corto plazo (próximos 3-5 días)
-            // Lógica basada en el retardo en la transmisión de precios mayoristas
-            if ($weeklyChangePct > 1.0) {
+            // Calculamos la diferencia entre el PVP estimado por el futuro y el PVP real actual de los surtidores de la zona.
+            // Esta brecha indica cuánto debe corregir el precio de venta local para alinearse con el precio internacional.
+            $predictedAdjustment = $currentEstRetail - $realRetailPrice;
+            $formattedAdj = number_format(abs($predictedAdjustment), 3, ',', '.') . ' €/L';
+
+            if ($predictedAdjustment > 0.005) {
                 $prediccionClase = 'up';
                 $prediccionIcono = '▲';
                 $prediccionColor = 'text-amber-700 bg-amber-50 border border-amber-200/60';
-                $prediccionLabel = 'Subida Probable (Próximos 3-5d)';
-            } elseif ($weeklyChangePct < -1.0) {
+                $prediccionLabel = 'Subida Probable: +' . $formattedAdj . ' (3-5d)';
+            } elseif ($predictedAdjustment < -0.005) {
                 $prediccionClase = 'down';
                 $prediccionIcono = '▼';
                 $prediccionColor = 'text-green-700 bg-green-50 border border-green-200/60';
-                $prediccionLabel = 'Bajada Probable (Próximos 3-5d)';
+                $prediccionLabel = 'Bajada Probable: -' . $formattedAdj . ' (3-5d)';
             } else {
                 $prediccionClase = 'stable';
                 $prediccionIcono = '◀▶';
                 $prediccionColor = 'text-slate-600 bg-slate-50 border border-slate-200/60';
-                $prediccionLabel = 'Tendencia Estable (Próximos 3-5d)';
+                $prediccionLabel = 'Tendencia Estable (3-5d)';
             }
 
             // 5. Generar Sparkline SVG
