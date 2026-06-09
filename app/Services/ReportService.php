@@ -753,6 +753,8 @@ class ReportService
                 'monthlyChangePct' => $monthlyChangePct,
                 'sparklinePoints' => $sparklineInfo['points_string'],
                 'sparklinePointsArray' => $sparklineInfo['points_array'],
+                'sparklineProjPoints' => $sparklineInfo['proj_points_string'],
+                'sparklineProjPointsArray' => $sparklineInfo['proj_points_array'],
                 'rango_fechas' => $rangoFechas,
                 'prediccion_clase' => $prediccionClase,
                 'prediccion_icono' => $prediccionIcono,
@@ -767,7 +769,7 @@ class ReportService
     }
 
     /**
-     * Genera los puntos de la sparkline SVG y un array con la información de cada punto para interactividad.
+     * Genera los puntos de la sparkline SVG y un array con la información de cada punto para interactividad, incluyendo proyección estadística.
      */
     private function getSparklineData(array $prices, array $timestamps, int $width = 120, int $height = 36, int $padding = 2): array
     {
@@ -778,20 +780,67 @@ class ReportService
             return [
                 'points_string' => '',
                 'points_array' => [],
+                'proj_points_string' => '',
+                'proj_points_array' => [],
             ];
         }
 
-        $min = min($prices);
-        $max = max($prices);
+        // 1. Calcular pendiente de regresión lineal (m) sobre los últimos N puntos (máx 10)
+        $n = min(10, $count);
+        $sumX = 0;
+        $sumY = 0;
+        $sumXY = 0;
+        $sumXX = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $xVal = $i;
+            $yVal = $prices[$count - $n + $i];
+            $sumX += $xVal;
+            $sumY += $yVal;
+            $sumXY += $xVal * $yVal;
+            $sumXX += $xVal * $xVal;
+        }
+        $meanX = $sumX / $n;
+        $meanY = $sumY / $n;
+        
+        $num = 0;
+        $den = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $xVal = $i;
+            $yVal = $prices[$count - $n + $i];
+            $num += ($xVal - $meanX) * ($yVal - $meanY);
+            $den += ($xVal - $meanX) * ($xVal - $meanX);
+        }
+        $slope = $den != 0 ? $num / $den : 0;
+
+        // 2. Proyectar puntos futuros (4 pasos hacia el futuro)
+        $projCount = 4;
+        $projPrices = [];
+        $lastPrice = end($prices);
+        for ($j = 1; $j <= $projCount; $j++) {
+            $projPrices[] = $lastPrice + ($slope * $j);
+        }
+
+        // Combinar para calcular los límites de escalado vertical
+        $allPrices = array_merge($prices, $projPrices);
+        $min = min($allPrices);
+        $max = max($allPrices);
         $range = $max - $min;
         if ($range == 0) {
             $range = 1;
         }
 
+        // Calcular el tamaño promedio del intervalo de tiempo
+        $lastTimestamp = end($timestamps);
+        $timeStep = 86400; // por defecto 1 día
+        if ($count > 1 && $lastTimestamp && $timestamps[0]) {
+            $timeStep = ($lastTimestamp - $timestamps[0]) / ($count - 1);
+        }
+
+        $xStep = ($width - 2 * $padding) / (count($allPrices) - 1);
+
+        // Generar coordenadas históricas
         $pointsString = [];
         $pointsArray = [];
-        $xStep = ($width - 2 * $padding) / ($count - 1);
-
         for ($i = 0; $i < $count; $i++) {
             $x = $padding + ($i * $xStep);
             $y = ($height - $padding) - (($prices[$i] - $min) / $range) * ($height - 2 * $padding);
@@ -810,12 +859,44 @@ class ReportService
                 'y' => $yRound,
                 'price' => number_format($prices[$i], 3, ',', '.'),
                 'date' => $dateFormatted,
+                'is_projection' => false,
+            ];
+        }
+
+        // Generar coordenadas proyectadas (inicia en el último punto real para continuidad)
+        $projPointsString = [];
+        $projPointsArray = [];
+        $lastRealPt = end($pointsArray);
+        $projPointsString[] = $lastRealPt['x'] . ',' . $lastRealPt['y'];
+
+        for ($j = 0; $j < $projCount; $j++) {
+            $i = $count + $j;
+            $x = $padding + ($i * $xStep);
+            $y = ($height - $padding) - (($projPrices[$j] - $min) / $range) * ($height - 2 * $padding);
+            $xRound = round($x, 1);
+            $yRound = round($y, 1);
+
+            $projPointsString[] = $xRound . ',' . $yRound;
+
+            $futureTimestamp = $lastTimestamp ? round($lastTimestamp + (($j + 1) * $timeStep)) : null;
+            $dateFormatted = $futureTimestamp
+                ? \Carbon\Carbon::createFromTimestamp($futureTimestamp)->locale('es')->isoFormat('D MMM YY')
+                : '';
+
+            $projPointsArray[] = [
+                'x' => $xRound,
+                'y' => $yRound,
+                'price' => number_format($projPrices[$j], 3, ',', '.'),
+                'date' => $dateFormatted,
+                'is_projection' => true,
             ];
         }
 
         return [
             'points_string' => implode(' ', $pointsString),
             'points_array' => $pointsArray,
+            'proj_points_string' => implode(' ', $projPointsString),
+            'proj_points_array' => $projPointsArray,
         ];
     }
 

@@ -128,6 +128,19 @@
                                         points="{{ $future['sparklinePoints'] }}"
                                     />
                                     
+                                    {{-- Projection Line (dashed blue) --}}
+                                    @if(!empty($future['sparklineProjPoints']))
+                                    <polyline
+                                        fill="none"
+                                        stroke="#3b82f6"
+                                        stroke-width="1.5"
+                                        stroke-dasharray="2 2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        points="{{ $future['sparklineProjPoints'] }}"
+                                    />
+                                    @endif
+                                    
                                     {{-- Last Point Indicator dot --}}
                                     @php
                                         $lastPointObj = end($future['sparklinePointsArray']);
@@ -143,7 +156,7 @@
                                     <circle id="hover-dot-{{ $symbol }}" cx="0" cy="0" r="3" fill="#3b82f6" class="hidden" />
 
                                     {{-- Interactive invisible circle triggers for each point --}}
-                                    @foreach($future['sparklinePointsArray'] as $pt)
+                                    @foreach(array_merge($future['sparklinePointsArray'], $future['sparklineProjPointsArray'] ?? []) as $pt)
                                         <circle 
                                             cx="{{ $pt['x'] }}" 
                                             cy="{{ $pt['y'] }}" 
@@ -153,6 +166,7 @@
                                             data-date="{{ $pt['date'] }}" 
                                             data-price="{{ $pt['price'] }}"
                                             data-symbol="{{ $symbol }}"
+                                            data-is-projection="{{ ($pt['is_projection'] ?? false) ? '1' : '0' }}"
                                         />
                                     @endforeach
                                 </svg>
@@ -571,6 +585,7 @@
                             const price = this.getAttribute('data-price');
                             const cx = this.getAttribute('cx');
                             const cy = this.getAttribute('cy');
+                            const isProj = this.getAttribute('data-is-projection') === '1';
                             
                             const line = document.getElementById('hover-line-' + symbol);
                             const dot = document.getElementById('hover-dot-' + symbol);
@@ -591,7 +606,8 @@
                                 lastDot.classList.add('opacity-0');
                             }
                             if (display) {
-                                display.textContent = date + ' - ' + price + ' €/L';
+                                const prefix = isProj ? 'Proyección: ' : '';
+                                display.textContent = prefix + date + ' - ' + price + ' €/L';
                             }
                         });
                     });
