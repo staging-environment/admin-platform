@@ -538,48 +538,68 @@ class ReportService
     }
 
     /**
-     * Obtiene los precios de futuros de combustible desde Yahoo Finance.
-     * Cache de 30 minutos para no saturar la API.
+     * Obtiene los datos crudos de futuros y tipo de cambio desde Yahoo Finance.
+     * Cache de 30 minutos.
      */
-    public function getFuturesPrices(): array
+    public function getRawFuturesData(): array
     {
-        return Cache::remember('futures_prices_v1', 1800, function () {
+        return Cache::remember('futures_raw_data_v2', 1800, function () {
+            $usdToEurRate = 0.92; // default fallback
+            try {
+                $rateUrl = "https://query2.finance.yahoo.com/v8/finance/chart/EUR=X?interval=1d&range=1d";
+                $rateResponse = \Illuminate\Support\Facades\Http::timeout(5)
+                    ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'])
+                    ->get($rateUrl);
+                if ($rateResponse->successful()) {
+                    $ratePrice = $rateResponse->json()['chart']['result'][0]['meta']['regularMarketPrice'] ?? null;
+                    if ($ratePrice > 0) {
+                        $usdToEurRate = (float) $ratePrice;
+                    }
+                }
+            } catch (\Exception $e) {
+                report($e);
+            }
+
             $symbols = [
-                'RB=F' => ['nombre' => 'Gasolina RBOB', 'unidad' => 'USD/gal', 'icono' => '⛽'],
-                'HO=F' => ['nombre' => 'Gasoil (Diésel ref.)', 'unidad' => 'USD/gal', 'icono' => '🛢️'],
+                'RB=F' => ['nombre' => 'Gasolina RBOB', 'unidad' => 'USD/gal', 'icono' => '⛽', 'tipo' => 'gas95'],
+                'HO=F' => ['nombre' => 'Gasoil (Diésel ref.)', 'unidad' => 'USD/gal', 'icono' => '🛢️', 'tipo' => 'diesel'],
             ];
 
-            $results = [];
+            $results = [
+                'usd_to_eur' => $usdToEurRate,
+                'symbols' => [],
+            ];
+
             foreach ($symbols as $symbol => $meta) {
                 try {
-                    $url      = "https://query2.finance.yahoo.com/v8/finance/chart/{$symbol}?interval=1d&range=2d";
+                    $url = "https://query2.finance.yahoo.com/v8/finance/chart/{$symbol}?interval=1d&range=30d";
                     $response = \Illuminate\Support\Facades\Http::timeout(5)
-                        ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; PHP)'])
+                        ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'])
                         ->get($url);
 
                     if ($response->failed()) {
                         continue;
                     }
 
-                    $metaInfo = $response->json()['chart']['result'][0]['meta'] ?? null;
-                    if (!$metaInfo) {
+                    $resData = $response->json();
+                    $metaInfo = $resData['chart']['result'][0]['meta'] ?? null;
+                    $closePrices = $resData['chart']['result'][0]['indicators']['quote'][0]['close'] ?? [];
+                    $closePrices = array_values(array_filter($closePrices, fn($p) => $p !== null));
+
+                    if (!$metaInfo || empty($closePrices)) {
                         continue;
                     }
 
-                    $precio    = (float) ($metaInfo['regularMarketPrice'] ?? 0);
+                    $precio = (float) ($metaInfo['regularMarketPrice'] ?? end($closePrices));
                     $prevClose = (float) ($metaInfo['chartPreviousClose'] ?? 0);
-                    $cambio    = $prevClose > 0 ? $precio - $prevClose : 0;
-                    $cambioPct = $prevClose > 0 ? ($cambio / $prevClose) * 100 : 0;
 
-                    $results[$symbol] = [
-                        'nombre'    => $meta['nombre'],
-                        'unidad'    => $meta['unidad'],
-                        'icono'     => $meta['icono'],
-                        'precio'    => $precio,
-                        'cambio'    => $cambio,
-                        'cambioPct' => $cambioPct,
-                        'positivo'  => $cambio >= 0,
-                        'currency'  => $metaInfo['currency'] ?? 'USD',
+                    $results['symbols'][$symbol] = [
+                        'nombre' => $meta['nombre'],
+                        'icono' => $meta['icono'],
+                        'tipo' => $meta['tipo'],
+                        'precio_usd_gal' => $precio,
+                        'prev_close_usd_gal' => $prevClose,
+                        'close_prices_usd_gal' => $closePrices,
                     ];
                 } catch (\Exception $e) {
                     report($e);
@@ -588,6 +608,140 @@ class ReportService
 
             return $results;
         });
+    }
+
+    /**
+     * Obtiene los precios de futuros de combustible estimando el PVP en España (€/L).
+     */
+    public function getFuturesPrices(?string $selectedLocality = 'espana', ?array $currentPrices = null): array
+    {
+        $rawData = $this->getRawFuturesData();
+        $usdToEurRate = $rawData['usd_to_eur'] ?? 0.92;
+        $symbolsData = $rawData['symbols'] ?? [];
+
+        // Impuestos especiales de España (€/L)
+        // Gasolina 95: 0.47269 €/L
+        // Diésel A: 0.37900 €/L
+        $taxes = [
+            'gas95' => 0.47269,
+            'diesel' => 0.37900,
+        ];
+
+        $results = [];
+
+        foreach ($symbolsData as $symbol => $data) {
+            $tipo = $data['tipo'];
+            $specialTax = $taxes[$tipo] ?? 0.379;
+
+            // 1. Convertir precios de USD/gal a EUR/L
+            $galToLiter = 3.785411784;
+            $convFactor = $usdToEurRate / $galToLiter;
+
+            $currentPriceUsdGal = $data['precio_usd_gal'];
+            $currentPriceEurL = $currentPriceUsdGal * $convFactor;
+
+            $closePricesUsdGal = $data['close_prices_usd_gal'];
+            $closePricesEurL = array_map(fn($p) => $p * $convFactor, $closePricesUsdGal);
+
+            // 2. Calcular el Margen Implícito actual
+            // PVP Medio Surtidor Real hoy en la localidad
+            $realRetailPrice = (float) ($currentPrices[$tipo] ?? 0);
+            if ($realRetailPrice <= 0) {
+                // Fallback razonable de PVP real si no hay estaciones en la zona
+                $realRetailPrice = $tipo === 'gas95' ? 1.60 : 1.55;
+            }
+
+            // Margin = (PVP_real / 1.21) - Future_EurL - SpecialTax
+            $margin = ($realRetailPrice / 1.21) - $currentPriceEurL - $specialTax;
+            if ($margin < 0.05) {
+                $margin = 0.15; // fallback de margen mínimo (15 céntimos)
+            }
+
+            // 3. Proyectar serie de precios estimados en surtidor (€/L)
+            $estimatedPrices = array_map(function($fPrice) use ($specialTax, $margin) {
+                return ($fPrice + $specialTax + $margin) * 1.21;
+            }, $closePricesEurL);
+
+            // Precio estimado actual en surtidor
+            $currentEstRetail = end($estimatedPrices);
+            
+            // Variaciones del precio estimado en surtidor
+            $count = count($estimatedPrices);
+            
+            // Cambio Diario (último vs anterior)
+            $cambioDiario = 0;
+            $cambioDiarioPct = 0;
+            if ($count > 1) {
+                $prevDay = $estimatedPrices[$count - 2];
+                $cambioDiario = $currentEstRetail - $prevDay;
+                $cambioDiarioPct = (($currentEstRetail - $prevDay) / $prevDay) * 100;
+            }
+
+            // Cambio Semanal (7d, o sea, hace 7 días de mercado)
+            $weeklyChangePct = 0;
+            if ($count >= 7) {
+                $prev7d = $estimatedPrices[$count - 7];
+                $weeklyChangePct = (($currentEstRetail - $prev7d) / $prev7d) * 100;
+            }
+
+            // Cambio Mensual (30d, o sea, primer elemento de la serie vs último)
+            $monthlyChangePct = 0;
+            if ($count > 1) {
+                $prev30d = $estimatedPrices[0];
+                $monthlyChangePct = (($currentEstRetail - $prev30d) / $prev30d) * 100;
+            }
+
+            // 4. Generar Sparkline SVG
+            $sparklinePoints = $this->getSparklinePoints($estimatedPrices, 120, 36);
+
+            $results[$symbol] = [
+                'nombre' => $data['nombre'] . ($tipo === 'gas95' ? ' (Super 95)' : ' (Diésel A)'),
+                'icono' => $data['icono'],
+                'tipo' => $tipo,
+                'precio_futuro' => $currentPriceEurL, // €/L
+                'precio_estimado_surtidor' => $currentEstRetail, // €/L estimado
+                'cambio' => $cambioDiario,
+                'cambioPct' => $cambioDiarioPct,
+                'positivo' => $cambioDiario >= 0,
+                'weeklyChangePct' => $weeklyChangePct,
+                'monthlyChangePct' => $monthlyChangePct,
+                'sparklinePoints' => $sparklinePoints,
+                'currency' => 'EUR',
+                'unidad' => '€/L',
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Helper para generar los puntos de la sparkline SVG.
+     */
+    private function getSparklinePoints(array $prices, int $width = 120, int $height = 36, int $padding = 2): string
+    {
+        $prices = array_values(array_filter($prices, fn($p) => $p !== null));
+        $count = count($prices);
+        if ($count < 2) {
+            return '';
+        }
+
+        $min = min($prices);
+        $max = max($prices);
+        $range = $max - $min;
+        if ($range == 0) {
+            $range = 1;
+        }
+
+        $points = [];
+        $xStep = ($width - 2 * $padding) / ($count - 1);
+
+        for ($i = 0; $i < $count; $i++) {
+            $x = $padding + ($i * $xStep);
+            $y = ($height - $padding) - (($prices[$i] - $min) / $range) * ($height - 2 * $padding);
+            $points[] = round($x, 1) . ',' . round($y, 1);
+        }
+
+        return implode(' ', $points);
     }
 
     /**

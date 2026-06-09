@@ -216,9 +216,57 @@ class DashboardController extends Controller
         $ownGas95 = \App\Models\PreciosProducto::where('CodigoEstacion', $targetLoc['own_code'])->where('CodigoProducto', '2')->value('PVP');
 
         // --- COMPONENT: FUTURES PRICES (commodity reference) ---
+        $futuresLocality = $request->input('futures_locality', 'espana');
+        if (!in_array($futuresLocality, ['espana', 'utrera', 'sevilla', 'el_cuervo', 'lebrija'], true)) {
+            $futuresLocality = 'espana';
+        }
+
+        // Calculate averages for the selected futures locality
+        $sumDiesel = 0;
+        $countDiesel = 0;
+        $sumGas95 = 0;
+        $countGas95 = 0;
+
+        foreach ($sevillaStations as $s) {
+            $mun = strtoupper($s['Municipio'] ?? '');
+            $matched = false;
+
+            if ($futuresLocality === 'espana') {
+                $matched = true;
+            } elseif ($futuresLocality === 'el_cuervo') {
+                $matched = (strpos($mun, 'CUERVO') !== false);
+            } else {
+                $matchNames = [
+                    'utrera' => 'UTRERA',
+                    'sevilla' => 'SEVILLA',
+                    'lebrija' => 'LEBRIJA',
+                ];
+                $matched = ($mun === ($matchNames[$futuresLocality] ?? ''));
+            }
+
+            if ($matched) {
+                $dPrice = (float) str_replace(',', '.', $s['Precio Gasoleo A'] ?? '0');
+                $gPrice = (float) str_replace(',', '.', $s['Precio Gasolina 95 E5'] ?? '0');
+
+                if ($dPrice > 0) {
+                    $sumDiesel += $dPrice;
+                    $countDiesel++;
+                }
+                if ($gPrice > 0) {
+                    $sumGas95 += $gPrice;
+                    $countGas95++;
+                }
+            }
+        }
+
+        $avgCurrentPrices = [
+            'diesel' => $countDiesel > 0 ? $sumDiesel / $countDiesel : 1.55,
+            'gas95' => $countGas95 > 0 ? $sumGas95 / $countGas95 : 1.60,
+        ];
+
         $futuresPrices = [];
         try {
-            $futuresPrices = $reportService->getFuturesPrices();
+            $futuresPrices = $reportService->getFuturesPrices($futuresLocality, $avgCurrentPrices);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -244,6 +292,7 @@ class DashboardController extends Controller
             'ourRank' => $ourRank,
             'ourStationName' => $targetLoc['own_name'],
             'futuresPrices' => $futuresPrices,
+            'futuresLocality' => $futuresLocality,
         ]);
     }
 

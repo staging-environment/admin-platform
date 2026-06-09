@@ -21,36 +21,122 @@
             {{-- ══════════════════════════════════════════════════════════════ --}}
             @if(!empty($futuresPrices))
             <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                <div class="px-5 py-3 border-b border-gray-100 bg-gray-50/60 flex items-center justify-between">
+                {{-- Header --}}
+                <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
-                        <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                         </svg>
-                        <span class="text-xs font-extrabold text-gray-600 uppercase tracking-wider">Futuros de Combustible</span>
-                        <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">Mercado NY · cache 30min</span>
-                    </div>
-                    <span class="text-[10px] text-gray-400">Fuente: Yahoo Finance</span>
-                </div>
-                <div class="grid grid-cols-2 divide-x divide-gray-100">
-                    @foreach($futuresPrices as $symbol => $future)
-                    <div class="px-5 py-4 flex items-center justify-between gap-4">
                         <div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-base">{{ $future['icono'] }}</span>
-                                <span class="text-xs font-bold text-gray-700">{{ $future['nombre'] }}</span>
-                            </div>
-                            <div class="text-[10px] text-gray-400 mt-0.5 font-mono">{{ $symbol }} · {{ $future['unidad'] }}</div>
+                            <span class="text-xs font-black text-gray-600 uppercase tracking-wider block">Tendencia y Precios de Combustible</span>
+                            <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block mt-0.5">Mercado NY (NYMEX) · Actualizado cada 30min</span>
                         </div>
-                        <div class="text-right">
-                            <div class="text-xl font-black text-gray-800 font-mono leading-tight">
-                                {{ number_format($future['precio'], 4, ',', '.') }}
-                                <span class="text-xs font-normal text-gray-400">{{ $future['currency'] }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label for="futures_locality" class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Ver Estimación en:</label>
+                        <form method="GET" action="{{ route('dashboard') }}" class="flex items-center">
+                            <input type="hidden" name="locality" value="{{ $selectedLocality }}">
+                            <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+                            @if($searchName)
+                                <input type="hidden" name="search_name" value="{{ $searchName }}">
+                            @endif
+                            <select name="futures_locality" id="futures_locality" onchange="this.form.submit()" class="text-xs font-black rounded-lg border-gray-200 bg-white shadow-sm py-1 px-3 text-slate-700 cursor-pointer focus:ring-blue-500 focus:border-blue-500">
+                                <option value="espana" @selected($futuresLocality === 'espana')>España (Nacional)</option>
+                                <option value="sevilla" @selected($futuresLocality === 'sevilla')>Sevilla</option>
+                                <option value="utrera" @selected($futuresLocality === 'utrera')>Utrera</option>
+                                <option value="el_cuervo" @selected($futuresLocality === 'el_cuervo')>El Cuervo de Sevilla</option>
+                                <option value="lebrija" @selected($futuresLocality === 'lebrija')>Lebrija</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- Informative Text --}}
+                <div class="px-5 py-3.5 bg-blue-50/45 border-b border-gray-100 flex items-start gap-2.5">
+                    <svg class="h-4 w-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        <strong>¿Qué hace este bloque?</strong> Muestra la tendencia internacional del mercado mayorista (NYMEX). Calculamos una estimación del <strong>PVP en Surtidor</strong> aplicando los impuestos especiales de España (IEH + 21% IVA) y el margen real promedio observado en la zona seleccionada. Esto sirve como indicador adelantado: los movimientos de los futuros suelen reflejarse en los precios de surtidor locales con unos días de retraso.
+                    </p>
+                </div>
+
+                {{-- Grid of Prices & Trends --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                    @foreach($futuresPrices as $symbol => $future)
+                    <div class="p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5">
+                        
+                        {{-- Left Column: Fuel & Main Price --}}
+                        <div class="flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-lg">{{ $future['icono'] }}</span>
+                                    <span class="text-xs font-black uppercase text-slate-700 tracking-wide">{{ $future['nombre'] }}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-0.5 font-mono">
+                                    Mercado NY: {{ $symbol }} · Ref. Mayorista: {{ number_format($future['precio_futuro'], 4, ',', '.') }} €/L
+                                </div>
                             </div>
-                            <div class="text-xs font-bold mt-0.5 {{ $future['positivo'] ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $future['positivo'] ? '+' : '' }}{{ number_format($future['cambio'], 4, ',', '.') }}
-                                ({{ $future['positivo'] ? '+' : '' }}{{ number_format($future['cambioPct'], 2, ',', '.') }}%)
+                            
+                            <div class="mt-3">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PVP Estimado Surtidor</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-2xl font-black text-slate-800 font-mono leading-none">
+                                        {{ number_format($future['precio_estimado_surtidor'], 3, ',', '.') }}
+                                    </span>
+                                    <span class="text-xs font-bold text-slate-500">€/L</span>
+                                    <span class="text-[11px] font-bold {{ $future['positivo'] ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $future['positivo'] ? '▲' : '▼' }} {{ number_format(abs($future['cambio']), 3, ',', '.') }}
+                                        ({{ number_format($future['cambioPct'], 2, ',', '.') }}%)
+                                    </span>
+                                </div>
                             </div>
                         </div>
+
+                        {{-- Right Column: Sparkline & Historical Stats --}}
+                        <div class="flex flex-col justify-between items-end gap-2 shrink-0">
+                            {{-- Sparkline SVG --}}
+                            @if(!empty($future['sparklinePoints']))
+                            <div class="relative bg-slate-50 p-2.5 rounded-xl border border-slate-100/80">
+                                <svg class="h-10 w-32 overflow-visible" viewBox="0 0 120 36">
+                                    <polyline
+                                        fill="none"
+                                        stroke="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        points="{{ $future['sparklinePoints'] }}"
+                                    />
+                                    @php
+                                        $points = explode(' ', $future['sparklinePoints']);
+                                        $lastPoint = end($points);
+                                        $coords = explode(',', $lastPoint);
+                                    @endphp
+                                    @if(count($coords) === 2)
+                                        <circle cx="{{ $coords[0] }}" cy="{{ $coords[1] }}" r="3" fill="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}" />
+                                    @endif
+                                </svg>
+                                <span class="absolute top-1 right-2 text-[8px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none">Últimos 30d</span>
+                            </div>
+                            @endif
+
+                            {{-- Trend stats (7d / 30d) --}}
+                            <div class="flex gap-4 mt-1">
+                                <div class="text-right">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Tendencia 7d</span>
+                                    <span class="text-xs font-black {{ $future['weeklyChangePct'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $future['weeklyChangePct'] >= 0 ? '+' : '' }}{{ number_format($future['weeklyChangePct'], 2, ',', '.') }}%
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Tendencia 30d</span>
+                                    <span class="text-xs font-black {{ $future['monthlyChangePct'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $future['monthlyChangePct'] >= 0 ? '+' : '' }}{{ number_format($future['monthlyChangePct'], 2, ',', '.') }}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     @endforeach
                 </div>
