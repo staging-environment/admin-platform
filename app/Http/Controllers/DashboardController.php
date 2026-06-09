@@ -221,6 +221,11 @@ class DashboardController extends Controller
             $futuresLocality = 'espana';
         }
 
+        $futuresRange = $request->input('futures_range', '30d');
+        if (!in_array($futuresRange, ['30d', '6m', '1y'], true)) {
+            $futuresRange = '30d';
+        }
+
         // Calculate averages for the selected futures locality
         $sumDiesel = 0;
         $countDiesel = 0;
@@ -266,7 +271,7 @@ class DashboardController extends Controller
 
         $futuresPrices = [];
         try {
-            $futuresPrices = $reportService->getFuturesPrices($futuresLocality, $avgCurrentPrices);
+            $futuresPrices = $reportService->getFuturesPrices($futuresLocality, $avgCurrentPrices, $futuresRange);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -293,6 +298,7 @@ class DashboardController extends Controller
             'ourStationName' => $targetLoc['own_name'],
             'futuresPrices' => $futuresPrices,
             'futuresLocality' => $futuresLocality,
+            'futuresRange' => $futuresRange,
         ]);
     }
 

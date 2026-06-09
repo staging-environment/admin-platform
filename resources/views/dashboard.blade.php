@@ -32,21 +32,35 @@
                             <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block mt-0.5">Referencia Mayorista Nacional · Actualizado cada 30min</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <label for="futures_locality" class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Ver Estimación en:</label>
-                        <form method="GET" action="{{ route('dashboard') }}" class="flex items-center">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-4">
                             <input type="hidden" name="locality" value="{{ $selectedLocality }}">
                             <input type="hidden" name="sort_by" value="{{ $sortBy }}">
                             @if($searchName)
                                 <input type="hidden" name="search_name" value="{{ $searchName }}">
                             @endif
-                            <select name="futures_locality" id="futures_locality" onchange="this.form.submit()" class="text-xs font-black rounded-lg border-gray-200 bg-white shadow-sm py-1 px-3 text-slate-700 cursor-pointer focus:ring-blue-500 focus:border-blue-500">
-                                <option value="espana" @selected($futuresLocality === 'espana')>España (Nacional)</option>
-                                <option value="sevilla" @selected($futuresLocality === 'sevilla')>Sevilla</option>
-                                <option value="utrera" @selected($futuresLocality === 'utrera')>Utrera</option>
-                                <option value="el_cuervo" @selected($futuresLocality === 'el_cuervo')>El Cuervo de Sevilla</option>
-                                <option value="lebrija" @selected($futuresLocality === 'lebrija')>Lebrija</option>
-                            </select>
+
+                            {{-- Locality Selector --}}
+                            <div class="flex items-center gap-2">
+                                <label for="futures_locality" class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Ver Estimación en:</label>
+                                <select name="futures_locality" id="futures_locality" onchange="this.form.submit()" class="text-xs font-black rounded-lg border-gray-200 bg-white shadow-sm py-1 px-3 text-slate-700 cursor-pointer focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="espana" @selected($futuresLocality === 'espana')>España (Nacional)</option>
+                                    <option value="sevilla" @selected($futuresLocality === 'sevilla')>Sevilla</option>
+                                    <option value="utrera" @selected($futuresLocality === 'utrera')>Utrera</option>
+                                    <option value="el_cuervo" @selected($futuresLocality === 'el_cuervo')>El Cuervo de Sevilla</option>
+                                    <option value="lebrija" @selected($futuresLocality === 'lebrija')>Lebrija</option>
+                                </select>
+                            </div>
+
+                            {{-- Range Selector --}}
+                            <div class="flex items-center gap-2">
+                                <label for="futures_range" class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Rango Temporal:</label>
+                                <select name="futures_range" id="futures_range" onchange="this.form.submit()" class="text-xs font-black rounded-lg border-gray-200 bg-white shadow-sm py-1 px-3 text-slate-700 cursor-pointer focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="30d" @selected($futuresRange === '30d')>Últimos 30 días</option>
+                                    <option value="6m" @selected($futuresRange === '6m')>Últimos 6 meses</option>
+                                    <option value="1y" @selected($futuresRange === '1y')>Último año</option>
+                                </select>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -100,8 +114,11 @@
                         <div class="flex flex-col justify-between items-end gap-2 shrink-0">
                             {{-- Sparkline SVG --}}
                             @if(!empty($future['sparklinePoints']))
-                            <div class="relative bg-slate-50 p-2.5 pb-4 rounded-xl border border-slate-100/80 flex flex-col justify-between items-end">
+                            <div class="relative bg-slate-50 p-2.5 pb-4 rounded-xl border border-slate-100/80 flex flex-col justify-between items-end w-full sm:w-auto">
                                 <svg class="h-10 w-32 overflow-visible mb-1.5" viewBox="0 0 120 36">
+                                    {{-- Light grid line inside sparkline --}}
+                                    <line x1="0" y1="18" x2="120" y2="18" stroke="#f1f5f9" stroke-width="0.5" stroke-dasharray="2" />
+                                    
                                     <polyline
                                         fill="none"
                                         stroke="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}"
@@ -110,18 +127,43 @@
                                         stroke-linejoin="round"
                                         points="{{ $future['sparklinePoints'] }}"
                                     />
+                                    
+                                    {{-- Last Point Indicator dot --}}
                                     @php
-                                        $points = explode(' ', $future['sparklinePoints']);
-                                        $lastPoint = end($points);
-                                        $coords = explode(',', $lastPoint);
+                                        $lastPointObj = end($future['sparklinePointsArray']);
                                     @endphp
-                                    @if(count($coords) === 2)
-                                        <circle cx="{{ $coords[0] }}" cy="{{ $coords[1] }}" r="3" fill="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}" />
+                                    @if($lastPointObj)
+                                        <circle id="dot-last-{{ $symbol }}" cx="{{ $lastPointObj['x'] }}" cy="{{ $lastPointObj['y'] }}" r="3" fill="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}" class="transition-all duration-150" />
                                     @endif
+
+                                    {{-- Invisible hover tracking vertical line --}}
+                                    <line id="hover-line-{{ $symbol }}" x1="0" y1="0" x2="0" y2="36" stroke="#cbd5e1" stroke-width="1" class="hidden" />
+
+                                    {{-- Dynamic hover dot --}}
+                                    <circle id="hover-dot-{{ $symbol }}" cx="0" cy="0" r="3" fill="#3b82f6" class="hidden" />
+
+                                    {{-- Interactive invisible circle triggers for each point --}}
+                                    @foreach($future['sparklinePointsArray'] as $pt)
+                                        <circle 
+                                            cx="{{ $pt['x'] }}" 
+                                            cy="{{ $pt['y'] }}" 
+                                            r="8" 
+                                            fill="transparent" 
+                                            class="sparkline-point cursor-pointer hover:fill-blue-500/10" 
+                                            data-date="{{ $pt['date'] }}" 
+                                            data-price="{{ $pt['price'] }}"
+                                            data-symbol="{{ $symbol }}"
+                                        />
+                                    @endforeach
                                 </svg>
-                                <div class="w-full flex justify-between gap-1 text-[7px] font-black text-slate-400 uppercase tracking-tight select-none">
-                                    <span>Histórico (30d)</span>
-                                    <span>{{ $future['rango_fechas'] }}</span>
+                                
+                                <div class="w-full flex justify-between gap-3 text-[7px] font-black text-slate-400 uppercase tracking-tight select-none">
+                                    <span>
+                                        Histórico ({{ $futuresRange === '30d' ? '30d' : ($futuresRange === '6m' ? '6 meses' : '1 año') }})
+                                    </span>
+                                    <span class="hover-info-display-{{ $symbol }} text-blue-600 font-extrabold normal-case" data-default="{{ $future['rango_fechas'] }}">
+                                        {{ $future['rango_fechas'] }}
+                                    </span>
                                 </div>
                             </div>
                             @endif
@@ -519,6 +561,69 @@
                             filterStations();
                         }
                     }
+
+                    // Interactive Sparklines Hover Info
+                    const sparklinePoints = document.querySelectorAll('.sparkline-point');
+                    sparklinePoints.forEach(function(point) {
+                        point.addEventListener('mouseenter', function() {
+                            const symbol = this.getAttribute('data-symbol');
+                            const date = this.getAttribute('data-date');
+                            const price = this.getAttribute('data-price');
+                            const cx = this.getAttribute('cx');
+                            const cy = this.getAttribute('cy');
+                            
+                            const line = document.getElementById('hover-line-' + symbol);
+                            const dot = document.getElementById('hover-dot-' + symbol);
+                            const lastDot = document.getElementById('dot-last-' + symbol);
+                            const display = document.querySelector('.hover-info-display-' + symbol);
+                            
+                            if (line) {
+                                line.setAttribute('x1', cx);
+                                line.setAttribute('x2', cx);
+                                line.classList.remove('hidden');
+                            }
+                            if (dot) {
+                                dot.setAttribute('cx', cx);
+                                dot.setAttribute('cy', cy);
+                                dot.classList.remove('hidden');
+                            }
+                            if (lastDot) {
+                                lastDot.classList.add('opacity-0');
+                            }
+                            if (display) {
+                                display.textContent = date + ' - ' + price + ' €/L';
+                            }
+                        });
+                    });
+
+                    // Reset on mouseleave of the SVG
+                    const svgs = document.querySelectorAll('svg.overflow-visible');
+                    svgs.forEach(function(svg) {
+                        svg.addEventListener('mouseleave', function() {
+                            // Find the symbol by looking at one of its sparkline points
+                            const firstPt = svg.querySelector('.sparkline-point');
+                            if (!firstPt) return;
+                            const symbol = firstPt.getAttribute('data-symbol');
+                            
+                            const line = document.getElementById('hover-line-' + symbol);
+                            const dot = document.getElementById('hover-dot-' + symbol);
+                            const lastDot = document.getElementById('dot-last-' + symbol);
+                            const display = document.querySelector('.hover-info-display-' + symbol);
+                            
+                            if (line) {
+                                line.classList.add('hidden');
+                            }
+                            if (dot) {
+                                dot.classList.add('hidden');
+                            }
+                            if (lastDot) {
+                                lastDot.classList.remove('opacity-0');
+                            }
+                            if (display) {
+                                display.textContent = display.getAttribute('data-default');
+                            }
+                        });
+                    });
                 });
             </script>
 </x-app-layout>

@@ -541,9 +541,16 @@ class ReportService
      * Obtiene los datos crudos de futuros y tipo de cambio desde Yahoo Finance.
      * Cache de 30 minutos.
      */
-    public function getRawFuturesData(): array
+    public function getRawFuturesData(?string $futuresRange = '30d'): array
     {
-        return Cache::remember('futures_raw_data_v2', 1800, function () {
+        $rangesConf = [
+            '30d' => ['range' => '1mo', 'interval' => '1d'],
+            '6m'  => ['range' => '6mo', 'interval' => '1wk'],
+            '1y'  => ['range' => '1y', 'interval' => '1wk'],
+        ];
+        $conf = $rangesConf[$futuresRange] ?? $rangesConf['30d'];
+
+        return Cache::remember("futures_raw_data_v3_{$futuresRange}", 1800, function () use ($conf) {
             $usdToEurRate = 0.92; // default fallback
             try {
                 $rateUrl = "https://query2.finance.yahoo.com/v8/finance/chart/EUR=X?interval=1d&range=1d";
@@ -572,7 +579,7 @@ class ReportService
 
             foreach ($symbols as $symbol => $meta) {
                 try {
-                    $url = "https://query2.finance.yahoo.com/v8/finance/chart/{$symbol}?interval=1d&range=30d";
+                    $url = "https://query2.finance.yahoo.com/v8/finance/chart/{$symbol}?range={$conf['range']}&interval={$conf['interval']}";
                     $response = \Illuminate\Support\Facades\Http::timeout(5)
                         ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'])
                         ->get($url);
@@ -609,6 +616,7 @@ class ReportService
                         'precio_usd_gal' => $precio,
                         'prev_close_usd_gal' => $prevClose,
                         'close_prices_usd_gal' => $validClosePrices,
+                        'timestamps' => $validTimestamps,
                         'first_timestamp' => !empty($validTimestamps) ? $validTimestamps[0] : null,
                         'last_timestamp' => !empty($validTimestamps) ? end($validTimestamps) : null,
                     ];
@@ -624,9 +632,9 @@ class ReportService
     /**
      * Obtiene los precios de futuros de combustible estimando el PVP en España (€/L).
      */
-    public function getFuturesPrices(?string $selectedLocality = 'espana', ?array $currentPrices = null): array
+    public function getFuturesPrices(?string $selectedLocality = 'espana', ?array $currentPrices = null, ?string $futuresRange = '30d'): array
     {
-        $rawData = $this->getRawFuturesData();
+        $rawData = $this->getRawFuturesData($futuresRange);
         $usdToEurRate = $rawData['usd_to_eur'] ?? 0.92;
         $symbolsData = $rawData['symbols'] ?? [];
 
@@ -725,12 +733,12 @@ class ReportService
                 $prediccionLabel = 'Tendencia Estable (3-5d)';
             }
 
-            // 5. Generar Sparkline SVG
-            $sparklinePoints = $this->getSparklinePoints($estimatedPrices, 120, 36);
+            // 5. Generar Sparkline SVG interactivo
+            $sparklineInfo = $this->getSparklineData($estimatedPrices, $data['timestamps'] ?? [], 120, 36);
 
             $fechaInicio = isset($data['first_timestamp']) && $data['first_timestamp'] ? Carbon::createFromTimestamp($data['first_timestamp'])->locale('es')->isoFormat('D [de] MMMM') : '';
             $fechaFin = isset($data['last_timestamp']) && $data['last_timestamp'] ? Carbon::createFromTimestamp($data['last_timestamp'])->locale('es')->isoFormat('D [de] MMMM') : '';
-            $rangoFechas = $fechaInicio && $fechaFin ? "{$fechaInicio} al {$fechaFin}" : 'Últimos 30 días';
+            $rangoFechas = $fechaInicio && $fechaFin ? "{$fechaInicio} al {$fechaFin}" : 'Histórico';
 
             $results[$symbol] = [
                 'nombre' => $data['nombre'] . ($tipo === 'gas95' ? ' (Super 95)' : ' (Diésel A)'),
@@ -743,7 +751,8 @@ class ReportService
                 'positivo' => $cambioDiario >= 0,
                 'weeklyChangePct' => $weeklyChangePct,
                 'monthlyChangePct' => $monthlyChangePct,
-                'sparklinePoints' => $sparklinePoints,
+                'sparklinePoints' => $sparklineInfo['points_string'],
+                'sparklinePointsArray' => $sparklineInfo['points_array'],
                 'rango_fechas' => $rangoFechas,
                 'prediccion_clase' => $prediccionClase,
                 'prediccion_icono' => $prediccionIcono,
@@ -758,14 +767,18 @@ class ReportService
     }
 
     /**
-     * Helper para generar los puntos de la sparkline SVG.
+     * Genera los puntos de la sparkline SVG y un array con la información de cada punto para interactividad.
      */
-    private function getSparklinePoints(array $prices, int $width = 120, int $height = 36, int $padding = 2): string
+    private function getSparklineData(array $prices, array $timestamps, int $width = 120, int $height = 36, int $padding = 2): array
     {
-        $prices = array_values(array_filter($prices, fn($p) => $p !== null));
+        $prices = array_values($prices);
+        $timestamps = array_values($timestamps);
         $count = count($prices);
         if ($count < 2) {
-            return '';
+            return [
+                'points_string' => '',
+                'points_array' => [],
+            ];
         }
 
         $min = min($prices);
@@ -775,16 +788,35 @@ class ReportService
             $range = 1;
         }
 
-        $points = [];
+        $pointsString = [];
+        $pointsArray = [];
         $xStep = ($width - 2 * $padding) / ($count - 1);
 
         for ($i = 0; $i < $count; $i++) {
             $x = $padding + ($i * $xStep);
             $y = ($height - $padding) - (($prices[$i] - $min) / $range) * ($height - 2 * $padding);
-            $points[] = round($x, 1) . ',' . round($y, 1);
+            $xRound = round($x, 1);
+            $yRound = round($y, 1);
+
+            $pointsString[] = $xRound . ',' . $yRound;
+
+            $timestamp = $timestamps[$i] ?? null;
+            $dateFormatted = $timestamp
+                ? \Carbon\Carbon::createFromTimestamp($timestamp)->locale('es')->isoFormat('D MMM YY')
+                : '';
+
+            $pointsArray[] = [
+                'x' => $xRound,
+                'y' => $yRound,
+                'price' => number_format($prices[$i], 3, ',', '.'),
+                'date' => $dateFormatted,
+            ];
         }
 
-        return implode(' ', $points);
+        return [
+            'points_string' => implode(' ', $pointsString),
+            'points_array' => $pointsArray,
+        ];
     }
 
     /**
