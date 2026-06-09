@@ -69,9 +69,12 @@
                         {{-- Left Column: Fuel & Main Price --}}
                         <div class="flex flex-col justify-between">
                             <div>
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 flex-wrap">
                                     <span class="text-lg">{{ $future['icono'] }}</span>
                                     <span class="text-xs font-black uppercase text-slate-700 tracking-wide">{{ $future['nombre'] }}</span>
+                                    <span class="text-[9px] font-black px-2 py-0.5 rounded-md shadow-2xs {{ $future['prediccion_color'] }}" title="Proyección estimada en surtidor para los próximos días según la tendencia de los futuros de esta semana">
+                                        {{ $future['prediccion_icono'] }} {{ $future['prediccion_label'] }}
+                                    </span>
                                 </div>
                                 <div class="text-[10px] text-gray-400 mt-0.5 font-mono">
                                     Mercado NY: {{ $symbol }} · Ref. Mayorista: {{ number_format($future['precio_futuro'], 4, ',', '.') }} €/L

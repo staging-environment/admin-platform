@@ -702,7 +702,26 @@ class ReportService
                 $monthlyChangePct = (($currentEstRetail - $prev30d) / $prev30d) * 100;
             }
 
-            // 4. Generar Sparkline SVG
+            // 4. Predicción de tendencia a corto plazo (próximos 3-5 días)
+            // Lógica basada en el retardo en la transmisión de precios mayoristas
+            if ($weeklyChangePct > 1.0) {
+                $prediccionClase = 'up';
+                $prediccionIcono = '▲';
+                $prediccionColor = 'text-amber-700 bg-amber-50 border border-amber-200/60';
+                $prediccionLabel = 'Subida Probable (Próximos 3-5d)';
+            } elseif ($weeklyChangePct < -1.0) {
+                $prediccionClase = 'down';
+                $prediccionIcono = '▼';
+                $prediccionColor = 'text-green-700 bg-green-50 border border-green-200/60';
+                $prediccionLabel = 'Bajada Probable (Próximos 3-5d)';
+            } else {
+                $prediccionClase = 'stable';
+                $prediccionIcono = '◀▶';
+                $prediccionColor = 'text-slate-600 bg-slate-50 border border-slate-200/60';
+                $prediccionLabel = 'Tendencia Estable (Próximos 3-5d)';
+            }
+
+            // 5. Generar Sparkline SVG
             $sparklinePoints = $this->getSparklinePoints($estimatedPrices, 120, 36);
 
             $fechaInicio = isset($data['first_timestamp']) && $data['first_timestamp'] ? Carbon::createFromTimestamp($data['first_timestamp'])->locale('es')->isoFormat('D [de] MMMM') : '';
@@ -722,6 +741,10 @@ class ReportService
                 'monthlyChangePct' => $monthlyChangePct,
                 'sparklinePoints' => $sparklinePoints,
                 'rango_fechas' => $rangoFechas,
+                'prediccion_clase' => $prediccionClase,
+                'prediccion_icono' => $prediccionIcono,
+                'prediccion_color' => $prediccionColor,
+                'prediccion_label' => $prediccionLabel,
                 'currency' => 'EUR',
                 'unidad' => '€/L',
             ];
