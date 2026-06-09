@@ -82,7 +82,7 @@ CURRENT_URL=$(grep '^APP_URL=' .env | cut -d= -f2 | tr -d '"')
 if [ "$CURRENT_URL" != "$PROD_URL" ]; then
   echo -e "\033[1;33m  ⚠ APP_URL incorrecto: '$CURRENT_URL'"
   echo -e "  ⚠ Corrigiendo a: '$PROD_URL'\033[0m"
-  sed -i "s|APP_URL=.*|APP_URL=${PROD_URL}|"\ .env
+  sed -i "s|APP_URL=.*|APP_URL=${PROD_URL}|" .env
 fi
 ok "APP_URL=$PROD_URL"
 
