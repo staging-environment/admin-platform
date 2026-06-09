@@ -29,7 +29,7 @@
                         </svg>
                         <div>
                             <span class="text-xs font-black text-gray-600 uppercase tracking-wider block">Tendencia y Precios de Combustible</span>
-                            <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block mt-0.5">Mercado NY (NYMEX) · Actualizado cada 30min</span>
+                            <span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block mt-0.5">Referencia Mayorista Nacional · Actualizado cada 30min</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -57,7 +57,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        <strong>¿Qué hace este bloque?</strong> Muestra la tendencia internacional del mercado mayorista (NYMEX). Calculamos una estimación del <strong>PVP en Surtidor</strong> aplicando los impuestos especiales de España (IEH + 21% IVA) y el margen real promedio observado en la zona seleccionada. Esto sirve como indicador adelantado: los movimientos de los futuros suelen reflejarse en los precios de surtidor locales con unos días de retraso. <strong>Nota: Los gráficos muestran la evolución histórica real de los últimos 30 días, no una previsión de precios futuros.</strong>
+                        <strong>¿Qué hace este bloque?</strong> Muestra la tendencia de los precios del mercado mayorista de referencia. Calculamos una estimación del <strong>PVP en Surtidor</strong> aplicando los impuestos especiales de España (IEH + 21% IVA) y el margen real promedio observado en la zona seleccionada. Esto sirve como indicador adelantado: los movimientos de los precios de origen se trasladan a los surtidores locales en España con unos días de retraso. <strong>Nota: Los gráficos muestran la evolución histórica real de los últimos 30 días, no una previsión de precios futuros.</strong>
                     </p>
                 </div>
 
@@ -77,7 +77,7 @@
                                     </span>
                                 </div>
                                 <div class="text-[10px] text-gray-400 mt-0.5 font-mono">
-                                    Mercado NY: {{ $symbol }} · Ref. Mayorista: {{ number_format($future['precio_futuro'], 4, ',', '.') }} €/L
+                                    Referencia CIF España: {{ number_format($future['precio_futuro'], 4, ',', '.') }} €/L
                                 </div>
                             </div>
                             
