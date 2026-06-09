@@ -37,7 +37,11 @@ class ReportService
 
         // ── Productos de los grupos seleccionados (incluyendo subgrupos) ──────
         $productosDeGrupo = $db->table('productos')
-            ->whereIn('CodigoDeGrupo', $groupCodes)
+            ->where(function ($q) use ($groupCodes) {
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
             ->pluck('Codigo')
             ->toArray();
 
@@ -53,7 +57,9 @@ class ReportService
             ->select([
                 'd.CodigoDeProducto',
                 DB::raw('SUM(d.Cantidad * d.Precio) / SUM(d.Cantidad) as precio_compra'),
+                DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva_compra'),
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
+                DB::raw('MAX(f.FechaYHoraDeFactura) as fecha_ultima_compra'),
             ])
             ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
@@ -64,13 +70,13 @@ class ReportService
 
         $compras = $comprasQuery->groupBy('d.CodigoDeProducto')->get()->keyBy('CodigoDeProducto');
 
-        if ($compras->isEmpty()) return [];
-
-        $codigosConCompra = $compras->keys()->toArray();
-
         // ── 2. Precio de VENTA real (TPV) por artículo ───────────────────────
-        $ventasQuery = $db->table('detalledeventasencurso as dv')
-            ->join('ventasencurso as v', 'v.Id', '=', 'dv.IdDeVentaEnCurso')
+        $ventasQuery = $db->table('detalledefacturasyticketsdeventa as dv')
+            ->join('facturasyticketsdeventa as v', function ($j) {
+                $j->on('v.CodigoDeEmpresaPropia', '=', 'dv.CodigoDeEmpresaPropia')
+                  ->on('v.Serie', '=', 'dv.Serie')
+                  ->on('v.Numero', '=', 'dv.Numero');
+            })
             ->select([
                 'dv.CodigoDeProducto',
                 DB::raw('SUM(dv.Cantidad * dv.Precio) / SUM(dv.Cantidad) as precio_venta'),
@@ -78,32 +84,41 @@ class ReportService
                 DB::raw('SUM(dv.Cantidad) as uds_vendidas'),
                 DB::raw('SUM(dv.Importe) as total_facturado'),
             ])
-            ->whereIn('dv.CodigoDeProducto', $codigosConCompra)
+            ->whereIn('dv.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(v.FechaYHora)'), [$dateFrom, $dateTo]);
 
         if ($stationCode !== null) {
-            $ventasQuery->where('v.CoDigoDeEstacion', $stationCode);
+            $ventasQuery->where('v.CodigoDeEstacion', $stationCode);
         }
 
         $ventas = $ventasQuery->groupBy('dv.CodigoDeProducto')->get()->keyBy('CodigoDeProducto');
+
+        $codigosActivos = array_unique(array_merge($compras->keys()->toArray(), $ventas->keys()->toArray()));
+
+        if (empty($codigosActivos)) return [];
 
         // ── 3. Nombre de productos ────────────────────────────────────────────
         $productos = $db->table('productos as p')
             ->join('gruposdeproductos as g', 'g.Codigo', '=', 'p.CodigoDeGrupo')
             ->select(['p.Codigo', 'p.Descripcion', 'g.Nombre as GrupoNombre'])
-            ->whereIn('p.Codigo', $codigosConCompra)
+            ->whereIn('p.Codigo', $codigosActivos)
             ->get()
             ->keyBy('Codigo');
 
         // ── 4. Construir resultado ────────────────────────────────────────────
         $result = [];
 
-        foreach ($compras as $codigo => $compra) {
+        foreach ($codigosActivos as $codigo) {
             $producto = $productos[$codigo] ?? null;
             if (!$producto) continue;
 
-            $precioCompra = (float) $compra->precio_compra;
-            if ($precioCompra <= 0) continue;
+            $compra         = $compras[$codigo] ?? null;
+            $precioCompra   = $compra ? (float) $compra->precio_compra : 0.0;
+            $pctIvaCompra   = $compra ? (float) $compra->pct_iva_compra : 0.0;
+            $udsCompradas   = $compra ? (float) $compra->uds_compradas : 0.0;
+            $fechaUltCompra = $compra ? $compra->fecha_ultima_compra : null;
+
+            $precioCompraConIva = $precioCompra * (1 + $pctIvaCompra / 100);
 
             $venta          = $ventas[$codigo] ?? null;
             $precioVenta    = $venta ? (float) $venta->precio_venta    : null;
@@ -115,25 +130,39 @@ class ReportService
             $totalComprado  = $udsVendidas > 0 ? $precioCompra * $udsVendidas : 0;
 
             // Beneficio y margen
-            $beneficio  = $totalFacturado > 0 ? $totalFacturado - $totalComprado : null;
-            $margenPct  = ($beneficio !== null && $totalComprado > 0)
-                ? ($beneficio / $totalComprado) * 100
-                : null;
+            $beneficio  = $totalFacturado > 0 ? $totalFacturado - $totalComprado : ($udsVendidas > 0 ? 0 - $totalComprado : null);
+            
+            $margenPct  = null;
+            if ($totalComprado > 0) {
+                $margenPct = ($beneficio / $totalComprado) * 100;
+            } elseif ($totalFacturado > 0 && $precioCompra <= 0) {
+                $margenPct = 100.0; // 100% de margen si no hay coste
+            }
 
             $result[] = [
                 'codigo'          => $codigo,
                 'descripcion'     => $producto->Descripcion,
                 'grupo_nombre'    => $producto->GrupoNombre,
 
-                'precio_compra'   => round($precioCompra, 4),
+                'precio_compra'          => round($precioCompra, 4),
+                'pct_iva_compra'         => round($pctIvaCompra, 1),
+                'precio_compra_con_iva'  => round($precioCompraConIva, 4),
                 'precio_venta'    => $precioVenta !== null ? round($precioVenta, 4) : null,
-                'uds_compradas'   => (float) $compra->uds_compradas,
+                'uds_compradas'   => $udsCompradas,
                 'uds_vendidas'    => $udsVendidas,
 
                 'total_comprado'  => round($totalComprado, 2),
                 'total_facturado' => round($totalFacturado, 2),
                 'beneficio'       => $beneficio !== null ? round($beneficio, 2) : null,
                 'margen_pct'      => $margenPct !== null ? round($margenPct, 2) : null,
+
+                'pct_iva'              => round($pctIva, 1),
+                'precio_venta_sin_iva' => $precioVenta !== null && $pctIva > 0
+                    ? round($precioVenta / (1 + $pctIva / 100), 4)
+                    : $precioVenta,
+                'fecha_ultima_compra'  => $fechaUltCompra
+                    ? \Carbon\Carbon::parse($fechaUltCompra)->locale('es')->isoFormat('MMM YYYY')
+                    : null,
 
                 'sin_ventas'      => $venta === null,
             ];
@@ -181,7 +210,11 @@ class ReportService
         // Productos de los grupos seleccionados
         $productosDeGrupo = $db->table('productos as p')
             ->join('gruposdeproductos as g', 'g.Codigo', '=', 'p.CodigoDeGrupo')
-            ->whereIn('p.CodigoDeGrupo', $groupCodes)
+            ->where(function ($q) use ($groupCodes) {
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('p.CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
             ->pluck('p.Codigo')
             ->toArray();
 
@@ -217,8 +250,12 @@ class ReportService
         $productCodes = $compras->keys()->toArray();
 
         // ── 2. Precios de VENTA real (ticket TPV) en el mismo período ────────
-        $ventasQuery = $db->table('detalledeventasencurso as dv')
-            ->join('ventasencurso as v', 'v.Id', '=', 'dv.IdDeVentaEnCurso')
+        $ventasQuery = $db->table('detalledefacturasyticketsdeventa as dv')
+            ->join('facturasyticketsdeventa as v', function ($j) {
+                $j->on('v.CodigoDeEmpresaPropia', '=', 'dv.CodigoDeEmpresaPropia')
+                  ->on('v.Serie', '=', 'dv.Serie')
+                  ->on('v.Numero', '=', 'dv.Numero');
+            })
             ->select([
                 'dv.CodigoDeProducto',
                 DB::raw('SUM(dv.Cantidad * dv.Precio) / SUM(dv.Cantidad) as precio_venta_medio'),
@@ -230,7 +267,7 @@ class ReportService
             ->whereBetween(DB::raw('DATE(v.FechaYHora)'), [$dateFrom, $dateTo]);
 
         if ($stationCode !== null) {
-            $ventasQuery->where('v.CoDigoDeEstacion', $stationCode);
+            $ventasQuery->where('v.CodigoDeEstacion', $stationCode);
         }
 
         $ventas = $ventasQuery->groupBy('dv.CodigoDeProducto')->get()->keyBy('CodigoDeProducto');
@@ -316,9 +353,11 @@ class ReportService
                 'pct_iva'            => $pctIvaV,
 
                 // Compra
-                'precio_compra'      => round($precioCompra, 4),
-                'uds_compradas'      => (float) $compra->uds_compradas,
-                'coste_total'        => round((float) $compra->coste_total, 2),
+                'precio_compra'          => round($precioCompra, 4),
+                'pct_iva_compra'         => round($pctIvaC, 1),
+                'precio_compra_con_iva'  => round($precioCompra * (1 + $pctIvaC / 100), 4),
+                'uds_compradas'          => (float) $compra->uds_compradas,
+                'coste_total'            => round((float) $compra->coste_total, 2),
 
                 // Venta real (TPV)
                 'pvp_venta_con_iva'  => $pvpVentaConIva !== null ? round($pvpVentaConIva, 4) : null,
@@ -470,6 +509,8 @@ class ReportService
                 continue;
             }
 
+            $precioCompraConIva = $precioCompra * (1 + $pctIva / 100);
+
             $divisorIva = 1 + ($pctIva / 100);
             $pvpSinIva  = $pvpConIva / $divisorIva;
             $margenPct  = (($pvpSinIva - $precioCompra) / $precioCompra) * 100;
@@ -479,7 +520,9 @@ class ReportService
                 'descripcion'        => $producto->Descripcion,
                 'grupo_codigo'       => $producto->GrupoCodigo,
                 'grupo_nombre'       => $producto->GrupoNombre,
-                'precio_compra'      => round($precioCompra, 4),
+                'precio_compra'          => round($precioCompra, 4),
+                'pct_iva_compra'         => round($pctIva, 1),
+                'precio_compra_con_iva'  => round($precioCompraConIva, 4),
                 'pvp_con_iva'        => round($pvpConIva, 4),
                 'pct_iva'            => $pctIva,
                 'pvp_sin_iva'        => round($pvpSinIva, 4),
@@ -564,7 +607,11 @@ class ReportService
         $db = DB::connection('virtusgesnet');
 
         $productosDeGrupo = $db->table('productos')
-            ->whereIn('CodigoDeGrupo', $groupCodes)
+            ->where(function ($q) use ($groupCodes) {
+                foreach ($groupCodes as $gc) {
+                    $q->orWhere('CodigoDeGrupo', 'like', $gc . '%');
+                }
+            })
             ->pluck('Codigo')
             ->toArray();
 
@@ -592,8 +639,12 @@ class ReportService
         $compras = $comprasQuery->groupBy('anio', 'mes')->get();
 
         // Ventas por mes
-        $ventasQuery = $db->table('detalledeventasencurso as dv')
-            ->join('ventasencurso as v', 'v.Id', '=', 'dv.IdDeVentaEnCurso')
+        $ventasQuery = $db->table('detalledefacturasyticketsdeventa as dv')
+            ->join('facturasyticketsdeventa as v', function ($j) {
+                $j->on('v.CodigoDeEmpresaPropia', '=', 'dv.CodigoDeEmpresaPropia')
+                  ->on('v.Serie', '=', 'dv.Serie')
+                  ->on('v.Numero', '=', 'dv.Numero');
+            })
             ->select([
                 DB::raw('YEAR(v.FechaYHora) as anio'),
                 DB::raw('MONTH(v.FechaYHora) as mes'),
@@ -603,7 +654,7 @@ class ReportService
             ->whereBetween(DB::raw('DATE(v.FechaYHora)'), [$dateFrom, $dateTo]);
 
         if ($stationCode !== null) {
-            $ventasQuery->where('v.CoDigoDeEstacion', $stationCode);
+            $ventasQuery->where('v.CodigoDeEstacion', $stationCode);
         }
 
         $ventas = $ventasQuery->groupBy('anio', 'mes')->get();

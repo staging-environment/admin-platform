@@ -120,6 +120,7 @@
                          const ingresos = data.map(d => d.ingreso);
                          const costes = data.map(d => d.coste);
                          const beneficios = data.map(d => d.beneficio);
+                         const margenes = data.map(d => d.margen_pct);
                          
                          this.chartEvInstance = new Chart(canvas.getContext('2d'), {
                              type: 'bar',
@@ -151,6 +152,18 @@
                                          backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500
                                          borderRadius: 4,
                                          yAxisID: 'y'
+                                     },
+                                     {
+                                         type: 'line',
+                                         label: '% Margen Real',
+                                         data: margenes,
+                                         borderColor: '#8b5cf6',
+                                         backgroundColor: 'rgba(139,92,246,0.15)',
+                                         borderWidth: 2,
+                                         tension: 0.3,
+                                         pointRadius: 4,
+                                         pointBackgroundColor: '#8b5cf6',
+                                         yAxisID: 'y1'
                                      }
                                  ]
                              },
@@ -165,7 +178,7 @@
                                      tooltip: {
                                          callbacks: {
                                              label: function(ctx) {
-                                                 return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('es-ES') + ' €';
+                                                 return ' ' + ctx.dataset.label + ': ' + (ctx.dataset.yAxisID === 'y1' ? ctx.parsed.y.toFixed(1) + ' %' : ctx.parsed.y.toLocaleString('es-ES') + ' €');
                                              }
                                          }
                                      }
@@ -179,6 +192,14 @@
                                          display: true,
                                          position: 'left',
                                          ticks: { callback: function(v) { return v + ' €'; } }
+                                     },
+                                     y1: {
+                                         type: 'linear',
+                                         display: true,
+                                         position: 'right',
+                                         title: { display: true, text: '% Margen', color: '#8b5cf6' },
+                                         ticks: { callback: function(v) { return v.toFixed(1) + ' %'; }, color: '#8b5cf6' },
+                                         grid: { drawOnChartArea: false }
                                      }
                                  }
                              }
@@ -187,8 +208,16 @@
                  }"
                  x-on:chart-ev-data-ready.window="buildEvChart($event.detail.chartEvolucionData)"
                  x-init="
+                     const self = this;
                      const initialEvData = {{ Js::from($chartEvolucionData) }};
-                     $nextTick(() => buildEvChart(initialEvData));
+                     const tryBuildEvChart = (attempts) => {
+                         if (attempts <= 0) return;
+                         if (typeof Chart === 'undefined' || !document.getElementById('evolucionChartCanvas')) {
+                             setTimeout(() => tryBuildEvChart(attempts - 1), 100); return;
+                         }
+                         self.buildEvChart(initialEvData);
+                     };
+                     $nextTick(() => tryBuildEvChart(20));
                  "
             >
                 <div class="px-6 pt-5 pb-2 flex items-center justify-between">
@@ -307,11 +336,35 @@
                         </p>
                     </div>
                     {{-- Selector de registros por página y Buscador --}}
-                    <div class="flex items-center gap-4 text-xs text-gray-500 no-print">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 no-print">
+                        {{-- Filtro por Grupo --}}
+                        <div>
+                            <select wire:model.live="filterGroup" 
+                                    class="py-1.5 pl-2.5 pr-8 border border-gray-300 rounded-lg text-xs focus:ring-amber-500 focus:border-amber-500 shadow-sm bg-white">
+                                <option value="">Todos los Grupos</option>
+                                @foreach($this->getActiveGroups() as $group)
+                                    <option value="{{ $group }}">{{ $group }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Filtro por Margen --}}
+                        <div>
+                            <select wire:model.live="filterMargin" 
+                                    class="py-1.5 pl-2.5 pr-8 border border-gray-300 rounded-lg text-xs focus:ring-amber-500 focus:border-amber-500 shadow-sm bg-white">
+                                <option value="">Todos los Márgenes</option>
+                                <option value="high">🟢 Alto Margen (≥ 40%)</option>
+                                <option value="mid">🟡 Margen Medio (20% – 40%)</option>
+                                <option value="low">🔴 Bajo Margen (0% – 20%)</option>
+                                <option value="negative">💀 Pérdidas (< 0%)</option>
+                                <option value="no_sales">⏳ Sin Ventas</option>
+                            </select>
+                        </div>
+
                         <div class="relative">
                             <input type="text" wire:model.live.debounce.300ms="searchQuery" 
-                                   placeholder="Buscar artículo, código..." 
-                                   class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-amber-500 focus:border-amber-500 w-48 shadow-sm">
+                                   placeholder="Buscar..." 
+                                   class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-amber-500 focus:border-amber-500 w-36 shadow-sm">
                             <svg class="h-4 w-4 text-gray-400 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -348,10 +401,25 @@
                                     Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
                                 </th>
                                 <th wire:click="sortBy('precio_compra')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
-                                    P.Compra<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                    P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pct_iva_compra')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('fecha_ultima_compra')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    Últ. Compra<span class="font-normal">{{ $ico('fecha_ultima_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('precio_venta_sin_iva')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    PVP s/IVA<span class="font-normal">{{ $ico('precio_venta_sin_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pct_iva')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
                                 </th>
                                 <th wire:click="sortBy('precio_venta')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
-                                    P.Venta<span class="font-normal">{{ $ico('precio_venta') }}</span>
+                                    PVP c/IVA<span class="font-normal">{{ $ico('precio_venta') }}</span>
                                 </th>
                                 <th wire:click="sortBy('uds_compradas')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider border-l-2 border-gray-100 {{ $thS }}">
                                     Uds. Compradas<span class="font-normal">{{ $ico('uds_compradas') }}</span>
@@ -392,10 +460,22 @@
                                     Grupo<span class="text-gray-400 font-normal">{{ $ico('grupo_nombre') }}</span>
                                 </th>
                                 <th wire:click="sortBy('precio_compra')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
-                                    P.Compra<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                    P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pct_iva_compra')" class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
+                                </th>
+                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pvp_sin_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    PVP s/IVA<span class="font-normal">{{ $ico('pvp_sin_iva') }}</span>
+                                </th>
+                                <th wire:click="sortBy('pct_iva')" class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
                                 </th>
                                 <th wire:click="sortBy('pvp_con_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
-                                    PVP Tarifa<span class="font-normal">{{ $ico('pvp_con_iva') }}</span>
+                                    PVP c/IVA<span class="font-normal">{{ $ico('pvp_con_iva') }}</span>
                                 </th>
                                 <th wire:click="sortBy('margen_pct')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
@@ -420,6 +500,11 @@
                                             : ($mReal >= 40 ? 'bg-green-100 text-green-800 border-green-200'
                                             : ($mReal >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
                                                             : 'bg-red-100 text-red-800 border-red-200'));
+
+                                    $iva = $row['pct_iva'] ?? 0;
+                                    $ivaBadge = $iva >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                              : ($iva >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                              : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                 @endphp
                                 <tr class="hover:bg-gray-50/60 transition-colors {{ $sinV ? 'opacity-50' : '' }}">
                                     <td class="px-3 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
@@ -432,10 +517,42 @@
                                     <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }} €
                                     </td>
+                                    <td class="px-3 py-2.5 text-center">
+                                        @php
+                                            $ivaC = $row['pct_iva_compra'] ?? 0;
+                                            $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                                      : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                                      : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                        @endphp
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaCBadge }}">
+                                            {{ number_format($ivaC, 1, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }} €
+                                    </td>
+                                    <td class="px-3 py-2.5 text-center text-xs text-gray-500 font-medium">
+                                        {{ $row['fecha_ultima_compra'] ?? '—' }}
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
+                                        @if($row['precio_venta_sin_iva'] !== null)
+                                            {{ number_format($row['precio_venta_sin_iva'], 4, ',', '.') }} €
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-3 py-2.5 text-center">
+                                        @if($row['precio_venta'] !== null)
+                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaBadge }}">
+                                                {{ number_format($iva, 1, ',', '.') }}%
+                                            </span>
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
                                     <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
                                         @if($row['precio_venta'] !== null)
                                             {{ number_format($row['precio_venta'], 4, ',', '.') }} €
                                         @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-3 py-2.5 text-right text-xs text-gray-500 border-l-2 border-gray-100">
+                                        {{ $row['uds_compradas'] > 0 ? number_format($row['uds_compradas'], 0, ',', '.') : '—' }}
                                     </td>
                                     <td class="px-3 py-2.5 text-right text-xs text-gray-500">
                                         {{ $row['uds_vendidas'] > 0 ? number_format($row['uds_vendidas'], 0, ',', '.') : '—' }}
@@ -472,6 +589,11 @@
                                         ? 'bg-green-100 text-green-800 border-green-200'
                                         : ($m >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
                                                     : 'bg-red-100 text-red-800 border-red-200');
+
+                                    $ivaM = $row['pct_iva'] ?? 0;
+                                    $ivaBadgeM = $ivaM >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                               : ($ivaM >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                               : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                 @endphp
                                 <tr class="hover:bg-gray-50/60 transition-colors">
                                     <td class="px-4 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
@@ -482,6 +604,28 @@
                                     <td class="px-4 py-2.5 text-xs text-gray-500">{{ $row['grupo_nombre'] }}</td>
                                     <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }} €
+                                    </td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        @php
+                                            $ivaC = $row['pct_iva_compra'] ?? 0;
+                                            $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                                      : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                                      : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                        @endphp
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaCBadge }}">
+                                            {{ number_format($ivaC, 1, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }} €
+                                    </td>
+                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
+                                        {{ number_format($row['pvp_sin_iva'], 4, ',', '.') }} €
+                                    </td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaBadgeM }}">
+                                            {{ number_format($ivaM, 1, ',', '.') }}%
+                                        </span>
                                     </td>
                                     <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
                                         {{ number_format($row['pvp_con_iva'], 4, ',', '.') }} €

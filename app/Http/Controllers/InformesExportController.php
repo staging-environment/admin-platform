@@ -35,6 +35,21 @@ class InformesExportController extends Controller
                     default => $this->exportCsv($rows, 'margen_mercaderia'),
                 };
 
+            case 'tienda_margen':
+            case 'lavado_margen':
+                $rows = $reportService->getMargenSimple(
+                    $startMonth,
+                    $startYear,
+                    $endMonth,
+                    $endYear,
+                    $reportType === 'tienda_margen' ? ['3'] : ['4'],
+                    $stationCode
+                );
+                return match ($format) {
+                    'excel' => $this->exportExcel($rows, $reportType),
+                    default => $this->exportCsv($rows, $reportType),
+                };
+
             default:
                 abort(400, 'Tipo de informe no soportado.');
         }
@@ -48,8 +63,13 @@ class InformesExportController extends Controller
 
         $headers = match ($reportType) {
             'margen_mercaderia' => [
-                'Código', 'Descripción', 'Grupo', 'P.Compra (€)', 'PVP con IVA (€)',
+                'Código', 'Descripción', 'Grupo', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'PVP con IVA (€)',
                 '% IVA', 'PVP sin IVA (€)', '% Margen', 'Uds. Compradas',
+            ],
+            'tienda_margen', 'lavado_margen' => [
+                'Código', 'Descripción', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)',
+                '% IVA', 'PVP con IVA (€)', 'Uds. Compradas', 'Uds. Vendidas',
+                'Total Comprado (€)', 'Total Facturado (€)', 'Beneficio (€)', '% Margen',
             ],
             default => [],
         };
@@ -67,11 +87,30 @@ class InformesExportController extends Controller
                         $row['descripcion'],
                         $row['grupo_nombre'],
                         number_format($row['precio_compra'], 4, ',', '.'),
+                        number_format($row['pct_iva_compra'] ?? 0, 1, ',', '.') . '%',
+                        number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.'),
                         number_format($row['pvp_con_iva'], 4, ',', '.'),
                         number_format($row['pct_iva'], 2, ',', '.') . '%',
                         number_format($row['pvp_sin_iva'], 4, ',', '.'),
                         number_format($row['margen_pct'], 2, ',', '.') . '%',
                         number_format($row['unidades_compradas'], 3, ',', '.'),
+                    ],
+                    'tienda_margen', 'lavado_margen' => [
+                        $row['codigo'],
+                        $row['descripcion'],
+                        number_format($row['precio_compra'], 4, ',', '.'),
+                        number_format($row['pct_iva_compra'] ?? 0, 1, ',', '.') . '%',
+                        number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.'),
+                        $row['fecha_ultima_compra'] ?? '—',
+                        $row['precio_venta_sin_iva'] !== null ? number_format($row['precio_venta_sin_iva'], 4, ',', '.') : '—',
+                        $row['precio_venta'] !== null ? number_format($row['pct_iva'], 1, ',', '.') . '%' : '—',
+                        $row['precio_venta'] !== null ? number_format($row['precio_venta'], 4, ',', '.') : '—',
+                        number_format($row['uds_compradas'], 3, ',', '.'),
+                        number_format($row['uds_vendidas'], 3, ',', '.'),
+                        number_format($row['total_comprado'], 2, ',', '.'),
+                        number_format($row['total_facturado'], 2, ',', '.'),
+                        $row['beneficio'] !== null ? number_format($row['beneficio'], 2, ',', '.') : '—',
+                        $row['margen_pct'] !== null ? number_format($row['margen_pct'], 2, ',', '.') . '%' : '—',
                     ],
                     default => [],
                 };
@@ -102,7 +141,7 @@ class InformesExportController extends Controller
                     <Table>';
 
         if ($reportType === 'margen_mercaderia') {
-            $cols = ['Código','Descripción','Grupo','P.Compra (€)','PVP con IVA (€)','% IVA','PVP sin IVA (€)','% Margen','Uds. Compradas'];
+            $cols = ['Código','Descripción','Grupo','P.Compra (€)','% IVA Compra','P.Compra con IVA (€)','PVP con IVA (€)','% IVA','PVP sin IVA (€)','% Margen','Uds. Compradas'];
             $html .= '<Row>';
             foreach ($cols as $col) {
                 $html .= '<Cell ss:StyleID="header"><Data ss:Type="String">' . htmlspecialchars($col) . '</Data></Cell>';
@@ -115,11 +154,40 @@ class InformesExportController extends Controller
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['descripcion']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['grupo_nombre']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['precio_compra'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['pct_iva_compra'] ?? 0) . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['precio_compra_con_iva'] ?? $row['precio_compra']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['pvp_con_iva'] . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['pct_iva'] . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['pvp_sin_iva'] . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['margen_pct'] . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['unidades_compradas'] . '</Data></Cell>';
+                $html .= '</Row>';
+            }
+        } elseif (in_array($reportType, ['tienda_margen', 'lavado_margen'])) {
+            $cols = ['Código', 'Descripción', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)', '% IVA', 'PVP con IVA (€)', 'Uds. Compradas', 'Uds. Vendidas', 'Total Comprado (€)', 'Total Facturado (€)', 'Beneficio (€)', '% Margen'];
+            $html .= '<Row>';
+            foreach ($cols as $col) {
+                $html .= '<Cell ss:StyleID="header"><Data ss:Type="String">' . htmlspecialchars($col) . '</Data></Cell>';
+            }
+            $html .= '</Row>';
+
+            foreach ($rows as $row) {
+                $html .= '<Row>';
+                $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['codigo']) . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['descripcion']) . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . $row['precio_compra'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['pct_iva_compra'] ?? 0) . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['precio_compra_con_iva'] ?? $row['precio_compra']) . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['fecha_ultima_compra'] ?? '') . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="' . ($row['precio_venta_sin_iva'] !== null ? 'Number' : 'String') . '">' . ($row['precio_venta_sin_iva'] ?? '') . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="' . ($row['precio_venta'] !== null ? 'Number' : 'String') . '">' . ($row['precio_venta'] !== null ? $row['pct_iva'] : '') . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="' . ($row['precio_venta'] !== null ? 'Number' : 'String') . '">' . ($row['precio_venta'] ?? '') . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . $row['uds_compradas'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . $row['uds_vendidas'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . $row['total_comprado'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . $row['total_facturado'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="' . ($row['beneficio'] !== null ? 'Number' : 'String') . '">' . ($row['beneficio'] ?? '') . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="' . ($row['margen_pct'] !== null ? 'Number' : 'String') . '">' . ($row['margen_pct'] ?? '') . '</Data></Cell>';
                 $html .= '</Row>';
             }
         }

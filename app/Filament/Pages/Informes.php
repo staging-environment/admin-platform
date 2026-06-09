@@ -47,6 +47,10 @@ class Informes extends Page implements HasForms
     /** Búsqueda en la tabla de resultados */
     public string $searchQuery  = '';
 
+    /** Filtros adicionales de la tabla */
+    public ?string $filterGroup = null;
+    public ?string $filterMargin = null;
+
     /** Paginación de la tabla */
     public int    $tablePage      = 1;
     public int    $tablePerPage   = 30;
@@ -189,60 +193,6 @@ class Informes extends Page implements HasForms
                                         ->required(),
                                 ]),
                         ]),
-
-                    Wizard\Step::make('Paso 3: Resumen')
-                        ->description('Verifica la información que se mostrará')
-                        ->schema([
-                            Placeholder::make('resumen_info')
-                                ->label('Información que vas a generar')
-                                ->content(function (Get $get) {
-                                    $type = $get('reportType');
-                                    if ($type === 'tienda_margen') {
-                                        return new HtmlString('
-                                            <div class="space-y-2 text-sm text-gray-700">
-                                                <p><b>📦 Grupo Seleccionado:</b> Grupo 3 (Alimentación) y todos sus subgrupos.</p>
-                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
-                                                <ul class="list-disc pl-5 text-gray-600">
-                                                    <li>Precio de Compra (Coste de mercancía en factura)</li>
-                                                    <li>Precio de Venta (Cobro real en caja)</li>
-                                                    <li>Unidades Totales Vendidas</li>
-                                                    <li>Total Comprado (€ invertidos) y Total Facturado (€ ingresados)</li>
-                                                    <li>Beneficio Neto (€ de ganancia limpia) y % de Margen Real</li>
-                                                </ul>
-                                            </div>
-                                        ');
-                                    }
-                                    if ($type === 'lavado_margen') {
-                                        return new HtmlString('
-                                            <div class="space-y-2 text-sm text-gray-700">
-                                                <p><b>🚐 Grupo Seleccionado:</b> Grupo 4 (Centro de Lavado) y todos sus subgrupos.</p>
-                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
-                                                <ul class="list-disc pl-5 text-gray-600">
-                                                    <li>Precio de Compra (Coste de insumos)</li>
-                                                    <li>Precio de Venta (Cobro real del servicio)</li>
-                                                    <li>Unidades Vendidas</li>
-                                                    <li>Total Comprado (€ invertidos) y Total Facturado (€ ingresados)</li>
-                                                    <li>Beneficio Neto (€ de ganancia limpia) y % de Margen Real</li>
-                                                </ul>
-                                            </div>
-                                        ');
-                                    }
-                                    if ($type === 'margen_mercaderia') {
-                                        return new HtmlString('
-                                            <div class="space-y-2 text-sm text-gray-700">
-                                                <p><b>📦/🚐 Grupos Seleccionados:</b> Grupo 3 (Tienda) y Grupo 4 (Lavadero).</p>
-                                                <p><b>📊 Columnas que verás en la tabla:</b></p>
-                                                <ul class="list-disc pl-5 text-gray-600">
-                                                    <li>Precio de Compra medio</li>
-                                                    <li>PVP de Tarifa (Teórico, no el real de caja)</li>
-                                                    <li>% Margen Comercial Teórico</li>
-                                                </ul>
-                                            </div>
-                                        ');
-                                    }
-                                    return new HtmlString('<p class="text-amber-600">Por favor, vuelve al Paso 1 y selecciona un tipo de informe.</p>');
-                                }),
-                        ]),
                 ])
                 ->nextAction(fn ($action) => $action->label('Siguiente Paso'))
                 ->previousAction(fn ($action) => $action->label('Atrás'))
@@ -276,8 +226,11 @@ class Informes extends Page implements HasForms
         $this->errorMsg   = null;
         $this->tablePage  = 1;
         $this->searchQuery = '';
+        $this->filterGroup   = null;
+        $this->filterMargin  = null;
         $this->sortColumn    = '';
         $this->sortDirection = 'asc';
+        $this->chartEvolucionData = null;
 
         $data = $this->form->getState();
 
@@ -457,11 +410,29 @@ class Informes extends Page implements HasForms
         $this->tablePage = 1;
     }
 
+    public function updatedFilterGroup()
+    {
+        $this->tablePage = 1;
+    }
+
+    public function updatedFilterMargin()
+    {
+        $this->tablePage = 1;
+    }
+
+    public function getActiveGroups(): array
+    {
+        if (!$this->tableData) return [];
+        return array_values(array_unique(array_filter(array_column($this->tableData, 'grupo_nombre'))));
+    }
+
     protected function getFilteredTableData(): array
     {
         if (!$this->tableData) return [];
         
         $data = $this->tableData;
+        
+        // Filtro buscador
         if (!empty($this->searchQuery)) {
             $q = mb_strtolower($this->searchQuery);
             $data = array_filter($data, function($row) use ($q) {
@@ -470,6 +441,31 @@ class Informes extends Page implements HasForms
                     || str_contains(mb_strtolower($row['grupo_nombre'] ?? ''), $q);
             });
         }
+
+        // Filtro grupo
+        if (!empty($this->filterGroup)) {
+            $fg = $this->filterGroup;
+            $data = array_filter($data, function($row) use ($fg) {
+                return ($row['grupo_nombre'] ?? '') === $fg;
+            });
+        }
+
+        // Filtro margen
+        if (!empty($this->filterMargin)) {
+            $fm = $this->filterMargin;
+            $data = array_filter($data, function($row) use ($fm) {
+                $m = $row['margen_pct'] ?? $row['margen_real_pct'] ?? null;
+                $sinV = $row['sin_ventas'] ?? false;
+
+                if ($fm === 'high') return $m !== null && $m >= 40 && !$sinV;
+                if ($fm === 'mid') return $m !== null && $m >= 20 && $m < 40 && !$sinV;
+                if ($fm === 'low') return $m !== null && $m >= 0 && $m < 20 && !$sinV;
+                if ($fm === 'negative') return $m !== null && $m < 0 && !$sinV;
+                if ($fm === 'no_sales') return $sinV || $m === null;
+                return true;
+            });
+        }
+
         return $data;
     }
 
