@@ -57,7 +57,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        <strong>¿Qué hace este bloque?</strong> Muestra la tendencia internacional del mercado mayorista (NYMEX). Calculamos una estimación del <strong>PVP en Surtidor</strong> aplicando los impuestos especiales de España (IEH + 21% IVA) y el margen real promedio observado en la zona seleccionada. Esto sirve como indicador adelantado: los movimientos de los futuros suelen reflejarse en los precios de surtidor locales con unos días de retraso.
+                        <strong>¿Qué hace este bloque?</strong> Muestra la tendencia internacional del mercado mayorista (NYMEX). Calculamos una estimación del <strong>PVP en Surtidor</strong> aplicando los impuestos especiales de España (IEH + 21% IVA) y el margen real promedio observado en la zona seleccionada. Esto sirve como indicador adelantado: los movimientos de los futuros suelen reflejarse en los precios de surtidor locales con unos días de retraso. <strong>Nota: Los gráficos muestran la evolución histórica real de los últimos 30 días, no una previsión de precios futuros.</strong>
                     </p>
                 </div>
 
@@ -97,8 +97,8 @@
                         <div class="flex flex-col justify-between items-end gap-2 shrink-0">
                             {{-- Sparkline SVG --}}
                             @if(!empty($future['sparklinePoints']))
-                            <div class="relative bg-slate-50 p-2.5 rounded-xl border border-slate-100/80">
-                                <svg class="h-10 w-32 overflow-visible" viewBox="0 0 120 36">
+                            <div class="relative bg-slate-50 p-2.5 pb-4 rounded-xl border border-slate-100/80 flex flex-col justify-between items-end">
+                                <svg class="h-10 w-32 overflow-visible mb-1.5" viewBox="0 0 120 36">
                                     <polyline
                                         fill="none"
                                         stroke="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}"
@@ -116,7 +116,10 @@
                                         <circle cx="{{ $coords[0] }}" cy="{{ $coords[1] }}" r="3" fill="{{ $future['positivo'] ? '#16a34a' : '#dc2626' }}" />
                                     @endif
                                 </svg>
-                                <span class="absolute top-1 right-2 text-[8px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none">Últimos 30d</span>
+                                <div class="w-full flex justify-between gap-1 text-[7px] font-black text-slate-400 uppercase tracking-tight select-none">
+                                    <span>Histórico (30d)</span>
+                                    <span>{{ $future['rango_fechas'] }}</span>
+                                </div>
                             </div>
                             @endif
 

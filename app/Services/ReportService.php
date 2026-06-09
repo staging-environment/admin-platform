@@ -584,13 +584,22 @@ class ReportService
                     $resData = $response->json();
                     $metaInfo = $resData['chart']['result'][0]['meta'] ?? null;
                     $closePrices = $resData['chart']['result'][0]['indicators']['quote'][0]['close'] ?? [];
-                    $closePrices = array_values(array_filter($closePrices, fn($p) => $p !== null));
+                    $timestamps = $resData['chart']['result'][0]['timestamp'] ?? [];
 
-                    if (!$metaInfo || empty($closePrices)) {
+                    $validClosePrices = [];
+                    $validTimestamps = [];
+                    foreach ($closePrices as $idx => $p) {
+                        if ($p !== null) {
+                            $validClosePrices[] = $p;
+                            $validTimestamps[] = $timestamps[$idx] ?? null;
+                        }
+                    }
+
+                    if (!$metaInfo || empty($validClosePrices)) {
                         continue;
                     }
 
-                    $precio = (float) ($metaInfo['regularMarketPrice'] ?? end($closePrices));
+                    $precio = (float) ($metaInfo['regularMarketPrice'] ?? end($validClosePrices));
                     $prevClose = (float) ($metaInfo['chartPreviousClose'] ?? 0);
 
                     $results['symbols'][$symbol] = [
@@ -599,7 +608,9 @@ class ReportService
                         'tipo' => $meta['tipo'],
                         'precio_usd_gal' => $precio,
                         'prev_close_usd_gal' => $prevClose,
-                        'close_prices_usd_gal' => $closePrices,
+                        'close_prices_usd_gal' => $validClosePrices,
+                        'first_timestamp' => !empty($validTimestamps) ? $validTimestamps[0] : null,
+                        'last_timestamp' => !empty($validTimestamps) ? end($validTimestamps) : null,
                     ];
                 } catch (\Exception $e) {
                     report($e);
@@ -694,6 +705,10 @@ class ReportService
             // 4. Generar Sparkline SVG
             $sparklinePoints = $this->getSparklinePoints($estimatedPrices, 120, 36);
 
+            $fechaInicio = isset($data['first_timestamp']) && $data['first_timestamp'] ? Carbon::createFromTimestamp($data['first_timestamp'])->locale('es')->isoFormat('D [de] MMMM') : '';
+            $fechaFin = isset($data['last_timestamp']) && $data['last_timestamp'] ? Carbon::createFromTimestamp($data['last_timestamp'])->locale('es')->isoFormat('D [de] MMMM') : '';
+            $rangoFechas = $fechaInicio && $fechaFin ? "{$fechaInicio} al {$fechaFin}" : 'Últimos 30 días';
+
             $results[$symbol] = [
                 'nombre' => $data['nombre'] . ($tipo === 'gas95' ? ' (Super 95)' : ' (Diésel A)'),
                 'icono' => $data['icono'],
@@ -706,6 +721,7 @@ class ReportService
                 'weeklyChangePct' => $weeklyChangePct,
                 'monthlyChangePct' => $monthlyChangePct,
                 'sparklinePoints' => $sparklinePoints,
+                'rango_fechas' => $rangoFechas,
                 'currency' => 'EUR',
                 'unidad' => '€/L',
             ];
