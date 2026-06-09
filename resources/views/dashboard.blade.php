@@ -167,15 +167,19 @@
                                             data-price="{{ $pt['price'] }}"
                                             data-symbol="{{ $symbol }}"
                                             data-is-projection="{{ ($pt['is_projection'] ?? false) ? '1' : '0' }}"
+                                            data-color="{{ ($pt['is_projection'] ?? false) ? '#3b82f6' : ($future['positivo'] ? '#16a34a' : '#dc2626') }}"
                                         />
                                     @endforeach
                                 </svg>
                                 
-                                <div class="w-full flex justify-between gap-3 text-[7px] font-black text-slate-400 uppercase tracking-tight select-none">
-                                    <span>
-                                        Histórico ({{ $futuresRange === '30d' ? '30d' : ($futuresRange === '6m' ? '6 meses' : '1 año') }})
-                                    </span>
-                                    <span class="hover-info-display-{{ $symbol }} text-blue-600 font-extrabold normal-case" data-default="{{ $future['rango_fechas'] }}">
+                                <div class="w-full flex justify-between items-center gap-3 text-[7px] font-black text-slate-400 uppercase tracking-tight select-none mt-1">
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <span class="inline-block w-1 h-1 rounded-full {{ $future['positivo'] ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                                        <span>Histórico ({{ $futuresRange === '30d' ? '30d' : ($futuresRange === '6m' ? '6 meses' : '1 año') }})</span>
+                                        <span class="inline-block w-1.5 h-0.5 bg-blue-500 rounded-sm"></span>
+                                        <span class="text-blue-500 font-extrabold">Proyección</span>
+                                    </div>
+                                    <span class="hover-info-display-{{ $symbol }} text-blue-600 font-extrabold normal-case text-right truncate" data-default="{{ $future['rango_fechas'] }}">
                                         {{ $future['rango_fechas'] }}
                                     </span>
                                 </div>
@@ -600,14 +604,18 @@
                             if (dot) {
                                 dot.setAttribute('cx', cx);
                                 dot.setAttribute('cy', cy);
+                                dot.setAttribute('fill', this.getAttribute('data-color') || '#3b82f6');
                                 dot.classList.remove('hidden');
                             }
                             if (lastDot) {
                                 lastDot.classList.add('opacity-0');
                             }
                             if (display) {
-                                const prefix = isProj ? 'Proyección: ' : '';
-                                display.textContent = prefix + date + ' - ' + price + ' €/L';
+                                if (isProj) {
+                                    display.innerHTML = '<span class="text-blue-500 font-extrabold uppercase text-[6px]">Proy.</span> <span class="text-blue-600 font-bold">' + date + ' - ' + price + ' €/L</span>';
+                                } else {
+                                    display.innerHTML = '<span class="text-slate-450 font-bold uppercase text-[6px]">Hist.</span> <span class="text-slate-600 font-bold">' + date + ' - ' + price + ' €/L</span>';
+                                }
                             }
                         });
                     });
