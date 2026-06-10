@@ -268,7 +268,7 @@
         {{-- ZONA INFERIOR: COMPETENCIA LOCAL                               --}}
         {{-- ═══════════════════════════════════════════════════════════════ --}}
 
-        <section wire:poll.300s="refreshCompetitors">
+        <section wire:poll.10s="refreshCompetitors">
 
             <div class="flex items-center gap-2.5 mb-4">
                 <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
