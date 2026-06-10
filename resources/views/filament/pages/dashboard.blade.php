@@ -352,6 +352,7 @@
                                         </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
+                                        wire:key="price-diesel-{{ $key }}-{{ $rank }}-{{ time() }}"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#111827' : '#374151' }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
@@ -397,6 +398,7 @@
                                         </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
+                                        wire:key="price-gas95-{{ $key }}-{{ $rank }}-{{ time() }}"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#15803d' : '#16a34a' }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
