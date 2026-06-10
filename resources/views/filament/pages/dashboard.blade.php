@@ -1,3 +1,6 @@
+<style>
+    .fi-header { display: none !important; }
+</style>
 <x-filament-panels::page>
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
