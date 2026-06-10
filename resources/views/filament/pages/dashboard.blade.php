@@ -357,15 +357,18 @@
 
             /* Flecha */
             if (elArrow) {
-                var arrowUp   = prefix === 'gasoil' ? '#34d399' : '#6ee7b7';
-                var arrowDown = prefix === 'gasoil' ? '#f87171' : '#fca5a5';
-                var arrowNull = prefix === 'gasoil' ? '#6b7280' : 'rgba(52,211,153,0.4)';
+                var arrowUpColor   = prefix === 'gasoil' ? '#34d399' : '#6ee7b7';
+                var arrowDownColor = prefix === 'gasoil' ? '#f87171' : '#fca5a5';
+                var arrowNullColor = prefix === 'gasoil' ? '#6b7280' : 'rgba(52,211,153,0.4)';
                 if (data.is_up === true) {
-                    elArrow.innerHTML = '<span style="color:' + arrowUp + '">▲</span>';
+                    elArrow.style.color = arrowUpColor;
+                    elArrow.textContent = '▲';
                 } else if (data.is_up === false) {
-                    elArrow.innerHTML = '<span style="color:' + arrowDown + '">▼</span>';
+                    elArrow.style.color = arrowDownColor;
+                    elArrow.textContent = '▼';
                 } else {
-                    elArrow.innerHTML = '<span style="color:' + arrowNull + '">—</span>';
+                    elArrow.style.color = arrowNullColor;
+                    elArrow.textContent = '—';
                 }
             }
 
@@ -401,6 +404,99 @@
         fetchMarkets();
         setInterval(fetchMarkets, POLL_INTERVAL);
 
+        /* Helpers to build DOM elements programmatically (bypassing Trusted Types CSP restrictions) */
+        function createStationRow(rank, station, fuelType) {
+            var row = document.createElement('div');
+            row.className = 'station-row' + (rank === 0 ? ' rank-1' : '');
+            if (fuelType === 'gas95' && rank === 0) {
+                row.style.background = 'rgba(22,163,74,0.05)';
+            }
+
+            var chip = document.createElement('span');
+            chip.className = 'rank-chip text-white';
+            var chipBg = '';
+            if (fuelType === 'diesel') {
+                chipBg = rank === 0 ? '#111827' : (rank === 1 ? '#374151' : (rank === 2 ? '#4b5563' : '#6b7280'));
+            } else {
+                chipBg = rank === 0 ? '#15803d' : (rank === 1 ? '#16a34a' : (rank === 2 ? '#22c55e' : '#4ade80'));
+            }
+            chip.style.backgroundColor = chipBg;
+            chip.textContent = rank + 1;
+            row.appendChild(chip);
+
+            var infoCol = document.createElement('div');
+            infoCol.className = 'flex-1 min-w-0';
+
+            var link = document.createElement('a');
+            var mapQuery = encodeURIComponent(station.name + ', ' + station.address);
+            link.href = 'https://www.google.com/maps/search/?api=1&query=' + mapQuery;
+            link.target = '_blank';
+            link.className = 'hover:underline block group';
+            link.title = 'Ver en Google Maps';
+
+            var nameP = document.createElement('p');
+            nameP.className = 'font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400';
+            nameP.style.fontSize = '11px';
+            nameP.style.color = '#1f2937';
+            nameP.textContent = station.name.length > 24 ? station.name.substring(0, 21) + '...' : station.name;
+
+            var addrP = document.createElement('p');
+            addrP.className = 'truncate leading-none dark:text-gray-400 mt-0.5';
+            addrP.style.fontSize = '9px';
+            addrP.style.color = '#6b7280';
+            addrP.textContent = station.address.length > 30 ? station.address.substring(0, 27) + '...' : station.address;
+
+            link.appendChild(nameP);
+            link.appendChild(addrP);
+            infoCol.appendChild(link);
+            row.appendChild(infoCol);
+
+            var priceSpan = document.createElement('span');
+            priceSpan.className = 'font-black tabular-nums whitespace-nowrap local-price-blink';
+            priceSpan.style.fontSize = '12px';
+            var priceColor = '';
+            if (fuelType === 'diesel') {
+                priceColor = rank === 0 ? '#111827' : '#374151';
+            } else {
+                priceColor = rank === 0 ? '#15803d' : '#16a34a';
+            }
+            priceSpan.style.color = priceColor;
+            
+            var formattedPrice = parseFloat(station.price).toFixed(3).replace('.', ',');
+            priceSpan.textContent = formattedPrice + ' \u20AC';
+            
+            row.appendChild(priceSpan);
+            return row;
+        }
+
+        function createEmptyState() {
+            var div = document.createElement('div');
+            div.className = 'flex flex-col items-center justify-center py-6 gap-1.5';
+            
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'w-6 h-6');
+            svg.setAttribute('style', 'color:#d1d5db');
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('stroke', 'currentColor');
+            
+            var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            path.setAttribute('stroke-width', '1.5');
+            path.setAttribute('d', 'M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z');
+            svg.appendChild(path);
+            
+            var span = document.createElement('span');
+            span.className = 'text-xs';
+            span.style.color = '#9ca3af';
+            span.textContent = 'Sin datos disponibles';
+            
+            div.appendChild(svg);
+            div.appendChild(span);
+            return div;
+        }
+
         const COMPETITORS_URL = '{{ route("admin.competitor.data") }}';
         function fetchCompetitors() {
             fetch(COMPETITORS_URL, {
@@ -415,17 +511,50 @@
                 return res.json();
             })
             .then(function (data) {
-                var container = document.getElementById('competitors-container');
-                if (container) {
-                    container.innerHTML = data.html;
+                if (!data || !data.localities) return;
+                
+                Object.keys(data.localities).forEach(function (key) {
+                    var locality = data.localities[key];
                     
-                    // Trigger flash on all local prices
-                    var prices = container.querySelectorAll('.local-price-blink');
-                    prices.forEach(function (el) {
-                        el.classList.add('price-blink');
-                        setTimeout(function () { el.classList.remove('price-blink'); }, 500);
-                    });
-                }
+                    // Update timestamp
+                    var timeEl = document.getElementById('updated-time-' + key);
+                    if (timeEl) {
+                        timeEl.textContent = locality.updated_at ? 'Actualizado: ' + locality.updated_at : '';
+                    }
+                    
+                    // Update diesel rows
+                    var dieselContainer = document.getElementById('rows-' + key + '-diesel');
+                    if (dieselContainer) {
+                        dieselContainer.textContent = '';
+                        if (locality.diesel && locality.diesel.length > 0) {
+                            locality.diesel.forEach(function (station, rank) {
+                                dieselContainer.appendChild(createStationRow(rank, station, 'diesel'));
+                            });
+                        } else {
+                            dieselContainer.appendChild(createEmptyState());
+                        }
+                    }
+                    
+                    // Update gas95 rows
+                    var gas95Container = document.getElementById('rows-' + key + '-gas95');
+                    if (gas95Container) {
+                        gas95Container.textContent = '';
+                        if (locality.gas95 && locality.gas95.length > 0) {
+                            locality.gas95.forEach(function (station, rank) {
+                                gas95Container.appendChild(createStationRow(rank, station, 'gas95'));
+                            });
+                        } else {
+                            gas95Container.appendChild(createEmptyState());
+                        }
+                    }
+                });
+
+                // Trigger flash on all local prices
+                var prices = document.querySelectorAll('.local-price-blink');
+                prices.forEach(function (el) {
+                    el.classList.add('price-blink');
+                    setTimeout(function () { el.classList.remove('price-blink'); }, 500);
+                });
             })
             .catch(function (err) {
                 console.warn('[Dashboard] Error fetching competitor data:', err);

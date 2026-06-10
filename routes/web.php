@@ -214,8 +214,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/admin/api/competitor-data', function () {
         $localityData = app(\App\Services\MineturService::class)->getAllLocalitiesData();
-        $html = view('filament.pages.competitors-list', compact('localityData'))->render();
-        return response()->json(['html' => $html]);
+        return response()->json(['localities' => $localityData]);
     })->name('admin.competitor.data');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

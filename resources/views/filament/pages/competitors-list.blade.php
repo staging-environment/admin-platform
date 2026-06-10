@@ -24,11 +24,11 @@
                     </div>
                     <h3 class="text-sm font-bold text-white">{{ $localityName }}</h3>
                 </div>
-                @if($ldata['updated_at'])
-                    <span class="text-xs font-medium tabular-nums" style="color:#9ca3af">
+                <span id="updated-time-{{ $key }}" class="text-xs font-medium tabular-nums" style="color:#9ca3af">
+                    @if($ldata['updated_at'])
                         Actualizado: {{ $ldata['updated_at'] }}
-                    </span>
-                @endif
+                    @endif
+                </span>
             </div>
 
             {{-- Columnas Diesel | Gasolina 95 --}}
@@ -41,8 +41,8 @@
                         <span class="text-xs font-black uppercase tracking-widest" style="color:#1f2937;font-size:9px">Diesel</span>
                     </div>
 
-                    @if(count($ldata['diesel']) > 0)
-                        <div class="space-y-1">
+                    <div id="rows-{{ $key }}-diesel" class="space-y-1">
+                        @if(count($ldata['diesel']) > 0)
                             @foreach($ldata['diesel'] as $rank => $station)
                                 <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}">
                                     <span class="rank-chip text-white"
@@ -68,15 +68,15 @@
                                     </span>
                                 </div>
                             @endforeach
-                        </div>
-                    @else
-                        <div class="flex flex-col items-center justify-center py-6 gap-1.5">
-                            <svg class="w-6 h-6" style="color:#d1d5db" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-                            </svg>
-                            <span class="text-xs" style="color:#9ca3af">Sin datos disponibles</span>
-                        </div>
-                    @endif
+                        @else
+                            <div class="flex flex-col items-center justify-center py-6 gap-1.5">
+                                <svg class="w-6 h-6" style="color:#d1d5db" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                                </svg>
+                                <span class="text-xs" style="color:#9ca3af">Sin datos disponibles</span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- ── COLUMNA GASOLINA 95 (verde) ─────────────── --}}
@@ -86,8 +86,8 @@
                         <span class="text-xs font-black uppercase tracking-widest" style="color:#16a34a;font-size:9px">Gasolina 95</span>
                     </div>
 
-                    @if(count($ldata['gas95']) > 0)
-                        <div class="space-y-1">
+                    <div id="rows-{{ $key }}-gas95" class="space-y-1">
+                        @if(count($ldata['gas95']) > 0)
                             @foreach($ldata['gas95'] as $rank => $station)
                                 <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}" style="{{ $rank === 0 ? 'background:rgba(22,163,74,0.05)' : '' }}">
                                     <span class="rank-chip text-white"
@@ -113,15 +113,15 @@
                                     </span>
                                 </div>
                             @endforeach
-                        </div>
-                    @else
-                        <div class="flex flex-col items-center justify-center py-6 gap-1.5">
-                            <svg class="w-6 h-6" style="color:#d1d5db" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-                            </svg>
-                            <span class="text-xs" style="color:#9ca3af">Sin datos disponibles</span>
-                        </div>
-                    @endif
+                        @else
+                            <div class="flex flex-col items-center justify-center py-6 gap-1.5">
+                                <svg class="w-6 h-6" style="color:#d1d5db" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                                </svg>
+                                <span class="text-xs" style="color:#9ca3af">Sin datos disponibles</span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
             </div>
