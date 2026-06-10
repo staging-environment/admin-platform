@@ -140,7 +140,7 @@
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(251,191,36,0.12);color:#fbbf24;font-size:9px">FUTURES</span>
                             </div>
                             <h3 class="text-xl font-black text-white">Gasoil Londres</h3>
-                            <p class="text-xs mt-0.5" style="color:#4b5563">Brent Crude Oil Futures · USD/bbl</p>
+                            <p class="text-xs mt-0.5" style="color:#4b5563">Brent Crude Oil Futures · EUR/bbl</p>
                         </div>
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
                             <svg class="w-5 h-5" style="color:#fbbf24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -159,7 +159,7 @@
                                     <span class="market-spinner"></span>
                                 @endif
                             </span>
-                            <span class="text-sm font-semibold" style="color:#6b7280">USD</span>
+                            <span class="text-sm font-semibold" style="color:#6b7280">EUR</span>
                         </div>
 
                         {{-- Variación --}}
@@ -204,7 +204,7 @@
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(52,211,153,0.12);color:#34d399;font-size:9px">FUTURES</span>
                             </div>
                             <h3 class="text-xl font-black text-white">Gasolina RBOB</h3>
-                            <p class="text-xs mt-0.5" style="color:rgba(52,211,153,0.4)">Reformulated Gasoline Futures · USD/gal</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(52,211,153,0.4)">Reformulated Gasoline Futures · EUR/gal</p>
                         </div>
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">
                             <svg class="w-5 h-5" style="color:#34d399" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -223,7 +223,7 @@
                                     <span class="market-spinner"></span>
                                 @endif
                             </span>
-                            <span class="text-sm font-semibold" style="color:rgba(52,211,153,0.4)">USD</span>
+                            <span class="text-sm font-semibold" style="color:rgba(52,211,153,0.4)">EUR</span>
                         </div>
 
                         {{-- Variación --}}

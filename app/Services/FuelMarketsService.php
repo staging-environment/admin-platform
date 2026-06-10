@@ -37,7 +37,7 @@ class FuelMarketsService
                     'Referer'         => 'https://finance.yahoo.com/',
                 ])
                 ->get('https://query1.finance.yahoo.com/v7/finance/quote', [
-                    'symbols' => 'BZ=F,RB=F',
+                    'symbols' => 'BZ=F,RB=F,EUR=X',
                     'fields'  => 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime,currency',
                     'lang'    => 'en-US',
                     'region'  => 'US',
@@ -45,6 +45,7 @@ class FuelMarketsService
 
             if (! $response->successful()) {
                 Log::warning('FuelMarketsService: v7 returned ' . $response->status() . '. Falling back to v8/chart.');
+                $this->refreshViaChart('EUR=X');
                 $this->refreshViaChart('BZ=F');
                 $this->refreshViaChart('RB=F');
                 return;
@@ -53,21 +54,38 @@ class FuelMarketsService
             $quotes = $response->json('quoteResponse.result', []);
             if (empty($quotes)) {
                 Log::warning('FuelMarketsService: v7 returned empty result. Falling back to v8/chart.');
+                $this->refreshViaChart('EUR=X');
                 $this->refreshViaChart('BZ=F');
                 $this->refreshViaChart('RB=F');
                 return;
             }
 
+            // Primero buscamos y guardamos el cambio USD/EUR
+            $rate = 0.92;
             foreach ($quotes as $quote) {
                 $symbol = $quote['symbol'] ?? '';
-                $change = $quote['regularMarketChange'] ?? 0;
+                if ($symbol === 'EUR=X' || $symbol === 'USDEUR=X') {
+                    $rate = (float) ($quote['regularMarketPrice'] ?? 0.92);
+                    Cache::put('fuel_markets_usd_eur_rate', $rate, self::CACHE_TTL);
+                }
+            }
+
+            // Ahora aplicamos la conversión a los futuros
+            foreach ($quotes as $quote) {
+                $symbol = $quote['symbol'] ?? '';
+                if ($symbol === 'EUR=X' || $symbol === 'USDEUR=X') {
+                    continue;
+                }
+
+                $price  = (float) ($quote['regularMarketPrice'] ?? 0);
+                $change = (float) ($quote['regularMarketChange'] ?? 0);
 
                 $payload = [
                     'symbol'     => $symbol,
-                    'price'      => round($quote['regularMarketPrice'] ?? 0, 4),
-                    'change'     => round($change, 4),
+                    'price'      => round($price * $rate, 4),
+                    'change'     => round($change * $rate, 4),
                     'change_pct' => round($quote['regularMarketChangePercent'] ?? 0, 2),
-                    'currency'   => $quote['currency'] ?? 'USD',
+                    'currency'   => 'EUR',
                     'is_up'      => $change >= 0,
                     'updated_at' => now()->format('H:i:s'),
                 ];
@@ -79,10 +97,11 @@ class FuelMarketsService
                 }
             }
 
-            Log::info('FuelMarketsService: Updated ' . count($quotes) . ' quotes via v7.');
+            Log::info('FuelMarketsService: Updated quotes via v7 (USD/EUR rate: ' . $rate . ').');
 
         } catch (\Throwable $e) {
             Log::warning('FuelMarketsService (v7 exception): ' . $e->getMessage());
+            $this->refreshViaChart('EUR=X');
             $this->refreshViaChart('BZ=F');
             $this->refreshViaChart('RB=F');
         }
@@ -120,12 +139,20 @@ class FuelMarketsService
             $change    = $price - $prevClose;
             $changePct = $prevClose > 0 ? ($change / $prevClose) * 100 : 0;
 
+            if ($symbol === 'EUR=X' || $symbol === 'USDEUR=X') {
+                Cache::put('fuel_markets_usd_eur_rate', $price, self::CACHE_TTL);
+                Log::info("FuelMarketsService (chart): Updated USD/EUR rate to {$price}.");
+                return;
+            }
+
+            $rate = (float) Cache::get('fuel_markets_usd_eur_rate', 0.92);
+
             $payload = [
                 'symbol'     => $symbol,
-                'price'      => round($price, 4),
-                'change'     => round($change, 4),
+                'price'      => round($price * $rate, 4),
+                'change'     => round($change * $rate, 4),
                 'change_pct' => round($changePct, 2),
-                'currency'   => $meta['currency'] ?? 'USD',
+                'currency'   => 'EUR',
                 'is_up'      => $change >= 0,
                 'updated_at' => now()->format('H:i:s'),
             ];
@@ -136,7 +163,7 @@ class FuelMarketsService
                 Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
             }
 
-            Log::info("FuelMarketsService (chart): Updated {$symbol}.");
+            Log::info("FuelMarketsService (chart): Updated {$symbol} (converted to EUR).");
 
         } catch (\Throwable $e) {
             Log::warning("FuelMarketsService (chart/{$symbol}): " . $e->getMessage());
@@ -150,7 +177,7 @@ class FuelMarketsService
             'price'      => null,
             'change'     => null,
             'change_pct' => null,
-            'currency'   => 'USD',
+            'currency'   => 'EUR',
             'is_up'      => null,
             'updated_at' => null,
         ];
