@@ -328,9 +328,17 @@
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-semibold truncate leading-tight dark:text-gray-200" style="font-size:11px;color:#1f2937">
-                                            {{ Str::limit($station['name'], 20) }}
-                                        </p>
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address']) }}" 
+                                           target="_blank" 
+                                           class="hover:underline block group"
+                                           title="Ver en Google Maps">
+                                            <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
+                                                {{ Str::limit($station['name'], 24) }}
+                                            </p>
+                                            <p class="truncate leading-none dark:text-gray-400 mt-0.5" style="font-size:9px;color:#6b7280">
+                                                {{ Str::limit($station['address'], 30) }}
+                                            </p>
+                                        </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#111827' : '#374151' }}">
@@ -365,9 +373,17 @@
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-semibold truncate leading-tight dark:text-gray-200" style="font-size:11px;color:#1f2937">
-                                            {{ Str::limit($station['name'], 20) }}
-                                        </p>
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address']) }}" 
+                                           target="_blank" 
+                                           class="hover:underline block group"
+                                           title="Ver en Google Maps">
+                                            <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
+                                                {{ Str::limit($station['name'], 24) }}
+                                            </p>
+                                            <p class="truncate leading-none dark:text-gray-400 mt-0.5" style="font-size:9px;color:#6b7280">
+                                                {{ Str::limit($station['address'], 30) }}
+                                            </p>
+                                        </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#15803d' : '#16a34a' }}">
