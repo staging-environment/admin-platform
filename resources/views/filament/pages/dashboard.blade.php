@@ -115,7 +115,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
-    <div class="space-y-7">
+    <div class="space-y-7" style="margin-top: -2.25rem !important;">
 
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         {{-- ZONA SUPERIOR: MERCADOS ENERGÉTICOS INTERNACIONALES            --}}
