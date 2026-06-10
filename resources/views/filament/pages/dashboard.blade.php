@@ -1,7 +1,7 @@
-<style>
-    .fi-header { display: none !important; }
-</style>
 <x-filament-panels::page>
+    <style>
+        .fi-header { display: none !important; }
+    </style>
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     {{-- ESTILOS INLINE DEL DASHBOARD                                       --}}
