@@ -555,6 +555,15 @@
                     el.classList.add('price-blink');
                     setTimeout(function () { el.classList.remove('price-blink'); }, 500);
                 });
+
+                // Trigger flash on all update timestamps to give live system feel
+                Object.keys(data.localities).forEach(function (key) {
+                    var timeEl = document.getElementById('updated-time-' + key);
+                    if (timeEl) {
+                        timeEl.classList.add('price-blink');
+                        setTimeout(function () { timeEl.classList.remove('price-blink'); }, 500);
+                    }
+                });
             })
             .catch(function (err) {
                 console.warn('[Dashboard] Error fetching competitor data:', err);
