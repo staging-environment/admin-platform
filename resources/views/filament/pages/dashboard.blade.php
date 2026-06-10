@@ -570,9 +570,9 @@
             });
         }
 
-        // Ejecutar de inmediato y luego cada 10 segundos
+        // Ejecutar de inmediato y luego cada 1 hora (sincronizado con el Ministerio/cron)
         fetchCompetitors();
-        setInterval(fetchCompetitors, 10000);
+        setInterval(fetchCompetitors, 3600000);
 
     })();
     </script>
