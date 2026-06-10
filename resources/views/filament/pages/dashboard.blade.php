@@ -71,6 +71,14 @@
         }
         .price-blink { animation: pricePulse 0.45s ease-in-out; }
 
+        /* ── Animación blink para precios locales ───────────────── */
+        @keyframes localPricePulse {
+            0%   { opacity: 1; transform: scale(1); }
+            50%  { opacity: 0.55; transform: scale(0.97); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .local-price-blink { animation: localPricePulse 0.6s ease-in-out; }
+
         /* ── Indicador de variación ─────────────────────────────── */
         .change-badge-up   { color: #34d399; }
         .change-badge-down { color: #f87171; }
@@ -306,8 +314,8 @@
                             <h3 class="text-sm font-bold text-white">{{ $localityName }}</h3>
                         </div>
                         @if($ldata['updated_at'])
-                        <span class="text-xs font-mono tabular-nums" style="color:#4b5563">
-                            {{ $ldata['updated_at'] }}
+                        <span class="text-xs font-medium tabular-nums" style="color:#9ca3af">
+                            Actualizado: {{ $ldata['updated_at'] }}
                         </span>
                         @endif
                     </div>
@@ -343,7 +351,7 @@
                                             </p>
                                         </a>
                                     </div>
-                                    <span class="font-black tabular-nums whitespace-nowrap"
+                                    <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#111827' : '#374151' }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
@@ -388,7 +396,7 @@
                                             </p>
                                         </a>
                                     </div>
-                                    <span class="font-black tabular-nums whitespace-nowrap"
+                                    <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
                                         style="font-size:12px;color:{{ $rank === 0 ? '#15803d' : '#16a34a' }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
