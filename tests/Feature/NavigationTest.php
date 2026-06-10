@@ -16,23 +16,35 @@ class NavigationTest extends TestCase
     {
         parent::setUp();
 
+        // Clear and re-register permissions in memory
+        $registrar = app(\Spatie\Permission\PermissionRegistrar::class);
+        $registrar->forgetCachedPermissions();
+        $registrar->registerPermissions(app(\Illuminate\Contracts\Auth\Access\Gate::class));
+
         // Create standard permissions and roles
         Permission::findOrCreate('manage-users');
+        Permission::findOrCreate('gestion_roles');
+        Permission::findOrCreate('ver_dashboard');
         $adminRole = Role::findOrCreate('Admin');
         $adminRole->givePermissionTo('manage-users');
+        $adminRole->givePermissionTo('gestion_roles');
     }
 
     public function test_guest_cannot_see_administration_menu(): void
     {
-        $response = $this->get('/admin/dashboard');
-        $response->assertRedirect('/login');
+        $response = $this->get('/admin');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_non_admin_user_cannot_see_administration_menu(): void
     {
-        $user = User::factory()->create();
+        // Create dummy user to occupy ID 1 (which acts as Super Admin bypass)
+        User::factory()->create();
 
-        $response = $this->actingAs($user)->get('/admin/dashboard');
+        $user = User::factory()->create();
+        $user->givePermissionTo('ver_dashboard');
+
+        $response = $this->actingAs($user)->get('/admin');
         $response->assertSuccessful();
         $response->assertDontSee(__('Administración'));
         $response->assertDontSee('/admin/gasolineras');
@@ -45,7 +57,7 @@ class NavigationTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('Admin');
 
-        $response = $this->actingAs($user)->get('/admin/dashboard');
+        $response = $this->actingAs($user)->get('/admin');
         $response->assertSuccessful();
         $response->assertSee(__('Administración'));
         $response->assertSee('/admin/gasolineras');

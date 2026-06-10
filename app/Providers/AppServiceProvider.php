@@ -42,7 +42,16 @@ class AppServiceProvider extends ServiceProvider
 
 
         // Share global data for all views
-        \Illuminate\Support\Facades\View::share('homeConfig', HomeConfig::first());
+        if (!app()->runningInConsole() || app()->environment() !== 'testing') {
+            try {
+                \Illuminate\Support\Facades\View::share('homeConfig', HomeConfig::first());
+            } catch (\Throwable $e) {
+                // Ignore during migrations or console testing
+            }
+        } else {
+            // For testing, share null or mock
+            \Illuminate\Support\Facades\View::share('homeConfig', null);
+        }
         \Illuminate\Support\Facades\View::share('gasolineras', []);
 
     }

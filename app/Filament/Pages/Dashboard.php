@@ -2,37 +2,63 @@
 
 namespace App\Filament\Pages;
 
+use App\Services\FuelMarketsService;
+use App\Services\MineturService;
+use Illuminate\Support\Facades\Cache;
+
 class Dashboard extends \Filament\Pages\Dashboard
 {
-    public function mount()
-    {
-        $user = auth()->user();
-        if ($user) {
-            if ($user->hasRole('Admin')) {
-                if ($user->can('ver_dashboard')) {
-                    return redirect()->to('/admin/dashboard');
-                }
-                if ($user->can('gestion_recursos_humanos')) {
-                    return redirect()->to('/admin/recursos-humanos');
-                }
-            }
+    protected string $view = 'filament.pages.dashboard';
 
-            if ($user->hasRole('Gestor') || $user->hasRole('gestor')) {
-                if ($user->can('gestion_recursos_humanos')) {
-                    return redirect()->to('/admin/recursos-humanos');
-                }
-                if ($user->can('ver_dashboard')) {
-                    return redirect()->to('/admin/dashboard');
-                }
-                }
+    protected static ?string $title            = 'Dashboard Energético';
+    protected static ?string $navigationLabel  = 'Panel';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    /** Datos de mercados internacionales (Yahoo Finance) */
+    public array $gasoilData = [];
+    public array $rbobData   = [];
+
+    /** Datos de competencia local (MITECO) */
+    public array $localityData = [];
+
+    public function mount(): void
+    {
+        // Si no hay datos en caché, los obtenemos inmediatamente (primer acceso)
+        $fuelService    = app(FuelMarketsService::class);
+        $mineturService = app(MineturService::class);
+
+        if (! Cache::has('fuel_markets_gasoil')) {
+            $fuelService->refresh();
         }
-        return redirect()->to('/admin/dashboard');
+        if (! Cache::has('minetur_sevilla')) {
+            $mineturService->refreshAll();
+        }
+
+        $this->loadData();
+    }
+
+    /** Carga (o recarga) todos los datos desde caché. */
+    public function loadData(): void
+    {
+        $fuelService    = app(FuelMarketsService::class);
+        $mineturService = app(MineturService::class);
+
+        $this->gasoilData  = $fuelService->getGasoilLondres();
+        $this->rbobData    = $fuelService->getRBOB();
+        $this->localityData = $mineturService->getAllLocalitiesData();
+    }
+
+    /** Refresca sólo los datos de competencia local (llamado por wire:poll cada 5 min). */
+    public function refreshCompetitors(): void
+    {
+        $mineturService     = app(MineturService::class);
+        $this->localityData = $mineturService->getAllLocalitiesData();
     }
 
     public static function canAccess(): bool
     {
         $user = auth()->user();
-        if (!$user) return false;
+        if (! $user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
         return $user->hasRole('Admin') || $user->can('ver_dashboard');
     }

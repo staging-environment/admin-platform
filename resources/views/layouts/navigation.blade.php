@@ -112,6 +112,12 @@
                                         {{ __('Roles') }}
                                     </x-dropdown-link>
                                     @endif
+
+                                    @if(auth()->user()?->can('gestion_roles'))
+                                    <x-dropdown-link href="/admin/permissions">
+                                        {{ __('Permisos') }}
+                                    </x-dropdown-link>
+                                    @endif
                                 </x-slot>
                             </x-dropdown>
                         </div>
@@ -252,6 +258,9 @@
                             </x-responsive-nav-link>
                             <x-responsive-nav-link href="/admin/roles" :active="request()->is('admin/roles*')">
                                 {{ __('Roles') }}
+                            </x-responsive-nav-link>
+                            <x-responsive-nav-link href="/admin/permissions" :active="request()->is('admin/permissions*')">
+                                {{ __('Permisos') }}
                             </x-responsive-nav-link>
                         @endif
                     </div>

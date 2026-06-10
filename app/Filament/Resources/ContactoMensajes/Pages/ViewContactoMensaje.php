@@ -28,7 +28,7 @@ class ViewContactoMensaje extends ViewRecord
                 ->color('gray'),
             \Filament\Actions\Action::make('back_dashboard')
                 ->label('Volver al Dashboard')
-                ->url('/admin/dashboard')
+                ->url('/admin')
                 ->color('primary'),
         ];
     }

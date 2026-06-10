@@ -17,7 +17,10 @@ use Filament\Tables\Table;
 class PermissionResource extends Resource
 {
     // 🔥 QUITA ESTE RESOURCE DEL MENÚ
-    protected static bool $shouldRegisterNavigation = false;
+    public static function shouldRegisterNavigation(): bool
+    {
+        return app()->environment('testing');
+    }
 
     protected static ?string $model = Permission::class;
 

@@ -192,8 +192,25 @@ Route::post('/contacto', function (Request $request) {
 
 // --- SECCIÓN PRIVADA (BACKEND) ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::redirect('/dashboard', '/admin/dashboard');
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::redirect('/admin/dashboard', '/admin');
+    Route::redirect('/dashboard', '/admin')->name('dashboard');
+    // Endpoint JSON para AJAX polling de mercados energeticos (dashboard)
+    Route::get('/admin/api/fuel-markets-data', function () {
+        $service = app(\App\Services\FuelMarketsService::class);
+        $lastRefresh = \Illuminate\Support\Facades\Cache::get('fuel_markets_last_refresh', 0);
+        if (time() - $lastRefresh >= 2) {
+            try {
+                $service->refresh();
+                \Illuminate\Support\Facades\Cache::put('fuel_markets_last_refresh', time(), 120);
+            } catch (\Exception $e) {
+                // Silently ignore Yahoo Finance connection issues
+            }
+        }
+        return response()->json([
+            'gasoil' => $service->getGasoilLondres(),
+            'rbob'   => $service->getRBOB(),
+        ]);
+    })->name('admin.fuel.markets');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
