@@ -165,7 +165,7 @@
                         <div class="flex items-baseline gap-2">
                             <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:2.6rem;line-height:1;letter-spacing:-0.02em">
                                 @if($gasoilData['price'])
-                                    {{ number_format($gasoilData['price'], 2, '.', ',') }}
+                                    {{ number_format($gasoilData['price'], 4, '.', ',') }}
                                 @else
                                     <span class="market-spinner"></span>
                                 @endif
@@ -183,7 +183,7 @@
                             </span>
                             <span id="gasoil-change" class="text-base font-bold tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
                                 @if($gasoilData['change'] !== null)
-                                    {{ ($gasoilData['change'] >= 0 ? '+' : '') . number_format($gasoilData['change'], 2, '.', ',') }}
+                                    {{ ($gasoilData['change'] >= 0 ? '+' : '') . number_format($gasoilData['change'], 4, '.', ',') }}
                                 @else ---
                                 @endif
                             </span>
@@ -392,7 +392,7 @@
                 return res.json();
             })
             .then(function (data) {
-                updateCard('gasoil', data.gasoil, 2, 2);
+                updateCard('gasoil', data.gasoil, 4, 4);
                 updateCard('rbob',   data.rbob,   4, 4);
             })
             .catch(function (err) {
