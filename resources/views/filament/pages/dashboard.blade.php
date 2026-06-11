@@ -179,7 +179,7 @@
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-semibold" style="color:#6b7280">EUR</span>
+                                <span class="text-xs font-semibold" style="color:#6b7280">USD</span>
                             </div>
 
                             <div class="flex items-center justify-end gap-1 mt-0.5" id="gasoil-change-row">
@@ -237,7 +237,7 @@
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-semibold" style="color:rgba(52,211,153,0.4)">EUR</span>
+                                <span class="text-xs font-semibold" style="color:rgba(52,211,153,0.4)">USD</span>
                             </div>
 
                             <div class="flex items-center justify-end gap-1 mt-0.5" id="rbob-change-row">

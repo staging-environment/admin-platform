@@ -82,10 +82,10 @@ class FuelMarketsService
 
                 $payload = [
                     'symbol'     => $symbol,
-                    'price'      => round($price * $rate, 4),
-                    'change'     => round($change * $rate, 4),
+                    'price'      => round($price, 4),
+                    'change'     => round($change, 4),
                     'change_pct' => round($quote['regularMarketChangePercent'] ?? 0, 2),
-                    'currency'   => 'EUR',
+                    'currency'   => 'USD',
                     'is_up'      => $change >= 0,
                     'updated_at' => now('Europe/Madrid')->format('H:i:s'),
                 ];
@@ -97,7 +97,7 @@ class FuelMarketsService
                 }
             }
 
-            Log::info('FuelMarketsService: Updated quotes via v7 (USD/EUR rate: ' . $rate . ').');
+            Log::info('FuelMarketsService: Updated quotes via v7 (in USD).');
 
         } catch (\Throwable $e) {
             Log::warning('FuelMarketsService (v7 exception): ' . $e->getMessage());
@@ -145,14 +145,12 @@ class FuelMarketsService
                 return;
             }
 
-            $rate = (float) Cache::get('fuel_markets_usd_eur_rate', 0.92);
-
             $payload = [
                 'symbol'     => $symbol,
-                'price'      => round($price * $rate, 4),
-                'change'     => round($change * $rate, 4),
+                'price'      => round($price, 4),
+                'change'     => round($change, 4),
                 'change_pct' => round($changePct, 2),
-                'currency'   => 'EUR',
+                'currency'   => 'USD',
                 'is_up'      => $change >= 0,
                 'updated_at' => now('Europe/Madrid')->format('H:i:s'),
             ];
@@ -163,7 +161,7 @@ class FuelMarketsService
                 Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
             }
 
-            Log::info("FuelMarketsService (chart): Updated {$symbol} (converted to EUR).");
+            Log::info("FuelMarketsService (chart): Updated {$symbol} (in USD).");
 
         } catch (\Throwable $e) {
             Log::warning("FuelMarketsService (chart/{$symbol}): " . $e->getMessage());
@@ -177,7 +175,7 @@ class FuelMarketsService
             'price'      => null,
             'change'     => null,
             'change_pct' => null,
-            'currency'   => 'EUR',
+            'currency'   => 'USD',
             'is_up'      => null,
             'updated_at' => null,
         ];
