@@ -14,7 +14,7 @@ class FuelMarketsService
 
     public function getGasoilLondres(): array
     {
-        return Cache::get(self::GASOIL_CACHE_KEY, $this->emptyData('LGO=F'));
+        return Cache::get(self::GASOIL_CACHE_KEY, $this->emptyData('BZ=F'));
     }
 
     public function getRBOB(): array
@@ -37,7 +37,7 @@ class FuelMarketsService
                     'Referer'         => 'https://finance.yahoo.com/',
                 ])
                 ->get('https://query1.finance.yahoo.com/v7/finance/quote', [
-                    'symbols' => 'LGO=F,RB=F,EUR=X',
+                    'symbols' => 'BZ=F,RB=F,EUR=X',
                     'fields'  => 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime,currency',
                     'lang'    => 'en-US',
                     'region'  => 'US',
@@ -46,7 +46,7 @@ class FuelMarketsService
             if (! $response->successful()) {
                 Log::warning('FuelMarketsService: v7 returned ' . $response->status() . '. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('LGO=F');
+                $this->refreshViaChart('BZ=F');
                 $this->refreshViaChart('RB=F');
                 return;
             }
@@ -55,12 +55,12 @@ class FuelMarketsService
             if (empty($quotes)) {
                 Log::warning('FuelMarketsService: v7 returned empty result. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('LGO=F');
+                $this->refreshViaChart('BZ=F');
                 $this->refreshViaChart('RB=F');
                 return;
             }
 
-            // Primero buscamos y guardamos el cambio USD/EUR
+            // Primero buscamos y guardamos el cambio USD/EUR (lo mantenemos por si se usa en otros sitios)
             $rate = 0.92;
             foreach ($quotes as $quote) {
                 $symbol = $quote['symbol'] ?? '';
@@ -70,7 +70,7 @@ class FuelMarketsService
                 }
             }
 
-            // Ahora aplicamos la conversión a los futuros
+            // Ahora aplicamos los datos de los futuros (manteniéndolos en USD)
             foreach ($quotes as $quote) {
                 $symbol = $quote['symbol'] ?? '';
                 if ($symbol === 'EUR=X' || $symbol === 'USDEUR=X') {
@@ -79,6 +79,11 @@ class FuelMarketsService
 
                 $price  = (float) ($quote['regularMarketPrice'] ?? 0);
                 $change = (float) ($quote['regularMarketChange'] ?? 0);
+
+                if ($symbol === 'RB=F' && $price > 10.0) {
+                    $price  = $price / 100.0;
+                    $change = $change / 100.0;
+                }
 
                 $payload = [
                     'symbol'     => $symbol,
@@ -90,19 +95,19 @@ class FuelMarketsService
                     'updated_at' => now('Europe/Madrid')->format('H:i:s'),
                 ];
 
-                if ($symbol === 'LGO=F') {
+                if ($symbol === 'BZ=F') {
                     Cache::put(self::GASOIL_CACHE_KEY, $payload, self::CACHE_TTL);
                 } elseif ($symbol === 'RB=F') {
                     Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
                 }
             }
 
-            Log::info('FuelMarketsService: Updated quotes via v7 (in USD).');
+            Log::info('FuelMarketsService: Updated quotes via v7 (USD).');
 
         } catch (\Throwable $e) {
             Log::warning('FuelMarketsService (v7 exception): ' . $e->getMessage());
             $this->refreshViaChart('EUR=X');
-            $this->refreshViaChart('LGO=F');
+            $this->refreshViaChart('BZ=F');
             $this->refreshViaChart('RB=F');
         }
     }
@@ -145,6 +150,12 @@ class FuelMarketsService
                 return;
             }
 
+            if ($symbol === 'RB=F' && $price > 10.0) {
+                $price  = $price / 100.0;
+                $change = $change / 100.0;
+                $changePct = $prevClose > 0 ? ($change / ($prevClose / 100.0)) * 100 : 0;
+            }
+
             $payload = [
                 'symbol'     => $symbol,
                 'price'      => round($price, 4),
@@ -155,13 +166,13 @@ class FuelMarketsService
                 'updated_at' => now('Europe/Madrid')->format('H:i:s'),
             ];
 
-            if ($symbol === 'LGO=F') {
+            if ($symbol === 'BZ=F') {
                 Cache::put(self::GASOIL_CACHE_KEY, $payload, self::CACHE_TTL);
             } elseif ($symbol === 'RB=F') {
                 Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
             }
 
-            Log::info("FuelMarketsService (chart): Updated {$symbol} (in USD).");
+            Log::info("FuelMarketsService (chart): Updated {$symbol} (USD).");
 
         } catch (\Throwable $e) {
             Log::warning("FuelMarketsService (chart/{$symbol}): " . $e->getMessage());

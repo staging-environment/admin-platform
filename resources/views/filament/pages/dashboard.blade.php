@@ -159,7 +159,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-black text-white leading-tight">Gasoil Londres</h3>
+                                <h3 class="text-sm font-black text-white leading-tight">Gasoil Londres (ICE)</h3>
                                 <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(251,191,36,0.25); color:#fbbf24; width: fit-content; line-height: 1;">
                                     <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
                                     <span id="gasoil-updated" class="tabular-nums font-bold">
@@ -169,35 +169,36 @@
                             </div>
                         </div>
 
-                        {{-- Derecha: Precio y Variación --}}
-                        <div class="text-right">
+                        {{-- Derecha: Precio y Variación (Formato Investing) --}}
+                        <div class="text-right flex flex-col justify-center items-end">
                             <div class="flex items-baseline justify-end gap-1">
-                                <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.6rem;line-height:1;letter-spacing:-0.02em">
+                                <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.75rem;line-height:1;letter-spacing:-0.02em">
                                     @if($gasoilData['price'])
                                         {{ number_format($gasoilData['price'], 4, '.', ',') }}
                                     @else
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-semibold" style="color:#6b7280">USD</span>
+                                <span class="text-xs font-bold" style="color:rgba(255,255,255,0.4)">USD/t</span>
                             </div>
 
-                            <div class="flex items-center justify-end gap-1 mt-0.5" id="gasoil-change-row">
-                                <span id="gasoil-arrow" class="text-xs leading-none">
-                                    @if($gasoilData['is_up'] === true)  <span style="color:#34d399">▲</span>
-                                    @elseif($gasoilData['is_up'] === false) <span style="color:#f87171">▼</span>
-                                    @else <span style="color:#6b7280">—</span>
-                                    @endif
-                                </span>
-                                <span id="gasoil-change" class="text-xs font-bold tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
+                            <div class="flex items-center justify-end gap-1.5 mt-1 font-bold" id="gasoil-change-row" style="font-size: 0.9rem;">
+                                <span id="gasoil-arrow" class="hidden"></span>
+                                <span id="gasoil-change" class="text-xs font-semibold opacity-90 tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
                                     @if($gasoilData['change'] !== null)
                                         {{ ($gasoilData['change'] >= 0 ? '+' : '') . number_format($gasoilData['change'], 4, '.', ',') }}
                                     @else ---
                                     @endif
                                 </span>
-                                <span id="gasoil-pct" class="text-xs font-semibold tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}" style="opacity:0.85">
+                                <span id="gasoil-pct" class="font-black tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
                                     @if($gasoilData['change_pct'] !== null)
-                                        ({{ ($gasoilData['change_pct'] >= 0 ? '+' : '') . number_format($gasoilData['change_pct'], 2, '.', ',') }}%)
+                                        @if($gasoilData['is_up'] === true)
+                                            🟢 <strong>+{{ number_format($gasoilData['change_pct'], 2, '.', ',') }}%</strong>
+                                        @elseif($gasoilData['is_up'] === false)
+                                            🔴 <strong>{{ number_format($gasoilData['change_pct'], 2, '.', ',') }}%</strong>
+                                        @else
+                                            <strong>0.00%</strong>
+                                        @endif
                                     @else (--%)
                                     @endif
                                 </span>
@@ -217,7 +218,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-black text-white leading-tight">Gasolina RBOB</h3>
+                                <h3 class="text-sm font-black text-white leading-tight">Gasolina RBOB (NYMEX)</h3>
                                 <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(52,211,153,0.25); color:#34d399; width: fit-content; line-height: 1;">
                                     <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
                                     <span id="rbob-updated" class="tabular-nums font-bold">
@@ -227,35 +228,36 @@
                             </div>
                         </div>
 
-                        {{-- Derecha: Precio y Variación --}}
-                        <div class="text-right">
+                        {{-- Derecha: Precio y Variación (Formato Investing) --}}
+                        <div class="text-right flex flex-col justify-center items-end">
                             <div class="flex items-baseline justify-end gap-1">
-                                <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.6rem;line-height:1;letter-spacing:-0.02em">
+                                <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.75rem;line-height:1;letter-spacing:-0.02em">
                                     @if($rbobData['price'])
                                         {{ number_format($rbobData['price'], 4, '.', ',') }}
                                     @else
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-semibold" style="color:rgba(52,211,153,0.4)">USD</span>
+                                <span class="text-xs font-bold" style="color:rgba(255,255,255,0.4)">USD/gal</span>
                             </div>
 
-                            <div class="flex items-center justify-end gap-1 mt-0.5" id="rbob-change-row">
-                                <span id="rbob-arrow" class="text-xs leading-none">
-                                    @if($rbobData['is_up'] === true)  <span style="color:#6ee7b7">▲</span>
-                                    @elseif($rbobData['is_up'] === false) <span style="color:#fca5a5">▼</span>
-                                    @else <span style="color:rgba(52,211,153,0.4)">—</span>
-                                    @endif
-                                </span>
-                                <span id="rbob-change" class="text-xs font-bold tabular-nums" style="color:{{ $rbobData['is_up'] === true ? '#6ee7b7' : ($rbobData['is_up'] === false ? '#fca5a5' : 'rgba(52,211,153,0.5)') }}">
+                            <div class="flex items-center justify-end gap-1.5 mt-1 font-bold" id="rbob-change-row" style="font-size: 0.9rem;">
+                                <span id="rbob-arrow" class="hidden"></span>
+                                <span id="rbob-change" class="text-xs font-semibold opacity-90 tabular-nums" style="color:{{ $rbobData['is_up'] === true ? '#6ee7b7' : ($rbobData['is_up'] === false ? '#fca5a5' : 'rgba(52,211,153,0.5)') }}">
                                     @if($rbobData['change'] !== null)
                                         {{ ($rbobData['change'] >= 0 ? '+' : '') . number_format($rbobData['change'], 4, '.', ',') }}
                                     @else ---
                                     @endif
                                 </span>
-                                <span id="rbob-pct" class="text-xs font-semibold tabular-nums" style="color:{{ $rbobData['is_up'] === true ? '#6ee7b7' : ($rbobData['is_up'] === false ? '#fca5a5' : 'rgba(52,211,153,0.5)') }};opacity:0.85">
+                                <span id="rbob-pct" class="font-black tabular-nums {{ $rbobData['is_up'] === true ? 'change-badge-up' : ($rbobData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
                                     @if($rbobData['change_pct'] !== null)
-                                        ({{ ($rbobData['change_pct'] >= 0 ? '+' : '') . number_format($rbobData['change_pct'], 2, '.', ',') }}%)
+                                        @if($rbobData['is_up'] === true)
+                                            🟢 <strong>+{{ number_format($rbobData['change_pct'], 2, '.', ',') }}%</strong>
+                                        @elseif($rbobData['is_up'] === false)
+                                            🔴 <strong>{{ number_format($rbobData['change_pct'], 2, '.', ',') }}%</strong>
+                                        @else
+                                            <strong>0.00%</strong>
+                                        @endif
                                     @else (--%)
                                     @endif
                                 </span>
@@ -271,8 +273,7 @@
         {{-- ZONA INFERIOR: COMPETENCIA LOCAL                               --}}
         {{-- ═══════════════════════════════════════════════════════════════ --}}
 
-                <section>
-
+        <section>
             <div class="flex items-center gap-2.5 mb-4">
                 <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
                 <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local</h2>
@@ -296,7 +297,7 @@
         'use strict';
 
         const MARKETS_URL    = '{{ route("admin.fuel.markets") }}';
-        const POLL_INTERVAL  = 1000; // 1 segundo
+        const POLL_INTERVAL  = 3000; // 3 segundos
 
         /* ─── Helpers de formateo ──────────────────────────────────────── */
         function fmt(value, decimals) {
@@ -326,14 +327,23 @@
 
             /* Precio */
             if (elPrice && data.price !== null) {
-                elPrice.textContent = fmt(data.price, priceDecimals);
+                // Si es RBOB y viene en centavos (>10), lo dividimos entre 100
+                var finalPrice = parseFloat(data.price);
+                if (prefix === 'rbob' && finalPrice > 10.0) {
+                    finalPrice = finalPrice / 100.0;
+                }
+                elPrice.textContent = fmt(finalPrice, priceDecimals);
                 elPrice.classList.add('price-blink');
                 setTimeout(function () { elPrice.classList.remove('price-blink'); }, 500);
             }
 
             /* Variación absoluta */
             if (elChange && data.change !== null) {
-                elChange.textContent = fmtChange(data.change, changeDecimals);
+                var finalChange = parseFloat(data.change);
+                if (prefix === 'rbob' && Math.abs(finalChange) > 5.0) {
+                    finalChange = finalChange / 100.0;
+                }
+                elChange.textContent = fmtChange(finalChange, changeDecimals);
                 var upColor   = prefix === 'gasoil' ? '#34d399' : '#6ee7b7';
                 var downColor = prefix === 'gasoil' ? '#f87171' : '#fca5a5';
                 var nullColor = prefix === 'gasoil' ? '#6b7280' : 'rgba(52,211,153,0.5)';
@@ -342,29 +352,26 @@
 
             /* Variación % */
             if (elPct && data.change_pct !== null) {
-                var sign = parseFloat(data.change_pct) >= 0 ? '+' : '';
-                elPct.textContent = '(' + sign + parseFloat(data.change_pct).toFixed(2) + '%)';
+                var pctVal = parseFloat(data.change_pct);
                 var upColor2   = prefix === 'gasoil' ? '#34d399' : '#6ee7b7';
                 var downColor2 = prefix === 'gasoil' ? '#f87171' : '#fca5a5';
                 var nullColor2 = prefix === 'gasoil' ? '#6b7280' : 'rgba(52,211,153,0.5)';
+
                 elPct.style.color = data.is_up === true ? upColor2 : (data.is_up === false ? downColor2 : nullColor2);
+                elPct.style.fontWeight = 'bold';
+
+                if (data.is_up === true) {
+                    elPct.textContent = '🟢 +' + pctVal.toFixed(2) + '%';
+                } else if (data.is_up === false) {
+                    elPct.textContent = '🔴 ' + pctVal.toFixed(2) + '%';
+                } else {
+                    elPct.textContent = '0.00%';
+                }
             }
 
-            /* Flecha */
+            /* Flecha (Hidden but maintained just in case) */
             if (elArrow) {
-                var arrowUpColor   = prefix === 'gasoil' ? '#34d399' : '#6ee7b7';
-                var arrowDownColor = prefix === 'gasoil' ? '#f87171' : '#fca5a5';
-                var arrowNullColor = prefix === 'gasoil' ? '#6b7280' : 'rgba(52,211,153,0.4)';
-                if (data.is_up === true) {
-                    elArrow.style.color = arrowUpColor;
-                    elArrow.textContent = '▲';
-                } else if (data.is_up === false) {
-                    elArrow.style.color = arrowDownColor;
-                    elArrow.textContent = '▼';
-                } else {
-                    elArrow.style.color = arrowNullColor;
-                    elArrow.textContent = '—';
-                }
+                elArrow.textContent = '';
             }
 
             /* Timestamp */

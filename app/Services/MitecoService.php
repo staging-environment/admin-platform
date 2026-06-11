@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Log;
 class MitecoService
 {
     protected string $baseUrl = 'https://energia.serviciosmin.gob.es/rispapi';
-    protected ?string $user;
-    protected ?string $password;
     protected string $firma;
-    protected string $remitente;
 
     // Hardcoded station mappings for Utrecar S.L. (NIF B41527250)
     protected array $stationsConfig = [
@@ -20,41 +17,40 @@ class MitecoService
             'name' => 'E.S. VISTALEGRE (Utrera)',
             'num_reg' => '6435',
             'margen' => 'N',
+            'env_key' => 'UTRERA',
         ],
         2 => [
             'name' => 'RONDA NORTE (Sevilla)',
             'num_reg' => '7070',
             'margen' => 'N',
+            'env_key' => 'RONDA_NORTE',
         ],
         3 => [
             'name' => 'E.S. RODALABOTA (El Cuervo)',
             'num_reg' => '13714',
             'margen' => 'N',
+            'env_key' => 'EL_CUERVO',
         ],
         4 => [
             'name' => 'E.S. ATENAS (Lebrija)',
             'num_reg' => '13194',
             'margen' => 'D',
+            'env_key' => 'LEBRIJA',
         ],
     ];
 
     public function __construct()
     {
-        $this->user = config('services.miteco.user');
-        $this->password = config('services.miteco.password');
         $this->firma = config('services.miteco.firma', 'IND');
-        
-        // ZZZ code in ITGFSZZZAAAAMMDD. If not configured, default to the user username or 'IND'
-        $this->remitente = env('MITECO_REMITENTE') ?: substr($this->user ?? 'IND', 0, 3);
     }
 
     /**
      * Authenticate with the MITECO API and retrieve the Bearer Token.
      */
-    public function login(): ?string
+    public function login(string $user, string $password): ?string
     {
-        if (empty($this->user) || empty($this->password)) {
-            Log::error('MitecoService: Missing credentials in configuration.');
+        if (empty($user) || empty($password)) {
+            Log::error('MitecoService: Missing credentials for login.');
             return null;
         }
 
@@ -65,50 +61,68 @@ class MitecoService
                     'Accept' => 'application/json',
                 ])
                 ->post($this->baseUrl . '/v1/usuario/login', [
-                    'usuario' => $this->user,
-                    'password' => $this->password,
+                    'usuario' => $user,
+                    'password' => $password,
                 ]);
 
             if ($response->failed()) {
-                Log::error('MitecoService login failed: ' . $response->status() . ' - ' . $response->body());
+                Log::error("MitecoService login failed for {$user}: " . $response->status() . ' - ' . $response->body());
                 return null;
             }
 
             $token = $response->json('token');
             if (empty($token)) {
-                Log::error('MitecoService: Login response did not contain a token.');
+                Log::error("MitecoService: Login response for {$user} did not contain a token.");
                 return null;
             }
 
             return $token;
         } catch (\Throwable $e) {
-            Log::error('MitecoService login exception: ' . $e->getMessage());
+            Log::error("MitecoService login exception for {$user}: " . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Fetch prices from virtusgesnet and upload them to MITECO.
+     * Fetch prices from virtusgesnet and upload them to MITECO for all stations individually.
      */
     public function uploadPrices(): array
     {
-        $token = $this->login();
-        if (!$token) {
-            return [
-                'success' => false,
-                'message' => 'Authentication failed',
-            ];
-        }
+        $results = [];
+        $overallSuccess = true;
 
         // MITECO requires vigencia to be at least 1 hour in the future, and maximum 3 days.
         // We set it to current time + 75 minutes (1h 15m) to safely clear the 1-hour constraint.
         $vigencia = now('Europe/Madrid')->addMinutes(75);
         $fechaiper = $vigencia->format('d/m/Y');
         $horaiper = $vigencia->format('H:i');
-
-        $precios = [];
+        $dateStr = now('Europe/Madrid')->format('Ymd');
 
         foreach ($this->stationsConfig as $stationCode => $config) {
+            $envKey = $config['env_key'];
+            $user = config("services.miteco.stations.{$envKey}.user");
+            $password = config("services.miteco.stations.{$envKey}.password");
+
+            if (!$user || !$password) {
+                Log::warning("MitecoService: Missing credentials for station {$config['name']} (Key: {$envKey}).");
+                $results[$config['name']] = [
+                    'success' => false,
+                    'message' => 'Missing credentials',
+                ];
+                $overallSuccess = false;
+                continue;
+            }
+
+            $token = $this->login($user, $password);
+            if (!$token) {
+                $results[$config['name']] = [
+                    'success' => false,
+                    'message' => 'Authentication failed',
+                ];
+                $overallSuccess = false;
+                continue;
+            }
+
             // Retrieve current prices from preciosdeproductos table
             // Code 1 = Gasoleo A
             // Code 2 = Gasolina 95 (Sin Plomo 95)
@@ -122,6 +136,11 @@ class MitecoService
 
             if ($pvpGoa === null && $pvpG95e5 === null) {
                 Log::warning("MitecoService: No prices found for station {$config['name']} (Code {$stationCode}) in database.");
+                $results[$config['name']] = [
+                    'success' => false,
+                    'message' => 'No price data found in database',
+                ];
+                $overallSuccess = false;
                 continue;
             }
 
@@ -143,60 +162,57 @@ class MitecoService
                 $stationData['pvpgoa'] = number_format((float) $pvpGoa, 3, ',', '');
             }
 
-            $precios[] = $stationData;
-        }
+            // ZZZ code in ITGFSZZZAAAAMMDD. Derived from the specific user, or default to 'IND'
+            $remitente = substr($user, 0, 3);
+            $envioCode = 'ITGFS' . str_pad($remitente, 3, 'X', STR_PAD_RIGHT) . $dateStr;
 
-        if (empty($precios)) {
-            return [
-                'success' => false,
-                'message' => 'No price data found to upload',
+            $payload = [
+                'tipo' => 'ITGFS',
+                'envio' => $envioCode,
+                'precios' => [$stationData],
             ];
-        }
 
-        // Format: ITGFS + ZZZ (remitente) + AAAAMMDD (date)
-        $dateStr = now('Europe/Madrid')->format('Ymd');
-        $envioCode = 'ITGFS' . str_pad($this->remitente, 3, 'X', STR_PAD_RIGHT) . $dateStr;
+            try {
+                Log::info("MitecoService: Sending prices to MITECO for station {$config['name']}...", ['envio' => $envioCode, 'payload' => $payload]);
 
-        $payload = [
-            'tipo' => 'ITGFS',
-            'envio' => $envioCode,
-            'precios' => $precios,
-        ];
+                $response = Http::timeout(30)
+                    ->withToken($token)
+                    ->withHeaders([
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                    ])
+                    ->post($this->baseUrl . '/v1/envio/itgfs', $payload);
 
-        try {
-            Log::info('MitecoService: Sending prices to MITECO...', ['envio' => $envioCode, 'payload' => $payload]);
+                if ($response->failed()) {
+                    Log::error("MitecoService upload failed for station {$config['name']}: " . $response->status() . ' - ' . $response->body());
+                    $results[$config['name']] = [
+                        'success' => false,
+                        'status' => $response->status(),
+                        'message' => $response->body(),
+                    ];
+                    $overallSuccess = false;
+                } else {
+                    $responseData = $response->json();
+                    Log::info("MitecoService: Prices uploaded successfully for station {$config['name']}.", $responseData);
+                    $results[$config['name']] = [
+                        'success' => true,
+                        'data' => $responseData,
+                    ];
+                }
 
-            $response = Http::timeout(30)
-                ->withToken($token)
-                ->withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ])
-                ->post($this->baseUrl . '/v1/envio/itgfs', $payload);
-
-            if ($response->failed()) {
-                Log::error('MitecoService upload failed: ' . $response->status() . ' - ' . $response->body());
-                return [
+            } catch (\Throwable $e) {
+                Log::error("MitecoService upload exception for station {$config['name']}: " . $e->getMessage());
+                $results[$config['name']] = [
                     'success' => false,
-                    'status' => $response->status(),
-                    'message' => $response->body(),
+                    'message' => $e->getMessage(),
                 ];
+                $overallSuccess = false;
             }
-
-            $responseData = $response->json();
-            Log::info('MitecoService: Prices uploaded successfully.', $responseData);
-
-            return [
-                'success' => true,
-                'data' => $responseData,
-            ];
-
-        } catch (\Throwable $e) {
-            Log::error('MitecoService upload exception: ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => $e->getMessage(),
-            ];
         }
+
+        return [
+            'success' => $overallSuccess,
+            'results' => $results,
+        ];
     }
 }

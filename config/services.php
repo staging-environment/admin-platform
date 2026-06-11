@@ -42,10 +42,25 @@ return [
     ],
 
     'miteco' => [
-        'user' => env('MITECO_USER'),
-        'password' => env('MITECO_PASSWORD'),
         'firma' => env('MITECO_FIRMA', 'IND'),
+        'stations' => [
+            'UTRERA' => [
+                'user' => env('MITECO_UTRERA_USER'),
+                'password' => env('MITECO_UTRERA_PASS'),
+            ],
+            'RONDA_NORTE' => [
+                'user' => env('MITECO_RONDA_NORTE_USER'),
+                'password' => env('MITECO_RONDA_NORTE_PASS'),
+            ],
+            'EL_CUERVO' => [
+                'user' => env('MITECO_EL_CUERVO_USER'),
+                'password' => env('MITECO_EL_CUERVO_PASS'),
+            ],
+            'LEBRIJA' => [
+                'user' => env('MITECO_LEBRIJA_USER'),
+                'password' => env('MITECO_LEBRIJA_PASS'),
+            ],
+        ],
     ],
 
 ];
-
