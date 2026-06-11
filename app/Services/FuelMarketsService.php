@@ -23,12 +23,70 @@ class FuelMarketsService
     }
 
     /**
+     * Intenta raspar el precio real de London Gas Oil (ICE) desde Investing.com.
+     */
+    public function fetchGasoilFromInvesting(): ?array
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                    'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                ])
+                ->get('https://www.investing.com/commodities/london-gas-oil');
+
+            if ($response->successful()) {
+                $html = $response->body();
+
+                $price = null;
+                $change = null;
+                $changePct = null;
+
+                if (preg_match('/data-test="instrument-price-last">([^<]+)</', $html, $matches)) {
+                    $price = (float) str_replace(',', '', $matches[1]);
+                }
+
+                if (preg_match('/data-test="instrument-price-change">([^<]+)</', $html, $matches)) {
+                    $change = (float) str_replace(',', '', $matches[1]);
+                }
+
+                if (preg_match('/data-test="instrument-price-change-percent">\(([^%]+)%?\)</', $html, $matches)) {
+                    $changePct = (float) $matches[1];
+                }
+
+                if ($price !== null && $change !== null && $changePct !== null) {
+                    return [
+                        'symbol'     => 'LGO',
+                        'price'      => $price,
+                        'change'     => $change,
+                        'change_pct' => $changePct,
+                        'currency'   => 'USD',
+                        'is_up'      => $change >= 0,
+                        'updated_at' => now('Europe/Madrid')->format('H:i:s'),
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('FuelMarketsService: Failed to fetch Gasoil from Investing: ' . $e->getMessage());
+        }
+        return null;
+    }
+
+    /**
      * Llama a Yahoo Finance para actualizar los datos de ambos futuros.
      * Intenta primero el endpoint v7 (quote), y si falla usa v8/chart.
      */
     public function refresh(): void
     {
+        // 1. Intentamos obtener el Gasoil Londres directamente de Investing.com
+        $gasoilPayload = $this->fetchGasoilFromInvesting();
+        if ($gasoilPayload) {
+            Cache::put(self::GASOIL_CACHE_KEY, $gasoilPayload, self::CACHE_TTL);
+            Log::info('FuelMarketsService: Updated London Gasoil via Investing.com');
+        }
+
         try {
+            // Buscaremos BZ=F (Brent como fallback para Gasoil) y RB=F (RBOB) y EUR=X
             $response = Http::timeout(10)
                 ->withHeaders([
                     'User-Agent'      => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
@@ -46,7 +104,9 @@ class FuelMarketsService
             if (! $response->successful()) {
                 Log::warning('FuelMarketsService: v7 returned ' . $response->status() . '. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('BZ=F');
+                if (!$gasoilPayload) {
+                    $this->refreshViaChart('BZ=F');
+                }
                 $this->refreshViaChart('RB=F');
                 return;
             }
@@ -55,7 +115,9 @@ class FuelMarketsService
             if (empty($quotes)) {
                 Log::warning('FuelMarketsService: v7 returned empty result. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('BZ=F');
+                if (!$gasoilPayload) {
+                    $this->refreshViaChart('BZ=F');
+                }
                 $this->refreshViaChart('RB=F');
                 return;
             }
@@ -77,6 +139,11 @@ class FuelMarketsService
                     continue;
                 }
 
+                // Si ya pudimos obtener el Gasoil real de Investing, no lo sobrescribimos con el Brent de Yahoo
+                if ($symbol === 'BZ=F' && $gasoilPayload) {
+                    continue;
+                }
+
                 $price  = (float) ($quote['regularMarketPrice'] ?? 0);
                 $change = (float) ($quote['regularMarketChange'] ?? 0);
 
@@ -86,7 +153,7 @@ class FuelMarketsService
                 }
 
                 $payload = [
-                    'symbol'     => $symbol,
+                    'symbol'     => $symbol === 'BZ=F' ? 'BZ=F (Brent)' : $symbol,
                     'price'      => round($price, 4),
                     'change'     => round($change, 4),
                     'change_pct' => round($quote['regularMarketChangePercent'] ?? 0, 2),
@@ -102,12 +169,14 @@ class FuelMarketsService
                 }
             }
 
-            Log::info('FuelMarketsService: Updated quotes via v7 (USD).');
+            Log::info('FuelMarketsService: Updated quotes via v7.');
 
         } catch (\Throwable $e) {
             Log::warning('FuelMarketsService (v7 exception): ' . $e->getMessage());
             $this->refreshViaChart('EUR=X');
-            $this->refreshViaChart('BZ=F');
+            if (!$gasoilPayload) {
+                $this->refreshViaChart('BZ=F');
+            }
             $this->refreshViaChart('RB=F');
         }
     }
@@ -157,7 +226,7 @@ class FuelMarketsService
             }
 
             $payload = [
-                'symbol'     => $symbol,
+                'symbol'     => $symbol === 'BZ=F' ? 'BZ=F (Brent)' : $symbol,
                 'price'      => round($price, 4),
                 'change'     => round($change, 4),
                 'change_pct' => round($changePct, 2),
