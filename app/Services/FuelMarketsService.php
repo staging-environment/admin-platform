@@ -14,7 +14,7 @@ class FuelMarketsService
 
     public function getGasoilLondres(): array
     {
-        return Cache::get(self::GASOIL_CACHE_KEY, $this->emptyData('BZ=F'));
+        return Cache::get(self::GASOIL_CACHE_KEY, $this->emptyData('LGO=F'));
     }
 
     public function getRBOB(): array
@@ -37,7 +37,7 @@ class FuelMarketsService
                     'Referer'         => 'https://finance.yahoo.com/',
                 ])
                 ->get('https://query1.finance.yahoo.com/v7/finance/quote', [
-                    'symbols' => 'BZ=F,RB=F,EUR=X',
+                    'symbols' => 'LGO=F,RB=F,EUR=X',
                     'fields'  => 'regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime,currency',
                     'lang'    => 'en-US',
                     'region'  => 'US',
@@ -46,7 +46,7 @@ class FuelMarketsService
             if (! $response->successful()) {
                 Log::warning('FuelMarketsService: v7 returned ' . $response->status() . '. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('BZ=F');
+                $this->refreshViaChart('LGO=F');
                 $this->refreshViaChart('RB=F');
                 return;
             }
@@ -55,7 +55,7 @@ class FuelMarketsService
             if (empty($quotes)) {
                 Log::warning('FuelMarketsService: v7 returned empty result. Falling back to v8/chart.');
                 $this->refreshViaChart('EUR=X');
-                $this->refreshViaChart('BZ=F');
+                $this->refreshViaChart('LGO=F');
                 $this->refreshViaChart('RB=F');
                 return;
             }
@@ -90,7 +90,7 @@ class FuelMarketsService
                     'updated_at' => now('Europe/Madrid')->format('H:i:s'),
                 ];
 
-                if ($symbol === 'BZ=F') {
+                if ($symbol === 'LGO=F') {
                     Cache::put(self::GASOIL_CACHE_KEY, $payload, self::CACHE_TTL);
                 } elseif ($symbol === 'RB=F') {
                     Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
@@ -102,7 +102,7 @@ class FuelMarketsService
         } catch (\Throwable $e) {
             Log::warning('FuelMarketsService (v7 exception): ' . $e->getMessage());
             $this->refreshViaChart('EUR=X');
-            $this->refreshViaChart('BZ=F');
+            $this->refreshViaChart('LGO=F');
             $this->refreshViaChart('RB=F');
         }
     }
@@ -155,7 +155,7 @@ class FuelMarketsService
                 'updated_at' => now('Europe/Madrid')->format('H:i:s'),
             ];
 
-            if ($symbol === 'BZ=F') {
+            if ($symbol === 'LGO=F') {
                 Cache::put(self::GASOIL_CACHE_KEY, $payload, self::CACHE_TTL);
             } elseif ($symbol === 'RB=F') {
                 Cache::put(self::RBOB_CACHE_KEY, $payload, self::CACHE_TTL);
