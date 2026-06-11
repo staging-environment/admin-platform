@@ -18,3 +18,8 @@ Schedule::job(new RefreshFuelMarketsJob)->everyThirtySeconds();
 // ── Competencia Local (API MITECO) ───────────────────────────────────────────
 // La API del Ministerio se actualiza ~1 vez/hora. Refrescamos cada hora.
 Schedule::job(new RefreshMineturJob)->hourly();
+
+// ── Envío de Precios a MITECO ─────────────────────────────────────────────────
+// Envía los precios actuales de nuestras 4 gasolineras a MITECO de forma horaria.
+Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->hourly();
+

@@ -35,11 +35,17 @@ return [
         ],
     ],
 
-
     'anthropic' => [
         'api_key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
         'max_tokens' => env('ANTHROPIC_MAX_TOKENS', 1024),
     ],
 
+    'miteco' => [
+        'user' => env('MITECO_USER'),
+        'password' => env('MITECO_PASSWORD'),
+        'firma' => env('MITECO_FIRMA', 'IND'),
+    ],
+
 ];
+
