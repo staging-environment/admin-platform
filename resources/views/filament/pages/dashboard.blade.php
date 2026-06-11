@@ -144,14 +144,9 @@
                 {{-- ── TARJETA 1: GASOIL BRENT LONDRES (BZ=F) ─────────── --}}
                 <div class="market-card-black rounded-2xl px-5 py-4 shadow-2xl" id="card-gasoil">
                     {{-- Cabecera --}}
-                    <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center justify-between mb-2">
                         <div>
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:#6b7280; font-size: 9px;">BZ=F</span>
-                                <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(251,191,36,0.12);color:#fbbf24;font-size:8px">FUTURES</span>
-                            </div>
                             <h3 class="text-base font-black text-white leading-tight">Gasoil Londres</h3>
-                            <p class="text-xs" style="color:#4b5563; font-size: 9px;">Brent Crude Oil Futures · EUR/bbl</p>
                         </div>
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
                             <svg class="w-4 h-4" style="color:#fbbf24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -208,14 +203,9 @@
                 {{-- ── TARJETA 2: GASOLINA RBOB (RB=F) ────────────────── --}}
                 <div class="market-card-green rounded-2xl px-5 py-4 shadow-2xl" id="card-rbob">
                     {{-- Cabecera --}}
-                    <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center justify-between mb-2">
                         <div>
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:rgba(52,211,153,0.55); font-size: 9px;">RB=F</span>
-                                <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(52,211,153,0.12);color:#34d399;font-size:8px">FUTURES</span>
-                            </div>
                             <h3 class="text-base font-black text-white leading-tight">Gasolina RBOB</h3>
-                            <p class="text-xs" style="color:rgba(52,211,153,0.4); font-size: 9px;">Reformulated Gasoline Futures · EUR/gal</p>
                         </div>
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">
                             <svg class="w-4 h-4" style="color:#34d399" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
