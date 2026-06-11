@@ -153,9 +153,9 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-black text-white leading-tight">Gasoil Londres</h3>
-                                <div class="flex items-center gap-1 mt-0.5" style="opacity: 0.7">
-                                    <span style="color:#4b5563; font-size: 9px;">Actualizado:</span>
-                                    <span id="gasoil-updated" class="font-mono tabular-nums" style="color:#9ca3af; font-size: 9px;">
+                                <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(251,191,36,0.25); color:#fbbf24; width: fit-content; line-height: 1;">
+                                    <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
+                                    <span id="gasoil-updated" class="tabular-nums font-bold">
                                         {{ $gasoilData['updated_at'] ?? '—' }}
                                     </span>
                                 </div>
@@ -211,9 +211,9 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-black text-white leading-tight">Gasolina RBOB</h3>
-                                <div class="flex items-center gap-1 mt-0.5" style="opacity: 0.7">
-                                    <span style="color:rgba(52,211,153,0.45); font-size: 9px;">Actualizado:</span>
-                                    <span id="rbob-updated" class="font-mono tabular-nums" style="color:rgba(52,211,153,0.55); font-size: 9px;">
+                                <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(52,211,153,0.25); color:#34d399; width: fit-content; line-height: 1;">
+                                    <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
+                                    <span id="rbob-updated" class="tabular-nums font-bold">
                                         {{ $rbobData['updated_at'] ?? '—' }}
                                     </span>
                                 </div>
