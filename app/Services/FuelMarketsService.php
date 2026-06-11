@@ -87,7 +87,7 @@ class FuelMarketsService
                     'change_pct' => round($quote['regularMarketChangePercent'] ?? 0, 2),
                     'currency'   => 'EUR',
                     'is_up'      => $change >= 0,
-                    'updated_at' => now()->format('H:i:s'),
+                    'updated_at' => now('Europe/Madrid')->format('H:i:s'),
                 ];
 
                 if ($symbol === 'BZ=F') {
@@ -154,7 +154,7 @@ class FuelMarketsService
                 'change_pct' => round($changePct, 2),
                 'currency'   => 'EUR',
                 'is_up'      => $change >= 0,
-                'updated_at' => now()->format('H:i:s'),
+                'updated_at' => now('Europe/Madrid')->format('H:i:s'),
             ];
 
             if ($symbol === 'BZ=F') {

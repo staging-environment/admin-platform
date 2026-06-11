@@ -65,7 +65,7 @@ class MineturService
 
             $data      = $response->json();
             $stations  = $data['ListaEESSPrecio'] ?? [];
-            $updatedAt = $data['Fecha'] ?? now()->format('d/m/Y H:i:s');
+            $updatedAt = $data['Fecha'] ?? now('Europe/Madrid')->format('d/m/Y H:i:s');
 
             if (empty($stations)) {
                 Log::warning('MineturService: Empty station list from API.');
