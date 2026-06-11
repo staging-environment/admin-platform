@@ -142,16 +142,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {{-- ── TARJETA 1: GASOIL BRENT LONDRES (BZ=F) ─────────── --}}
-                <div class="market-card-black rounded-2xl p-4.5 shadow-2xl" id="card-gasoil">
+                <div class="market-card-black rounded-2xl px-5 py-4 shadow-2xl" id="card-gasoil">
                     {{-- Cabecera --}}
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-start justify-between mb-2">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:#6b7280; font-size: 10px;">Yahoo Finance · BZ=F</span>
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-bold tracking-widest uppercase" style="color:#6b7280; font-size: 9px;">Yahoo Finance · BZ=F</span>
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(251,191,36,0.12);color:#fbbf24;font-size:8px">FUTURES</span>
                             </div>
-                            <h3 class="text-lg font-black text-white leading-tight">Gasoil Londres</h3>
-                            <p class="text-xs mt-0.5" style="color:#4b5563; font-size: 10px;">Brent Crude Oil Futures · EUR/bbl</p>
+                            <h3 class="text-base font-black text-white leading-tight">Gasoil Londres</h3>
+                            <p class="text-xs" style="color:#4b5563; font-size: 9px;">Brent Crude Oil Futures · EUR/bbl</p>
                         </div>
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
                             <svg class="w-4 h-4" style="color:#fbbf24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -161,9 +161,9 @@
                     </div>
 
                     {{-- Precio principal --}}
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <div class="flex items-baseline gap-2">
-                            <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.95rem;line-height:1;letter-spacing:-0.02em">
+                            <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:2.2rem;line-height:1;letter-spacing:-0.02em">
                                 @if($gasoilData['price'])
                                     {{ number_format($gasoilData['price'], 4, '.', ',') }}
                                 @else
@@ -174,8 +174,8 @@
                         </div>
 
                         {{-- Variación --}}
-                        <div class="flex items-center gap-1.5 mt-1" id="gasoil-change-row">
-                            <span id="gasoil-arrow" class="text-sm leading-none">
+                        <div class="flex items-center gap-1.5 mt-0.5" id="gasoil-change-row">
+                            <span id="gasoil-arrow" class="text-xs leading-none">
                                 @if($gasoilData['is_up'] === true)  <span style="color:#34d399">▲</span>
                                 @elseif($gasoilData['is_up'] === false) <span style="color:#f87171">▼</span>
                                 @else <span style="color:#6b7280">—</span>
@@ -197,25 +197,25 @@
                     </div>
 
                     {{-- Pie --}}
-                    <div class="flex items-center justify-between pt-2" style="border-top:1px solid rgba(255,255,255,0.05)">
-                        <span class="text-xs" style="color:#4b5563; font-size: 10px;">Última actualización</span>
-                        <span id="gasoil-updated" class="text-xs font-mono tabular-nums" style="color:#9ca3af; font-size: 10px;">
+                    <div class="flex items-center justify-between mt-2 pt-1.5" style="border-top:1px solid rgba(255,255,255,0.04)">
+                        <span class="text-xs" style="color:#4b5563; font-size: 9px;">Última actualización</span>
+                        <span id="gasoil-updated" class="text-xs font-mono tabular-nums" style="color:#9ca3af; font-size: 9px;">
                             {{ $gasoilData['updated_at'] ?? '—' }}
                         </span>
                     </div>
                 </div>
 
                 {{-- ── TARJETA 2: GASOLINA RBOB (RB=F) ────────────────── --}}
-                <div class="market-card-green rounded-2xl p-4.5 shadow-2xl" id="card-rbob">
+                <div class="market-card-green rounded-2xl px-5 py-4 shadow-2xl" id="card-rbob">
                     {{-- Cabecera --}}
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-start justify-between mb-2">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:rgba(52,211,153,0.55); font-size: 10px;">Yahoo Finance · RB=F</span>
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-bold tracking-widest uppercase" style="color:rgba(52,211,153,0.55); font-size: 9px;">Yahoo Finance · RB=F</span>
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(52,211,153,0.12);color:#34d399;font-size:8px">FUTURES</span>
                             </div>
-                            <h3 class="text-lg font-black text-white leading-tight">Gasolina RBOB</h3>
-                            <p class="text-xs mt-0.5" style="color:rgba(52,211,153,0.4); font-size: 10px;">Reformulated Gasoline Futures · EUR/gal</p>
+                            <h3 class="text-base font-black text-white leading-tight">Gasolina RBOB</h3>
+                            <p class="text-xs" style="color:rgba(52,211,153,0.4); font-size: 9px;">Reformulated Gasoline Futures · EUR/gal</p>
                         </div>
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">
                             <svg class="w-4 h-4" style="color:#34d399" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -225,9 +225,9 @@
                     </div>
 
                     {{-- Precio principal --}}
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <div class="flex items-baseline gap-2">
-                            <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.95rem;line-height:1;letter-spacing:-0.02em">
+                            <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:2.2rem;line-height:1;letter-spacing:-0.02em">
                                 @if($rbobData['price'])
                                     {{ number_format($rbobData['price'], 4, '.', ',') }}
                                 @else
@@ -238,8 +238,8 @@
                         </div>
 
                         {{-- Variación --}}
-                        <div class="flex items-center gap-1.5 mt-1" id="rbob-change-row">
-                            <span id="rbob-arrow" class="text-sm leading-none">
+                        <div class="flex items-center gap-1.5 mt-0.5" id="rbob-change-row">
+                            <span id="rbob-arrow" class="text-xs leading-none">
                                 @if($rbobData['is_up'] === true)  <span style="color:#6ee7b7">▲</span>
                                 @elseif($rbobData['is_up'] === false) <span style="color:#fca5a5">▼</span>
                                 @else <span style="color:rgba(52,211,153,0.4)">—</span>
@@ -261,9 +261,9 @@
                     </div>
 
                     {{-- Pie --}}
-                    <div class="flex items-center justify-between pt-2" style="border-top:1px solid rgba(255,255,255,0.06)">
-                        <span class="text-xs" style="color:rgba(52,211,153,0.35); font-size: 10px;">Última actualización</span>
-                        <span id="rbob-updated" class="text-xs font-mono tabular-nums" style="color:rgba(52,211,153,0.55); font-size: 10px;">
+                    <div class="flex items-center justify-between mt-2 pt-1.5" style="border-top:1px solid rgba(255,255,255,0.05)">
+                        <span class="text-xs" style="color:rgba(52,211,153,0.35); font-size: 9px;">Última actualización</span>
+                        <span id="rbob-updated" class="text-xs font-mono tabular-nums" style="color:rgba(52,211,153,0.55); font-size: 9px;">
                             {{ $rbobData['updated_at'] ?? '—' }}
                         </span>
                     </div>
