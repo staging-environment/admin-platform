@@ -147,7 +147,7 @@
                     <div class="flex items-start justify-between mb-2">
                         <div>
                             <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:#6b7280; font-size: 9px;">Yahoo Finance · BZ=F</span>
+                                <span class="text-xs font-bold tracking-widest uppercase" style="color:#6b7280; font-size: 9px;">BZ=F</span>
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(251,191,36,0.12);color:#fbbf24;font-size:8px">FUTURES</span>
                             </div>
                             <h3 class="text-base font-black text-white leading-tight">Gasoil Londres</h3>
@@ -211,7 +211,7 @@
                     <div class="flex items-start justify-between mb-2">
                         <div>
                             <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs font-bold tracking-widest uppercase" style="color:rgba(52,211,153,0.55); font-size: 9px;">Yahoo Finance · RB=F</span>
+                                <span class="text-xs font-bold tracking-widest uppercase" style="color:rgba(52,211,153,0.55); font-size: 9px;">RB=F</span>
                                 <span class="text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wide" style="background:rgba(52,211,153,0.12);color:#34d399;font-size:8px">FUTURES</span>
                             </div>
                             <h3 class="text-base font-black text-white leading-tight">Gasolina RBOB</h3>
