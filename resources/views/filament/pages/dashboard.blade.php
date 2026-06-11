@@ -1,6 +1,13 @@
 <x-filament-panels::page>
     <style>
         .fi-header { display: none !important; }
+        .fi-main-ctn, main {
+            padding-top: 0.25rem !important;
+        }
+        .fi-page {
+            margin-top: 0px !important;
+            padding-top: 0px !important;
+        }
     </style>
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
@@ -123,7 +130,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
-    <div class="space-y-7" style="margin-top: -2.25rem !important;">
+    <div class="space-y-7" style="margin-top: -3.5rem !important;">
 
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         {{-- ZONA SUPERIOR: MERCADOS ENERGÉTICOS INTERNACIONALES            --}}
