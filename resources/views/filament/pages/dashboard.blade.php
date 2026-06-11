@@ -163,7 +163,7 @@
                     {{-- Precio principal --}}
                     <div class="mb-2">
                         <div class="flex items-baseline gap-2">
-                            <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:2.2rem;line-height:1;letter-spacing:-0.02em">
+                            <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.8rem;line-height:1;letter-spacing:-0.02em">
                                 @if($gasoilData['price'])
                                     {{ number_format($gasoilData['price'], 4, '.', ',') }}
                                 @else
@@ -227,7 +227,7 @@
                     {{-- Precio principal --}}
                     <div class="mb-2">
                         <div class="flex items-baseline gap-2">
-                            <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:2.2rem;line-height:1;letter-spacing:-0.02em">
+                            <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.8rem;line-height:1;letter-spacing:-0.02em"></span>
                                 @if($rbobData['price'])
                                     {{ number_format($rbobData['price'], 4, '.', ',') }}
                                 @else
