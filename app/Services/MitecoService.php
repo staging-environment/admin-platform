@@ -15,25 +15,25 @@ class MitecoService
     protected array $stationsConfig = [
         1 => [
             'name' => 'E.S. VISTALEGRE (Utrera)',
-            'num_reg' => '41.1.00357',
+            'num_reg' => 'AND41.1.00357',
             'margen' => 'N',
             'env_key' => 'UTRERA',
         ],
         2 => [
             'name' => 'RONDA NORTE (Sevilla)',
-            'num_reg' => '41/35973',
+            'num_reg' => 'AND41/35973',
             'margen' => 'N',
             'env_key' => 'RONDA_NORTE',
         ],
         3 => [
             'name' => 'E.S. RODALABOTA (El Cuervo)',
-            'num_reg' => '201699903784267',
+            'num_reg' => 'AND201699903784267',
             'margen' => 'N',
             'env_key' => 'EL_CUERVO',
         ],
         4 => [
             'name' => 'E.S. ATENAS (Lebrija)',
-            'num_reg' => '201599901562684',
+            'num_reg' => 'AND201599901562684',
             'margen' => 'D',
             'env_key' => 'LEBRIJA',
         ],
@@ -152,7 +152,7 @@ class MitecoService
             }
 
             $stationData = [
-                'firma' => $config['firma'] ?? $this->firma,
+                'firma' => $config['firma'] ?? 'IND',
                 'num_reg' => $config['num_reg'],
                 'margen' => $config['margen'],
                 'fechaiper' => $fechaiper,
@@ -269,7 +269,7 @@ class MitecoService
             }
 
             $stationData = [
-                'firma' => $config['firma'] ?? $this->firma,
+                'firma' => $config['firma'] ?? 'IND',
                 'num_reg' => $config['num_reg'],
                 'margen' => $config['margen'],
                 'fechaiper' => $fechaiper,
