@@ -152,7 +152,7 @@ class MitecoService
             }
 
             $stationData = [
-                'firma' => $config['firma'] ?? 'IND',
+                'firma' => $config['firma'] ?? $this->firma,
                 'num_reg' => $config['num_reg'],
                 'margen' => $config['margen'],
                 'fechaiper' => $fechaiper,
@@ -269,7 +269,7 @@ class MitecoService
             }
 
             $stationData = [
-                'firma' => $config['firma'] ?? 'IND',
+                'firma' => $config['firma'] ?? $this->firma,
                 'num_reg' => $config['num_reg'],
                 'margen' => $config['margen'],
                 'fechaiper' => $fechaiper,
