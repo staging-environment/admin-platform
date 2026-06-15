@@ -84,10 +84,17 @@ class MitecoService
     }
 
     /**
-     * Fetch prices from virtusgesnet and upload them to MITECO for all stations individually.
+     * Fetch prices from virtusgesnet and upload them to MITECO for all stations.
      */
     public function uploadPrices(): array
     {
+        $groupUser = config('services.miteco.user');
+        $groupPassword = config('services.miteco.password');
+
+        if ($groupUser && $groupPassword) {
+            return $this->uploadPricesGrouped($groupUser, $groupPassword);
+        }
+
         $results = [];
         $overallSuccess = true;
 
@@ -214,5 +221,132 @@ class MitecoService
             'success' => $overallSuccess,
             'results' => $results,
         ];
+    }
+
+    /**
+     * Grouped upload of all stations under a single user/password.
+     */
+    protected function uploadPricesGrouped(string $user, string $password): array
+    {
+        $token = $this->login($user, $password);
+        if (!$token) {
+            Log::error('MitecoService: Grouped login failed.');
+            return [
+                'success' => false,
+                'message' => 'Grouped login failed',
+            ];
+        }
+
+        // MITECO requires vigencia to be at least 1 hour in the future, and maximum 3 days.
+        // We set it to current time + 75 minutes (1h 15m) to safely clear the 1-hour constraint.
+        $vigencia = now('Europe/Madrid')->addMinutes(75);
+        $fechaiper = $vigencia->format('d/m/Y');
+        $horaiper = $vigencia->format('H:i');
+        $dateStr = now('Europe/Madrid')->format('Ymd');
+
+        $precios = [];
+        $results = [];
+
+        foreach ($this->stationsConfig as $stationCode => $config) {
+            // Retrieve current prices from preciosdeproductos table
+            // Code 1 = Gasoleo A
+            // Code 2 = Gasolina 95 (Sin Plomo 95)
+            $pvpGoa = PreciosProducto::where('CodigoEstacion', $stationCode)
+                ->where('CodigoProducto', '1')
+                ->value('PVP');
+
+            $pvpG95e5 = PreciosProducto::where('CodigoEstacion', $stationCode)
+                ->where('CodigoProducto', '2')
+                ->value('PVP');
+
+            if ($pvpGoa === null && $pvpG95e5 === null) {
+                Log::warning("MitecoService: No prices found for station {$config['name']} (Code {$stationCode}) in database.");
+                $results[$config['name']] = [
+                    'success' => false,
+                    'message' => 'No price data found in database',
+                ];
+                continue;
+            }
+
+            $stationData = [
+                'firma' => $this->firma,
+                'num_reg' => $config['num_reg'],
+                'margen' => $config['margen'],
+                'fechaiper' => $fechaiper,
+                'horaiper' => $horaiper,
+                'tventa_coop' => 'P', // Public sale
+            ];
+
+            // MITECO expects prices formatted with 3 decimals and comma decimal separator (e.g. "1,499")
+            if ($pvpG95e5 !== null) {
+                $stationData['pvpg95e5'] = number_format((float) $pvpG95e5, 3, ',', '');
+            }
+
+            if ($pvpGoa !== null) {
+                $stationData['pvpgoa'] = number_format((float) $pvpGoa, 3, ',', '');
+            }
+
+            $precios[] = $stationData;
+            $results[$config['name']] = [
+                'success' => true,
+                'message' => 'Added to batch',
+            ];
+        }
+
+        if (empty($precios)) {
+            return [
+                'success' => false,
+                'message' => 'No station data to upload.',
+                'results' => $results,
+            ];
+        }
+
+        // ZZZ code in ITGFSZZZAAAAMMDD. Derived from the firma or default to 'IND'
+        $remitente = str_pad(substr($this->firma, 0, 3), 3, 'X', STR_PAD_RIGHT);
+        $envioCode = 'ITGFS' . $remitente . $dateStr;
+
+        $payload = [
+            'tipo' => 'ITGFS',
+            'envio' => $envioCode,
+            'precios' => $precios,
+        ];
+
+        try {
+            Log::info("MitecoService: Sending grouped prices to MITECO...", ['envio' => $envioCode, 'payload' => $payload]);
+
+            $response = Http::timeout(30)
+                ->withToken($token)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post($this->baseUrl . '/v1/envio/itgfs', $payload);
+
+            if ($response->failed()) {
+                Log::error("MitecoService grouped upload failed: " . $response->status() . ' - ' . $response->body());
+                return [
+                    'success' => false,
+                    'status' => $response->status(),
+                    'message' => $response->body(),
+                    'results' => $results,
+                ];
+            }
+
+            $responseData = $response->json();
+            Log::info("MitecoService: Grouped prices uploaded successfully.", $responseData);
+            return [
+                'success' => true,
+                'data' => $responseData,
+                'results' => $results,
+            ];
+
+        } catch (\Throwable $e) {
+            Log::error("MitecoService grouped upload exception: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'results' => $results,
+            ];
+        }
     }
 }

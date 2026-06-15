@@ -43,6 +43,8 @@ return [
 
     'miteco' => [
         'firma' => env('MITECO_FIRMA', 'IND'),
+        'user' => env('MITECO_USER'),
+        'password' => env('MITECO_PASSWORD'),
         'stations' => [
             'UTRERA' => [
                 'user' => env('MITECO_UTRERA_USER'),
