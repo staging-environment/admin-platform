@@ -9,12 +9,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class UploadPricesToMitecoJob implements ShouldQueue
+class UploadPricesToMitecoJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public int $tries   = 2;
-    public int $timeout = 60;
+    use Dispatchable;
 
     /**
      * Envía los precios actuales de nuestras 4 gasolineras a MITECO.

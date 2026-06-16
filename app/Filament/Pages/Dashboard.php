@@ -21,6 +21,9 @@ class Dashboard extends \Filament\Pages\Dashboard
     /** Datos de competencia local (MITECO) */
     public array $localityData = [];
 
+    /** Estado del bot MITECO */
+    public ?array $mitecoLastUpdate = null;
+
     public function mount(): void
     {
         // Si no hay datos en caché, los obtenemos inmediatamente (primer acceso)
@@ -34,6 +37,7 @@ class Dashboard extends \Filament\Pages\Dashboard
             $mineturService->refreshAll();
         }
 
+        $this->mitecoLastUpdate = Cache::get('miteco_last_update_status');
         $this->loadData();
     }
 

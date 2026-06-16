@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\PreciosProducto;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class MitecoService
 {
@@ -88,12 +89,110 @@ class MitecoService
      */
     public function uploadPrices(): array
     {
+        // 1. Fetch current prices from database for comparison
+        $currentPrices = [];
+        foreach ($this->stationsConfig as $stationCode => $config) {
+            $pvpGoa = PreciosProducto::where('CodigoEstacion', $stationCode)
+                ->where('CodigoProducto', '1')
+                ->value('PVP');
+            $pvpG95e5 = PreciosProducto::where('CodigoEstacion', $stationCode)
+                ->where('CodigoProducto', '2')
+                ->value('PVP');
+            
+            $currentPrices[$stationCode] = [
+                'name' => $config['name'],
+                'goa' => $pvpGoa !== null ? floatval($pvpGoa) : null,
+                'g95e5' => $pvpG95e5 !== null ? floatval($pvpG95e5) : null,
+            ];
+        }
+
+        // 2. Determine if prices changed compared to last upload
+        $lastPrices = Cache::get('miteco_last_uploaded_prices');
+        $pricesChanged = false;
+
+        if (!$lastPrices) {
+            $pricesChanged = true;
+        } else {
+            foreach ($currentPrices as $stationCode => $prices) {
+                if (!isset($lastPrices[$stationCode])) {
+                    $pricesChanged = true;
+                    break;
+                }
+                if ($lastPrices[$stationCode]['goa'] !== $prices['goa'] || 
+                    $lastPrices[$stationCode]['g95e5'] !== $prices['g95e5']) {
+                    $pricesChanged = true;
+                    break;
+                }
+            }
+        }
+
+        // 3. Apply Monday 06:00 AM constraint if prices haven't changed
+        if (!$pricesChanged) {
+            $now = now('Europe/Madrid');
+            $isMonday6AM = $now->isMonday() && $now->hour === 6;
+
+            if (!$isMonday6AM) {
+                $msg = 'Los precios no han cambiado y no es Lunes a las 06:00 AM (Hora Española). Envío omitido.';
+                Log::info("MitecoService: " . $msg);
+
+                $statusData = [
+                    'timestamp' => now('Europe/Madrid')->toIso8601String(),
+                    'status' => 'skipped',
+                    'message' => $msg,
+                    'prices' => $currentPrices,
+                ];
+                Cache::put('miteco_last_update_status', $statusData);
+
+                return [
+                    'success' => true,
+                    'skipped' => true,
+                    'message' => $msg,
+                    'prices' => $currentPrices,
+                ];
+            }
+        }
+
+        // 4. Perform the upload (grouped or individual)
         $groupUser = config('services.miteco.user');
         $groupPassword = config('services.miteco.password');
 
         if ($groupUser && $groupPassword) {
-            return $this->uploadPricesGrouped($groupUser, $groupPassword);
+            $res = $this->uploadPricesGrouped($groupUser, $groupPassword);
+        } else {
+            $res = $this->uploadPricesIndividual();
         }
+
+        // 5. Save execution outcome to Cache
+        if ($res['success']) {
+            Cache::put('miteco_last_uploaded_prices', $currentPrices);
+
+            $statusData = [
+                'timestamp' => now('Europe/Madrid')->toIso8601String(),
+                'status' => 'success',
+                'message' => 'Precios actualizados con éxito en Miteco.',
+                'prices' => $currentPrices,
+                'data' => $res['data'] ?? ($res['results'] ?? null),
+            ];
+            Cache::put('miteco_last_update_status', $statusData);
+        } else {
+            $statusData = [
+                'timestamp' => now('Europe/Madrid')->toIso8601String(),
+                'status' => 'failed',
+                'message' => $res['message'] ?? 'Fallo en la comunicación con Miteco.',
+                'prices' => $currentPrices,
+                'errors' => $res['results'] ?? null,
+            ];
+            Cache::put('miteco_last_update_status', $statusData);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Individual upload helper (formerly part of uploadPrices).
+     */
+    protected function uploadPricesIndividual(): array
+    {
 
         $results = [];
         $overallSuccess = true;
