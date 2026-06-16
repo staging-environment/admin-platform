@@ -133,82 +133,61 @@
     <div class="space-y-7" style="margin-top: -3.5rem !important;">
 
         @if(auth()->user() && (auth()->user()->hasRole('Admin') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
-            <section class="rounded-2xl p-5 shadow-2xl border" 
+            <section class="rounded-xl px-4 py-2.5 shadow-md border" 
                      style="background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%); border-color: rgba(99, 102, 241, 0.15); position: relative; overflow: hidden;">
                 
-                {{-- Decorative background glow --}}
-                <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%); pointer-events: none;"></div>
-
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" 
-                             style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25);">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                            </svg>
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs relative z-10">
+                    {{-- Left side: Status badge & timestamp --}}
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm">🤖</span>
+                            <span class="font-bold text-white">Bot MITECO:</span>
                         </div>
-                        <div>
-                            <h3 class="text-sm font-black text-white leading-tight">🤖 Robot de Integración MITECO</h3>
-                            <p class="text-xs text-gray-400 mt-1">Sincronización automática de precios de venta con el Ministerio</p>
-                            
-                            @if($mitecoLastUpdate)
-                                <div class="flex flex-wrap items-center gap-3 mt-3">
-                                    <span class="text-xs font-mono text-gray-300">
-                                        Última ejecución: <strong>{{ \Carbon\Carbon::parse($mitecoLastUpdate['timestamp'])->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</strong>
-                                    </span>
-
-                                    @if(($mitecoLastUpdate['status'] ?? '') === 'success')
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
-                                              style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
-                                            ● ÉXITO
-                                        </span>
-                                        @if(isset($mitecoLastUpdate['data']['numRegistro']))
-                                            <a href="{{ $mitecoLastUpdate['data']['urlComprobante'] ?? '#' }}" target="_blank" 
-                                               class="text-[10px] font-bold text-indigo-400 hover:underline flex items-center gap-1">
-                                                Comprobante (Reg: {{ $mitecoLastUpdate['data']['numRegistro'] }}) ↗
-                                            </a>
-                                        @endif
-                                    @elseif(($mitecoLastUpdate['status'] ?? '') === 'skipped')
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
-                                              style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3);">
-                                            ● OMITIDO (SIN CAMBIOS)
-                                        </span>
-                                    @else
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
-                                              style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
-                                            ● FALLIDO
-                                        </span>
-                                    @endif
-                                </div>
-                                
-                                @if(isset($mitecoLastUpdate['message']))
-                                    <p class="text-xs mt-2 text-indigo-200 opacity-90 italic">
-                                        "{{ $mitecoLastUpdate['message'] }}"
-                                    </p>
+                        
+                        @if($mitecoLastUpdate)
+                            @if(($mitecoLastUpdate['status'] ?? '') === 'success')
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
+                                      style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    ● ÉXITO
+                                </span>
+                                @if(isset($mitecoLastUpdate['data']['numRegistro']))
+                                    <a href="{{ $mitecoLastUpdate['data']['urlComprobante'] ?? '#' }}" target="_blank" 
+                                       class="text-[10px] font-bold text-indigo-400 hover:underline">
+                                        Reg: {{ $mitecoLastUpdate['data']['numRegistro'] }} ↗
+                                    </a>
                                 @endif
+                            @elseif(($mitecoLastUpdate['status'] ?? '') === 'skipped')
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
+                                      style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3);"
+                                      title="{{ $mitecoLastUpdate['message'] ?? '' }}">
+                                    ● OMITIDO (SIN CAMBIOS)
+                                </span>
                             @else
-                                <div class="flex items-center gap-1.5 mt-3 text-xs text-gray-400">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
-                                    Sin registros de ejecución previos en este entorno.
-                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
+                                      style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                    ● FALLIDO
+                                </span>
                             @endif
-                        </div>
+                            
+                            <span class="text-gray-400 text-[11px]">
+                                Última ejecución: <strong class="text-gray-200">{{ \Carbon\Carbon::parse($mitecoLastUpdate['timestamp'])->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</strong>
+                            </span>
+                        @else
+                            <span class="text-gray-400">Sin registros de ejecución previos.</span>
+                        @endif
                     </div>
 
+                    {{-- Right side: Verified Prices --}}
                     @if($mitecoLastUpdate && isset($mitecoLastUpdate['prices']))
-                        <div class="border-t md:border-t-0 md:border-l border-gray-700 pt-3 md:pt-0 md:pl-6 flex flex-col gap-2">
-                            <span class="text-[10px] font-bold uppercase text-indigo-300 tracking-wider">Últimos Precios Verificados:</span>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1">
-                                @foreach($mitecoLastUpdate['prices'] as $code => $station)
-                                    <div class="flex flex-col">
-                                        <span class="text-[9px] text-gray-400 truncate max-w-[100px]" title="{{ $station['name'] }}">{{ $station['name'] }}</span>
-                                        <div class="flex gap-2 text-[10px] font-mono text-white mt-0.5">
-                                            <span title="Gasóleo A">⛽ {{ $station['goa'] ? number_format($station['goa'], 3, ',', '') : '—' }}</span>
-                                            <span title="Gasolina 95 E5">🟢 {{ $station['g95e5'] ? number_format($station['g95e5'], 3, ',', '') : '—' }}</span>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] border-t lg:border-t-0 lg:border-l border-gray-700 pt-2 lg:pt-0 lg:pl-4">
+                            <span class="text-[9px] font-bold uppercase text-indigo-300 tracking-wider">Últimos Precios:</span>
+                            @foreach($mitecoLastUpdate['prices'] as $code => $station)
+                                <div class="flex items-center gap-1.5 bg-slate-800/40 px-2 py-0.5 rounded border border-slate-700/30">
+                                    <span class="text-gray-400 font-semibold" style="font-size: 10px;">{{ str_replace(['E.S. ', ' (Utrera)', ' (Sevilla)', ' (El Cuervo)', ' (Lebrija)'], '', $station['name']) }}:</span>
+                                    <span class="text-gray-200 font-mono" title="Gasóleo A">⛽{{ $station['goa'] ? number_format($station['goa'], 3, ',', '') : '—' }}</span>
+                                    <span class="text-emerald-400 font-mono" title="Gasolina 95 E5">🟢{{ $station['g95e5'] ? number_format($station['g95e5'], 3, ',', '') : '—' }}</span>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
                 </div>
