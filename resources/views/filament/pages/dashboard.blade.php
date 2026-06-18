@@ -141,7 +141,7 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-1.5">
                             <span class="text-sm">🤖</span>
-                            <span class="font-bold text-white">Bot MITECO:</span>
+                            <span class="font-bold text-white">Bot MITECO <span class="text-[10px] font-normal lowercase opacity-60" style="color:#94a3b8; margin-left: 2px;">(comprobación cada 5 min)</span>:</span>
                         </div>
                         
                         @if($mitecoLastUpdate)
@@ -201,7 +201,7 @@
         <section>
             <div class="flex items-center gap-2.5 mb-4">
                 <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#fbbf24,#f59e0b)"></div>
-                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Mercados Energéticos</h2>
+                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Mercados Energéticos <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(actualización cada 30s)</span></h2>
                 <span class="ml-auto flex items-center gap-1.5 text-xs" style="color:#6b7280">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                     Actualización en tiempo real · Yahoo Finance
@@ -338,7 +338,7 @@
         <section>
             <div class="flex items-center gap-2.5 mb-4">
                 <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
-                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local</h2>
+                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(consulta cada 15 min)</span></h2>
                 <span class="ml-auto text-xs" style="color:#6b7280">
                     Datos oficiales · Ministerio para la Transición Ecológica (MITECO)
                 </span>
@@ -641,9 +641,9 @@
             });
         }
 
-        // Ejecutar de inmediato y luego cada 1 hora (sincronizado con el Ministerio/cron)
+        // Ejecutar de inmediato y luego cada 5 minutos (sincronizado con el Ministerio/cron)
         fetchCompetitors();
-        setInterval(fetchCompetitors, 3600000);
+        setInterval(fetchCompetitors, 300000);
 
     })();
     </script>
