@@ -130,7 +130,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
-    <div class="space-y-7" style="margin-top: -3.5rem !important;">
+    <div class="space-y-7" style="margin-top: -3.5rem !important;" wire:poll.30s="loadData">
 
         @if(auth()->user() && (auth()->user()->hasRole('Admin') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
             <section class="rounded-xl px-4 py-2.5 shadow-md border" 

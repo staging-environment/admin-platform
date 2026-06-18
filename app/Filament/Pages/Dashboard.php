@@ -50,6 +50,7 @@ class Dashboard extends \Filament\Pages\Dashboard
         $this->gasoilData  = $fuelService->getGasoilLondres();
         $this->rbobData    = $fuelService->getRBOB();
         $this->localityData = $mineturService->getAllLocalitiesData();
+        $this->mitecoLastUpdate = Cache::get('miteco_last_update_status');
     }
 
     /** Refresca sólo los datos de competencia local (llamado por wire:poll cada 5 min). */

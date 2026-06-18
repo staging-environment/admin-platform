@@ -129,7 +129,8 @@ class MitecoService
         // 3. Apply Monday 06:00 AM constraint if prices haven't changed
         if (!$pricesChanged) {
             $now = now('Europe/Madrid');
-            $isMonday6AM = $now->isMonday() && $now->hour === 6;
+            // Since this runs every 5 minutes, we check if it's Monday between 06:00 and 06:04
+            $isMonday6AM = $now->isMonday() && $now->hour === 6 && $now->minute < 5;
 
             if (!$isMonday6AM) {
                 $msg = 'Los precios no han cambiado y no es Lunes a las 06:00 AM (Hora Española). Envío omitido.';

@@ -20,6 +20,6 @@ Schedule::job(new RefreshFuelMarketsJob)->everyThirtySeconds();
 Schedule::job(new RefreshMineturJob)->hourly();
 
 // ── Envío de Precios a MITECO ─────────────────────────────────────────────────
-// Envía los precios actuales de nuestras 4 gasolineras a MITECO de forma horaria.
-Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->hourly();
+// Envía los precios actuales de nuestras 4 gasolineras a MITECO cada 5 minutos si hay cambios.
+Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->everyFiveMinutes();
 
