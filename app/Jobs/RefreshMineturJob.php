@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class RefreshMineturJob implements ShouldQueue
+class RefreshMineturJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
