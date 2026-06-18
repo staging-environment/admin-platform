@@ -1,7 +1,13 @@
 <?php
-include 'vendor/autoload.php';
-$app = include 'bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-$cached = Cache::get('competitors_prices_30');
-echo "Cached 30km: " . json_encode($cached, JSON_PRETTY_PRINT) . PHP_EOL;
+use Illuminate\Support\Facades\Cache;
+
+require __DIR__ . '/vendor/autoload.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
+$status = Cache::get('miteco_last_update_status');
+echo "STATUS:\n";
+print_r($status);
+echo "\n";
