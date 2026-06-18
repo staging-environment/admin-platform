@@ -16,8 +16,8 @@ Artisan::command('inspire', function () {
 Schedule::job(new RefreshFuelMarketsJob)->everyThirtySeconds();
 
 // ── Competencia Local (API MITECO) ───────────────────────────────────────────
-// La API del Ministerio se actualiza ~1 vez/hora. Refrescamos cada hora.
-Schedule::job(new RefreshMineturJob)->hourly();
+// La API del Ministerio se actualiza ~1 vez/hora. Consultamos cada 15 minutos para sincronizar los cambios rápido.
+Schedule::job(new RefreshMineturJob)->everyFifteenMinutes();
 
 // ── Envío de Precios a MITECO ─────────────────────────────────────────────────
 // Envía los precios actuales de nuestras 4 gasolineras a MITECO cada 5 minutos si hay cambios.
