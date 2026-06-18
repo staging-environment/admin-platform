@@ -114,6 +114,7 @@ class MineturService
                     'diesel'     => array_slice($diesel, 0, 5),
                     'gas95'      => array_slice($gas95, 0, 5),
                     'updated_at' => $updatedAt,
+                    'checked_at' => now('Europe/Madrid')->format('d/m/Y H:i:s'),
                 ], self::CACHE_TTL);
             }
 

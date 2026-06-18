@@ -583,7 +583,14 @@
                     // Update timestamp
                     var timeEl = document.getElementById('updated-time-' + key);
                     if (timeEl) {
-                        timeEl.textContent = locality.updated_at ? 'Actualizado: ' + locality.updated_at : '';
+                        var text = '';
+                        if (locality.updated_at) {
+                            text += 'Miteco: ' + locality.updated_at;
+                        }
+                        if (locality.checked_at) {
+                            text += ' | Bot: ' + locality.checked_at;
+                        }
+                        timeEl.textContent = text;
                     }
                     
                     // Update diesel rows
