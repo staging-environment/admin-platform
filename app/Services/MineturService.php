@@ -110,10 +110,25 @@ class MineturService
                 usort($diesel, fn ($a, $b) => $a['price'] <=> $b['price']);
                 usort($gas95,  fn ($a, $b) => $a['price'] <=> $b['price']);
 
+                $newDiesel = array_slice($diesel, 0, 5);
+                $newGas95  = array_slice($gas95, 0, 5);
+                
+                $cached = Cache::get("minetur_{$key}");
+                $hasChanged = true;
+                
+                if ($cached && isset($cached['diesel']) && isset($cached['gas95'])) {
+                    if (json_encode($cached['diesel']) === json_encode($newDiesel) && 
+                        json_encode($cached['gas95']) === json_encode($newGas95)) {
+                        $hasChanged = false;
+                    }
+                }
+                
+                $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
+
                 Cache::put("minetur_{$key}", [
-                    'diesel'     => array_slice($diesel, 0, 5),
-                    'gas95'      => array_slice($gas95, 0, 5),
-                    'updated_at' => $updatedAt,
+                    'diesel'     => $newDiesel,
+                    'gas95'      => $newGas95,
+                    'updated_at' => $finalUpdatedAt,
                     'checked_at' => now('Europe/Madrid')->format('d/m/Y H:i:s'),
                 ], self::CACHE_TTL);
             }
