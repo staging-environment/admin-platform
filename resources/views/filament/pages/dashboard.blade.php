@@ -201,7 +201,7 @@
         <section>
             <div class="flex items-center gap-2.5 mb-4">
                 <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#fbbf24,#f59e0b)"></div>
-                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Mercados Energéticos <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(actualización cada 30s)</span></h2>
+                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Mercados Energéticos <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(actualización cada 3s)</span></h2>
                 <span class="ml-auto flex items-center gap-1.5 text-xs" style="color:#6b7280">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                     Actualización en tiempo real · Yahoo Finance
