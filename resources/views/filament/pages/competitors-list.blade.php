@@ -1,7 +1,7 @@
 @php
     $localities = [
-        'sevilla'   => 'Sevilla',
         'utrera'    => 'Utrera',
+        'sevilla'   => 'Sevilla',
         'el_cuervo' => 'El Cuervo de Sevilla',
         'lebrija'   => 'Lebrija',
     ];
