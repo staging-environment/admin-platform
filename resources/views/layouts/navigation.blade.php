@@ -64,7 +64,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
+                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
@@ -80,6 +80,12 @@
                                     @if(auth()->user()?->can('ver_informes'))
                                     <x-dropdown-link href="/admin/informes">
                                         {{ __('Informes') }}
+                                    </x-dropdown-link>
+                                    @endif
+
+                                    @if(auth()->user()?->can('ver_analiticas'))
+                                    <x-dropdown-link href="/admin/analytics">
+                                        {{ __('Analítica') }}
                                     </x-dropdown-link>
                                     @endif
                                     
@@ -216,7 +222,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->canAny(['ver_informes', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
+            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
@@ -225,6 +231,12 @@
                         @if(auth()->user()?->can('ver_informes'))
                             <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
                                 {{ __('Informes') }}
+                            </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()?->can('ver_analiticas'))
+                            <x-responsive-nav-link href="/admin/analytics" :active="request()->is('admin/analytics*')">
+                                {{ __('Analítica') }}
                             </x-responsive-nav-link>
                         @endif
 

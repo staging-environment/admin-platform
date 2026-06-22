@@ -49,6 +49,7 @@
                             'gestion_roles' => 'Gestión de Roles y Matriz de Permisos',
                             'utilizar_explorador' => 'Utilizar Explorador de Archivos',
                             'ver_informes' => 'Ver Informes y Estadísticas',
+                            'ver_analiticas' => 'Ver Analíticas de Visitas',
                             'gestion_portada' => 'Configuración de Portada',
                         ],
                         'Gasolineras' => [

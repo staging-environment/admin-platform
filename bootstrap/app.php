@@ -21,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackPageViews::class,
+        ]);
+
         // AÑADE ESTA LÍNEA AQUÍ:
         $middleware->trustProxies(at: '*');
     })
