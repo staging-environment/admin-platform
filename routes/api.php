@@ -34,3 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/filters', FilterController::class);
 });
 
+// Public Telegram Webhook Route
+Route::post('/telegram/webhook', [App\Http\Controllers\TelegramWebhookController::class, 'handle']);
+
