@@ -37,4 +37,9 @@ class MostVisitedPagesWidget extends BaseWidget
             ->defaultSort('visits_count', 'desc')
             ->paginated(false);
     }
+
+    public function getTableRecordKey(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) $record->path;
+    }
 }
