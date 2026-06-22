@@ -57,6 +57,26 @@
             <x-input-label for="telefono" :value="__('Teléfono')" />
             <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $user->telefono)" autocomplete="tel" />
             <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
+
+            @can('recibir_notificaciones_competencia')
+                <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm text-blue-900 space-y-2">
+                    <p class="font-semibold flex items-center gap-1">
+                        📢 Tienes activo el permiso para recibir alertas de competencia. Configura Telegram siguiendo estos pasos:
+                    </p>
+                    <ol class="list-decimal list-inside space-y-1 text-blue-800">
+                        <li>Guarda tu número de teléfono móvil de España en el campo superior.</li>
+                        <li>Busca en Telegram el bot <b>@utrecar_alertas_bot</b> o haz clic en <a href="https://t.me/utrecar_alertas_bot" target="_blank" class="underline font-semibold hover:text-blue-950">t.me/utrecar_alertas_bot</a>.</li>
+                        <li>Inicia el bot y pulsa el botón <b>📱 Compartir Teléfono</b>.</li>
+                    </ol>
+                    <p class="text-xs text-blue-700 font-medium">
+                        El sistema detectará tu número y vinculará automáticamente tu cuenta de Telegram para enviarte alertas inmediatas.
+                    </p>
+                </div>
+            @else
+                <div class="mt-4 p-4 bg-gray-50 border-l-4 border-gray-400 rounded-r-md text-sm text-gray-700">
+                    ℹ️ No tienes activo el permiso para recibir alertas de competencia. Si lo necesitas, solicita su activación en la Matriz de Permisos.
+                </div>
+            @endcan
         </div>
 
         <div class="flex items-center gap-4">
