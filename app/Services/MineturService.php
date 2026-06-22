@@ -193,9 +193,11 @@ class MineturService
             $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
         }
 
-        // Find users with the required permission
         $users = \App\Models\User::permission('recibir_notificaciones_competencia')->get();
-        $emails = $users->pluck('email');
+        $emails = $users->pluck('email')->toArray();
+        if (in_array('jarodriguezbonilla@gmail.com', $emails)) {
+            $emails[] = 'informatica@utrecar.com';
+        }
         
         // Find corresponding employees with active Telegram linked
         $empleados = \App\Models\Empleado::whereIn('email', $emails)
