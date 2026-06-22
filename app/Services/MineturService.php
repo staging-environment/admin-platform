@@ -165,6 +165,9 @@ class MineturService
 
             Log::info('MineturService: Refreshed ' . count(self::LOCALITIES) . ' localities. Stations total: ' . count($stations) . '. Date: ' . $updatedAt);
 
+        } catch (\Throwable $e) {
+            Log::error('MineturService: ' . $e->getMessage());
+        }
     }
 
     /**
