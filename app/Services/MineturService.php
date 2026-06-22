@@ -90,11 +90,16 @@ class MineturService
                     $name   = trim($s['Rótulo'] ?? 'Sin nombre');
                     $addr   = trim($s['Dirección'] ?? '');
 
+                    $margen = $s['Margen'] ?? '';
+                    $id     = (int) ($s['IDEESS'] ?? 0);
+
                     if ($dPrice > 0) {
                         $diesel[] = [
                             'name'    => $name,
                             'address' => $addr,
                             'price'   => $dPrice,
+                            'margen'  => $margen,
+                            'id'      => $id,
                         ];
                     }
                     if ($gPrice > 0) {
@@ -102,27 +107,44 @@ class MineturService
                             'name'    => $name,
                             'address' => $addr,
                             'price'   => $gPrice,
+                            'margen'  => $margen,
+                            'id'      => $id,
                         ];
                     }
                 }
 
-                // Ordenar de menor a mayor precio
-                usort($diesel, fn ($a, $b) => $a['price'] <=> $b['price']);
-                usort($gas95,  fn ($a, $b) => $a['price'] <=> $b['price']);
+                // Ordenar exactamente igual que Miteco (Precio asc -> Margen N < D < I -> IDEESS asc)
+                $mitecoSort = function ($a, $b) {
+                    if ($a['price'] != $b['price']) {
+                        return $a['price'] <=> $b['price'];
+                    }
+
+                    $margenOrder = ['N' => 1, 'D' => 2, 'I' => 3];
+                    $mA = $margenOrder[$a['margen']] ?? 4;
+                    $mB = $margenOrder[$b['margen']] ?? 4;
+                    if ($mA != $mB) {
+                        return $mA <=> $mB;
+                    }
+
+                    return $a['id'] <=> $b['id'];
+                };
+
+                usort($diesel, $mitecoSort);
+                usort($gas95,  $mitecoSort);
 
                 $newDiesel = array_slice($diesel, 0, 5);
                 $newGas95  = array_slice($gas95, 0, 5);
-                
+
                 $cached = Cache::get("minetur_{$key}");
                 $hasChanged = true;
-                
+
                 if ($cached && isset($cached['diesel']) && isset($cached['gas95'])) {
                     if (json_encode($cached['diesel']) === json_encode($newDiesel) && 
                         json_encode($cached['gas95']) === json_encode($newGas95)) {
                         $hasChanged = false;
                     }
                 }
-                
+
                 $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
 
                 Cache::put("minetur_{$key}", [
