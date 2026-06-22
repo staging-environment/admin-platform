@@ -707,12 +707,51 @@
     {{-- CSS de impresión --}}
     <style>
         @media print {
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+
+            /* Ocultar barra lateral, barra superior, cabecera de Filament y elementos innecesarios */
+            .fi-sidebar, 
+            .fi-topbar, 
+            .fi-breadcrumbs, 
+            .fi-header,
+            .fi-sidebar-header,
+            header,
+            aside,
+            nav {
+                display: none !important;
+                height: 0 !important;
+                width: 0 !important;
+                visibility: hidden !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 9px !important;
+            }
+
+            /* Contenedor principal de Filament - remover paddings de layout */
+            .fi-main,
+            .fi-main-ctn,
+            .fi-page,
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
             body * {
                 visibility: hidden;
             }
+
             #print-area, #print-area * {
                 visibility: visible;
             }
+
             #print-area {
                 position: absolute;
                 left: 0;
@@ -736,8 +775,14 @@
                 border: none !important; 
                 margin: 0 !important;
             }
-            body { font-size: 10px; color: black !important; }
-            th, td { padding: 3px 5px !important; font-size: 10px !important; color: black !important; }
+
+            th, td { 
+                padding: 3px 4px !important; 
+                font-size: 8px !important; 
+                color: black !important; 
+                border-bottom: 1px solid #e5e7eb !important;
+            }
+
             a[href]::after { content: none !important; }
             .rounded-full { border-radius: 4px !important; }
             
