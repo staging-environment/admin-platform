@@ -38,8 +38,8 @@ class MostVisitedPagesWidget extends BaseWidget
             ->paginated(false);
     }
 
-    public function getTableRecordKey(\Illuminate\Database\Eloquent\Model $record): string
+    public function getTableRecordKey(\Illuminate\Database\Eloquent\Model|array $record): string
     {
-        return (string) $record->path;
+        return is_array($record) ? (string) ($record['path'] ?? '') : (string) $record->path;
     }
 }
