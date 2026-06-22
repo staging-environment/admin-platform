@@ -17,6 +17,12 @@
         @csrf
         @method('patch')
 
+        @if (session('status') === 'profile-updated')
+            <div class="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-md text-sm font-medium">
+                ✅ La información de tu perfil se ha guardado correctamente.
+            </div>
+        @endif
+
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
