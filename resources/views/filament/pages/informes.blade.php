@@ -387,56 +387,49 @@
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
 
                         {{-- ─── CABECERA ────────────────────────────────────────────── --}}
-                        @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
-                        @php
-                            $sCol = $sortColumn;
-                            $sDir = $sortDirection;
-                            $ico  = fn($col) => $sCol === $col ? ($sDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
-                            $thS  = 'cursor-pointer select-none hover:bg-gray-100 transition-colors';
-                        @endphp
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
-                                <th wire:click="sortBy('descripcion')" class="px-3 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
+                                <th wire:click="sortBy('descripcion')" class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_compra')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_compra')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pct_iva_compra')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pct_iva_compra')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('fecha_ultima_compra')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('fecha_ultima_compra')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Últ. Compra<span class="font-normal">{{ $ico('fecha_ultima_compra') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_venta_sin_iva')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_venta_sin_iva')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     PVP s/IVA<span class="font-normal">{{ $ico('precio_venta_sin_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pct_iva')" class="px-3 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pct_iva')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_venta')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_venta')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     PVP c/IVA<span class="font-normal">{{ $ico('precio_venta') }}</span>
                                 </th>
-                                <th wire:click="sortBy('uds_compradas')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider border-l-2 border-gray-100 {{ $thS }}">
+                                <th wire:click="sortBy('uds_compradas')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider border-l-2 border-gray-100 {{ $thS }}">
                                     Uds. Compradas<span class="font-normal">{{ $ico('uds_compradas') }}</span>
                                 </th>
-                                <th wire:click="sortBy('uds_vendidas')" class="px-3 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('uds_vendidas')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Uds. Vendidas<span class="font-normal">{{ $ico('uds_vendidas') }}</span>
                                 </th>
-                                <th wire:click="sortBy('total_comprado')" class="px-3 py-3 text-right text-xs font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100 {{ $thS }}">
+                                <th wire:click="sortBy('total_comprado')" class="px-2 py-2 text-right text-[11px] font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100 {{ $thS }}">
                                     Total Comprado<span class="font-normal">{{ $ico('total_comprado') }}</span>
                                 </th>
-                                <th wire:click="sortBy('total_facturado')" class="px-3 py-3 text-right text-xs font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100 {{ $thS }}">
+                                <th wire:click="sortBy('total_facturado')" class="px-2 py-2 text-right text-[11px] font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100 {{ $thS }}">
                                     Total Facturado<span class="font-normal">{{ $ico('total_facturado') }}</span>
                                 </th>
-                                <th wire:click="sortBy('beneficio')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100 {{ $thS }}">
+                                <th wire:click="sortBy('beneficio')" class="px-2 py-2 text-right text-[11px] font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100 {{ $thS }}">
                                     Beneficio<span class="font-normal">{{ $ico('beneficio') }}</span>
                                 </th>
-                                <th wire:click="sortBy('margen_pct')" class="px-3 py-3 text-right text-xs font-bold text-amber-600 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('margen_pct')" class="px-2 py-2 text-right text-[11px] font-bold text-amber-600 uppercase tracking-wider {{ $thS }}">
                                     % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
                                 </th>
                             </tr>
@@ -452,35 +445,35 @@
                         @endphp
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
-                                <th wire:click="sortBy('descripcion')" class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
+                                <th wire:click="sortBy('descripcion')" class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
                                 </th>
-                                <th wire:click="sortBy('grupo_nombre')" class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('grupo_nombre')" class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     Grupo<span class="text-gray-400 font-normal">{{ $ico('grupo_nombre') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_compra')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_compra')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pct_iva_compra')" class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pct_iva_compra')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
-                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('precio_compra_con_iva')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pvp_sin_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pvp_sin_iva')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     PVP s/IVA<span class="font-normal">{{ $ico('pvp_sin_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pct_iva')" class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pct_iva')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('pvp_con_iva')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('pvp_con_iva')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     PVP c/IVA<span class="font-normal">{{ $ico('pvp_con_iva') }}</span>
                                 </th>
-                                <th wire:click="sortBy('margen_pct')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                <th wire:click="sortBy('margen_pct')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
                                 </th>
-                                <th wire:click="sortBy('unidades_compradas')" class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider no-print {{ $thS }}">
+                                <th wire:click="sortBy('unidades_compradas')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider no-print {{ $thS }}">
                                     Uds.<span class="font-normal">{{ $ico('unidades_compradas') }}</span>
                                 </th>
                             </tr>
@@ -507,75 +500,75 @@
                                               : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                 @endphp
                                 <tr class="hover:bg-gray-50/60 transition-colors {{ $sinV ? 'opacity-50' : '' }}">
-                                    <td class="px-3 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
-                                    <td class="px-3 py-2.5">
-                                        <div class="font-semibold text-gray-800 text-sm leading-tight">{{ $row['descripcion'] }}</div>
-                                        <div class="text-[11px] text-gray-400 font-mono">{{ $row['codigo'] }}
+                                    <td class="px-2 py-1.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
+                                    <td class="px-2 py-1.5">
+                                        <div class="font-semibold text-gray-800 text-xs leading-tight">{{ $row['descripcion'] }}</div>
+                                        <div class="text-[10px] text-gray-400 font-mono">{{ $row['codigo'] }}
                                             @if($sinV) <span class="text-amber-500 ml-1">sin ventas</span>@endif
                                         </div>
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
-                                        {{ number_format($row['precio_compra'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-3 py-2.5 text-center">
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php
                                             $ivaC = $row['pct_iva_compra'] ?? 0;
                                             $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
                                                       : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
                                                       : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                         @endphp
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaCBadge }}">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaCBadge }}">
                                             {{ number_format($ivaC, 1, ',', '.') }}%
                                         </span>
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
-                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-3 py-2.5 text-center text-xs text-gray-500 font-medium">
+                                    <td class="px-2 py-1.5 text-center text-xs text-gray-500 font-medium whitespace-nowrap">
                                         {{ $row['fecha_ultima_compra'] ?? '—' }}
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
                                         @if($row['precio_venta_sin_iva'] !== null)
-                                            {{ number_format($row['precio_venta_sin_iva'], 4, ',', '.') }} €
+                                            {{ number_format($row['precio_venta_sin_iva'], 4, ',', '.') }}&nbsp;€
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-center">
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @if($row['precio_venta'] !== null)
-                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaBadge }}">
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaBadge }}">
                                                 {{ number_format($iva, 1, ',', '.') }}%
                                             </span>
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-gray-600">
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
                                         @if($row['precio_venta'] !== null)
-                                            {{ number_format($row['precio_venta'], 4, ',', '.') }} €
+                                            {{ number_format($row['precio_venta'], 2, ',', '.') }}&nbsp;€
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-right text-xs text-gray-500 border-l-2 border-gray-100">
+                                    <td class="px-2 py-1.5 text-right text-xs text-gray-500 border-l-2 border-gray-100 whitespace-nowrap">
                                         {{ $row['uds_compradas'] > 0 ? number_format($row['uds_compradas'], 0, ',', '.') : '—' }}
                                     </td>
-                                    <td class="px-3 py-2.5 text-right text-xs text-gray-500">
+                                    <td class="px-2 py-1.5 text-right text-xs text-gray-500 whitespace-nowrap">
                                         {{ $row['uds_vendidas'] > 0 ? number_format($row['uds_vendidas'], 0, ',', '.') : '—' }}
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-blue-700 border-l-2 border-blue-50">
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-blue-700 border-l-2 border-blue-50 whitespace-nowrap">
                                         @if($row['total_comprado'] > 0)
-                                            {{ number_format($row['total_comprado'], 2, ',', '.') }} €
+                                            {{ number_format($row['total_comprado'], 2, ',', '.') }}&nbsp;€
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm text-emerald-700 border-l-2 border-emerald-50">
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-emerald-700 border-l-2 border-emerald-50 whitespace-nowrap">
                                         @if($row['total_facturado'] > 0)
-                                            {{ number_format($row['total_facturado'], 2, ',', '.') }} €
+                                            {{ number_format($row['total_facturado'], 2, ',', '.') }}&nbsp;€
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-right font-mono text-sm border-l-2 border-amber-50">
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs border-l-2 border-amber-50 whitespace-nowrap">
                                         @if($row['beneficio'] !== null)
                                             <span class="{{ $row['beneficio'] >= 0 ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold' }}">
-                                                {{ number_format($row['beneficio'], 2, ',', '.') }} €
+                                                {{ number_format($row['beneficio'], 2, ',', '.') }}&nbsp;€
                                             </span>
                                         @else <span class="text-gray-300">—</span>@endif
                                     </td>
-                                    <td class="px-3 py-2.5 text-right">
-                                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black border {{ $badgeR }}">
+                                    <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-black border {{ $badgeR }}">
                                             @if($mReal !== null) {{ number_format($mReal, 2, ',', '.') }}%
                                             @else —@endif
                                         </span>
@@ -596,46 +589,46 @@
                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                 @endphp
                                 <tr class="hover:bg-gray-50/60 transition-colors">
-                                    <td class="px-4 py-2.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
-                                    <td class="px-4 py-2.5">
-                                        <div class="font-semibold text-gray-800 text-sm leading-tight">{{ $row['descripcion'] }}</div>
-                                        <div class="text-[11px] text-gray-400 font-mono mt-0.5">{{ $row['codigo'] }}</div>
+                                    <td class="px-2 py-1.5 text-xs text-gray-400 font-mono">{{ $startIndex + $i + 1 }}</td>
+                                    <td class="px-2 py-1.5">
+                                        <div class="font-semibold text-gray-800 text-xs leading-tight">{{ $row['descripcion'] }}</div>
+                                        <div class="text-[10px] text-gray-400 font-mono mt-0.5">{{ $row['codigo'] }}</div>
                                     </td>
-                                    <td class="px-4 py-2.5 text-xs text-gray-500">{{ $row['grupo_nombre'] }}</td>
-                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
-                                        {{ number_format($row['precio_compra'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-xs text-gray-500 whitespace-nowrap">{{ $row['grupo_nombre'] }}</td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-4 py-2.5 text-center">
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php
                                             $ivaC = $row['pct_iva_compra'] ?? 0;
                                             $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
                                                       : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
                                                       : 'bg-emerald-50 text-emerald-700 border-emerald-200');
                                         @endphp
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaCBadge }}">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaCBadge }}">
                                             {{ number_format($ivaC, 1, ',', '.') }}%
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
-                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
-                                        {{ number_format($row['pvp_sin_iva'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['pvp_sin_iva'], 4, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-4 py-2.5 text-center">
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ivaBadgeM }}">
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaBadgeM }}">
                                             {{ number_format($ivaM, 1, ',', '.') }}%
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2.5 text-right font-mono text-sm text-gray-700">
-                                        {{ number_format($row['pvp_con_iva'], 4, ',', '.') }} €
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['pvp_con_iva'], 2, ',', '.') }}&nbsp;€
                                     </td>
-                                    <td class="px-4 py-2.5 text-right">
-                                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black border {{ $badge }}">
+                                    <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-black border {{ $badge }}">
                                             {{ number_format($m, 2, ',', '.') }}%
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2.5 text-right text-xs text-gray-400 no-print">
+                                    <td class="px-2 py-1.5 text-right text-xs text-gray-400 no-print whitespace-nowrap">
                                         {{ number_format($row['unidades_compradas'], 0, ',', '.') }}
                                     </td>
                                 </tr>
