@@ -126,35 +126,33 @@ class TelegramService
             return;
         }
 
-        // Search for the employee having this mobile number
-        // We compare the clean numbers to avoid spaces/dashes formatting issues
-        $empleado = Empleado::all()->first(function ($emp) use ($baseNumber) {
-            $p1 = preg_replace('/\D/', '', $emp->telefono_principal);
-            $p2 = preg_replace('/\D/', '', $emp->telefono_secundario);
+        // Search for the user having this mobile number
+        // We compare the clean numbers to avoid formatting issues
+        $user = \App\Models\User::all()->first(function ($u) use ($baseNumber) {
+            $p = preg_replace('/\D/', '', $u->telefono);
             
             // Remove 34 prefix from database fields too, just in case
-            if (str_starts_with($p1, '34') && strlen($p1) === 11) $p1 = substr($p1, 2);
-            if (str_starts_with($p2, '34') && strlen($p2) === 11) $p2 = substr($p2, 2);
+            if (str_starts_with($p, '34') && strlen($p) === 11) $p = substr($p, 2);
 
-            return $p1 === $baseNumber || $p2 === $baseNumber;
+            return $p === $baseNumber;
         });
 
-        if ($empleado) {
-            // Check if another employee already has this chat id
-            Empleado::where('telegram_chat_id', $chatId)
-                ->where('id', '!=', $empleado->id)
+        if ($user) {
+            // Check if another user already has this chat id
+            \App\Models\User::where('telegram_chat_id', $chatId)
+                ->where('id', '!=', $user->id)
                 ->update(['telegram_chat_id' => null]);
 
             // Save the telegram chat id
-            $empleado->telegram_chat_id = $chatId;
-            $empleado->save();
+            $user->telegram_chat_id = $chatId;
+            $user->save();
 
             $this->sendMessage($chatId, "✅ <b>¡Vinculación completada con éxito!</b>\n\n" .
-                                         "Se ha asociado tu cuenta de Telegram al empleado: <b>{$empleado->nombre} {$empleado->apellidos}</b>.\n\n" .
+                                         "Se ha asociado tu cuenta de Telegram al usuario: <b>{$user->name}</b>.\n\n" .
                                          "Recibirás alertas inmediatas cuando detectemos cambios de precios de la competencia en tus localidades.");
         } else {
-            $this->sendMessage($chatId, "❌ El número de teléfono <b>+{$phone}</b> no está registrado en nuestra base de datos de empleados.\n\n" .
-                                         "Por favor, asegúrate de que tu ficha de empleado tenga configurado este número como teléfono principal.");
+            $this->sendMessage($chatId, "❌ El número de teléfono <b>+{$phone}</b> no está registrado en nuestra base de datos de usuarios.\n\n" .
+                                         "Por favor, asegúrate de que tu perfil de usuario tenga configurado este número de teléfono.");
         }
     }
 }

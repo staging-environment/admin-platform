@@ -13,10 +13,10 @@ class TelegramTestSendCommand extends Command
 
     public function handle(TelegramService $telegramService): void
     {
-        $empleados = Empleado::whereNotNull('telegram_chat_id')->get();
+        $users = \App\Models\User::whereNotNull('telegram_chat_id')->get();
 
-        if ($empleados->isEmpty()) {
-            $this->error('No employees have been linked to a Telegram chat ID yet.');
+        if ($users->isEmpty()) {
+            $this->error('No users have been linked to a Telegram chat ID yet.');
             $this->info('Please start the bot @utrecar_alertas_bot and share your contact first.');
             return;
         }
@@ -30,11 +30,11 @@ class TelegramTestSendCommand extends Command
         $text .= "  1. Gasolinera Competencia A: <b>1.549 €</b>\n";
         $text .= "  2. Gasolinera Competencia B: <b>1.555 €</b>\n";
 
-        $this->info('Sending test message to ' . $empleados->count() . ' employees...');
+        $this->info('Sending test message to ' . $users->count() . ' users...');
 
-        foreach ($empleados as $emp) {
-            $this->info("Sending to {$emp->nombre} {$emp->apellidos} (Chat ID: {$emp->telegram_chat_id})...");
-            $success = $telegramService->sendMessage($emp->telegram_chat_id, $text);
+        foreach ($users as $user) {
+            $this->info("Sending to {$user->name} (Chat ID: {$user->telegram_chat_id})...");
+            $success = $telegramService->sendMessage($user->telegram_chat_id, $text);
             if ($success) {
                 $this->info('Success!');
             } else {

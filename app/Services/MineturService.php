@@ -193,20 +193,14 @@ class MineturService
             $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
         }
 
-        $users = \App\Models\User::permission('recibir_notificaciones_competencia')->get();
-        $emails = $users->pluck('email')->toArray();
-        if (in_array('jarodriguezbonilla@gmail.com', $emails)) {
-            $emails[] = 'informatica@utrecar.com';
-        }
-        
-        // Find corresponding employees with active Telegram linked
-        $empleados = \App\Models\Empleado::whereIn('email', $emails)
+        // Find users with the required permission and active Telegram linked
+        $usersToAlert = \App\Models\User::permission('recibir_notificaciones_competencia')
             ->whereNotNull('telegram_chat_id')
             ->get();
 
         $telegramService = app(TelegramService::class);
-        foreach ($empleados as $emp) {
-            $telegramService->sendMessage($emp->telegram_chat_id, $text);
+        foreach ($usersToAlert as $user) {
+            $telegramService->sendMessage($user->telegram_chat_id, $text);
         }
     }
 }
