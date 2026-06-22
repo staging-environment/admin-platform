@@ -61,15 +61,17 @@
             @can('recibir_notificaciones_competencia')
                 <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm text-blue-900 space-y-2">
                     <p class="font-semibold flex items-center gap-1">
-                        📢 Tienes activo el permiso para recibir alertas de competencia. Configura Telegram siguiendo estos pasos:
+                        📢 Tienes activo el permiso para recibir alertas de competencia. Sigue estos pasos para configurar las alertas en tu móvil:
                     </p>
-                    <ol class="list-decimal list-inside space-y-1 text-blue-800">
-                        <li>Guarda tu número de teléfono móvil de España en el campo superior.</li>
-                        <li>Busca en Telegram el bot <b>@utrecar_alertas_bot</b> o haz clic en <a href="https://t.me/utrecar_alertas_bot" target="_blank" class="underline font-semibold hover:text-blue-950">t.me/utrecar_alertas_bot</a>.</li>
-                        <li>Inicia el bot y pulsa el botón <b>📱 Compartir Teléfono</b>.</li>
+                    <ol class="list-decimal list-inside space-y-2 text-blue-800">
+                        <li><b>Instala la aplicación de Telegram</b> en tu móvil desde Google Play Store (Android) o App Store (iPhone) si aún no la tienes instalada.</li>
+                        <li>Escribe tu número de teléfono móvil en el campo superior y pulsa el botón <b>Save</b> (Guardar).</li>
+                        <li>Abre Telegram y busca el bot <b>@utrecar_alertas_bot</b> o pulsa directamente este enlace: <a href="https://t.me/utrecar_alertas_bot" target="_blank" class="underline font-semibold hover:text-blue-950">t.me/utrecar_alertas_bot</a>.</li>
+                        <li>Pulsa el botón <b>Iniciar</b> (Start) dentro del bot.</li>
+                        <li>Pulsa el botón <b>📱 Compartir Teléfono</b> que aparecerá abajo para verificar tu número.</li>
                     </ol>
                     <p class="text-xs text-blue-700 font-medium">
-                        El sistema detectará tu número y vinculará automáticamente tu cuenta de Telegram para enviarte alertas inmediatas.
+                        El sistema validará tu contacto y asociará tu cuenta automáticamente para enviarte las alertas al instante.
                     </p>
                 </div>
             @else
