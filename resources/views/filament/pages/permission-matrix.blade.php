@@ -51,6 +51,7 @@
                             'ver_informes' => 'Ver Informes y Estadísticas',
                             'ver_analiticas' => 'Ver Analíticas de Visitas',
                             'gestion_portada' => 'Configuración de Portada',
+                            'recibir_notificaciones_competencia' => 'Recibir alertas de cambios en los precios de las gasolineras por telegram',
                         ],
                         'Gasolineras' => [
                             'gestion_gasolineras' => 'Gestión de Gasolineras',
@@ -62,7 +63,6 @@
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
-                            'recibir_notificaciones_competencia' => 'Recibir alertas de competencia',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
