@@ -44,6 +44,8 @@ class TelegramService
      */
     public function handleUpdate(array $update): void
     {
+        Log::info('TelegramService: Incoming update: ' . json_encode($update));
+
         $message = $update['message'] ?? null;
         if (!$message) return;
 
