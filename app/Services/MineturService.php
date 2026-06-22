@@ -143,6 +143,14 @@ class MineturService
                         json_encode($cached['gas95']) === json_encode($newGas95)) {
                         $hasChanged = false;
                     }
+
+                    if ($hasChanged) {
+                        try {
+                            $this->notifyChanges($key, $newDiesel, $newGas95);
+                        } catch (\Throwable $e) {
+                            Log::error("MineturService notification error: " . $e->getMessage());
+                        }
+                    }
                 }
 
                 $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
@@ -157,8 +165,43 @@ class MineturService
 
             Log::info('MineturService: Refreshed ' . count(self::LOCALITIES) . ' localities. Stations total: ' . count($stations) . '. Date: ' . $updatedAt);
 
-        } catch (\Throwable $e) {
-            Log::error('MineturService: ' . $e->getMessage());
+    }
+
+    /**
+     * Send price change alerts to authorized users via Telegram.
+     */
+    public function notifyChanges(string $localityKey, array $newDiesel, array $newGas95): void
+    {
+        $localityName = self::LOCALITIES[$localityKey]['name'] ?? ucfirst($localityKey);
+        
+        $text = "🔔 <b>Cambio de precios de la competencia</b>\n";
+        $text .= "Localidad: <b>{$localityName}</b>\n\n";
+
+        $text .= "<b>Precios actuales (Top Competidores):</b>\n";
+        $text .= "⛽ <b>DIÉSEL:</b>\n";
+        foreach (array_slice($newDiesel, 0, 3) as $idx => $s) {
+            $num = $idx + 1;
+            $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+        }
+
+        $text .= "\n⛽ <b>GASOLINA 95:</b>\n";
+        foreach (array_slice($newGas95, 0, 3) as $idx => $s) {
+            $num = $idx + 1;
+            $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+        }
+
+        // Find users with the required permission
+        $users = \App\Models\User::permission('recibir_notificaciones_competencia')->get();
+        $emails = $users->pluck('email');
+        
+        // Find corresponding employees with active Telegram linked
+        $empleados = \App\Models\Empleado::whereIn('email', $emails)
+            ->whereNotNull('telegram_chat_id')
+            ->get();
+
+        $telegramService = app(TelegramService::class);
+        foreach ($empleados as $emp) {
+            $telegramService->sendMessage($emp->telegram_chat_id, $text);
         }
     }
 }
