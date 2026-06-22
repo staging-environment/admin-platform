@@ -203,4 +203,51 @@ class MineturService
             $telegramService->sendMessage($user->telegram_chat_id, $text);
         }
     }
+
+    /**
+     * Send daily summary of competitor prices.
+     */
+    public function sendDailySummary(): void
+    {
+        $text = "📊 <b>[INFORME DIARIO] Precios de la Competencia</b>\n";
+        $text .= "Fecha: <b>" . now('Europe/Madrid')->format('d/m/Y H:i') . "</b>\n\n";
+
+        foreach (self::LOCALITIES as $key => $config) {
+            $data = $this->getLocalityData($key);
+            $diesel = $data['diesel'] ?? [];
+            $gas95 = $data['gas95'] ?? [];
+
+            if (empty($diesel) && empty($gas95)) {
+                continue;
+            }
+
+            $text .= "📍 <b>" . strtoupper($config['name']) . "</b>\n";
+
+            if (!empty($diesel)) {
+                $text .= "  ⛽ <b>DIÉSEL:</b>\n";
+                foreach (array_slice($diesel, 0, 3) as $idx => $s) {
+                    $num = $idx + 1;
+                    $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+                }
+            }
+
+            if (!empty($gas95)) {
+                $text .= "  ⛽ <b>GASOLINA 95:</b>\n";
+                foreach (array_slice($gas95, 0, 3) as $idx => $s) {
+                    $num = $idx + 1;
+                    $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+                }
+            }
+            $text .= "\n";
+        }
+
+        $usersToAlert = \App\Models\User::permission('recibir_notificaciones_competencia')
+            ->whereNotNull('telegram_chat_id')
+            ->get();
+
+        $telegramService = app(TelegramService::class);
+        foreach ($usersToAlert as $user) {
+            $telegramService->sendMessage($user->telegram_chat_id, $text);
+        }
+    }
 }
