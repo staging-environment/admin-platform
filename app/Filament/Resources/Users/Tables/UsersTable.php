@@ -24,6 +24,10 @@ class UsersTable
                 TextColumn::make('email')
                     ->searchable(),
 
+                TextColumn::make('telefono')
+                    ->label('Teléfono')
+                    ->searchable(),
+
                 TextColumn::make('roles.name') // 🔥 magia aquí
                 ->label('Roles')
                     ->badge()

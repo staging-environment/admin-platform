@@ -22,6 +22,11 @@ class UserForm
                     ->required()
                     ->maxLength(255),
 
+                TextInput::make('telefono')
+                    ->label('Teléfono')
+                    ->tel()
+                    ->maxLength(50),
+
                 // --- EL CAMPO QUE FALTABA ---
                 TextInput::make('password')
                     ->label('Contraseña')
