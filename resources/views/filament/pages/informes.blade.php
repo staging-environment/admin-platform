@@ -386,7 +386,13 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
 
-                        {{-- ─── CABECERA ────────────────────────────────────────────── --}}
+                        @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
+                        @php
+                            $sCol = $sortColumn;
+                            $sDir = $sortDirection;
+                            $ico  = fn($col) => $sCol === $col ? ($sDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+                            $thS  = 'cursor-pointer select-none hover:bg-gray-100 transition-colors';
+                        @endphp
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
