@@ -443,7 +443,7 @@ class Informes extends Page implements HasForms
         return array_values(array_unique(array_filter(array_column($this->tableData, 'grupo_nombre'))));
     }
 
-    protected function getFilteredTableData(): array
+    public function getFilteredTableData(): array
     {
         if (!$this->tableData) return [];
         
@@ -574,6 +574,11 @@ class Informes extends Page implements HasForms
             'endYear'     => $data['endYear']     ?? $this->endYear,
             'stationCode' => $data['stationCode'] ?? null,
             'format'      => $format,
+            'searchQuery' => $this->searchQuery,
+            'filterGroup' => $this->filterGroup,
+            'filterMargin'=> $this->filterMargin,
+            'sortColumn'  => $this->sortColumn,
+            'sortDirection' => $this->sortDirection,
         ]);
     }
 }

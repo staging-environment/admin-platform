@@ -330,9 +330,12 @@
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/60 flex items-center justify-between print-header">
                     <div>
                         <h3 class="text-sm font-bold text-gray-700">Detalle por artículo</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">
+                        <p class="text-xs text-gray-400 mt-0.5 no-print">
                             Mostrando {{ ($tablePage - 1) * $tablePerPage + 1 }}–{{ min($tablePage * $tablePerPage, count($tableData)) }}
                             de {{ number_format(count($tableData), 0, ',', '.') }} artículos
+                        </p>
+                        <p class="text-xs text-gray-400 mt-0.5 print-only-text">
+                            Total: {{ number_format(count($tableData), 0, ',', '.') }} artículos
                         </p>
                     </div>
                     {{-- Selector de registros por página y Buscador --}}
@@ -383,7 +386,7 @@
                 </div>
 
                 {{-- Tabla --}}
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto no-print">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
 
                         @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
@@ -644,6 +647,254 @@
                     </table>
                 </div>
 
+                {{-- Tabla para impresión (completa, sin paginar) --}}
+                <div class="overflow-x-auto print-only">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+
+                        @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
+                        @php
+                            $sCol = $sortColumn;
+                            $sDir = $sortDirection;
+                            $ico  = fn($col) => $sCol === $col ? ($sDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+                        @endphp
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Últ. Compra<span class="font-normal">{{ $ico('fecha_ultima_compra') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    PVP s/IVA<span class="font-normal">{{ $ico('precio_venta_sin_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    PVP c/IVA<span class="font-normal">{{ $ico('precio_venta') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider border-l-2 border-gray-100">
+                                    Uds. Compradas<span class="font-normal">{{ $ico('uds_compradas') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Uds. Vendidas<span class="font-normal">{{ $ico('uds_vendidas') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-blue-600 uppercase tracking-wider border-l-2 border-blue-100">
+                                    Total Comprado<span class="font-normal">{{ $ico('total_comprado') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-emerald-600 uppercase tracking-wider border-l-2 border-emerald-100">
+                                    Total Facturado<span class="font-normal">{{ $ico('total_facturado') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-amber-600 uppercase tracking-wider border-l-2 border-amber-100">
+                                    Beneficio<span class="font-normal">{{ $ico('beneficio') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-amber-600 uppercase tracking-wider">
+                                    % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @else
+                        @php
+                            $sCol = $sCol ?? $sortColumn;
+                            $sDir = $sDir ?? $sortDirection;
+                            $ico  = $ico ?? fn($col) => $sCol === $col ? ($sDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+                        @endphp
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider w-8">#</th>
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Artículo<span class="text-gray-400 font-normal">{{ $ico('descripcion') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    Grupo<span class="text-gray-400 font-normal">{{ $ico('grupo_nombre') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    P.Compra c/IVA<span class="font-normal">{{ $ico('precio_compra_con_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    PVP s/IVA<span class="font-normal">{{ $ico('pvp_sin_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % IVA<span class="font-normal">{{ $ico('pct_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    PVP c/IVA<span class="font-normal">{{ $ico('pvp_con_iva') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % Margen<span class="font-normal">{{ $ico('margen_pct') }}</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        @endif
+
+                        <tbody class="bg-white divide-y divide-gray-100">
+                        @foreach($this->getFilteredTableData() as $i => $row)
+                            @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
+                                @php
+                                    $sinV   = $row['sin_ventas'] ?? false;
+                                    $mReal  = $row['margen_pct'];
+                                    $badgeR = $mReal === null ? 'bg-gray-100 text-gray-400 border-gray-200'
+                                            : ($mReal >= 40 ? 'bg-green-100 text-green-800 border-green-200'
+                                            : ($mReal >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                            : 'bg-red-100 text-red-800 border-red-200'));
+
+                                    $iva = $row['pct_iva'] ?? 0;
+                                    $ivaBadge = $iva >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                              : ($iva >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                              : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                @endphp
+                                <tr class="hover:bg-gray-50/60 transition-colors {{ $sinV ? 'opacity-50' : '' }}">
+                                    <td class="px-2 py-1.5 text-xs text-gray-400 font-mono">{{ $i + 1 }}</td>
+                                    <td class="px-2 py-1.5">
+                                        <div class="font-semibold text-gray-800 text-xs leading-tight">{{ $row['descripcion'] }}</div>
+                                        <div class="text-[10px] text-gray-400 font-mono">{{ $row['codigo'] }}
+                                            @if($sinV) <span class="text-amber-500 ml-1">sin ventas</span>@endif
+                                        </div>
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @php
+                                            $ivaC = $row['pct_iva_compra'] ?? 0;
+                                            $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                                      : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                                      : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                        @endphp
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaCBadge }}">
+                                            {{ number_format($ivaC, 1, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center text-xs text-gray-500 font-medium whitespace-nowrap">
+                                        {{ $row['fecha_ultima_compra'] ?? '—' }}
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        @if($row['precio_venta_sin_iva'] !== null)
+                                            {{ number_format($row['precio_venta_sin_iva'], 4, ',', '.') }}&nbsp;€
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @if($row['precio_venta'] !== null)
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaBadge }}">
+                                                {{ number_format($iva, 1, ',', '.') }}%
+                                            </span>
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
+                                        @if($row['precio_venta'] !== null)
+                                            {{ number_format($row['precio_venta'], 2, ',', '.') }}&nbsp;€
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right text-xs text-gray-500 border-l-2 border-gray-100 whitespace-nowrap">
+                                        {{ $row['uds_compradas'] > 0 ? number_format($row['uds_compradas'], 0, ',', '.') : '—' }}
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right text-xs text-gray-500 whitespace-nowrap">
+                                        {{ $row['uds_vendidas'] > 0 ? number_format($row['uds_vendidas'], 0, ',', '.') : '—' }}
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-blue-700 border-l-2 border-blue-5 whitespace-nowrap">
+                                        @if($row['total_comprado'] > 0)
+                                            {{ number_format($row['total_comprado'], 2, ',', '.') }}&nbsp;€
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-emerald-700 border-l-2 border-emerald-50 whitespace-nowrap">
+                                        @if($row['total_facturado'] > 0)
+                                            {{ number_format($row['total_facturado'], 2, ',', '.') }}&nbsp;€
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs border-l-2 border-amber-50 whitespace-nowrap">
+                                        @if($row['beneficio'] !== null)
+                                            <span class="{{ $row['beneficio'] >= 0 ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold' }}">
+                                                {{ number_format($row['beneficio'], 2, ',', '.') }}&nbsp;€
+                                            </span>
+                                        @else <span class="text-gray-300">—</span>@endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-black border {{ $badgeR }}">
+                                            @if($mReal !== null) {{ number_format($mReal, 2, ',', '.') }}%
+                                            @else —@endif
+                                        </span>
+                                    </td>
+                                </tr>
+                            @else
+                                @php
+                                    $m = $row['margen_pct'];
+                                    $badge = $m >= 40
+                                        ? 'bg-green-100 text-green-800 border-green-200'
+                                        : ($m >= 20 ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                                    : 'bg-red-100 text-red-800 border-red-200');
+
+                                    $ivaM = $row['pct_iva'] ?? 0;
+                                    $ivaBadgeM = $ivaM >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                               : ($ivaM >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                               : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                @endphp
+                                <tr class="hover:bg-gray-50/60 transition-colors">
+                                    <td class="px-2 py-1.5 text-xs text-gray-400 font-mono">{{ $i + 1 }}</td>
+                                    <td class="px-2 py-1.5">
+                                        <div class="font-semibold text-gray-800 text-xs leading-tight">{{ $row['descripcion'] }}</div>
+                                        <div class="text-[10px] text-gray-400 font-mono mt-0.5">{{ $row['codigo'] }}</div>
+                                    </td>
+                                    <td class="px-2 py-1.5 text-xs text-gray-500 whitespace-nowrap">{{ $row['grupo_nombre'] }}</td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @php
+                                            $ivaC = $row['pct_iva_compra'] ?? 0;
+                                            $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                                      : ($ivaC >= 10 ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                                      : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                        @endphp
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaCBadge }}">
+                                            {{ number_format($ivaC, 1, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['pvp_sin_iva'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border {{ $ivaBadgeM }}">
+                                            {{ number_format($ivaM, 1, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
+                                        {{ number_format($row['pvp_con_iva'], 2, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-xs font-black border {{ $badge }}">
+                                            {{ number_format($m, 2, ',', '.') }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
 
                 {{-- PAGINACIÓN --}}
                 @php $totalPages = $this->getTableTotalPages(); @endphp
@@ -706,7 +957,24 @@
 
     {{-- CSS de impresión --}}
     <style>
+        .print-only {
+            display: none !important;
+        }
+        .print-only-text {
+            display: none !important;
+        }
         @media print {
+            .print-only {
+                display: block !important;
+                visibility: visible !important;
+            }
+            .print-only * {
+                visibility: visible !important;
+            }
+            .print-only-text {
+                display: block !important;
+                visibility: visible !important;
+            }
             @page {
                 size: A4 landscape;
                 margin: 8mm;

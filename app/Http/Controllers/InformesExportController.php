@@ -25,15 +25,18 @@ class InformesExportController extends Controller
         $stationCode = $request->filled('stationCode') ? (int) $request->input('stationCode') : null;
         $format      = $request->input('format', 'csv');
 
+        $searchQuery = $request->input('searchQuery');
+        $filterGroup = $request->input('filterGroup');
+        $filterMargin = $request->input('filterMargin');
+        $sortColumn  = $request->input('sortColumn');
+        $sortDirection = $request->input('sortDirection', 'asc');
+
         switch ($reportType) {
             case 'margen_mercaderia':
                 $rows = $reportService->getMargenMercaderia(
                     $startMonth, $startYear, $endMonth, $endYear, $stationCode
                 );
-                return match ($format) {
-                    'excel' => $this->exportExcel($rows, 'margen_mercaderia'),
-                    default => $this->exportCsv($rows, 'margen_mercaderia'),
-                };
+                break;
 
             case 'tienda_margen':
             case 'lavado_margen':
@@ -45,14 +48,70 @@ class InformesExportController extends Controller
                     $reportType === 'tienda_margen' ? ['3'] : ['4'],
                     $stationCode
                 );
-                return match ($format) {
-                    'excel' => $this->exportExcel($rows, $reportType),
-                    default => $this->exportCsv($rows, $reportType),
-                };
+                break;
 
             default:
                 abort(400, 'Tipo de informe no soportado.');
         }
+
+        // --- APLICAR FILTROS Y ORDENACIÓN IGUAL QUE EN LA INTERFAZ ---
+        // 1. Buscador
+        if (!empty($searchQuery)) {
+            $q = mb_strtolower($searchQuery);
+            $rows = array_filter($rows, function($row) use ($q) {
+                return str_contains(mb_strtolower($row['descripcion'] ?? ''), $q)
+                    || str_contains(mb_strtolower($row['codigo'] ?? ''), $q)
+                    || str_contains(mb_strtolower($row['grupo_nombre'] ?? ''), $q);
+            });
+        }
+
+        // 2. Filtro grupo
+        if (!empty($filterGroup)) {
+            $rows = array_filter($rows, function($row) use ($filterGroup) {
+                return ($row['grupo_nombre'] ?? '') === $filterGroup;
+            });
+        }
+
+        // 3. Filtro margen
+        if (!empty($filterMargin)) {
+            $rows = array_filter($rows, function($row) use ($filterMargin) {
+                $m = $row['margen_pct'] ?? $row['margen_real_pct'] ?? null;
+                $sinV = $row['sin_ventas'] ?? false;
+
+                if ($filterMargin === 'high') return $m !== null && $m >= 40 && !$sinV;
+                if ($filterMargin === 'mid') return $m !== null && $m >= 20 && $m < 40 && !$sinV;
+                if ($filterMargin === 'low') return $m !== null && $m >= 0 && $m < 20 && !$sinV;
+                if ($filterMargin === 'negative') return $m !== null && $m < 0 && !$sinV;
+                if ($filterMargin === 'no_sales') return $sinV || $m === null;
+                return true;
+            });
+        }
+
+        // 4. Ordenación
+        if (!empty($sortColumn)) {
+            $col = $sortColumn;
+            $dir = $sortDirection === 'desc' ? 'desc' : 'asc';
+            usort($rows, function ($a, $b) use ($col, $dir) {
+                $va = $a[$col] ?? null;
+                $vb = $b[$col] ?? null;
+
+                if ($va === null && $vb === null) return 0;
+                if ($va === null) return 1;
+                if ($vb === null) return -1;
+
+                $cmp = is_numeric($va) && is_numeric($vb)
+                    ? ($va <=> $vb)
+                    : strcmp((string)$va, (string)$vb);
+
+                return $dir === 'asc' ? $cmp : -$cmp;
+            });
+        }
+
+        // Retornar formato
+        return match ($format) {
+            'excel' => $this->exportExcel($rows, $reportType),
+            default => $this->exportCsv($rows, $reportType),
+        };
     }
 
     // ─── CSV ──────────────────────────────────────────────────────────────────
