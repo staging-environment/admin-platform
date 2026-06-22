@@ -25,7 +25,8 @@ class UserForm
                 TextInput::make('telefono')
                     ->label('Teléfono')
                     ->tel()
-                    ->maxLength(50),
+                    ->maxLength(50)
+                    ->disabled(fn () => auth()->user()?->email !== 'jarodriguezbonilla@gmail.com'),
 
                 // --- EL CAMPO QUE FALTABA ---
                 TextInput::make('password')
