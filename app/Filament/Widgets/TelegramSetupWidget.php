@@ -6,7 +6,7 @@ use Filament\Widgets\Widget;
 
 class TelegramSetupWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.telegram-setup-widget';
+    protected string $view = 'filament.widgets.telegram-setup-widget';
 
     protected static ?int $sort = -10; // Show at the very top of the dashboard
 

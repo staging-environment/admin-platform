@@ -4,10 +4,18 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$users = \App\Models\User::all();
-foreach ($users as $u) {
-    echo "User: {$u->email}\n";
-    echo "Roles: " . $u->roles->pluck('name')->join(', ') . "\n";
-    echo "Permissions: " . $u->getAllPermissions()->pluck('name')->join(', ') . "\n";
-    echo "Has gestion_usuarios_roles? " . ($u->can('gestion_usuarios_roles') ? 'Yes' : 'No') . "\n\n";
+try {
+    echo "Refreshing localities Minetur data...\n";
+    $service = app(App\Services\MineturService::class);
+    $service->refreshAll();
+    echo "Refreshed! Checking cache for 'sevilla':\n";
+    print_r(Illuminate\Support\Facades\Cache::get('minetur_sevilla'));
+    echo "\nChecking cache for 'utrera':\n";
+    print_r(Illuminate\Support\Facades\Cache::get('minetur_utrera'));
+    echo "\nChecking cache for 'el_cuervo':\n";
+    print_r(Illuminate\Support\Facades\Cache::get('minetur_el_cuervo'));
+    echo "\nChecking cache for 'lebrija':\n";
+    print_r(Illuminate\Support\Facades\Cache::get('minetur_lebrija'));
+} catch (\Throwable $e) {
+    echo "ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
 }

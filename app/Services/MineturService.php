@@ -113,17 +113,10 @@ class MineturService
                     }
                 }
 
-                // Ordenar exactamente igual que Miteco (Precio asc -> Margen N < D < I -> IDEESS asc)
+                // Ordenar exactamente igual que Miteco (Precio asc -> IDEESS asc)
                 $mitecoSort = function ($a, $b) {
                     if ($a['price'] != $b['price']) {
                         return $a['price'] <=> $b['price'];
-                    }
-
-                    $margenOrder = ['N' => 1, 'D' => 2, 'I' => 3];
-                    $mA = $margenOrder[$a['margen']] ?? 4;
-                    $mB = $margenOrder[$b['margen']] ?? 4;
-                    if ($mA != $mB) {
-                        return $mA <=> $mB;
                     }
 
                     return $a['id'] <=> $b['id'];
@@ -153,7 +146,7 @@ class MineturService
                     }
                 }
 
-                $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
+                $finalUpdatedAt = $updatedAt;
 
                 Cache::put("minetur_{$key}", [
                     'diesel'     => $newDiesel,
