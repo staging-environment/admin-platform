@@ -73,18 +73,18 @@ def create_manual():
     # ─── PASO 2 ───
     pdf.set_font('helvetica', 'B', 12)
     pdf.set_text_color(30, 41, 59)
-    pdf.cell(0, 6, 'Paso 2: Buscar el bot en Telegram e iniciar la conversación', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 6, 'Paso 2: Registrar su número de teléfono en la plataforma', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
     
     pdf.set_font('helvetica', '', 10)
     pdf.set_text_color(55, 65, 81)
     step2_text = (
-        "Una vez dentro de Telegram:\n"
-        "  1. Pulse sobre el icono de lupa (Buscar) en la esquina superior derecha.\n"
-        "  2. Escriba exactamente el nombre del bot: utrecar_alertas_bot\n"
-        "  3. Seleccione el bot que aparece en la lista de resultados.\n"
-        "  4. Pulse el botón inferior \"Iniciar\" (o escriba /start) para activar el canal de comunicación.\n"
-        "  5. El bot le dará la bienvenida y le proporcionará su ID de chat de Telegram (un código numérico)."
+        "La vinculación se realiza automáticamente mediante su número de teléfono móvil:\n"
+        "  1. Inicie sesión en la plataforma de Utrecar (https://utrecar.com/admin).\n"
+        "  2. Diríjase a su Perfil de Usuario (arriba a la derecha o en la URL https://utrecar.com/profile).\n"
+        "  3. Asegúrese de añadir o corregir su número de teléfono móvil y guarde los cambios.\n"
+        "  Nota: Si tiene el permiso de alertas pero aún no ha vinculado Telegram, el Panel de Control\n"
+        "        le mostrará un aviso recordatorio en la parte superior."
     )
     pdf.multi_cell(0, 5, step2_text)
     pdf.ln(5)
@@ -92,17 +92,17 @@ def create_manual():
     # ─── PASO 3 ───
     pdf.set_font('helvetica', 'B', 12)
     pdf.set_text_color(30, 41, 59)
-    pdf.cell(0, 6, 'Paso 3: Asociar su cuenta de usuario en el Panel de Administración', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 6, 'Paso 3: Buscar el bot en Telegram e iniciar la conversación', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
     
     pdf.set_font('helvetica', '', 10)
     pdf.set_text_color(55, 65, 81)
     step3_text = (
-        "Para vincular su usuario de la plataforma con su Telegram:\n"
-        "  1. Inicie sesión en la plataforma de Utrecar (https://utrecar.com/admin).\n"
-        "  2. En el Dashboard principal, en la parte superior, verá un widget de configuración de Telegram.\n"
-        "  3. Introduzca el ID de chat numérico que le dio el bot en el campo de texto.\n"
-        "  4. Guarde la configuración. A partir de ese momento, su usuario estará vinculado."
+        "Una vez dentro de Telegram:\n"
+        "  1. Pulse sobre el icono de lupa (Buscar) en la esquina superior derecha.\n"
+        "  2. Escriba exactamente el nombre del bot: utrecar_alertas_bot (o entre en https://t.me/utrecar_alertas_bot).\n"
+        "  3. Seleccione el bot que aparece en la lista de resultados.\n"
+        "  4. Pulse el botón inferior \"Iniciar\" (o escriba /start) para activar el bot."
     )
     pdf.multi_cell(0, 5, step3_text)
     pdf.ln(5)
@@ -110,18 +110,18 @@ def create_manual():
     # ─── PASO 4 ───
     pdf.set_font('helvetica', 'B', 12)
     pdf.set_text_color(30, 41, 59)
-    pdf.cell(0, 6, 'Paso 4: Asignar permisos y recibir alertas', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 6, 'Paso 4: Compartir el teléfono y activar las alertas', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
     
     pdf.set_font('helvetica', '', 10)
     pdf.set_text_color(55, 65, 81)
     step4_text = (
-        "Para que las notificaciones comiencen a llegar a su chat de Telegram:\n"
-        "  - El administrador del sitio debe asegurarse de que su usuario tenga asignado el permiso:\n"
-        "    \"recibir_notificaciones_competencia\" (o rol de Administrador).\n"
-        "  - Cada 15 minutos, cuando el bot realice la comprobación y detecte un cambio en los precios "
-        "de Utrera, Sevilla, El Cuervo o Lebrija, le llegará un mensaje con los nuevos valores oficiales.\n\n"
-        "Nota: También recibirá un informe de resumen diario con el estado consolidado de la competencia."
+        "Para completar el proceso y activar la recepción de notificaciones:\n"
+        "  1. Tras iniciar el bot, le aparecerá un botón grande abajo que dice \"Compartir Teléfono\".\n"
+        "  2. Pulse ese botón. Telegram le pedirá confirmación para compartir su número de móvil.\n"
+        "  3. El bot buscará su número en la plataforma y guardará automáticamente su identificador (Chat ID).\n"
+        "  4. Recibirá un mensaje de confirmación: \"¡Vinculación completada con éxito!\".\n\n"
+        "Nota: Recuerde que el administrador debe asignarle el permiso \"recibir_notificaciones_competencia\"."
     )
     pdf.multi_cell(0, 5, step4_text)
     pdf.ln(8)

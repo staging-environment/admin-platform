@@ -53,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+                \App\Filament\Widgets\TelegramSetupWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
