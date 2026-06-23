@@ -146,7 +146,7 @@ class MineturService
                     }
                 }
 
-                $finalUpdatedAt = $updatedAt;
+                $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
 
                 Cache::put("minetur_{$key}", [
                     'diesel'     => $newDiesel,
