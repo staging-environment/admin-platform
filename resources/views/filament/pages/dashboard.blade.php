@@ -584,11 +584,10 @@
                     var timeEl = document.getElementById('updated-time-' + key);
                     if (timeEl) {
                         var text = '';
-                        if (locality.updated_at) {
-                            text += 'Miteco: ' + locality.updated_at;
-                        }
                         if (locality.checked_at) {
-                            text += ' | Bot: ' + locality.checked_at;
+                            text = 'Última comprobación: ' + locality.checked_at;
+                        } else if (locality.updated_at) {
+                            text = 'Última comprobación: ' + locality.updated_at;
                         }
                         timeEl.textContent = text;
                     }

@@ -25,11 +25,10 @@
                     <h3 class="text-sm font-bold text-white">{{ $localityName }}</h3>
                 </div>
                 <span id="updated-time-{{ $key }}" class="text-xs font-medium tabular-nums" style="color:#9ca3af; font-size: 10px;">
-                    @if($ldata['updated_at'])
-                        Miteco: {{ $ldata['updated_at'] }}
-                    @endif
                     @if(isset($ldata['checked_at']))
-                        | Bot: {{ $ldata['checked_at'] }}
+                        Última comprobación: {{ $ldata['checked_at'] }}
+                    @elseif($ldata['updated_at'])
+                        Última comprobación: {{ $ldata['updated_at'] }}
                     @endif
                 </span>
             </div>
