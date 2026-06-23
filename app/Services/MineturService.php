@@ -175,13 +175,13 @@ class MineturService
 
         $text .= "<b>Precios actuales (Top Competidores):</b>\n";
         $text .= "⛽ <b>DIÉSEL:</b>\n";
-        foreach (array_slice($newDiesel, 0, 3) as $idx => $s) {
+        foreach (array_slice($newDiesel, 0, 5) as $idx => $s) {
             $num = $idx + 1;
             $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
         }
 
         $text .= "\n⛽ <b>GASOLINA 95:</b>\n";
-        foreach (array_slice($newGas95, 0, 3) as $idx => $s) {
+        foreach (array_slice($newGas95, 0, 5) as $idx => $s) {
             $num = $idx + 1;
             $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
         }
@@ -218,7 +218,7 @@ class MineturService
 
             if (!empty($diesel)) {
                 $text .= "  ⛽ <b>DIÉSEL:</b>\n";
-                foreach (array_slice($diesel, 0, 3) as $idx => $s) {
+                foreach (array_slice($diesel, 0, 5) as $idx => $s) {
                     $num = $idx + 1;
                     $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
                 }
@@ -226,7 +226,7 @@ class MineturService
 
             if (!empty($gas95)) {
                 $text .= "  ⛽ <b>GASOLINA 95:</b>\n";
-                foreach (array_slice($gas95, 0, 3) as $idx => $s) {
+                foreach (array_slice($gas95, 0, 5) as $idx => $s) {
                     $num = $idx + 1;
                     $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
                 }
