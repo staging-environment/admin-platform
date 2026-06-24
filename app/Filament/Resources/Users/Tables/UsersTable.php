@@ -38,7 +38,11 @@ class UsersTable
                     ->sortable(),
             ])
             ->filters([
-                //
+                \Filament\Tables\Filters\SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
+                    ->preload()
+                    ->multiple()
+                    ->label('Rol'),
             ])
             ->recordActions([
                 EditAction::make(),

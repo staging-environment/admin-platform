@@ -8,6 +8,45 @@ class Empleado extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::saved(function ($empleado) {
+            if ($empleado->wasRecentlyCreated) {
+                $user = \App\Models\User::where('email', $empleado->email)->first();
+                if (!$user) {
+                    $user = new \App\Models\User();
+                    $user->password = bcrypt('12345678');
+                }
+            } else {
+                $originalEmail = $empleado->getOriginal('email');
+                $user = \App\Models\User::where('email', $originalEmail)->first();
+                if (!$user) {
+                    $user = \App\Models\User::where('email', $empleado->email)->first();
+                    if (!$user) {
+                        $user = new \App\Models\User();
+                        $user->password = bcrypt('12345678');
+                    }
+                }
+            }
+
+            $user->name = $empleado->nombre . ' ' . $empleado->apellidos;
+            $user->email = $empleado->email;
+            $user->telefono = $empleado->telefono_principal;
+            $user->save();
+
+            if (!$user->hasRole('Empleado')) {
+                $user->assignRole('Empleado');
+            }
+        });
+
+        static::deleted(function ($empleado) {
+            $user = \App\Models\User::where('email', $empleado->email)->first();
+            if ($user) {
+                $user->delete();
+            }
+        });
+    }
+
     public function documentos()
     {
         return $this->hasMany(EmpleadoDocumento::class);
