@@ -8,6 +8,8 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 
 class EmpleadosTable
 {
@@ -16,66 +18,71 @@ class EmpleadosTable
         return $table
             ->recordUrl(fn (\App\Models\Empleado $record): string => \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]))
             ->columns([
-                ImageColumn::make('foto')
-                    ->label('Foto')
-                    ->circular()
-                    ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
-                    ->size(40),
+                Split::make([
+                    ImageColumn::make('foto')
+                        ->label('Foto')
+                        ->circular()
+                        ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
+                        ->size(80)
+                        ->grow(false),
 
-                TextColumn::make('nombre_completo')
-                    ->label('Empleado')
-                    ->state(fn (\App\Models\Empleado $record) => trim($record->nombre . ' ' . $record->apellidos))
-                    ->searchable(['nombre', 'apellidos'])
-                    ->sortable(['nombre', 'apellidos'])
-                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                    ->description(fn (\App\Models\Empleado $record) => $record->dni ?? 'Sin DNI'),
+                    Stack::make([
+                        TextColumn::make('nombre_completo_tarjeta')
+                            ->state(function (\App\Models\Empleado $record) {
+                                $nombre = trim($record->nombre);
+                                $apellidos = trim($record->apellidos ?? '');
 
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->icon('heroicon-m-envelope')
-                    ->searchable()
-                    ->copyable()
-                    ->limit(20)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-                        if (strlen($state) <= $column->getCharacterLimit()) {
-                            return null;
-                        }
-                        return $state;
-                    }),
+                                if (empty($apellidos)) {
+                                    return mb_strtoupper($nombre);
+                                }
 
-                TextColumn::make('telefono_principal')
-                    ->label('Teléfono')
-                    ->icon('heroicon-m-phone')
-                    ->searchable(),
+                                $parts = preg_split('/\s+/', $apellidos);
+                                $primerApellido = array_shift($parts);
+                                $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
 
-                TextColumn::make('provincia')
-                    ->label('Provincia')
-                    ->badge()
-                    ->color('info')
-                    ->sortable()
-                    ->searchable(),
-                
-                TextColumn::make('contratos.centro_trabajo')
-                    ->label('Centro de Trabajo')
-                    ->icon('heroicon-m-building-office-2')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                                if ($segundoApellido !== '') {
+                                    return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($segundoApellido) . ' ' . mb_strtoupper($nombre);
+                                }
+                                return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
+                            })
+                            ->searchable(['nombre', 'apellidos'])
+                            ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                            ->size('lg'),
+
+                        TextColumn::make('dni')
+                            ->icon('heroicon-m-identification')
+                            ->color('gray')
+                            ->state(fn ($record) => $record->dni ?? 'Sin DNI'),
+
+                        TextColumn::make('email')
+                            ->icon('heroicon-m-envelope')
+                            ->color('gray')
+                            ->state(fn ($record) => $record->email ?? 'Sin Email'),
+
+                        TextColumn::make('telefono_principal')
+                            ->icon('heroicon-m-phone')
+                            ->color('gray')
+                            ->state(fn ($record) => $record->telefono_principal ?? 'Sin Teléfono'),
+
+                        TextColumn::make('localidad_provincia')
+                            ->icon('heroicon-m-map-pin')
+                            ->color('gray')
+                            ->state(function ($record) {
+                                $loc = trim($record->localidad ?? '');
+                                $prov = trim($record->provincia ?? '');
+                                if ($loc !== '' && $prov !== '') {
+                                    return "$loc ($prov)";
+                                }
+                                return $loc !== '' ? $loc : ($prov !== '' ? $prov : 'Sin localización');
+                            }),
+                    ])->space(1),
+                ])
             ])
-            ->defaultSort('apellidos', 'desc')
+            ->contentGrid([
+                'md' => 2,
+            ])
+            ->defaultSort('apellidos', 'asc')
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('provincia')
-                    ->label('Provincia')
-                    ->options(function () {
-                        return \App\Models\Empleado::query()
-                            ->select('provincia')
-                            ->whereNotNull('provincia')
-                            ->where('provincia', '!=', '')
-                            ->distinct()
-                            ->pluck('provincia', 'provincia')
-                            ->toArray();
-                    }),
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
                     ->label('Localidad')
                     ->options(function () {

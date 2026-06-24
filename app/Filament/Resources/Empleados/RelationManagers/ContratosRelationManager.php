@@ -78,11 +78,15 @@ class ContratosRelationManager extends RelationManager
                     ->numeric()
                     ->prefix('€')
                     ->required(),
-                TextInput::make('centro_trabajo')
+                Select::make('centro_trabajo')
                     ->label('Centro de Trabajo')
-                    ->placeholder('Oficina Principal, Delegación Sevilla...')
-                    ->required()
-                    ->maxLength(255),
+                    ->options([
+                        'Sevilla' => 'Sevilla',
+                        'Utrera' => 'Utrera',
+                        'El Cuervo' => 'El Cuervo',
+                        'Lebrija' => 'Lebrija',
+                    ])
+                    ->required(),
                 FileUpload::make('file_path')
                     ->label('Archivo del Contrato (Opcional)')
                     ->directory('empleados/contratos')
