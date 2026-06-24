@@ -109,6 +109,7 @@ class EmpleadosTable
             ->actions([
                 \Filament\Actions\ViewAction::make(),
                 EditAction::make(),
+                \Filament\Actions\DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
