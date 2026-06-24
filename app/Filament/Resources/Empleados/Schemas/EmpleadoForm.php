@@ -149,11 +149,6 @@ class EmpleadoForm
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                     ->default(false),
 
-                                TextInput::make('incapacidad')
-                                    ->label('Incapacidad')
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
-
                                 FileUpload::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad (Archivo)')
                                     ->directory('empleados/resoluciones')

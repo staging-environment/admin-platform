@@ -132,10 +132,6 @@ class EmpleadoResource extends Resource
                                     ->boolean()
                                     ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad)),
 
-                                \Filament\Infolists\Components\TextEntry::make('incapacidad')
-                                    ->label('Incapacidad')
-                                    ->placeholder('Ninguna'),
-                                
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
                                     ->url(fn ($record) => $record?->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
