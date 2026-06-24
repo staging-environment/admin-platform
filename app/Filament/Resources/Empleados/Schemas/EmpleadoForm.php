@@ -30,13 +30,13 @@ class EmpleadoForm
                     ->columnSpanFull()
                     ->schema([
                         // Datos Personales
-                        Grid::make(3)
+                        Grid::make(12)
                             ->schema([
                                 FileUpload::make('foto')
                                     ->label('Foto de perfil')
                                     ->image()
                                     ->directory('empleados/fotos')
-                                    ->columnSpan(1),
+                                    ->columnSpan(3),
                                 Grid::make(2)
                                     ->schema([
                                         TextInput::make('nombre')
@@ -67,6 +67,7 @@ class EmpleadoForm
                                             ->required()
                                             ->live(),
                                     ])
+                                    ->columnSpan(9)
                             ]),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
