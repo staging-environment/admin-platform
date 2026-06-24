@@ -55,4 +55,12 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     {
         return $this->hasMany(Filter::class);
     }
+
+    /**
+     * Relación con el empleado correspondiente por email
+     */
+    public function empleado(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Empleado::class, 'email', 'email');
+    }
 }

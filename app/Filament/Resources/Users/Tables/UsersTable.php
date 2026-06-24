@@ -25,6 +25,10 @@ class UsersTable
                 TextColumn::make('telefono')
                     ->label('Teléfono'),
 
+                TextColumn::make('centro_trabajo')
+                    ->label('Centro de Trabajo')
+                    ->getStateUsing(fn ($record) => $record->empleado?->contratos?->sortByDesc('fecha_inicio')?->first()?->centro_trabajo ?? '-'),
+
                 TextColumn::make('roles.name') // 🔥 magia aquí
                 ->label('Roles')
                     ->badge()
@@ -56,8 +60,24 @@ class UsersTable
                             })
                         );
                     }),
+                \Filament\Tables\Filters\SelectFilter::make('centro_trabajo')
+                    ->label('Centro de Trabajo')
+                    ->options([
+                        'Sevilla' => 'Sevilla',
+                        'Utrera' => 'Utrera',
+                        'El Cuervo' => 'El Cuervo',
+                        'Lebrija' => 'Lebrija',
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['value'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $value) => $query->whereHas('empleado.contratos', function ($q) use ($value) {
+                                $q->where('centro_trabajo', $value);
+                            })
+                        );
+                    }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->filtersFormColumns(2)
+            ->filtersFormColumns(3)
             ->recordActions([
                 EditAction::make(),
             ])
