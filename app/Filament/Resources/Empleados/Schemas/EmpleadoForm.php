@@ -23,10 +23,12 @@ class EmpleadoForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
-                Section::make('Datos Personales')
-                    ->description('Información básica de identificación')
+                Section::make('Ficha del Empleado')
+                    ->columnSpanFull()
                     ->schema([
+                        // Datos Personales
                         Grid::make(3)
                             ->schema([
                                 FileUpload::make('foto')
@@ -66,10 +68,11 @@ class EmpleadoForm
                                     ])
                                     ->columnSpan(2),
                             ]),
-                    ]),
 
-                Section::make('Contacto y Dirección')
-                    ->schema([
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        // Contacto y Dirección
                         Grid::make(3)
                             ->schema([
                                 TextInput::make('direccion')
@@ -103,11 +106,11 @@ class EmpleadoForm
                                     ->maxLength(255)
                                     ->columnSpan(3),
                             ]),
-                    ]),
 
-                Section::make('Discapacidad / Incapacidad')
-                    ->description('Información opcional sobre discapacidad o incapacidades')
-                    ->schema([
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        // Discapacidad / Incapacidad
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('tipo_discapacidad')
@@ -162,70 +165,6 @@ class EmpleadoForm
                             ->label('Documentos')
                             ->createItemButtonLabel('Añadir otro documento'),
                     ]),
-
-                Section::make('Horario Laboral Inicial')
-                    ->description('Configurar la jornada y horario inicial del empleado')
-                    ->visible(fn ($context) => $context === 'create')
-                    ->schema([
-                        Repeater::make('horarios')
-                            ->relationship('horarios')
-                            ->schema([
-                                Grid::make(2)
-                                    ->schema([
-                                        Select::make('tipo_jornada')
-                                            ->label('Tipo de Jornada')
-                                            ->options([
-                                                'Completa' => 'Jornada Completa',
-                                                'Parcial' => 'Jornada Parcial',
-                                                'Reducida' => 'Jornada Reducida',
-                                                'Otros' => 'Otros',
-                                            ])
-                                            ->required(),
-                                        TextInput::make('turnos')
-                                            ->label('Turnos Asignados (Opcional)')
-                                            ->placeholder('Ej. Mañana, Tarde, Rotativo...')
-                                            ->maxLength(255),
-                                    ]),
-                                CheckboxList::make('dias_laborales')
-                                    ->label('Días Laborales')
-                                    ->options([
-                                        'Lunes' => 'Lunes',
-                                        'Martes' => 'Martes',
-                                        'Miércoles' => 'Miércoles',
-                                        'Jueves' => 'Jueves',
-                                        'Viernes' => 'Viernes',
-                                        'Sábado' => 'Sábado',
-                                        'Domingo' => 'Domingo',
-                                    ])
-                                    ->columns(7)
-                                    ->columnSpan('full')
-                                    ->required(),
-                                Grid::make(2)
-                                    ->schema([
-                                        TimePicker::make('hora_inicio')
-                                            ->label('Hora de Inicio')
-                                            ->required(),
-                                        TimePicker::make('hora_fin')
-                                            ->label('Hora de Fin')
-                                            ->required(),
-                                    ]),
-                                Textarea::make('horarios')
-                                    ->label('Detalles del Horario')
-                                    ->placeholder('Ej. Lunes a Viernes de 9:00 a 18:00...')
-                                    ->required()
-                                    ->rows(3)
-                                    ->columnSpan('full'),
-                                FileUpload::make('calendario_laboral_path')
-                                    ->label('Calendario Laboral (PDF/Imagen)')
-                                    ->directory('empleados/calendarios')
-                                    ->disk('local')
-                                    ->columnSpan('full'),
-                            ])
-                            ->columnSpan('full')
-                            ->label('Horarios')
-                            ->createItemButtonLabel('Añadir horario/turno')
-                    ]),
             ]);
     }
 }
-

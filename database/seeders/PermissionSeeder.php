@@ -40,20 +40,6 @@ class PermissionSeeder extends Seeder
             'gestion_eliminar_empleados',
             'ver_documentacion_empleados',
             'editar_documentacion_empleados',
-            'ver_cursos_empleados',
-            'editar_cursos_empleados',
-            'ver_notificaciones_empleados',
-            'editar_notificaciones_empleados',
-            'ver_horarios_empleados',
-            'editar_horarios_empleados',
-            'ver_ausencias_empleados',
-            'editar_ausencias_empleados',
-            'ver_vacaciones_empleados',
-            'editar_vacaciones_empleados',
-            'ver_contratos_empleados',
-            'editar_contratos_empleados',
-            'ver_comentarios_empleados',
-            'editar_comentarios_empleados',
         ];
 
         foreach ($permissions as $permission) {

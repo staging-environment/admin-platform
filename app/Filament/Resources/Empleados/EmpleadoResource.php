@@ -46,10 +46,12 @@ class EmpleadoResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->schema([
-                \Filament\Schemas\Components\Section::make('Datos Personales')
-                    ->description('Información básica de identificación')
+                \Filament\Schemas\Components\Section::make('Ficha del Empleado')
+                    ->columnSpanFull()
                     ->schema([
+                        // Datos Personales
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
@@ -72,10 +74,11 @@ class EmpleadoResource extends Resource
                                     ])
                                     ->columnSpan(2),
                             ]),
-                    ]),
 
-                \Filament\Schemas\Components\Section::make('Contacto y Dirección')
-                    ->schema([
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        // Contacto y Dirección
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('direccion')
@@ -95,11 +98,11 @@ class EmpleadoResource extends Resource
                                     ->label('Correo Electrónico')
                                     ->columnSpan(3),
                             ]),
-                    ]),
 
-                \Filament\Schemas\Components\Section::make('Discapacidad / Incapacidad')
-                    ->description('Información sobre discapacidad o incapacidades')
-                    ->schema([
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        // Discapacidad / Incapacidad
                         \Filament\Schemas\Components\Grid::make(2)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
@@ -117,37 +120,7 @@ class EmpleadoResource extends Resource
                                     ->url(fn ($record) => $record->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
                                     ->placeholder('Sin documento adjunto'),
                             ]),
-                    ]),
-
-                \Filament\Schemas\Components\Section::make('Jornada y Horarios Laborales')
-                    ->description('Configuración de horarios y jornada asignada')
-                    ->schema([
-                        \Filament\Infolists\Components\RepeatableEntry::make('horarios')
-                            ->label('')
-                            ->schema([
-                                \Filament\Infolists\Components\TextEntry::make('tipo_jornada')
-                                    ->label('Tipo de Jornada')
-                                    ->badge()
-                                    ->color('info'),
-                                \Filament\Infolists\Components\TextEntry::make('turnos')
-                                    ->label('Turnos Asignados')
-                                    ->placeholder('Sin turnos específicos'),
-                                \Filament\Infolists\Components\TextEntry::make('dias_laborales')
-                                    ->label('Días Laborales')
-                                    ->badge()
-                                    ->separator(','),
-                                \Filament\Infolists\Components\TextEntry::make('hora_inicio')
-                                    ->label('Hora de Inicio')
-                                    ->time('H:i'),
-                                \Filament\Infolists\Components\TextEntry::make('hora_fin')
-                                    ->label('Hora de Fin')
-                                    ->time('H:i'),
-                                \Filament\Infolists\Components\TextEntry::make('horarios')
-                                    ->label('Detalles del Horario')
-                                    ->columnSpan(2),
-                            ])
-                            ->columns(2)
-                    ]),
+                    ])
             ]);
     }
 
@@ -160,13 +133,6 @@ class EmpleadoResource extends Resource
     {
         return [
             RelationManagers\DocumentosRelationManager::class,
-            RelationManagers\CursosRelationManager::class,
-            RelationManagers\NotificacionesRelationManager::class,
-            RelationManagers\HorariosRelationManager::class,
-            RelationManagers\AusenciasRelationManager::class,
-            RelationManagers\VacacionesRelationManager::class,
-            RelationManagers\ContratosRelationManager::class,
-            RelationManagers\ComentariosRelationManager::class,
         ];
     }
 
