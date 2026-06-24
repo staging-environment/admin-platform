@@ -45,8 +45,12 @@ button.fi-topbar-trigger {
 }
 
 /* Forzar la visibilidad de las migas de pan (breadcrumbs) en la cabecera en todos los tamaños de pantalla */
-.fi-header .fi-breadcrumbs {
-    display: block !important;
+.fi-breadcrumbs {
+    display: flex !important;
+}
+.fi-breadcrumbs ol {
+    display: flex !important;
+    flex-wrap: wrap !important;
 }
 
 /* Forzar que el contenedor de la Ficha del Empleado ocupe 7 de las 12 columnas */
