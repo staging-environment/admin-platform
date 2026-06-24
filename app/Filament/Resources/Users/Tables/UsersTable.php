@@ -41,7 +41,7 @@ class UsersTable
                 \Filament\Tables\Filters\SelectFilter::make('roles')
                     ->relationship('roles', 'name')
                     ->preload()
-                    ->multiple()
+                    ->searchable()
                     ->label('Rol'),
             ])
             ->recordActions([
