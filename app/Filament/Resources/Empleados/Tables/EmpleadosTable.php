@@ -36,14 +36,7 @@ class EmpleadosTable
                                     return mb_strtoupper($nombre);
                                 }
 
-                                $parts = preg_split('/\s+/', $apellidos);
-                                $primerApellido = array_shift($parts);
-                                $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
-
-                                if ($segundoApellido !== '') {
-                                    return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($segundoApellido) . ' ' . mb_strtoupper($nombre);
-                                }
-                                return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
+                                return mb_strtoupper($apellidos) . ', ' . mb_strtoupper($nombre);
                             })
                             ->weight(\Filament\Support\Enums\FontWeight::Bold)
                             ->size('lg'),
