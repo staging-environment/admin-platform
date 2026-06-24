@@ -26,7 +26,7 @@ class PermissionSeeder extends Seeder
 
         $permissions = [
             'ver_dashboard',
-            'gestion_usuarios_roles',
+            'gestion_roles',
             'utilizar_explorador',
             'ver_informes',
             'gestion_gasolineras',
