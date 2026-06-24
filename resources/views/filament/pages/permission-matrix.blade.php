@@ -46,6 +46,7 @@
                         'Sistema y General' => [
                             'ver_dashboard' => 'Ver Comparador de Precios',
                             'gestion_usuarios' => 'Gestión de Usuarios',
+                            'gestion_eliminar_usuarios' => 'Eliminar usuarios',
                             'gestion_roles' => 'Gestión de Roles y Matriz de Permisos',
                             'utilizar_explorador' => 'Utilizar Explorador de Archivos',
                             'ver_informes' => 'Ver Informes y Estadísticas',
