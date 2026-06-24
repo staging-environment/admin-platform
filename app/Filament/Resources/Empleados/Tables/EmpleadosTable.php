@@ -45,7 +45,6 @@ class EmpleadosTable
                                 }
                                 return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
                             })
-                            ->searchable(['nombre', 'apellidos'])
                             ->weight(\Filament\Support\Enums\FontWeight::Bold)
                             ->size('lg'),
 
@@ -94,18 +93,26 @@ class EmpleadosTable
                             ->pluck('localidad', 'localidad')
                             ->toArray();
                     }),
-                \Filament\Tables\Filters\SelectFilter::make('contratos.centro_trabajo')
-                    ->label('Centro de Trabajo (Empresa)')
-                    ->options(function () {
-                        return \App\Models\EmpleadoContrato::query()
-                            ->select('centro_trabajo')
-                            ->whereNotNull('centro_trabajo')
-                            ->where('centro_trabajo', '!=', '')
-                            ->distinct()
-                            ->pluck('centro_trabajo', 'centro_trabajo')
-                            ->toArray();
+                \Filament\Tables\Filters\Filter::make('search')
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('query')
+                            ->label('Buscar')
+                            ->placeholder('Nombre, DNI, email o teléfono...'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['query'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $search) => $query->where(function ($q) use ($search) {
+                                $q->where('nombre', 'like', "%{$search}%")
+                                  ->orWhere('apellidos', 'like', "%{$search}%")
+                                  ->orWhere('dni', 'like', "%{$search}%")
+                                  ->orWhere('email', 'like', "%{$search}%")
+                                  ->orWhere('telefono_principal', 'like', "%{$search}%");
+                            })
+                        );
                     }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
+            ->filtersFormColumns(2)
             ->actions([
                 \Filament\Actions\ViewAction::make(),
                 EditAction::make(),

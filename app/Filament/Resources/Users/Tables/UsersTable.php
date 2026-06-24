@@ -26,9 +26,9 @@ class UsersTable
                 TextColumn::make('telefono')
                     ->label('Teléfono'),
 
-                TextColumn::make('centro_trabajo')
-                    ->label('Centro de Trabajo')
-                    ->getStateUsing(fn ($record) => $record->empleado?->contratos?->sortByDesc('fecha_inicio')?->first()?->centro_trabajo ?? '-'),
+                TextColumn::make('localidad')
+                    ->label('Localidad')
+                    ->getStateUsing(fn ($record) => $record->empleado?->localidad ?? '-'),
 
                 TextColumn::make('roles.name') // 🔥 magia aquí
                 ->label('Roles')
@@ -62,8 +62,8 @@ class UsersTable
                             })
                         );
                     }),
-                \Filament\Tables\Filters\SelectFilter::make('centro_trabajo')
-                    ->label('Centro de Trabajo')
+                \Filament\Tables\Filters\SelectFilter::make('localidad')
+                    ->label('Localidad')
                     ->options([
                         'Sevilla' => 'Sevilla',
                         'Utrera' => 'Utrera',
@@ -73,8 +73,8 @@ class UsersTable
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
                             $data['value'],
-                            fn (\Illuminate\Database\Eloquent\Builder $query, $value) => $query->whereHas('empleado.contratos', function ($q) use ($value) {
-                                $q->where('centro_trabajo', $value);
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $value) => $query->whereHas('empleado', function ($q) use ($value) {
+                                $q->where('localidad', $value);
                             })
                         );
                     }),
