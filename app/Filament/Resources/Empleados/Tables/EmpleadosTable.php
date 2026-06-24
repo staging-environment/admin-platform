@@ -82,8 +82,13 @@ class EmpleadosTable
             ])
             ->defaultSort('apellidos', 'asc')
             ->filters([
+                \Filament\Tables\Filters\SelectFilter::make('gasolinera_codigo')
+                    ->label('Gasolinera')
+                    ->options(function () {
+                        return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
+                    }),
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
-                    ->label('Localidad')
+                    ->label('Localidad (Residencia)')
                     ->options(function () {
                         return \App\Models\Empleado::query()
                             ->select('localidad')

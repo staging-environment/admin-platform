@@ -156,6 +156,11 @@ class EmpleadoResource extends Resource
                                     ->date()
                                     ->visible(fn ($record) => $record?->tipo_contrato === 'Eventual')
                                     ->placeholder('N/A'),
+
+                                \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
+                                    ->label('Gasolinera / Centro de Trabajo')
+                                    ->placeholder('No especificado')
+                                    ->columnSpanFull(),
                             ]),
                     ])
             ]);

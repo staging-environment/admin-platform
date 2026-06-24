@@ -14,6 +14,7 @@ class Empleado extends Model
         'tipo_discapacidad' => 'array',
         'fecha_resolucion_discapacidad' => 'date',
         'fecha_vencimiento_contrato' => 'date',
+        'gasolinera_codigo' => 'integer',
     ];
 
 
@@ -54,6 +55,11 @@ class Empleado extends Model
                 $user->delete();
             }
         });
+    }
+
+    public function gasolinera()
+    {
+        return $this->belongsTo(Gasolinera::class, 'gasolinera_codigo', 'Codigo');
     }
 
     public function documentos()

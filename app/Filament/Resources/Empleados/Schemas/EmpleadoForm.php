@@ -177,6 +177,14 @@ class EmpleadoForm
                                     ->label('Fecha de vencimiento')
                                     ->visible(fn (Get $get) => $get('tipo_contrato') === 'Eventual')
                                     ->required(fn (Get $get) => $get('tipo_contrato') === 'Eventual'),
+
+                                Select::make('gasolinera_codigo')
+                                    ->label('Gasolinera / Centro de Trabajo')
+                                    ->options(function () {
+                                        return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
+                                    })
+                                    ->placeholder('Selecciona la gasolinera')
+                                    ->columnSpanFull(),
                             ]),
                     ]),
 
