@@ -84,93 +84,94 @@ class EmpleadoForm
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
                             ->columnSpan('full'),
 
-                        // Contacto y Dirección
-                        Grid::make(3)
+                        // Información Personal del Empleado
+                        Section::make('Información Personal del Empleado')
                             ->schema([
-                                TextInput::make('direccion')
-                                    ->label('Dirección')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('localidad')
-                                    ->label('Localidad')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('codigo_postal')
-                                    ->label('Código Postal')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('provincia')
-                                    ->label('Provincia')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('telefono_principal')
-                                    ->label('Teléfono Principal')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('telefono_secundario')
-                                    ->label('Teléfono Secundario')
-                                    ->maxLength(255),
-                                TextInput::make('email')
-                                    ->label('Correo Electrónico')
-                                    ->email()
-                                    ->required()
-                                    ->unique(ignoreRecord: true)
-                                    ->maxLength(255)
-                                    ->columnSpan(3),
+                                // Contacto y Dirección
+                                Grid::make(3)
+                                    ->schema([
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('localidad')
+                                            ->label('Localidad')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('codigo_postal')
+                                            ->label('Código Postal')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('provincia')
+                                            ->label('Provincia')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('telefono_principal')
+                                            ->label('Teléfono Principal')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('telefono_secundario')
+                                            ->label('Teléfono Secundario')
+                                            ->maxLength(255),
+                                        TextInput::make('email')
+                                            ->label('Correo Electrónico')
+                                            ->email()
+                                            ->required()
+                                            ->unique(ignoreRecord: true)
+                                            ->maxLength(255)
+                                            ->columnSpan(3),
+                                    ]),
+
+                                \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                                    ->columnSpan('full'),
+
+                                // Discapacidad / Incapacidad
+                                Grid::make(2)
+                                    ->schema([
+                                        Toggle::make('tiene_discapacidad')
+                                            ->label('¿Tiene discapacidad?')
+                                            ->live()
+                                            ->columnSpanFull(),
+                                        
+                                        Select::make('tipo_discapacidad')
+                                            ->label('Tipo de Discapacidad')
+                                            ->multiple()
+                                            ->options([
+                                                'Física' => 'Física',
+                                                'Psíquica' => 'Psíquica',
+                                                'Sensorial' => 'Sensorial',
+                                            ])
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                        
+                                        TextInput::make('porcentaje_discapacidad')
+                                            ->label('Porcentaje de Discapacidad')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(100)
+                                            ->suffix('%')
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                                        DatePicker::make('fecha_resolucion_discapacidad')
+                                            ->label('Fecha de resolución')
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                                        Toggle::make('pertenece_andalucia')
+                                            ->label('¿Pertenece a Andalucía?')
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->default(false),
+
+                                        FileUpload::make('resolucion_discapacidad')
+                                            ->label('Resolución de Discapacidad (Archivo)')
+                                            ->directory('empleados/resoluciones')
+                                            ->disk('local')
+                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
-
-                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
-                            ->columnSpan('full'),
-
-                        // Discapacidad / Incapacidad
-                        Grid::make(2)
-                            ->schema([
-                                Toggle::make('tiene_discapacidad')
-                                    ->label('¿Tiene discapacidad?')
-                                    ->live()
-                                    ->columnSpanFull(),
-                                
-                                Select::make('tipo_discapacidad')
-                                    ->label('Tipo de Discapacidad')
-                                    ->multiple()
-                                    ->options([
-                                        'Física' => 'Física',
-                                        'Psíquica' => 'Psíquica',
-                                        'Sensorial' => 'Sensorial',
-                                    ])
-                                    ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
-                                
-                                TextInput::make('porcentaje_discapacidad')
-                                    ->label('Porcentaje de Discapacidad')
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                                    ->suffix('%')
-                                    ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
-
-                                DatePicker::make('fecha_resolucion_discapacidad')
-                                    ->label('Fecha de resolución')
-                                    ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
-
-                                Toggle::make('pertenece_andalucia')
-                                    ->label('¿Pertenece a Andalucía?')
-                                    ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->default(false),
-
-                                FileUpload::make('resolucion_discapacidad')
-                                    ->label('Resolución de Discapacidad (Archivo)')
-                                    ->directory('empleados/resoluciones')
-                                    ->disk('local')
-                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                    ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->columnSpanFull(),
-                            ]),
-
-                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
-                            ->columnSpan('full'),
 
                         // Información de Contratación
                         Grid::make(2)
