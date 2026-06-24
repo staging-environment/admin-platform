@@ -28,6 +28,7 @@ class PermissionSeeder extends Seeder
             'ver_dashboard',
             'gestion_roles',
             'gestion_usuarios',
+            'gestion_eliminar_usuarios',
             'utilizar_explorador',
             'ver_informes',
             'gestion_gasolineras',

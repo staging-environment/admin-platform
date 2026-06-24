@@ -80,12 +80,15 @@ class UsersTable
                     }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
+                \Filament\Actions\DeleteAction::make()
+                    ->visible(fn () => auth()->user()->can('gestion_eliminar_usuarios')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => auth()->user()->can('gestion_eliminar_usuarios')),
                 ]),
             ]);
     }
