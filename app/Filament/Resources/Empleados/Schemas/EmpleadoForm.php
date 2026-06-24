@@ -67,8 +67,18 @@ class EmpleadoForm
                                             ->required()
                                             ->live(),
                                     ])
-                                    ->columnSpan(2),
                             ]),
+
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        Select::make('gasolinera_codigo')
+                            ->label('Ubicación de trabajo')
+                            ->options(function () {
+                                return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
+                            })
+                            ->placeholder('Selecciona la ubicación de trabajo')
+                            ->required(),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
                             ->columnSpan('full'),
@@ -177,14 +187,6 @@ class EmpleadoForm
                                     ->label('Fecha de vencimiento')
                                     ->visible(fn (Get $get) => $get('tipo_contrato') === 'Eventual')
                                     ->required(fn (Get $get) => $get('tipo_contrato') === 'Eventual'),
-
-                                Select::make('gasolinera_codigo')
-                                    ->label('Gasolinera / Centro de Trabajo')
-                                    ->options(function () {
-                                        return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
-                                    })
-                                    ->placeholder('Selecciona la gasolinera')
-                                    ->columnSpanFull(),
                             ]),
                     ]),
 

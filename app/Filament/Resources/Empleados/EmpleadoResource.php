@@ -78,6 +78,14 @@ class EmpleadoResource extends Resource
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
                             ->columnSpan('full'),
 
+                        \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
+                            ->label('Ubicación de trabajo')
+                            ->placeholder('No especificada')
+                            ->weight(\Filament\Support\Enums\FontWeight::Bold),
+
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
                         // Contacto y Dirección
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
@@ -156,11 +164,6 @@ class EmpleadoResource extends Resource
                                     ->date()
                                     ->visible(fn ($record) => $record?->tipo_contrato === 'Eventual')
                                     ->placeholder('N/A'),
-
-                                \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
-                                    ->label('Gasolinera / Centro de Trabajo')
-                                    ->placeholder('No especificado')
-                                    ->columnSpanFull(),
                             ]),
                     ])
             ]);
