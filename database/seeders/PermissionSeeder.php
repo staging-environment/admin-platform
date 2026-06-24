@@ -40,6 +40,8 @@ class PermissionSeeder extends Seeder
             'gestion_eliminar_empleados',
             'ver_documentacion_empleados',
             'editar_documentacion_empleados',
+            'recibir_notificaciones_competencia',
+            'ver_analiticas',
         ];
 
         foreach ($permissions as $permission) {
