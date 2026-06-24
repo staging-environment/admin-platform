@@ -10,6 +10,8 @@ class PageViewChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Historial de Visitas';
 
+    protected int | string | array $columnSpan = 'full';
+
     public ?string $filter = '30';
 
     protected function getFilters(): ?array
