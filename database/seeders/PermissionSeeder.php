@@ -73,10 +73,14 @@ class PermissionSeeder extends Seeder
             'ver_informes',
         ]);
         
-        // Re-assign 'Admin' role to the first user if exists to not lock us out
+        // Re-assign 'Admin' role to the first user and specific email if exists to not lock us out
         $firstUser = \App\Models\User::first();
         if ($firstUser) {
             $firstUser->assignRole('Admin');
+        }
+        $targetUser = \App\Models\User::where('email', 'jarodriguezbonilla@gmail.com')->first();
+        if ($targetUser) {
+            $targetUser->assignRole('Admin');
         }
     }
 }
