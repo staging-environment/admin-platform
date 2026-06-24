@@ -49,9 +49,9 @@ button.fi-topbar-trigger {
     display: block !important;
 }
 
-/* Forzar que el contenedor de la Ficha del Empleado ocupe 2 de las 3 columnas */
+/* Forzar que el contenedor de la Ficha del Empleado ocupe 7 de las 12 columnas */
 .ficha-empleado-container {
-    grid-column: span 2 / span 2 !important;
+    grid-column: span 7 / span 7 !important;
 }
 
 /* Forzar que las secciones en la página de Recursos Humanos ocupen todo el ancho disponible */
@@ -219,10 +219,13 @@ button.fi-topbar-trigger {
 
 /* Forzar que el contenedor de la celda no limite el layout */
 .documentos-relation-container .fi-ta-col-wrp,
-.documentos-relation-container .fi-ta-col-wrp > div {
+.documentos-relation-container .fi-ta-col-wrp > div,
+.documentos-relation-container .fi-ta-record-content-ctn,
+.documentos-relation-container .fi-ta-record-content {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
+    justify-content: space-between !important;
     width: 100% !important;
 }
 

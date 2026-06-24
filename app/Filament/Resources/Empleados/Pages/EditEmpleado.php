@@ -14,17 +14,17 @@ class EditEmpleado extends EditRecord
     {
         return $schema
             ->components([
-                \Filament\Schemas\Components\Grid::make(3)
+                \Filament\Schemas\Components\Grid::make(12)
                     ->columnSpanFull()
                     ->schema([
                         \Filament\Schemas\Components\Grid::make(1)
                             ->schema([
                                 $this->getFormContentComponent(),
                             ])
-                            ->columnSpan(2)
+                            ->columnSpan(7)
                             ->extraAttributes(['class' => 'ficha-empleado-container']),
                         $this->getRelationManagersContentComponent()
-                            ->columnSpan(1)
+                            ->columnSpan(5)
                             ->extraAttributes(['class' => 'documentos-relation-container max-h-[600px] overflow-y-auto pr-2']),
                     ]),
             ]);
