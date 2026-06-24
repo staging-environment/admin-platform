@@ -18,15 +18,12 @@ class UsersTable
                     ->sortable(),
 
                 TextColumn::make('name')
-                    ->searchable()
                     ->sortable(),
 
-                TextColumn::make('email')
-                    ->searchable(),
+                TextColumn::make('email'),
 
                 TextColumn::make('telefono')
-                    ->label('Teléfono')
-                    ->searchable(),
+                    ->label('Teléfono'),
 
                 TextColumn::make('roles.name') // 🔥 magia aquí
                 ->label('Roles')
@@ -43,8 +40,24 @@ class UsersTable
                     ->preload()
                     ->searchable()
                     ->label('Rol'),
+                \Filament\Tables\Filters\Filter::make('search')
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('query')
+                            ->label('Buscar')
+                            ->placeholder('Nombre, email o teléfono...'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['query'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $search) => $query->where(function ($q) use ($search) {
+                                $q->where('name', 'like', "%{$search}%")
+                                  ->orWhere('email', 'like', "%{$search}%")
+                                  ->orWhere('telefono', 'like', "%{$search}%");
+                            })
+                        );
+                    }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->filtersFormColumns(3)
+            ->filtersFormColumns(2)
             ->recordActions([
                 EditAction::make(),
             ])
