@@ -35,6 +35,7 @@ class PermissionSeeder extends Seeder
             'gestion_recursos_humanos',
             'gestion_alta_empleados',
             'gestion_editar_empleados',
+            'gestion_eliminar_empleados',
             'ver_documentacion_empleados',
             'editar_documentacion_empleados',
             'ver_cursos_empleados',

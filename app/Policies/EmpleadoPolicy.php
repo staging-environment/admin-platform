@@ -44,7 +44,7 @@ class EmpleadoPolicy
      */
     public function delete(User $user, Empleado $empleado): bool
     {
-        return $user->hasRole('Admin');
+        return $user->can('gestion_eliminar_empleados');
     }
 
     /**
@@ -52,6 +52,6 @@ class EmpleadoPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasRole('Admin');
+        return $user->can('gestion_eliminar_empleados');
     }
 }

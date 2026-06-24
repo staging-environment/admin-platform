@@ -63,6 +63,7 @@
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
+                            'gestion_eliminar_empleados' => 'Eliminar empleados',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
