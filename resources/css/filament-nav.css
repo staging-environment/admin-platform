@@ -69,23 +69,36 @@ button.fi-topbar-trigger {
     max-width: 100% !important;
 }
 
-/* Ocultar la columna de acciones por defecto en el contenedor de documentación (pero manteniendo el botón Crear del header) */
-.documentos-relation-container table .fi-ta-actions {
-    display: none !important;
+/* Estilos de tabla clásica para el Relation Manager de Documentos */
+.documentos-relation-container table {
+    display: table !important;
+    width: 100% !important;
 }
-
-/* Hacer el table card en el contenedor de documentación más limpio y sin bordes/sombras pesadas */
-.documentos-relation-container .fi-ta-content {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
+.documentos-relation-container tbody {
+    display: table-row-group !important;
 }
-
-.documentos-relation-container .fi-ta-record {
+.documentos-relation-container tr {
+    display: table-row !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
-.dark .documentos-relation-container .fi-ta-record {
+.dark .documentos-relation-container tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+.documentos-relation-container td,
+.documentos-relation-container th {
+    display: table-cell !important;
+    vertical-align: middle !important;
+    padding: 8px 12px !important;
+}
+/* Alinear texto a la izquierda y acciones nativas a la derecha */
+.documentos-relation-container td:first-child {
+    text-align: left !important;
+    width: auto !important;
+}
+.documentos-relation-container td:last-child {
+    text-align: right !important;
+    width: 1% !important;
+    white-space: nowrap !important;
 }
 
 /* Ocultar el thead en el contenedor de documentación */
@@ -93,141 +106,13 @@ button.fi-topbar-trigger {
     display: none !important;
 }
 
-/* Forzar que los contenedores intermedios de la celda usen flex-row y ocupen el 100% */
-.documentos-relation-container .fi-ta-text,
-.documentos-relation-container .fi-ta-text > div,
-.documentos-relation-container .fi-ta-text-item,
-.documentos-relation-container .fi-ta-text-item-label,
-.documentos-relation-container .fi-ta-record-content-ctn,
-.documentos-relation-container .fi-ta-record-content {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
+/* Quitar bordes y sombras de la card de la tabla para que se integre bien */
+.documentos-relation-container .fi-ta-content {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
-/* Fila de documento en una sola línea */
-.doc-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    width: 100% !important;
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-}
-
-.doc-title {
-    font-size: 0.875rem !important; /* text-sm */
-    font-weight: 600 !important; /* font-semibold */
-    color: #1f2937 !important; /* text-gray-800 */
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important; /* truncate */
-    flex-grow: 1 !important;
-}
-.dark .doc-title {
-    color: #e5e7eb !important; /* text-gray-200 */
-}
-
-.doc-actions {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 4px !important;
-    flex-shrink: 0 !important;
-}
-
-.doc-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 6px !important;
-    border-radius: 6px !important;
-    transition: background-color 0.2s, color 0.2s !important;
-    outline: none !important;
-}
-
-.doc-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
-}
-.dark .doc-btn:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Colores específicos de cada botón */
-.doc-btn-preview {
-    color: #0284c7 !important; /* sky-600 */
-}
-.doc-btn-preview:hover {
-    color: #075985 !important; /* sky-800 */
-}
-.dark .doc-btn-preview {
-    color: #38bdf8 !important; /* sky-400 */
-}
-.dark .doc-btn-preview:hover {
-    color: #7dd3fc !important; /* sky-300 */
-}
-
-.doc-btn-download {
-    color: #059669 !important; /* emerald-600 */
-}
-.doc-btn-download:hover {
-    color: #065f46 !important; /* emerald-800 */
-}
-.dark .doc-btn-download {
-    color: #34d399 !important; /* emerald-400 */
-}
-.dark .doc-btn-download:hover {
-    color: #6ee7b7 !important; /* emerald-300 */
-}
-
-.doc-btn-edit {
-    color: #d97706 !important; /* amber-600 */
-}
-.doc-btn-edit:hover {
-    color: #92400e !important; /* amber-800 */
-}
-.dark .doc-btn-edit {
-    color: #fbbf24 !important; /* amber-400 */
-}
-.dark .doc-btn-edit:hover {
-    color: #fcd34d !important; /* amber-300 */
-}
-
-.doc-btn-delete {
-    color: #dc2626 !important; /* red-600 */
-}
-.doc-btn-delete:hover {
-    color: #991b1b !important; /* red-800 */
-}
-.dark .doc-btn-delete {
-    color: #f87171 !important; /* red-400 */
-}
-.dark .doc-btn-delete:hover {
-    color: #fca5a5 !important; /* red-300 */
-}
-
-/* Ocultar la columna de acciones nativas por completo en el relation manager de documentos */
-.documentos-relation-container .fi-ta-actions-cell,
-.documentos-relation-container .fi-ta-actions,
-.documentos-relation-container th.fi-ta-header-cell:last-child {
-    display: none !important;
-}
-
-/* Forzar que el contenedor de la celda no limite el layout */
-.documentos-relation-container .fi-ta-col-wrp,
-.documentos-relation-container .fi-ta-col-wrp > div,
-.documentos-relation-container .fi-ta-record-content-ctn,
-.documentos-relation-container .fi-ta-record-content {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-}
 
 
 

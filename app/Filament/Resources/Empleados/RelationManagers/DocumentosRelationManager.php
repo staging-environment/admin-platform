@@ -84,9 +84,10 @@ class DocumentosRelationManager extends RelationManager
             ->recordTitleAttribute('nombre')
             ->paginated(false)
             ->columns([
-                \Filament\Tables\Columns\ViewColumn::make('nombre')
+                TextColumn::make('nombre')
                     ->label('Nombre del Documento')
-                    ->view('filament.tables.columns.documento-row'),
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //
