@@ -48,20 +48,6 @@ class PermissionMatrix extends Page
         return Width::Full;
     }
 
-    /**
-     * Botón de volver dinámico para evitar errores de ruta
-     */
-    protected function getHeaderActions(): array
-    {
-        return [
-            Action::make('back')
-                ->label('Volver al Dashboard')
-                ->color('gray')
-                ->icon('heroicon-m-arrow-left')
-                // Apunta directamente a la ruta raíz de tu dashboard
-                ->url(route('dashboard')),
-        ];
-    }
 
     public $roles;
     public $permissions;

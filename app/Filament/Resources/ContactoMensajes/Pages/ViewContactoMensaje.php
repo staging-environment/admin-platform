@@ -26,10 +26,6 @@ class ViewContactoMensaje extends ViewRecord
                 ->label('Volver a Mensajes')
                 ->url(ContactoMensajeResource::getUrl('index'))
                 ->color('gray'),
-            \Filament\Actions\Action::make('back_dashboard')
-                ->label('Volver al Dashboard')
-                ->url('/admin')
-                ->color('primary'),
         ];
     }
 }

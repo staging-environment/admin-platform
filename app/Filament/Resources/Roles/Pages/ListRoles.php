@@ -14,11 +14,6 @@ class ListRoles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('back')
-                ->label('Volver al Dashboard')
-                ->color('gray')
-                ->icon('heroicon-m-arrow-left')
-                ->url(route('dashboard')),
             Actions\CreateAction::make(),
         ];
     }
