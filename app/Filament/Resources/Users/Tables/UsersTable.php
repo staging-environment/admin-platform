@@ -43,7 +43,7 @@ class UsersTable
                     ->preload()
                     ->searchable()
                     ->label('Rol'),
-            ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
+            ], layout: \Filament\Tables\Enums\FiltersLayout::BeforeContent)
             ->recordActions([
                 EditAction::make(),
             ])
