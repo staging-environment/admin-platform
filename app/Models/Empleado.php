@@ -8,6 +8,15 @@ class Empleado extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'tiene_discapacidad' => 'boolean',
+        'pertenece_andalucia' => 'boolean',
+        'tipo_discapacidad' => 'array',
+        'fecha_resolucion_discapacidad' => 'date',
+        'fecha_vencimiento_contrato' => 'date',
+    ];
+
+
     protected static function booted()
     {
         static::saved(function ($empleado) {

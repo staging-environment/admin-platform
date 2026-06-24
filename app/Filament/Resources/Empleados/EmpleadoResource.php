@@ -105,20 +105,61 @@ class EmpleadoResource extends Resource
                         // Discapacidad / Incapacidad
                         \Filament\Schemas\Components\Grid::make(2)
                             ->schema([
+                                \Filament\Infolists\Components\IconEntry::make('tiene_discapacidad')
+                                    ->label('¿Tiene discapacidad?')
+                                    ->boolean(),
+                                
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
-                                    ->placeholder('Ninguna'),
+                                    ->badge()
+                                    ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad))
+                                    ->placeholder('N/A'),
+                                
                                 \Filament\Infolists\Components\TextEntry::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
                                     ->suffix('%')
+                                    ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad))
                                     ->placeholder('N/A'),
+
+                                \Filament\Infolists\Components\TextEntry::make('fecha_resolucion_discapacidad')
+                                    ->label('Fecha de resolución')
+                                    ->date()
+                                    ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad))
+                                    ->placeholder('N/A'),
+
+                                \Filament\Infolists\Components\IconEntry::make('pertenece_andalucia')
+                                    ->label('¿Pertenece a Andalucía?')
+                                    ->boolean()
+                                    ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad)),
+
                                 \Filament\Infolists\Components\TextEntry::make('incapacidad')
                                     ->label('Incapacidad')
                                     ->placeholder('Ninguna'),
+                                
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
-                                    ->url(fn ($record) => $record->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
-                                    ->placeholder('Sin documento adjunto'),
+                                    ->url(fn ($record) => $record?->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
+                                    ->placeholder('Sin documento adjunto')
+                                    ->visible(fn ($record) => (bool) ($record?->tiene_discapacidad)),
+                            ]),
+
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        // Información de Contratación
+                        \Filament\Schemas\Components\Grid::make(2)
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
+                                    ->label('Tipo de Contrato')
+                                    ->badge()
+                                    ->color(fn ($state) => $state === 'Indefinido' ? 'success' : 'warning')
+                                    ->placeholder('No especificado'),
+
+                                \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
+                                    ->label('Fecha de vencimiento')
+                                    ->date()
+                                    ->visible(fn ($record) => $record?->tipo_contrato === 'Eventual')
+                                    ->placeholder('N/A'),
                             ]),
                     ])
             ]);
