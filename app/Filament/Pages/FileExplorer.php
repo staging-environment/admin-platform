@@ -20,13 +20,7 @@ class FileExplorer extends Page
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
-    public function getBreadcrumbs(): array
-    {
-        return [
-            '#' => 'Administración',
-            static::getNavigationLabel(),
-        ];
-    }
+
 
     public string $currentPath = '';
     public string $search = '';

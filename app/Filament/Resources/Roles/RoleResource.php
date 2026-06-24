@@ -22,6 +22,11 @@ class RoleResource extends Resource
     protected static ?string $modelLabel = 'Rol';
     protected static ?string $pluralModelLabel = 'Roles';
     
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

@@ -24,6 +24,11 @@ class EmpleadoResource extends Resource
     protected static ?string $modelLabel = 'Empleado';
     protected static ?string $pluralModelLabel = 'Empleados';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Recursos humanos';
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     public static function canAccess(): bool

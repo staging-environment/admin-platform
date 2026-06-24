@@ -22,6 +22,11 @@ class PermissionResource extends Resource
         return app()->environment('testing');
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
+
     protected static ?string $model = Permission::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

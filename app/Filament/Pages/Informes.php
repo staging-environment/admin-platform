@@ -84,6 +84,14 @@ class Informes extends Page implements HasForms
         return 'Informes';
     }
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '#' => 'Administración',
+            $this->getTitle(),
+        ];
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
