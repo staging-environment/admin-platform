@@ -107,7 +107,11 @@ class MitecoService
         }
 
         // 2. Determine if prices changed compared to last upload
-        $lastPrices = Cache::get('miteco_last_uploaded_prices');
+        $filePath = storage_path('app/miteco_last_uploaded_prices.json');
+        $lastPrices = null;
+        if (file_exists($filePath)) {
+            $lastPrices = json_decode(file_get_contents($filePath), true);
+        }
         $pricesChanged = false;
 
         if (!$lastPrices) {
@@ -163,9 +167,9 @@ class MitecoService
             $res = $this->uploadPricesIndividual();
         }
 
-        // 5. Save execution outcome to Cache
+        // 5. Save execution outcome to Cache and File
         if ($res['success']) {
-            Cache::put('miteco_last_uploaded_prices', $currentPrices);
+            file_put_contents($filePath, json_encode($currentPrices, JSON_PRETTY_PRINT));
 
             $statusData = [
                 'timestamp' => now('Europe/Madrid')->toIso8601String(),

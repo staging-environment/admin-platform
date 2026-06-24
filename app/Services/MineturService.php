@@ -23,6 +23,13 @@ class MineturService
      */
     public function getLocalityData(string $locality): array
     {
+        $filePath = storage_path("app/minetur_{$locality}.json");
+        if (file_exists($filePath)) {
+            $data = json_decode(file_get_contents($filePath), true);
+            if (is_array($data)) {
+                return $data;
+            }
+        }
         return Cache::get("minetur_{$locality}", [
             'diesel'     => [],
             'gas95'      => [],
@@ -128,10 +135,10 @@ class MineturService
                 $newDiesel = array_slice($diesel, 0, 5);
                 $newGas95  = array_slice($gas95, 0, 5);
 
-                $cached = Cache::get("minetur_{$key}");
+                $cached = $this->getLocalityData($key);
                 $hasChanged = true;
 
-                if ($cached && isset($cached['diesel']) && isset($cached['gas95'])) {
+                if (!empty($cached['diesel']) || !empty($cached['gas95'])) {
                     if (json_encode($cached['diesel']) === json_encode($newDiesel) && 
                         json_encode($cached['gas95']) === json_encode($newGas95)) {
                         $hasChanged = false;
@@ -146,14 +153,17 @@ class MineturService
                     }
                 }
 
-                $finalUpdatedAt = $updatedAt;
+                $finalUpdatedAt = $hasChanged ? $updatedAt : ($cached['updated_at'] ?? $updatedAt);
 
-                Cache::put("minetur_{$key}", [
+                $dataToStore = [
                     'diesel'     => $newDiesel,
                     'gas95'      => $newGas95,
                     'updated_at' => $finalUpdatedAt,
                     'checked_at' => now('Europe/Madrid')->format('d/m/Y H:i:s'),
-                ], self::CACHE_TTL);
+                ];
+
+                file_put_contents(storage_path("app/minetur_{$key}.json"), json_encode($dataToStore, JSON_PRETTY_PRINT));
+                Cache::put("minetur_{$key}", $dataToStore, self::CACHE_TTL);
             }
 
             Log::info('MineturService: Refreshed ' . count(self::LOCALITIES) . ' localities. Stations total: ' . count($stations) . '. Date: ' . $updatedAt);
