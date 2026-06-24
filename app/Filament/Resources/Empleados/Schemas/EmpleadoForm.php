@@ -80,15 +80,10 @@ class EmpleadoForm
                                     ->label('Dirección')
                                     ->required()
                                     ->maxLength(255),
-                                Select::make('localidad')
+                                TextInput::make('localidad')
                                     ->label('Localidad')
-                                    ->options([
-                                        'Utrera' => 'Utrera',
-                                        'Sevilla' => 'Sevilla',
-                                        'El Cuervo' => 'El Cuervo',
-                                        'Lebrija' => 'Lebrija',
-                                    ])
-                                    ->required(),
+                                    ->required()
+                                    ->maxLength(255),
                                 TextInput::make('codigo_postal')
                                     ->label('Código Postal')
                                     ->required()
