@@ -210,6 +210,23 @@ button.fi-topbar-trigger {
     color: #fca5a5 !important; /* red-300 */
 }
 
+/* Ocultar la columna de acciones nativas por completo en el relation manager de documentos */
+.documentos-relation-container .fi-ta-actions-cell,
+.documentos-relation-container .fi-ta-actions,
+.documentos-relation-container th.fi-ta-header-cell:last-child {
+    display: none !important;
+}
+
+/* Forzar que el contenedor de la celda no limite el layout */
+.documentos-relation-container .fi-ta-col-wrp,
+.documentos-relation-container .fi-ta-col-wrp > div {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+
 
 
 
