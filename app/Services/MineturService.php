@@ -146,7 +146,7 @@ class MineturService
 
                     if ($hasChanged) {
                         try {
-                            $this->notifyChanges($key, $newDiesel, $newGas95);
+                            $this->notifyChanges($key, $newDiesel, $newGas95, $cached['diesel'] ?? [], $cached['gas95'] ?? []);
                         } catch (\Throwable $e) {
                             Log::error("MineturService notification error: " . $e->getMessage());
                         }
@@ -176,24 +176,51 @@ class MineturService
     /**
      * Send price change alerts to authorized users via Telegram.
      */
-    public function notifyChanges(string $localityKey, array $newDiesel, array $newGas95): void
+    public function notifyChanges(string $localityKey, array $newDiesel, array $newGas95, array $oldDiesel = [], array $oldGas95 = []): void
     {
         $localityName = self::LOCALITIES[$localityKey]['name'] ?? ucfirst($localityKey);
         
         $text = "🔔 <b>Cambio de precios de la competencia</b>\n";
         $text .= "Localidad: <b>{$localityName}</b>\n\n";
 
+        // Create lookups for old prices
+        $oldDieselPrices = [];
+        foreach ($oldDiesel as $s) {
+            $oldDieselPrices[$s['id']] = $s['price'];
+        }
+
+        $oldGas95Prices = [];
+        foreach ($oldGas95 as $s) {
+            $oldGas95Prices[$s['id']] = $s['price'];
+        }
+
         $text .= "<b>Precios actuales (Top Competidores):</b>\n";
         $text .= "⛽ <b>DIÉSEL:</b>\n";
         foreach (array_slice($newDiesel, 0, 5) as $idx => $s) {
             $num = $idx + 1;
-            $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+            $oldPrice = $oldDieselPrices[$s['id']] ?? null;
+            $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
+            $highlight = "";
+            if ($oldPrice !== null && abs($oldPrice - $s['price']) > 0.0001) {
+                $diff = $s['price'] - $oldPrice;
+                $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
+                $highlight = " ⚠️ <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
+            }
+            $text .= "  {$num}. {$s['name']}: {$priceText}{$highlight}\n";
         }
 
         $text .= "\n⛽ <b>GASOLINA 95:</b>\n";
         foreach (array_slice($newGas95, 0, 5) as $idx => $s) {
             $num = $idx + 1;
-            $text .= "  {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
+            $oldPrice = $oldGas95Prices[$s['id']] ?? null;
+            $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
+            $highlight = "";
+            if ($oldPrice !== null && abs($oldPrice - $s['price']) > 0.0001) {
+                $diff = $s['price'] - $oldPrice;
+                $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
+                $highlight = " ⚠️ <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
+            }
+            $text .= "  {$num}. {$s['name']}: {$priceText}{$highlight}\n";
         }
 
         // Find users with the required permission and active Telegram linked

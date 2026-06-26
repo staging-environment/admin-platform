@@ -22,7 +22,14 @@ class AppServiceProvider extends ServiceProvider
     {
         if (str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
-            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+            $forwardedHost = request()->header('X-Forwarded-Host');
+            if ($forwardedHost) {
+                // Handle potential comma-separated list of proxies
+                $host = trim(explode(',', $forwardedHost)[0]);
+                \Illuminate\Support\Facades\URL::forceRootUrl("https://{$host}");
+            } else {
+                \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+            }
             $_SERVER['HTTPS'] = 'on';
             request()->server->set('HTTPS', 'on');
             request()->headers->set('X-Forwarded-Proto', 'https');
