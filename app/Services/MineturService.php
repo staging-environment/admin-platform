@@ -139,9 +139,39 @@ class MineturService
                 $hasChanged = true;
 
                 if (!empty($cached['diesel']) || !empty($cached['gas95'])) {
-                    if (json_encode($cached['diesel']) === json_encode($newDiesel) && 
-                        json_encode($cached['gas95']) === json_encode($newGas95)) {
-                        $hasChanged = false;
+                    $hasChanged = false;
+                    // Check diesel changes (only price or list composition changes)
+                    if (count($cached['diesel'] ?? []) !== count($newDiesel)) {
+                        $hasChanged = true;
+                    } else {
+                        $oldPrices = [];
+                        foreach ($cached['diesel'] ?? [] as $s) {
+                            $oldPrices[$s['id']] = $s['price'];
+                        }
+                        foreach ($newDiesel as $s) {
+                            if (!isset($oldPrices[$s['id']]) || abs($oldPrices[$s['id']] - $s['price']) > 0.0001) {
+                                $hasChanged = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Check gas95 changes (only price or list composition changes)
+                    if (!$hasChanged) {
+                        if (count($cached['gas95'] ?? []) !== count($newGas95)) {
+                            $hasChanged = true;
+                        } else {
+                            $oldPrices = [];
+                            foreach ($cached['gas95'] ?? [] as $s) {
+                                $oldPrices[$s['id']] = $s['price'];
+                            }
+                            foreach ($newGas95 as $s) {
+                                if (!isset($oldPrices[$s['id']]) || abs($oldPrices[$s['id']] - $s['price']) > 0.0001) {
+                                    $hasChanged = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if ($hasChanged) {
