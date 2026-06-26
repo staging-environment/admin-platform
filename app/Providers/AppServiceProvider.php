@@ -22,9 +22,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $host = request()->header('X-Forwarded-Host') ?? request()->header('Host');
         if ($host) {
-            $host = explode(',', $host)[0];
-            $proto = request()->header('X-Forwarded-Proto') ?? (request()->secure() ? 'https' : 'http');
-            $baseUrl = $proto . '://' . trim($host);
+            $host = trim(explode(',', $host)[0]);
+            $isLocal = str_contains($host, '.ddev.site') || str_contains($host, 'localhost') || str_contains($host, '127.0.0.1');
+            $proto = $isLocal ? (request()->header('X-Forwarded-Proto') ?? (request()->secure() ? 'https' : 'http')) : 'https';
+            $baseUrl = $proto . '://' . $host;
             config(['app.url' => $baseUrl]);
             config(['filesystems.disks.public.url' => $baseUrl . '/storage']);
         }
