@@ -20,16 +20,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $host = request()->header('X-Forwarded-Host') ?? request()->header('Host');
+        if ($host) {
+            $host = explode(',', $host)[0];
+            $proto = request()->header('X-Forwarded-Proto') ?? (request()->secure() ? 'https' : 'http');
+            $baseUrl = $proto . '://' . trim($host);
+            config(['app.url' => $baseUrl]);
+            config(['filesystems.disks.public.url' => $baseUrl . '/storage']);
+        }
+
         if (str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
-            $forwardedHost = request()->header('X-Forwarded-Host');
-            if ($forwardedHost) {
-                // Handle potential comma-separated list of proxies
-                $host = trim(explode(',', $forwardedHost)[0]);
-                \Illuminate\Support\Facades\URL::forceRootUrl("https://{$host}");
-            } else {
-                \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
-            }
+            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
             $_SERVER['HTTPS'] = 'on';
             request()->server->set('HTTPS', 'on');
             request()->headers->set('X-Forwarded-Proto', 'https');
