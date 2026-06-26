@@ -169,6 +169,52 @@ class MitecoService
 
         // 5. Save execution outcome to Cache and File
         if ($res['success']) {
+            // Notify Telegram of own price changes
+            try {
+                $telegramService = app(\App\Services\TelegramService::class);
+                $users = \App\Models\User::whereNotNull('telegram_chat_id')->get();
+                if ($users->isNotEmpty()) {
+                    $text = "📢 <b>Nuevos precios actualizados (Utrecar)</b>\n";
+                    $text .= "Se han enviado correctamente los nuevos precios a MITECO:\n\n";
+
+                    foreach ($currentPrices as $stationCode => $prices) {
+                        $oldGoa = $lastPrices[$stationCode]['goa'] ?? null;
+                        $oldG95 = $lastPrices[$stationCode]['g95e5'] ?? null;
+
+                        $text .= "⛽ <b>" . $prices['name'] . "</b>\n";
+                        
+                        // Diésel
+                        if ($prices['goa'] !== null) {
+                            $priceText = "  • Diésel A: <b>" . number_format($prices['goa'], 3) . " €</b>";
+                            if ($oldGoa !== null && abs($oldGoa - $prices['goa']) > 0.0001) {
+                                $diff = $prices['goa'] - $oldGoa;
+                                $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
+                                $priceText .= " ⚠️ <i>(antes " . number_format($oldGoa, 3) . " € | {$diffText} €)</i>";
+                            }
+                            $text .= $priceText . "\n";
+                        }
+                        
+                        // Gasolina 95
+                        if ($prices['g95e5'] !== null) {
+                            $priceText = "  • Gasolina 95: <b>" . number_format($prices['g95e5'], 3) . " €</b>";
+                            if ($oldG95 !== null && abs($oldG95 - $prices['g95e5']) > 0.0001) {
+                                $diff = $prices['g95e5'] - $oldG95;
+                                $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
+                                $priceText .= " ⚠️ <i>(antes " . number_format($oldG95, 3) . " € | {$diffText} €)</i>";
+                            }
+                            $text .= $priceText . "\n";
+                        }
+                        $text .= "\n";
+                    }
+
+                    foreach ($users as $user) {
+                        $telegramService->sendMessage($user->telegram_chat_id, $text);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error("Failed to send own price change notification: " . $e->getMessage());
+            }
+
             file_put_contents($filePath, json_encode($currentPrices, JSON_PRETTY_PRINT));
 
             $statusData = [
