@@ -100,6 +100,11 @@ class MineturService
                     $margen = $s['Margen'] ?? '';
                     $id     = (int) ($s['IDEESS'] ?? 0);
 
+                    // Excluir nuestras propias gasolineras del top de competidores
+                    if (in_array($id, [6435, 7070, 13714, 13194])) {
+                        continue;
+                    }
+
                     if ($dPrice > 0) {
                         $diesel[] = [
                             'name'    => $name,
