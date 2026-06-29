@@ -369,38 +369,49 @@ button.fi-topbar-trigger {
     display: none !important; /* Ocultar para ganar espacio vertical */
 }
 
-/* Ancho máximo para la columna Nombre (es el 3er td debido a checkbox y avatar) para evitar que expanda la tabla */
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2),
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3),
-.fi-resource-recursos-humanos td.fi-table-cell:nth-child(2),
-.fi-resource-recursos-humanos td.fi-table-cell:nth-child(3) {
-    max-width: 150px !important;
-    width: 150px !important;
-    white-space: normal !important;
-    word-break: break-all !important;
-    overflow-wrap: break-word !important;
+/* Ocultar la barra de búsqueda redundante de la tabla (ya tenemos el input de filtros arriba) */
+.fi-resource-recursos-humanos .fi-ta-header-toolbar {
+    display: none !important;
 }
 
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2) *,
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) *,
-.fi-resource-recursos-humanos td.fi-table-cell:nth-child(2) *,
-.fi-resource-recursos-humanos td.fi-table-cell:nth-child(3) * {
-    white-space: normal !important;
-    word-break: break-all !important;
-    overflow-wrap: break-word !important;
-}
-
-/* Forzar ancho y diseño fijo a la tabla para evitar scrolls */
+/* Forzar distribución de anchos de columna óptima sin romper el layout */
 .fi-resource-recursos-humanos table {
-    table-layout: fixed !important;
+    table-layout: auto !important;
     width: 100% !important;
 }
 
-.fi-resource-recursos-humanos th:nth-child(2),
-.fi-resource-recursos-humanos th:nth-child(3) {
-    width: 150px !important;
-    max-width: 150px !important;
+/* Columna Nombre: Más ancha para que no rompa en 2 filas */
+.fi-resource-recursos-humanos th:nth-child(3),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
+    width: 320px !important;
+    max-width: 350px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
+
+/* Columnas secundarias: Más estrechas para que quepan */
+.fi-resource-recursos-humanos th:nth-child(4),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4),
+.fi-resource-recursos-humanos th:nth-child(5),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
+    width: 110px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Columna Puesto */
+.fi-resource-recursos-humanos th:nth-child(6),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(6) {
+    width: 100px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
 
 
 
