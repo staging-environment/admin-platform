@@ -45,23 +45,19 @@ class EmpleadosTable
                             return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
                         })
                         ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                        ->size('sm')
                         ->grow(false),
 
                     TextColumn::make('detalles_empleado')
                         ->color('gray')
-                        ->size('sm')
+                        ->size('xs')
                         ->state(function ($record) {
                             $parts = [];
                             if ($record->dni) $parts[] = $record->dni;
                             if ($record->telefono_principal) $parts[] = $record->telefono_principal;
                             $loc = trim($record->localidad ?? '');
-                            $prov = trim($record->provincia ?? '');
-                            if ($loc !== '' && $prov !== '') {
-                                $parts[] = "$loc ($prov)";
-                            } elseif ($loc !== '') {
+                            if ($loc !== '') {
                                 $parts[] = $loc;
-                            } elseif ($prov !== '') {
-                                $parts[] = $prov;
                             }
                             return implode('  •  ', $parts);
                         }),
