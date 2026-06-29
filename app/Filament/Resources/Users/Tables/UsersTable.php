@@ -84,7 +84,7 @@ class UsersTable
                 EditAction::make(),
                 \Filament\Actions\DeleteAction::make()
                     ->visible(fn () => auth()->user()->can('gestion_eliminar_usuarios')),
-                \Filament\Tables\Actions\Action::make('restoreEmpleado')
+                \Filament\Actions\Action::make('restoreEmpleado')
                     ->label('Restaurar')
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
