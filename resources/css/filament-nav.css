@@ -288,3 +288,15 @@ button.fi-topbar-trigger {
     padding: 2px !important;
     margin: 0 !important;
 }
+
+/* Ocultar el título de la página "Empleados" y el breadcrumb, manteniendo el botón de Crear */
+.fi-resource-recursos-humanos .fi-header-heading,
+.fi-resource-recursos-humanos .fi-breadcrumbs {
+    display: none !important;
+}
+
+/* Ocultar el título de "Filtros", pero mantener "Resetear los filtros" */
+.fi-resource-recursos-humanos .fi-ta-filters-header-heading,
+.fi-resource-recursos-humanos .fi-ta-filters-heading {
+    display: none !important;
+}
