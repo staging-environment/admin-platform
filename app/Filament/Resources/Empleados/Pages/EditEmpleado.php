@@ -14,19 +14,9 @@ class EditEmpleado extends EditRecord
     {
         return $schema
             ->components([
-                \Filament\Schemas\Components\Grid::make(12)
+                $this->getFormContentComponent()
                     ->columnSpanFull()
-                    ->schema([
-                        \Filament\Schemas\Components\Grid::make(1)
-                            ->schema([
-                                $this->getFormContentComponent(),
-                            ])
-                            ->columnSpan(7)
-                            ->extraAttributes(['class' => 'ficha-empleado-container']),
-                        $this->getRelationManagersContentComponent()
-                            ->columnSpan(5)
-                            ->extraAttributes(['class' => 'documentos-relation-container max-h-[600px] overflow-y-auto pr-2']),
-                    ]),
+                    ->extraAttributes(['class' => 'ficha-empleado-container']),
             ]);
     }
 
@@ -34,6 +24,15 @@ class EditEmpleado extends EditRecord
     {
         return [
             DeleteAction::make(),
+            \Filament\Actions\Action::make('manageDocuments')
+                ->label('Documentación')
+                ->icon('heroicon-o-document-duplicate')
+                ->color('warning')
+                ->modalHeading('Documentación del Empleado')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record]))
+                ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
         ];
     }
 }
