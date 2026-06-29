@@ -92,9 +92,6 @@ class UsersTable
                     ->modalHeading('¿Restaurar empleado?')
                     ->modalDescription('Esta acción volverá a activar al empleado y te redirigirá a su edición.')
                     ->visible(function ($record) {
-                        if (!$record->hasRole('Empleado')) {
-                            return false;
-                        }
                         $empleado = \App\Models\Empleado::onlyTrashed()->where('email', $record->email)->first();
                         return $empleado !== null;
                     })

@@ -58,10 +58,17 @@ class UserForm
                             $component->state(true);
                         }
                     })
-                    ->visible(function (Get $get) {
+                    ->visible(function (Get $get, $record) {
                         $roles = $get('roles') ?? [];
                         $empleadoRole = \Spatie\Permission\Models\Role::where('name', 'Empleado')->first();
-                        return $empleadoRole && in_array($empleadoRole->id, $roles);
+                        $hasEmpleadoRoleSelected = $empleadoRole && in_array($empleadoRole->id, $roles);
+                        if ($hasEmpleadoRoleSelected) {
+                            return true;
+                        }
+                        if ($record) {
+                            return \App\Models\Empleado::withTrashed()->where('email', $record->email)->exists();
+                        }
+                        return false;
                     }),
             ]);
     }
