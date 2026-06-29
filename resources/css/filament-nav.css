@@ -210,31 +210,65 @@ button.fi-topbar-trigger {
     color: #fca5a5 !important; /* red-300 */
 }
 
-/* Recursos Humanos: Estilo de listado tipo Excel ultra compacto */
+/* Recursos Humanos: Estilo de listado en cuadrícula (2 columnas) ultra compacto y plano (tipo excel) */
 .fi-resource-recursos-humanos .fi-ta-content {
-    border-collapse: collapse !important;
     border: none !important;
     box-shadow: none !important;
+    background: transparent !important;
 }
 
-.fi-resource-recursos-humanos table {
-    width: 100% !important;
+/* El contenedor del grid */
+.fi-resource-recursos-humanos .fi-ta-grid-container {
+    gap: 0 !important; /* sin espacios entre columnas/filas */
 }
 
-.fi-resource-recursos-humanos th,
-.fi-resource-recursos-humanos td {
-    padding: 2px 6px !important; /* márgenes mínimos en celdas para estilo excel */
+/* Quitar fondos y sombras de cada tarjeta de empleado */
+.fi-resource-recursos-humanos .fi-ta-grid-item,
+.fi-resource-recursos-humanos .fi-ta-grid-item-ctn,
+.fi-resource-recursos-humanos article,
+.fi-resource-recursos-humanos .fi-ta-record {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important; /* márgenes internos al mínimo absoluto */
+    margin: 0 !important;
     height: auto !important;
-    font-size: 0.8rem !important;
 }
 
-.fi-resource-recursos-humanos tr {
-    height: auto !important;
+/* Forzar borde inferior sutil entre filas */
+.fi-resource-recursos-humanos article,
+.fi-resource-recursos-humanos .fi-ta-record {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
-
-.dark .fi-resource-recursos-humanos tr {
+.dark .fi-resource-recursos-humanos article,
+.dark .fi-resource-recursos-humanos .fi-ta-record {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* El elemento del registro */
+.fi-resource-recursos-humanos .fi-ta-record {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* alinear todo a la izquierda */
+    width: 100% !important;
+    gap: 0.5rem !important;
+    padding: 2px 0 !important; /* muy poca separación vertical */
+}
+
+/* El contenedor de columnas */
+.fi-resource-recursos-humanos .fi-ta-record > div:first-child {
+    flex-grow: 0 !important; /* no estirar para que las acciones queden al lado */
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* El Split container inside */
+.fi-resource-recursos-humanos .fi-ta-record-content {
+    gap: 0.5rem !important;
+    align-items: center !important;
+    display: flex !important;
+    flex-direction: row !important;
 }
 
 /* Reducir el tamaño de los iconos y botones en las acciones */
@@ -242,13 +276,15 @@ button.fi-topbar-trigger {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.25rem !important;
     padding: 0 !important;
     margin: 0 !important;
+    margin-left: 0.5rem !important; /* separador del texto anterior */
 }
 
-.fi-resource-recursos-humanos .fi-ta-actions a,
-.fi-resource-recursos-humanos .fi-ta-actions button {
-    font-size: 0.75rem !important; /* hacer botones de editar/borrar más pequeños */
-    padding: 2px 6px !important;
+/* Quitar padding de los botones de icono */
+.fi-resource-recursos-humanos .fi-ta-actions button,
+.fi-resource-recursos-humanos .fi-ta-actions a {
+    padding: 2px !important;
+    margin: 0 !important;
 }
