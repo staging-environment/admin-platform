@@ -369,11 +369,22 @@ button.fi-topbar-trigger {
     display: none !important; /* Ocultar para ganar espacio vertical */
 }
 
-/* Ancho máximo para la columna Nombre para evitar que expanda la tabla */
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2) {
-    max-width: 250px !important;
-    overflow: hidden !important;
+/* Ancho máximo para la columna Nombre (es el 3er td debido a checkbox y avatar) para evitar que expanda la tabla */
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2),
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) {
+    max-width: 180px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
 }
+
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2) *,
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) * {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
 
 
 
