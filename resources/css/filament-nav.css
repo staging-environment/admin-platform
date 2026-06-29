@@ -371,19 +371,37 @@ button.fi-topbar-trigger {
 
 /* Ancho máximo para la columna Nombre (es el 3er td debido a checkbox y avatar) para evitar que expanda la tabla */
 .fi-resource-recursos-humanos .fi-ta-cell:nth-child(2),
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) {
-    max-width: 180px !important;
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3),
+.fi-resource-recursos-humanos td.fi-table-cell:nth-child(2),
+.fi-resource-recursos-humanos td.fi-table-cell:nth-child(3) {
+    max-width: 150px !important;
+    width: 150px !important;
     white-space: normal !important;
-    word-break: break-word !important;
+    word-break: break-all !important;
     overflow-wrap: break-word !important;
 }
 
 .fi-resource-recursos-humanos .fi-ta-cell:nth-child(2) *,
-.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) * {
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(3) *,
+.fi-resource-recursos-humanos td.fi-table-cell:nth-child(2) *,
+.fi-resource-recursos-humanos td.fi-table-cell:nth-child(3) * {
     white-space: normal !important;
-    word-break: break-word !important;
+    word-break: break-all !important;
     overflow-wrap: break-word !important;
 }
+
+/* Forzar ancho y diseño fijo a la tabla para evitar scrolls */
+.fi-resource-recursos-humanos table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+.fi-resource-recursos-humanos th:nth-child(2),
+.fi-resource-recursos-humanos th:nth-child(3) {
+    width: 150px !important;
+    max-width: 150px !important;
+}
+
 
 
 
