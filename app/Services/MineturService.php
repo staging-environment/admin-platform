@@ -81,6 +81,9 @@ class MineturService
                 return;
             }
 
+            $previousHistory = Cache::get('minetur_all_prices_history', []);
+            $newHistory = $previousHistory;
+
             foreach (self::LOCALITIES as $key => $config) {
                 $diesel = [];
                 $gas95  = [];
@@ -101,6 +104,14 @@ class MineturService
 
                     $margen = $s['Margen'] ?? '';
                     $id     = (int) ($s['IDEESS'] ?? 0);
+
+                    if ($id > 0) {
+                        $newHistory[$id] = [
+                            'diesel' => $dPrice > 0 ? $dPrice : ($previousHistory[$id]['diesel'] ?? null),
+                            'gas95'  => $gPrice > 0 ? $gPrice : ($previousHistory[$id]['gas95'] ?? null),
+                            'name'   => $name,
+                        ];
+                    }
 
                     if ($dPrice > 0) {
                         $diesel[] = [
@@ -154,10 +165,10 @@ class MineturService
 
                     if ($hasChanged) {
                         try {
-                            if ($dieselChanged && $this->hasCompetitorChanges($newDiesel, $cached['diesel'] ?? [])) {
+                            if ($dieselChanged && $this->hasCompetitorChanges($newDiesel, $cached['diesel'] ?? [], 'diesel')) {
                                 $this->notifyChanges($key, 'diesel', $newDiesel, $cached['diesel'] ?? []);
                             }
-                            if ($gas95Changed && $this->hasCompetitorChanges($newGas95, $cached['gas95'] ?? [])) {
+                            if ($gas95Changed && $this->hasCompetitorChanges($newGas95, $cached['gas95'] ?? [], 'gas95')) {
                                 $this->notifyChanges($key, 'gas95', $newGas95, $cached['gas95'] ?? []);
                             }
                         } catch (\Throwable $e) {
@@ -179,6 +190,8 @@ class MineturService
                 Cache::put("minetur_{$key}", $dataToStore, self::CACHE_TTL);
             }
 
+            Cache::put('minetur_all_prices_history', $newHistory, now()->addDays(30));
+
             Log::info('MineturService: Refreshed ' . count(self::LOCALITIES) . ' localities. Stations total: ' . count($stations) . '. Date: ' . $updatedAt);
 
         } catch (\Throwable $e) {
@@ -196,7 +209,9 @@ class MineturService
         $text = "🔔 <b>Cambio de precios de la competencia</b>\n";
         $text .= "Localidad: <b>{$localityName}</b>\n\n";
 
-        // Create lookups for old prices
+        $previousHistory = Cache::get('minetur_all_prices_history', []);
+
+        // Create lookups for old prices (fallback)
         $oldPricesLookup = [];
         foreach ($oldPrices as $s) {
             $oldPricesLookup[$s['id']] = $s['price'];
@@ -210,7 +225,10 @@ class MineturService
 
         foreach (array_slice($newPrices, 0, 5) as $idx => $s) {
             $num = $idx + 1;
-            $oldPrice = $oldPricesLookup[$s['id']] ?? null;
+            
+            // Check global history first, fallback to cached top 5
+            $oldPrice = $previousHistory[$s['id']][$fuelType] ?? ($oldPricesLookup[$s['id']] ?? null);
+            
             $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
             $highlight = "";
             $stationName = $s['name'];
@@ -287,8 +305,10 @@ class MineturService
     /**
      * Check if a price change list contains changes on competitor stations.
      */
-    private function hasCompetitorChanges(array $newPrices, array $oldPrices): bool
+    private function hasCompetitorChanges(array $newPrices, array $oldPrices, string $fuelType): bool
     {
+        $previousHistory = Cache::get('minetur_all_prices_history', []);
+
         $oldPricesLookup = [];
         foreach ($oldPrices as $s) {
             $oldPricesLookup[$s['id']] = $s['price'];
@@ -301,9 +321,10 @@ class MineturService
             }
 
             $newPrice = $s['price'];
-            $oldPrice = $oldPricesLookup[$id] ?? null;
+            $oldPrice = $previousHistory[$id][$fuelType] ?? ($oldPricesLookup[$id] ?? null);
 
-            if ($oldPrice === null || abs($oldPrice - $newPrice) > 0.0001) {
+            // Only notify if we have a previous price AND it actually changed
+            if ($oldPrice !== null && abs($oldPrice - $newPrice) > 0.0001) {
                 return true;
             }
         }
