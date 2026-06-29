@@ -526,7 +526,7 @@
         setInterval(fetchMarkets, POLL_INTERVAL);
 
         /* Helpers to build DOM elements programmatically (bypassing Trusted Types CSP restrictions) */
-        function createStationRow(rank, station, fuelType) {
+        function createStationRow(rank, station, fuelType, localityName) {
             var row = document.createElement('div');
             row.className = 'station-row' + (rank === 0 ? ' rank-1' : '');
             if (fuelType === 'gas95' && rank === 0) {
@@ -549,7 +549,7 @@
             infoCol.className = 'flex-1 min-w-0';
 
             var link = document.createElement('a');
-            var mapQuery = encodeURIComponent(station.name + ', ' + station.address);
+            var mapQuery = encodeURIComponent(station.name + ', ' + station.address + ', ' + (localityName || ''));
             link.href = 'https://www.google.com/maps/search/?api=1&query=' + mapQuery;
             link.target = '_blank';
             link.className = 'hover:underline block group';
@@ -634,8 +634,16 @@
             .then(function (data) {
                 if (!data || !data.localities) return;
                 
+                const localityNames = {
+                    utrera: 'Utrera',
+                    sevilla: 'Sevilla',
+                    el_cuervo: 'El Cuervo de Sevilla',
+                    lebrija: 'Lebrija'
+                };
+
                 Object.keys(data.localities).forEach(function (key) {
                     var locality = data.localities[key];
+                    var localityName = localityNames[key] || '';
                     
                     // Update timestamp
                     var timeEl = document.getElementById('updated-time-' + key);
@@ -655,7 +663,7 @@
                         dieselContainer.textContent = '';
                         if (locality.diesel && locality.diesel.length > 0) {
                             locality.diesel.forEach(function (station, rank) {
-                                dieselContainer.appendChild(createStationRow(rank, station, 'diesel'));
+                                dieselContainer.appendChild(createStationRow(rank, station, 'diesel', localityName));
                             });
                         } else {
                             dieselContainer.appendChild(createEmptyState());
@@ -668,7 +676,7 @@
                         gas95Container.textContent = '';
                         if (locality.gas95 && locality.gas95.length > 0) {
                             locality.gas95.forEach(function (station, rank) {
-                                gas95Container.appendChild(createStationRow(rank, station, 'gas95'));
+                                gas95Container.appendChild(createStationRow(rank, station, 'gas95', localityName));
                             });
                         } else {
                             gas95Container.appendChild(createEmptyState());

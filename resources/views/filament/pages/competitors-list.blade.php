@@ -52,7 +52,7 @@
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
-                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address']) }}" 
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address'] . ', ' . $localityName) }}" 
                                            target="_blank" 
                                            class="hover:underline block group"
                                            title="Ver en Google Maps">
@@ -97,7 +97,7 @@
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
-                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address']) }}" 
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($station['name'] . ', ' . $station['address'] . ', ' . $localityName) }}" 
                                            target="_blank" 
                                            class="hover:underline block group"
                                            title="Ver en Google Maps">
