@@ -4,14 +4,15 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\Schema;
-
-echo "Columns in local 'empleados':\n";
-print_r(Schema::getColumnListing('empleados'));
+use Illuminate\Support\Facades\DB;
 
 try {
-    echo "Columns in 'virtusgesnet' table 'estaciones':\n";
-    print_r(Schema::connection('virtusgesnet')->getColumnListing('estaciones'));
+    echo "Raw DESCRIBE estaciones:\n";
+    $results = DB::connection('virtusgesnet')->select("DESCRIBE estaciones");
+    foreach ($results as $row) {
+        $row = (array)$row;
+        echo $row['Field'] . " - " . $row['Type'] . "\n";
+    }
 } catch (\Exception $e) {
-    echo "Error virtusgesnet connection: " . $e->getMessage() . "\n";
+    echo "Error describing: " . $e->getMessage() . "\n";
 }
