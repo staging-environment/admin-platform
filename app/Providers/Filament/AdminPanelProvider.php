@@ -53,7 +53,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
-                \App\Filament\Widgets\TelegramSetupWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -68,10 +67,54 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => \Illuminate\Support\Facades\Blade::render("
-                    @vite(['resources/css/filament-nav.css'])
-                    @include('filament.custom-filepond')
-                "),
+                function (): string {
+                    $css = \Illuminate\Support\Facades\Blade::render("
+                        @vite(['resources/css/filament-nav.css'])
+                        @include('filament.custom-filepond')
+                    ");
+                    if (request()->is('admin/recursos-humanos*')) {
+                        $css .= "
+                        <style>
+                            .fi-main-ctn,
+                            .fi-layout,
+                            main,
+                            .fi-content {
+                                padding-top: 0px !important;
+                                margin-top: 0px !important;
+                            }
+                            .fi-layout {
+                                display: flex !important;
+                                flex-direction: column !important;
+                                grid-template-rows: 1fr !important;
+                                gap: 0 !important;
+                                min-height: 0 !important;
+                            }
+                            .fi-main-ctn {
+                                display: flex !important;
+                                flex-direction: column !important;
+                                gap: 0 !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                flex-grow: 1 !important;
+                            }
+                            .fi-main {
+                                padding-top: 0px !important;
+                                margin-top: 0px !important;
+                            }
+                            .fi-header {
+                                margin-top: 0px !important;
+                                padding-top: 0px !important;
+                                margin-bottom: 0.25rem !important;
+                                gap: 0.15rem !important;
+                            }
+                            .fi-breadcrumbs {
+                                margin-bottom: 0px !important;
+                            }
+                        </style>
+                        ";
+                    }
+                    return $css;
+                }
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::BODY_START,
