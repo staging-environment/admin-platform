@@ -210,6 +210,32 @@ button.fi-topbar-trigger {
     color: #fca5a5 !important; /* red-300 */
 }
 
+/* Recursos Humanos: Listado ultra compacto sin bordes y con márgenes reducidos */
+.fi-resource-recursos-humanos .fi-ta-content {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.fi-resource-recursos-humanos .fi-ta-grid-container {
+    gap: 0.5rem !important; /* reducir espacio entre columnas y filas */
+}
+
+.fi-resource-recursos-humanos .fi-ta-grid-item,
+.fi-resource-recursos-humanos .fi-ta-grid-item-ctn,
+.fi-resource-recursos-humanos article,
+.fi-resource-recursos-humanos .fi-ta-record {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0.15rem 0.25rem !important; /* márgenes internos al mínimo */
+    margin: 0 !important;
+}
+
+.fi-resource-recursos-humanos .fi-ta-record-content {
+    gap: 0.5rem !important;
+}
+
 
 
 
