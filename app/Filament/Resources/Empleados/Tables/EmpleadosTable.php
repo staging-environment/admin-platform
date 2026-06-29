@@ -18,53 +18,47 @@ class EmpleadosTable
         return $table
             ->recordUrl(fn (\App\Models\Empleado $record): string => \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]))
             ->columns([
-                Split::make([
-                    ImageColumn::make('foto')
-                        ->label('Foto')
-                        ->circular()
-                        ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
-                        ->size(36)
-                        ->grow(false),
+                ImageColumn::make('foto')
+                    ->label('')
+                    ->circular()
+                    ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
+                    ->size(32),
 
-                    TextColumn::make('nombre_completo_tarjeta')
-                        ->state(function (\App\Models\Empleado $record) {
-                            $nombre = trim($record->nombre);
-                            $apellidos = trim($record->apellidos ?? '');
+                TextColumn::make('nombre_completo_tarjeta')
+                    ->label('Nombre')
+                    ->state(function (\App\Models\Empleado $record) {
+                        $nombre = trim($record->nombre);
+                        $apellidos = trim($record->apellidos ?? '');
 
-                            if (empty($apellidos)) {
-                                    return mb_strtoupper($nombre);
-                            }
+                        if (empty($apellidos)) {
+                                return mb_strtoupper($nombre);
+                        }
 
-                            $parts = preg_split('/\s+/', $apellidos);
-                            $primerApellido = array_shift($parts);
-                            $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
+                        $parts = preg_split('/\s+/', $apellidos);
+                        $primerApellido = array_shift($parts);
+                        $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
 
-                            if ($segundoApellido !== '') {
-                                    return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($segundoApellido) . ' ' . mb_strtoupper($nombre);
-                            }
-                            return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
-                        })
-                        ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                        ->size('sm')
-                        ->grow(false),
+                        if ($segundoApellido !== '') {
+                                return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($segundoApellido) . ' ' . mb_strtoupper($nombre);
+                        }
+                        return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
+                    })
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->size('sm'),
 
-                    TextColumn::make('detalles_empleado')
-                        ->color('gray')
-                        ->size('xs')
-                        ->state(function ($record) {
-                            $parts = [];
-                            if ($record->dni) $parts[] = $record->dni;
-                            if ($record->telefono_principal) $parts[] = $record->telefono_principal;
-                            $loc = trim($record->localidad ?? '');
-                            if ($loc !== '') {
-                                $parts[] = $loc;
-                            }
-                            return implode('  •  ', $parts);
-                        }),
-                ])
-            ])
-            ->contentGrid([
-                'md' => 2,
+                TextColumn::make('detalles_empleado')
+                    ->label('Detalles')
+                    ->color('gray')
+                    ->size('xs')
+                    ->state(function ($record) {
+                        $parts = [];
+                        if ($record->telefono_principal) $parts[] = $record->telefono_principal;
+                        $loc = trim($record->localidad ?? '');
+                        if ($loc !== '') {
+                            $parts[] = $loc;
+                        }
+                        return implode('  •  ', $parts);
+                    }),
             ])
             ->defaultSort('apellidos', 'asc')
             ->filters([
