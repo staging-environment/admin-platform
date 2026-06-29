@@ -299,3 +299,27 @@ button.fi-topbar-trigger {
 .fi-resource-recursos-humanos .fi-ta-filters-heading {
     display: none !important;
 }
+
+/* Reducir el espacio de la cabecera (breadcrumbs y botón de crear) al mínimo */
+.fi-resource-recursos-humanos .fi-header {
+    margin-bottom: 0.25rem !important;
+    gap: 0.15rem !important;
+}
+
+/* Reducir el margen superior del contenedor principal */
+.fi-resource-recursos-humanos .fi-main {
+    padding-top: 0.15rem !important;
+}
+
+/* Reducir márgenes en el formulario de filtros */
+.fi-resource-recursos-humanos .fi-ta-filters-form {
+    padding: 0.25rem !important;
+    gap: 0.25rem !important;
+}
+
+/* Espacio inferior de la cabecera de filtros */
+.fi-resource-recursos-humanos .fi-ta-filters-header {
+    margin-bottom: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+    padding-top: 0.15rem !important;
+}
