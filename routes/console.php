@@ -23,7 +23,5 @@ Schedule::job(new RefreshMineturJob)->everyFifteenMinutes();
 // Envía los precios actuales de nuestras 4 gasolineras a MITECO cada 5 minutos si hay cambios.
 Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->everyFiveMinutes();
 
-// ── Resumen Diario de Competencia por Telegram ─────────────────────────────────
-// Envía un resumen diario de precios a las 09:00 AM (Hora de Madrid).
-Schedule::command('telegram:send-daily-summary')->dailyAt('09:00')->timezone('Europe/Madrid');
+
 
