@@ -1,14 +1,5 @@
 <x-filament-panels::page>
-    <style>
-        .fi-header { display: none !important; }
-        .fi-main-ctn, main {
-            padding-top: 0.25rem !important;
-        }
-        .fi-page {
-            margin-top: 0px !important;
-            padding-top: 0px !important;
-        }
-    </style>
+
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     {{-- ESTILOS INLINE DEL DASHBOARD                                       --}}
@@ -130,7 +121,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
-    <div class="space-y-7" style="margin-top: -3.5rem !important;" wire:poll.30s="loadData">
+    <div class="space-y-7" wire:poll.30s="loadData">
 
         @if(auth()->user() && (auth()->user()->hasRole('Admin') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
             <section class="rounded-xl px-4 py-2.5 shadow-md border" 
