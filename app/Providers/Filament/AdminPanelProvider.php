@@ -32,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandLogo(fn () => view('components.logo'))
+            ->topNavigation()
+            ->topbar(false)
             ->colors([
                 'primary' => Color::Amber,
                 'danger' => Color::Red,
