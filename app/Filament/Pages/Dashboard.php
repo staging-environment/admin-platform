@@ -10,9 +10,11 @@ class Dashboard extends \Filament\Pages\Dashboard
 {
     protected string $view = 'filament.pages.dashboard';
 
-    protected static ?string $title            = 'Dashboard Energético';
+    protected static ?string $title            = '';
     protected static ?string $navigationLabel  = 'Panel';
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    public function getHeading(): string { return ''; }
 
     /** Datos de mercados internacionales (Yahoo Finance) */
     public array $gasoilData = [];
