@@ -236,12 +236,25 @@ button.fi-topbar-trigger {
 }
 
 /* Filas ultra-compactas y fuentes reducidas */
-.fi-resource-recursos-humanos .fi-ta-row td,
-.fi-resource-recursos-humanos tr.fi-ta-row > td {
-    padding-top: 1px !important;
-    padding-bottom: 1px !important;
+.fi-resource-recursos-humanos .fi-ta-cell,
+.fi-resource-recursos-humanos tr.fi-ta-row > td.fi-ta-cell {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
     padding-left: 4px !important;
     padding-right: 4px !important;
+    height: auto !important;
+}
+
+/* Remover altura y padding de contenedores internos */
+.fi-resource-recursos-humanos .fi-ta-cell > div,
+.fi-resource-recursos-humanos .fi-ta-col-wrp,
+.fi-resource-recursos-humanos .fi-ta-text,
+.fi-resource-recursos-humanos .fi-ta-text-item {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    min-height: 0px !important;
 }
 
 .fi-resource-recursos-humanos .fi-ta-row td * {
