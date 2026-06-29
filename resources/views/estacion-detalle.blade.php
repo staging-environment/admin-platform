@@ -417,12 +417,19 @@
                                     <textarea name="mensaje" rows="5" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                                 </div>
 
-                                {{-- Captcha Matemático --}}
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-2">Verificación de seguridad: ¿Cuánto es {{ $num1 }} + {{ $num2 }}?</label>
-                                    <input type="number" name="captcha_answer" required class="w-full md:w-1/2 bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all outline-none text-sm" placeholder="Escribe el resultado aquí">
-                                    <input type="hidden" name="captcha_token" value="{{ $captcha_token }}">
-                                </div>
+                                <div id="security-wrapper-estacion"></div>
+                                <script>
+                                    setTimeout(function() {
+                                        var container = document.getElementById('security-wrapper-estacion');
+                                        if (container) {
+                                            var input = document.createElement('input');
+                                            input.type = 'hidden';
+                                            input.name = 'security_check';
+                                            input.value = '{{ encrypt(date("Y-m-d") . "_utrecar_human_key") }}';
+                                            container.appendChild(input);
+                                        }
+                                    }, 100);
+                                </script>
 
                                 <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30 uppercase tracking-wider">
                                     Enviar Mensaje

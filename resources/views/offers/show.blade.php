@@ -140,12 +140,19 @@
                             </div>
                         </div>
 
-                        {{-- Captcha Matemático --}}
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Verificación de seguridad: ¿Cuánto es {{ $num1 }} + {{ $num2 }}? *</label>
-                            <input type="number" name="captcha_answer" required class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 transition-all outline-none text-sm" placeholder="Escribe el resultado aquí">
-                            <input type="hidden" name="captcha_token" value="{{ $captcha_token }}">
-                        </div>
+                        <div id="security-wrapper-offers"></div>
+                        <script>
+                            setTimeout(function() {
+                                var container = document.getElementById('security-wrapper-offers');
+                                if (container) {
+                                    var input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = 'security_check';
+                                    input.value = '{{ encrypt(date("Y-m-d") . "_utrecar_human_key") }}';
+                                    container.appendChild(input);
+                                }
+                            }, 100);
+                        </script>
 
                         <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/35 transition-all duration-300 uppercase tracking-widest">
                             Enviar candidatura

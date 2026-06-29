@@ -128,24 +128,30 @@ Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
     if ($request->filled('website_url_check')) {
         return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
     }
+
+    // Invisible antispam check (Honeypot + JS execution check)
+    if (!$request->has('security_check')) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
+
+    try {
+        $decrypted = decrypt($request->security_check);
+        $todayKey = date("Y-m-d") . "_utrecar_human_key";
+        $yesterdayKey = date("Y-m-d", strtotime("-1 day")) . "_utrecar_human_key";
+        
+        if ($decrypted !== $todayKey && $decrypted !== $yesterdayKey) {
+            return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
     
     $codigo = $estacion->Codigo;
     $request->validate([
         'nombre' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'mensaje' => 'required|string',
-        'captcha_answer' => 'required|numeric',
-        'captcha_token' => 'required|string',
     ]);
-
-    try {
-        $correctAnswer = decrypt($request->captcha_token);
-        if ((int)$request->captcha_answer !== (int)$correctAnswer) {
-            return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
-        }
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
-    }
 
     ContactoMensaje::create([
         'gasolinera_codigo' => $codigo,
@@ -163,22 +169,28 @@ Route::post('/contacto', function (Request $request) {
         return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
     }
 
+    // Invisible antispam check (Honeypot + JS execution check)
+    if (!$request->has('security_check')) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
+
+    try {
+        $decrypted = decrypt($request->security_check);
+        $todayKey = date("Y-m-d") . "_utrecar_human_key";
+        $yesterdayKey = date("Y-m-d", strtotime("-1 day")) . "_utrecar_human_key";
+        
+        if ($decrypted !== $todayKey && $decrypted !== $yesterdayKey) {
+            return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');
+    }
+
     $request->validate([
         'nombre' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'mensaje' => 'required|string',
-        'captcha_answer' => 'required|numeric',
-        'captcha_token' => 'required|string',
     ]);
-
-    try {
-        $correctAnswer = decrypt($request->captcha_token);
-        if ((int)$request->captcha_answer !== (int)$correctAnswer) {
-            return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
-        }
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
-    }
 
     ContactoMensaje::create([
         'gasolinera_codigo' => null,

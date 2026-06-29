@@ -77,6 +77,26 @@ class JobOfferController extends Controller
                 ->with('success', '¡Tu candidatura se ha enviado correctamente! Muchas gracias por tu interés.');
         }
 
+        // Invisible antispam check (Honeypot + JS execution check)
+        if (!$request->has('security_check')) {
+            return redirect()->route('offers.show', $offer->id)
+                ->with('success', '¡Tu candidatura se ha enviado correctamente! Muchas gracias por tu interés.');
+        }
+
+        try {
+            $decrypted = decrypt($request->security_check);
+            $todayKey = date("Y-m-d") . "_utrecar_human_key";
+            $yesterdayKey = date("Y-m-d", strtotime("-1 day")) . "_utrecar_human_key";
+            
+            if ($decrypted !== $todayKey && $decrypted !== $yesterdayKey) {
+                return redirect()->route('offers.show', $offer->id)
+                    ->with('success', '¡Tu candidatura se ha enviado correctamente! Muchas gracias por tu interés.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->route('offers.show', $offer->id)
+                ->with('success', '¡Tu candidatura se ha enviado correctamente! Muchas gracias por tu interés.');
+        }
+
         $request->validate([
             'first_name'          => 'required|string|max:255',
             'last_name'           => 'required|string|max:255',
@@ -87,18 +107,7 @@ class JobOfferController extends Controller
             'incorporation_time'  => 'nullable|string|max:255',
             'travel_possibility'  => 'nullable|boolean',
             'cv'                  => 'required|file|mimes:pdf,doc,docx|max:5120',
-            'captcha_answer'      => 'required|numeric',
-            'captcha_token'       => 'required|string',
         ]);
-
-        try {
-            $correctAnswer = decrypt($request->captcha_token);
-            if ((int)$request->captcha_answer !== (int)$correctAnswer) {
-                return redirect()->back()->withErrors(['captcha_answer' => 'La respuesta a la verificación de seguridad es incorrecta.'])->withInput();
-            }
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['captcha_answer' => 'La verificación de seguridad ha fallado. Por favor, intente de nuevo.'])->withInput();
-        }
 
         // Guardar el CV en el disco privado configurado para candidaturas
         $cvPath = $request->file('cv')->store('cvs', 'private_cvs');
