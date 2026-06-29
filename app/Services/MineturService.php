@@ -18,6 +18,8 @@ class MineturService
         'lebrija'   => ['name' => 'Lebrija',              'match' => 'LEBRIJA',               'exact' => true],
     ];
 
+    const OUR_STATIONS = [6435, 7070, 13714, 13194];
+
     /**
      * Devuelve los datos cacheados de una localidad (diesel + gas95, Top 5).
      */
@@ -100,11 +102,6 @@ class MineturService
                     $margen = $s['Margen'] ?? '';
                     $id     = (int) ($s['IDEESS'] ?? 0);
 
-                    // Excluir nuestras propias gasolineras del top de competidores
-                    if (in_array($id, [6435, 7070, 13714, 13194])) {
-                        continue;
-                    }
-
                     if ($dPrice > 0) {
                         $diesel[] = [
                             'name'    => $name,
@@ -157,10 +154,10 @@ class MineturService
 
                     if ($hasChanged) {
                         try {
-                            if ($dieselChanged) {
+                            if ($dieselChanged && $this->hasCompetitorChanges($newDiesel, $cached['diesel'] ?? [])) {
                                 $this->notifyChanges($key, 'diesel', $newDiesel, $cached['diesel'] ?? []);
                             }
-                            if ($gas95Changed) {
+                            if ($gas95Changed && $this->hasCompetitorChanges($newGas95, $cached['gas95'] ?? [])) {
                                 $this->notifyChanges($key, 'gas95', $newGas95, $cached['gas95'] ?? []);
                             }
                         } catch (\Throwable $e) {
@@ -285,5 +282,31 @@ class MineturService
         foreach ($usersToAlert as $user) {
             $telegramService->sendMessage($user->telegram_chat_id, $text);
         }
+    }
+
+    /**
+     * Check if a price change list contains changes on competitor stations.
+     */
+    private function hasCompetitorChanges(array $newPrices, array $oldPrices): bool
+    {
+        $oldPricesLookup = [];
+        foreach ($oldPrices as $s) {
+            $oldPricesLookup[$s['id']] = $s['price'];
+        }
+
+        foreach ($newPrices as $s) {
+            $id = $s['id'];
+            if (in_array($id, self::OUR_STATIONS)) {
+                continue;
+            }
+
+            $newPrice = $s['price'];
+            $oldPrice = $oldPricesLookup[$id] ?? null;
+
+            if ($oldPrice === null || abs($oldPrice - $newPrice) > 0.0001) {
+                return true;
+            }
+        }
+        return false;
     }
 }
