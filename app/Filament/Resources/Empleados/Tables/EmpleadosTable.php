@@ -23,7 +23,7 @@ class EmpleadosTable
                         ->label('Foto')
                         ->circular()
                         ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
-                        ->size(80)
+                        ->size(48)
                         ->grow(false),
 
                     Stack::make([
@@ -36,38 +36,45 @@ class EmpleadosTable
                                     return mb_strtoupper($nombre);
                                 }
 
-                                return mb_strtoupper($apellidos) . ', ' . mb_strtoupper($nombre);
+                                $parts = preg_split('/\s+/', $apellidos);
+                                $primerApellido = array_shift($parts);
+                                $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
+
+                                if ($segundoApellido !== '') {
+                                    return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($segundoApellido) . ' ' . mb_strtoupper($nombre);
+                                }
+                                return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
                             })
-                            ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                            ->size('lg'),
+                            ->weight(\Filament\Support\Enums\FontWeight::Bold),
 
-                        TextColumn::make('dni')
-                            ->icon('heroicon-m-identification')
+                        TextColumn::make('dni_telefono')
                             ->color('gray')
-                            ->state(fn ($record) => $record->dni ?? 'Sin DNI'),
-
-                        TextColumn::make('email')
-                            ->icon('heroicon-m-envelope')
-                            ->color('gray')
-                            ->state(fn ($record) => $record->email ?? 'Sin Email'),
-
-                        TextColumn::make('telefono_principal')
-                            ->icon('heroicon-m-phone')
-                            ->color('gray')
-                            ->state(fn ($record) => $record->telefono_principal ?? 'Sin Teléfono'),
-
-                        TextColumn::make('localidad_provincia')
-                            ->icon('heroicon-m-map-pin')
-                            ->color('gray')
+                            ->size('sm')
                             ->state(function ($record) {
+                                $parts = [];
+                                if ($record->dni) $parts[] = $record->dni;
+                                if ($record->telefono_principal) $parts[] = $record->telefono_principal;
+                                return implode('  •  ', $parts);
+                            }),
+
+                        TextColumn::make('email_localidad')
+                            ->color('gray')
+                            ->size('sm')
+                            ->state(function ($record) {
+                                $parts = [];
+                                if ($record->email) $parts[] = $record->email;
                                 $loc = trim($record->localidad ?? '');
                                 $prov = trim($record->provincia ?? '');
                                 if ($loc !== '' && $prov !== '') {
-                                    return "$loc ($prov)";
+                                    $parts[] = "$loc ($prov)";
+                                } elseif ($loc !== '') {
+                                    $parts[] = $loc;
+                                } elseif ($prov !== '') {
+                                    $parts[] = $prov;
                                 }
-                                return $loc !== '' ? $loc : ($prov !== '' ? $prov : 'Sin localización');
+                                return implode('  •  ', $parts);
                             }),
-                    ])->space(1),
+                    ])->space(0.5),
                 ])
             ])
             ->contentGrid([
@@ -75,13 +82,8 @@ class EmpleadosTable
             ])
             ->defaultSort('apellidos', 'asc')
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('gasolinera_codigo')
-                    ->label('Ubicación de trabajo')
-                    ->options(function () {
-                        return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
-                    }),
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
-                    ->label('Localidad (Residencia)')
+                    ->label('Localidad')
                     ->options(function () {
                         return \App\Models\Empleado::query()
                             ->select('localidad')
