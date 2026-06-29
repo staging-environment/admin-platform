@@ -222,56 +222,54 @@ button.fi-topbar-trigger {
     gap: 0 !important; /* sin espacios entre columnas/filas */
 }
 
-/* Quitar fondos y sombras de cada tarjeta de empleado */
+/* Quitar fondos, sombras de cada tarjeta de empleado y establecer borde sutil inferior */
 .fi-resource-recursos-humanos .fi-ta-grid-item,
-.fi-resource-recursos-humanos .fi-ta-grid-item-ctn,
-.fi-resource-recursos-humanos article,
-.fi-resource-recursos-humanos .fi-ta-record {
+.fi-resource-recursos-humanos article {
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    padding: 0 !important; /* márgenes internos al mínimo absoluto */
+    padding: 0 !important;
     margin: 0 !important;
-    height: auto !important;
-}
-
-/* Forzar borde inferior sutil entre filas */
-.fi-resource-recursos-humanos article,
-.fi-resource-recursos-humanos .fi-ta-record {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
-.dark .fi-resource-recursos-humanos article,
-.dark .fi-resource-recursos-humanos .fi-ta-record {
+
+.dark .fi-resource-recursos-humanos .fi-ta-grid-item,
+.dark .fi-resource-recursos-humanos article {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-/* El elemento del registro */
-.fi-resource-recursos-humanos .fi-ta-record {
+/* El div interno de la tarjeta (fuerza checkbox, contenido y acciones en la misma línea) */
+.fi-resource-recursos-humanos .fi-ta-grid-item > div,
+.fi-resource-recursos-humanos article > div {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* alinear todo a la izquierda */
-    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
     gap: 0.5rem !important;
-    padding: 2px 0 !important; /* muy poca separación vertical */
+    padding: 1px 0 !important; /* separación vertical mínima */
+    margin: 0 !important;
 }
 
-/* El contenedor de columnas */
-.fi-resource-recursos-humanos .fi-ta-record > div:first-child {
-    flex-grow: 0 !important; /* no estirar para que las acciones queden al lado */
+/* El contenedor de información */
+.fi-resource-recursos-humanos .fi-ta-record-content,
+.fi-resource-recursos-humanos .fi-ta-record-content-ctn {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
+    flex-grow: 0 !important;
+    gap: 0.5rem !important;
 }
 
 /* El Split container inside */
-.fi-resource-recursos-humanos .fi-ta-record-content {
-    gap: 0.5rem !important;
-    align-items: center !important;
+.fi-resource-recursos-humanos .fi-ta-record-content > div {
     display: flex !important;
     flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
-/* Reducir el tamaño de los iconos y botones en las acciones */
+/* Reducir el tamaño de los iconos y botones en las acciones y forzar inline */
 .fi-resource-recursos-humanos .fi-ta-actions {
     display: flex !important;
     flex-direction: row !important;
@@ -280,6 +278,8 @@ button.fi-topbar-trigger {
     padding: 0 !important;
     margin: 0 !important;
     margin-left: 0.5rem !important; /* separador del texto anterior */
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
 }
 
 /* Quitar padding de los botones de icono */
