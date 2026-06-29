@@ -289,9 +289,8 @@ button.fi-topbar-trigger {
     margin: 0 !important;
 }
 
-/* Ocultar el título de la página "Empleados" y el breadcrumb, manteniendo el botón de Crear */
-.fi-resource-recursos-humanos .fi-header-heading,
-.fi-resource-recursos-humanos .fi-breadcrumbs {
+/* Ocultar el título de la página "Empleados", manteniendo el breadcrumb y el botón de Crear */
+.fi-resource-recursos-humanos .fi-header-heading {
     display: none !important;
 }
 
