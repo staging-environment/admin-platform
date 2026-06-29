@@ -120,10 +120,17 @@ class MineturService
                     }
                 }
 
-                // Ordenar exactamente igual que Miteco (Precio asc -> IDEESS asc)
+                // Ordenar exactamente igual que Miteco (Precio asc -> Margen N < D < I -> IDEESS asc)
                 $mitecoSort = function ($a, $b) {
                     if ($a['price'] != $b['price']) {
                         return $a['price'] <=> $b['price'];
+                    }
+
+                    $margenOrder = ['N' => 1, 'D' => 2, 'I' => 3];
+                    $mA = $margenOrder[$a['margen']] ?? 4;
+                    $mB = $margenOrder[$b['margen']] ?? 4;
+                    if ($mA != $mB) {
+                        return $mA <=> $mB;
                     }
 
                     return $a['id'] <=> $b['id'];
@@ -136,47 +143,21 @@ class MineturService
                 $newGas95  = array_slice($gas95, 0, 5);
 
                 $cached = $this->getLocalityData($key);
-                $hasChanged = true;
+                $hasChanged = false;
 
                 if (!empty($cached['diesel']) || !empty($cached['gas95'])) {
-                    $hasChanged = false;
-                    // Check diesel changes (only price or list composition changes)
-                    if (count($cached['diesel'] ?? []) !== count($newDiesel)) {
-                        $hasChanged = true;
-                    } else {
-                        $oldPrices = [];
-                        foreach ($cached['diesel'] ?? [] as $s) {
-                            $oldPrices[$s['id']] = $s['price'];
-                        }
-                        foreach ($newDiesel as $s) {
-                            if (!isset($oldPrices[$s['id']]) || abs($oldPrices[$s['id']] - $s['price']) > 0.0001) {
-                                $hasChanged = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Check gas95 changes (only price or list composition changes)
-                    if (!$hasChanged) {
-                        if (count($cached['gas95'] ?? []) !== count($newGas95)) {
-                            $hasChanged = true;
-                        } else {
-                            $oldPrices = [];
-                            foreach ($cached['gas95'] ?? [] as $s) {
-                                $oldPrices[$s['id']] = $s['price'];
-                            }
-                            foreach ($newGas95 as $s) {
-                                if (!isset($oldPrices[$s['id']]) || abs($oldPrices[$s['id']] - $s['price']) > 0.0001) {
-                                    $hasChanged = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    $dieselChanged = json_encode($cached['diesel'] ?? []) !== json_encode($newDiesel);
+                    $gas95Changed = json_encode($cached['gas95'] ?? []) !== json_encode($newGas95);
+                    $hasChanged = $dieselChanged || $gas95Changed;
 
                     if ($hasChanged) {
                         try {
-                            $this->notifyChanges($key, $newDiesel, $newGas95, $cached['diesel'] ?? [], $cached['gas95'] ?? []);
+                            if ($dieselChanged) {
+                                $this->notifyChanges($key, 'diesel', $newDiesel, $cached['diesel'] ?? []);
+                            }
+                            if ($gas95Changed) {
+                                $this->notifyChanges($key, 'gas95', $newGas95, $cached['gas95'] ?? []);
+                            }
                         } catch (\Throwable $e) {
                             Log::error("MineturService notification error: " . $e->getMessage());
                         }
@@ -206,7 +187,7 @@ class MineturService
     /**
      * Send price change alerts to authorized users via Telegram.
      */
-    public function notifyChanges(string $localityKey, array $newDiesel, array $newGas95, array $oldDiesel = [], array $oldGas95 = []): void
+    public function notifyChanges(string $localityKey, string $fuelType, array $newPrices, array $oldPrices = []): void
     {
         $localityName = self::LOCALITIES[$localityKey]['name'] ?? ucfirst($localityKey);
         
@@ -214,43 +195,33 @@ class MineturService
         $text .= "Localidad: <b>{$localityName}</b>\n\n";
 
         // Create lookups for old prices
-        $oldDieselPrices = [];
-        foreach ($oldDiesel as $s) {
-            $oldDieselPrices[$s['id']] = $s['price'];
+        $oldPricesLookup = [];
+        foreach ($oldPrices as $s) {
+            $oldPricesLookup[$s['id']] = $s['price'];
         }
 
-        $oldGas95Prices = [];
-        foreach ($oldGas95 as $s) {
-            $oldGas95Prices[$s['id']] = $s['price'];
-        }
+        $fuelLabel = $fuelType === 'diesel' ? 'DIÉSEL' : 'GASOLINA 95';
+        $fuelEmoji = '⛽';
 
         $text .= "<b>Precios actuales (Top Competidores):</b>\n";
-        $text .= "⛽ <b>DIÉSEL:</b>\n";
-        foreach (array_slice($newDiesel, 0, 5) as $idx => $s) {
-            $num = $idx + 1;
-            $oldPrice = $oldDieselPrices[$s['id']] ?? null;
-            $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
-            $highlight = "";
-            if ($oldPrice !== null && abs($oldPrice - $s['price']) > 0.0001) {
-                $diff = $s['price'] - $oldPrice;
-                $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
-                $highlight = " ⚠️ <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
-            }
-            $text .= "  {$num}. {$s['name']}: {$priceText}{$highlight}\n";
-        }
+        $text .= "{$fuelEmoji} <b>{$fuelLabel}:</b>\n";
 
-        $text .= "\n⛽ <b>GASOLINA 95:</b>\n";
-        foreach (array_slice($newGas95, 0, 5) as $idx => $s) {
+        foreach (array_slice($newPrices, 0, 5) as $idx => $s) {
             $num = $idx + 1;
-            $oldPrice = $oldGas95Prices[$s['id']] ?? null;
+            $oldPrice = $oldPricesLookup[$s['id']] ?? null;
             $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
             $highlight = "";
+            $stationName = $s['name'];
+
             if ($oldPrice !== null && abs($oldPrice - $s['price']) > 0.0001) {
                 $diff = $s['price'] - $oldPrice;
                 $diffText = ($diff > 0 ? "+" : "") . number_format($diff, 3);
-                $highlight = " ⚠️ <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
+                $direction = $diff > 0 ? "sube" : "baja";
+                $highlight = " ⚠️ <b>({$direction})</b> <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
+                $stationName = "<b>{$stationName}</b>";
             }
-            $text .= "  {$num}. {$s['name']}: {$priceText}{$highlight}\n";
+
+            $text .= "  {$num}. {$stationName}: {$priceText}{$highlight}\n";
         }
 
         // Find users with the required permission and active Telegram linked
@@ -285,7 +256,7 @@ class MineturService
 
             if (!empty($diesel)) {
                 $text .= "  ⛽ <b>DIÉSEL:</b>\n";
-                foreach (array_slice($diesel, 0, 5) as $idx => $s) {
+                foreach (array_slice($diesel, 0, 3) as $idx => $s) {
                     $num = $idx + 1;
                     $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
                 }
@@ -293,7 +264,7 @@ class MineturService
 
             if (!empty($gas95)) {
                 $text .= "  ⛽ <b>GASOLINA 95:</b>\n";
-                foreach (array_slice($gas95, 0, 5) as $idx => $s) {
+                foreach (array_slice($gas95, 0, 3) as $idx => $s) {
                     $num = $idx + 1;
                     $text .= "    {$num}. {$s['name']}: <b>" . number_format($s['price'], 3) . " €</b>\n";
                 }
