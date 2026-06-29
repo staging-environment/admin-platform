@@ -26,10 +26,18 @@ button.fi-topbar-trigger {
     padding-bottom: 3rem !important;
 }
 
-.fi-header {
-    margin-bottom: 0.25rem !important;
+.fi-main-ctn,
+.fi-layout,
+main,
+.fi-content {
     padding-top: 0px !important;
-    padding-bottom: 0px !important;
+    margin-top: 0px !important;
+}
+
+.fi-header {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+    margin-bottom: 0.25rem !important;
     gap: 0.15rem !important;
 }
 
