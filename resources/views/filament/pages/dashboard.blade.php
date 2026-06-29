@@ -185,6 +185,72 @@
             </section>
         @endif
 
+        @php
+            $showContactAlerts = auth()->user()->hasRole('Admin') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com' || auth()->user()->can('ver_dashboard');
+            $showJobAlerts = auth()->user()->hasRole('Admin') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com' || auth()->user()->can('gestion_recursos_humanos');
+            
+            $unreadMessages = $showContactAlerts ? \App\Models\ContactoMensaje::with('gasolinera')->where('is_read', false)->orderBy('created_at', 'desc')->get() : collect();
+            $unreadApplications = $showJobAlerts ? \App\Models\JobApplication::with('jobOffer')->where('is_read', false)->orderBy('created_at', 'desc')->get() : collect();
+        @endphp
+
+        @if($unreadMessages->count() > 0 || $unreadApplications->count() > 0)
+            <div class="flex flex-col gap-3">
+                {{-- Contact Messages Banners (Red) --}}
+                @foreach($unreadMessages as $msg)
+                    <div class="bg-red-600 rounded-xl p-3 shadow-md flex flex-col md:flex-row md:items-center justify-between text-white border border-red-700" style="background-color: #dc2626; border-color: rgba(220, 38, 38, 0.4);">
+                        <div class="flex items-center gap-3 mb-2.5 md:mb-0">
+                            <div class="bg-white/20 p-1.5 rounded-full flex-shrink-0">
+                                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-white leading-tight">
+                                    @if($msg->gasolinera)
+                                        ¡Nuevo mensaje para {{ $msg->gasolinera->Nombre }}!
+                                    @else
+                                        ¡Nuevo mensaje de contacto principal!
+                                    @endif
+                                </h3>
+                                <p class="text-[11px] text-red-100 mt-0.5">
+                                    De: <strong class="text-white">{{ $msg->nombre }}</strong> ({{ $msg->email }}) · Hace {{ str_replace('hace ', '', $msg->created_at->diffForHumans()) }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ route('filament.admin.resources.contacto-mensajes.view', ['record' => $msg->id]) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-red-600 rounded-lg font-bold shadow hover:bg-gray-50 transition-all text-xs flex-shrink-0" style="color: #dc2626;">
+                            LEER MENSAJE
+                        </a>
+                    </div>
+                @endforeach
+
+                {{-- Job Applications Banners (Blue) --}}
+                @foreach($unreadApplications as $app)
+                    <div class="bg-blue-600 rounded-xl p-3 shadow-md flex flex-col md:flex-row md:items-center justify-between text-white border border-blue-700" style="background-color: #2563eb; border-color: rgba(37, 99, 235, 0.4);">
+                        <div class="flex items-center gap-3 mb-2.5 md:mb-0">
+                            <div class="bg-white/20 p-1.5 rounded-full flex-shrink-0">
+                                <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-white leading-tight">
+                                    ¡Nueva inscripción a: {{ $app->jobOffer->title ?? 'Oferta de empleo' }}!
+                                </h3>
+                                <p class="text-[11px] text-blue-100 mt-0.5">
+                                    Candidato: <strong class="text-white">{{ $app->first_name }} {{ $app->last_name }}</strong> ({{ $app->email }}) · Hace {{ str_replace('hace ', '', $app->created_at->diffForHumans()) }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ route('filament.admin.resources.job-applications.view', ['record' => $app->id]) }}" class="inline-flex items-center justify-center px-3 py-1.5 bg-white text-blue-600 rounded-lg font-bold shadow hover:bg-gray-50 transition-all text-xs flex-shrink-0" style="color: #2563eb;">
+                            VER CANDIDATURA
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         {{-- ZONA SUPERIOR: MERCADOS ENERGÉTICOS INTERNACIONALES            --}}
         {{-- ═══════════════════════════════════════════════════════════════ --}}
