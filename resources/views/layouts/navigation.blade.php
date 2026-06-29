@@ -11,18 +11,18 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
                     @if(auth()->user()?->can('ver_dashboard'))
-                        <x-nav-link :href="route('dashboard')" :active="request()->is('admin') || request()->is('admin/dashboard') || request()->routeIs('dashboard')">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             Inicio
                         </x-nav-link>
                     @endif
 
                     @if(auth()->user()?->can('gestion_recursos_humanos'))
-                        <div class="inline-flex h-full">
+                        <div class="inline-flex items-center">
                             <x-dropdown align="left" width="w-64">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out h-16 {{ (request()->is('admin/recursos-humanos*') || request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-indigo-600 font-bold border-indigo-500' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent' }}">
+                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin/recursos-humanos*') || request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
                                         <span>{{ __('Recursos humanos') }}</span>
                                         <svg class="ms-1.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -65,10 +65,10 @@
                     @endif
 
                     @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
-                        <div class="inline-flex h-full">
+                        <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out h-16 {{ (request()->is('admin*') && !request()->is('admin') && !request()->is('admin/dashboard') && !request()->is('admin/recursos-humanos*') && !request()->is('admin/file-explorer*') && !request()->is('admin/job-offers*') && !request()->is('admin/job-applications*')) ? 'text-indigo-600 font-bold border-indigo-500' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent' }}">
+                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin*') && !request()->is('admin/file-explorer*') && !request()->is('admin/job-offers*') && !request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
                                         <span>{{ __('Administración') }}</span>
                                         <svg class="ms-1.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -296,3 +296,42 @@
         </div>
     </div>
 </nav>
+
+<style>
+    /* Reducir espacio superior al mínimo */
+    .fi-main-ctn,
+    .fi-layout,
+    main,
+    .fi-content {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+    }
+    .fi-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-rows: 1fr !important;
+        gap: 0 !important;
+        min-height: 0 !important;
+    }
+    .fi-main-ctn {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-grow: 1 !important;
+    }
+    .fi-main {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+    }
+    .fi-header {
+        margin-top: 0px !important;
+        padding-top: 0px !important;
+        margin-bottom: 0.25rem !important;
+        gap: 0.15rem !important;
+    }
+    .fi-breadcrumbs {
+        margin-bottom: 0px !important;
+    }
+</style>
