@@ -72,7 +72,7 @@ class AdminPanelProvider extends PanelProvider
                         @vite(['resources/css/filament-nav.css'])
                         @include('filament.custom-filepond')
                     ");
-                    if (request()->is('admin/recursos-humanos*')) {
+                    if (str_contains(request()->url(), 'recursos-humanos')) {
                         $css .= "
                         <style>
                             .fi-main-ctn,
