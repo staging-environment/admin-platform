@@ -18,53 +18,59 @@ class EmpleadosTable
         return $table
             ->recordUrl(fn (\App\Models\Empleado $record): string => \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]))
             ->columns([
-                Split::make([
-                    ImageColumn::make('foto')
-                        ->label('')
-                        ->circular()
-                        ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
-                        ->size(32)
-                        ->grow(false),
+                ImageColumn::make('foto')
+                    ->label('')
+                    ->circular()
+                    ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
+                    ->size(28)
+                    ->grow(false),
 
-                    TextColumn::make('nombre_completo_tarjeta')
-                        ->state(function (\App\Models\Empleado $record) {
-                            $nombre = trim($record->nombre);
-                            $apellidos = trim($record->apellidos ?? '');
+                TextColumn::make('nombre_completo')
+                    ->label('Nombre')
+                    ->state(function (\App\Models\Empleado $record) {
+                        $nombre = trim($record->nombre);
+                        $apellidos = trim($record->apellidos ?? '');
 
-                            if (empty($apellidos)) {
-                                    return mb_strtoupper($nombre);
-                            }
+                        if (empty($apellidos)) {
+                            return mb_strtoupper($nombre);
+                        }
 
-                            $parts = preg_split('/\s+/', $apellidos);
-                            $primerApellido = array_shift($parts);
-                            $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
+                        $parts = preg_split('/\s+/', $apellidos);
+                        $primerApellido = array_shift($parts);
+                        $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
 
-                            if ($segundoApellido !== '') {
-                                    return mb_strtoupper($primerApellido) . ' ' . mb_strtoupper($segundoApellido) . ', ' . mb_strtoupper($nombre);
-                            }
-                            return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
-                        })
-                        ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                        ->size('sm')
-                        ->grow(false),
+                        if ($segundoApellido !== '') {
+                            return mb_strtoupper($primerApellido) . ' ' . mb_strtoupper($segundoApellido) . ', ' . mb_strtoupper($nombre);
+                        }
+                        return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
+                    })
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->size('sm')
+                    ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
+                        $q->where('nombre', 'like', "%{$search}%")
+                          ->orWhere('apellidos', 'like', "%{$search}%");
+                    })),
 
-                    TextColumn::make('detalles_empleado')
-                        ->color('gray')
-                        ->size('xs')
-                        ->state(function ($record) {
-                            $parts = [];
-                            if ($record->telefono_principal) $parts[] = $record->telefono_principal;
-                            $loc = trim($record->localidad ?? '');
-                            if ($loc !== '') {
-                                $parts[] = $loc;
-                            }
-                            return implode('  •  ', $parts);
-                        }),
-                ])
+                TextColumn::make('telefono_principal')
+                    ->label('Teléfono')
+                    ->size('xs')
+                    ->color('gray')
+                    ->default('—'),
+
+                TextColumn::make('localidad')
+                    ->label('Localidad')
+                    ->size('xs')
+                    ->color('gray')
+                    ->default('—'),
+
+                TextColumn::make('puesto')
+                    ->label('Puesto')
+                    ->size('xs')
+                    ->color('gray')
+                    ->default('—')
+                    ->visibleFrom('md'),
             ])
-            ->contentGrid([
-                'md' => 2,
-            ])
+            ->striped()
             ->defaultSort('apellidos', 'asc')
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
