@@ -51,6 +51,11 @@ button.fi-topbar-trigger {
     min-height: 0 !important;
 }
 
+/* Ocultar la cabecera de página (título) en el dashboard — tiene su propio diseño */
+.fi-page-dashboard .fi-header {
+    display: none !important;
+}
+
 /* Forzar la visibilidad de las migas de pan (breadcrumbs) en la cabecera en todos los tamaños de pantalla */
 .fi-header .fi-breadcrumbs {
     display: block !important;
