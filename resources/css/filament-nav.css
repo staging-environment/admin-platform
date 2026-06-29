@@ -226,14 +226,17 @@ button.fi-topbar-trigger {
    RECURSOS HUMANOS — Tabla compacta estilo Excel
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Quitar fondo/sombra/borde del card container exterior */
+/* Quitar fondo/sombra/borde del card container exterior y forzar no scroll */
 .fi-resource-recursos-humanos .fi-ta-ctn,
-.fi-resource-recursos-humanos .fi-ta-content {
+.fi-resource-recursos-humanos .fi-ta-content,
+.fi-resource-recursos-humanos .fi-ta-content-ctn {
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
     border-radius: 0 !important;
+    overflow-x: hidden !important;
 }
+
 
 /* Filas ultra-compactas y fuentes reducidas */
 .fi-resource-recursos-humanos .fi-ta-cell,
