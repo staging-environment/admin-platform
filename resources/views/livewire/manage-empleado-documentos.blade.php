@@ -22,7 +22,7 @@
                 Añadir Nuevo Documento
             </h3>
             
-            <form wire:submit.prevent="uploadDocument" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Documento</label>
                     <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
@@ -48,7 +48,7 @@
                         <input type="file" wire:model="file" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-950/20 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 transition-all cursor-pointer" />
                         @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                     </div>
-                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px] min-w-[80px]">
+                    <button type="button" wire:click="uploadDocument" class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px] min-w-[80px]">
                         <span wire:loading.remove wire:target="file">Subir</span>
                         <span wire:loading wire:target="file" class="flex items-center gap-1">
                             <svg class="animate-spin h-4.5 w-4.5 text-white" fill="none" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@
                         </span>
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     @endif
 
