@@ -4,15 +4,10 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Gasolinera;
 
-try {
-    echo "Raw DESCRIBE estaciones:\n";
-    $results = DB::connection('virtusgesnet')->select("DESCRIBE estaciones");
-    foreach ($results as $row) {
-        $row = (array)$row;
-        echo $row['Field'] . " - " . $row['Type'] . "\n";
-    }
-} catch (\Exception $e) {
-    echo "Error describing: " . $e->getMessage() . "\n";
+echo "All gasolineras in database:\n";
+$gasolineras = Gasolinera::all();
+foreach ($gasolineras as $g) {
+    echo "Codigo: " . $g->Codigo . " | Nombre: " . $g->Nombre . " | Poblacion: " . $g->Poblacion . " | Provincia: " . $g->Provincia . "\n";
 }
