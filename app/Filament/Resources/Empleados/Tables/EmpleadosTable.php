@@ -54,7 +54,6 @@ class EmpleadosTable
                             $parts = [];
                             if ($record->dni) $parts[] = $record->dni;
                             if ($record->telefono_principal) $parts[] = $record->telefono_principal;
-                            if ($record->email) $parts[] = $record->email;
                             $loc = trim($record->localidad ?? '');
                             $prov = trim($record->provincia ?? '');
                             if ($loc !== '' && $prov !== '') {
@@ -105,7 +104,6 @@ class EmpleadosTable
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->filtersFormColumns(2)
             ->actions([
-                \Filament\Actions\ViewAction::make(),
                 EditAction::make(),
                 \Filament\Actions\DeleteAction::make(),
             ])
