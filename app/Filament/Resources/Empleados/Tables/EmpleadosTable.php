@@ -58,7 +58,7 @@ class EmpleadosTable
                     ->color('gray')
                     ->default('—'),
 
-                 TextColumn::make('gasolinera.Poblacion')
+                 TextColumn::make('gasolinera.Nombre')
                     ->label('Localidad')
                     ->size('xs')
                     ->color('gray')
@@ -77,17 +77,17 @@ class EmpleadosTable
                     ->label('Localidad')
                     ->options(function () {
                         return \App\Models\Gasolinera::query()
-                            ->whereNotNull('Poblacion')
-                            ->where('Poblacion', '!=', '')
+                            ->whereNotNull('Nombre')
+                            ->where('Nombre', '!=', '')
                             ->distinct()
-                            ->pluck('Poblacion', 'Poblacion')
+                            ->pluck('Nombre', 'Nombre')
                             ->toArray();
                     })
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
                             $data['value'],
-                            fn (\Illuminate\Database\Eloquent\Builder $query, $poblacion) => $query->whereHas('gasolinera', function ($q) use ($poblacion) {
-                                $q->where('Poblacion', $poblacion);
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $nombre) => $query->whereHas('gasolinera', function ($q) use ($nombre) {
+                                $q->where('Nombre', $nombre);
                             })
                         );
                     }),
