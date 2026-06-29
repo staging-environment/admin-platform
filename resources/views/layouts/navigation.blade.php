@@ -301,21 +301,21 @@
 @if(str_contains(request()->url(), 'recursos-humanos'))
 <style>
     /* Reducir espacio superior al mínimo en Recursos Humanos */
-    .fi-main-ctn,
-    .fi-layout,
-    main,
-    .fi-content {
+    body.fi-body .fi-main-ctn,
+    body.fi-body .fi-layout,
+    body.fi-body main,
+    body.fi-body .fi-content {
         padding-top: 0px !important;
         margin-top: 0px !important;
     }
-    .fi-layout {
+    body.fi-body .fi-layout {
         display: flex !important;
         flex-direction: column !important;
         grid-template-rows: 1fr !important;
         gap: 0 !important;
         min-height: 0 !important;
     }
-    .fi-main-ctn {
+    body.fi-body .fi-main-ctn {
         display: flex !important;
         flex-direction: column !important;
         gap: 0 !important;
@@ -323,17 +323,17 @@
         padding: 0 !important;
         flex-grow: 1 !important;
     }
-    .fi-main {
+    body.fi-body .fi-main {
         padding-top: 0px !important;
         margin-top: 0px !important;
     }
-    .fi-header {
+    body.fi-body .fi-header {
         margin-top: 0px !important;
         padding-top: 0px !important;
         margin-bottom: 0.25rem !important;
         gap: 0.15rem !important;
     }
-    .fi-breadcrumbs {
+    body.fi-body .fi-breadcrumbs {
         margin-bottom: 0px !important;
     }
 </style>
