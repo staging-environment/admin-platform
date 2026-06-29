@@ -323,4 +323,57 @@ button.fi-topbar-trigger {
     padding-top: 0.15rem !important;
 }
 
+/* Forzar los filtros y el botón de aplicar en la misma línea */
+.fi-resource-recursos-humanos .fi-ta-filters {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end !important;
+    gap: 12px !important;
+    margin-bottom: 6px !important;
+}
+
+/* Alinear el grid de inputs en una sola línea */
+.fi-resource-recursos-humanos .fi-ta-filters > .fi-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    flex-grow: 1 !important;
+    gap: 8px !important;
+    --cols-lg: repeat(2, minmax(0, 1fr)) !important;
+    width: auto !important;
+}
+
+.fi-resource-recursos-humanos .fi-ta-filters > .fi-grid > .fi-grid-col {
+    flex: 1 1 0% !important;
+    min-width: 150px !important;
+}
+
+/* Ajustar el botón de aplicar filtros para que se sitúe al lado */
+.fi-resource-recursos-humanos .fi-ta-filters-actions-ctn {
+    display: flex !important;
+    align-items: flex-end !important;
+    margin-top: 0 !important;
+    padding-bottom: 2px !important;
+}
+
+.fi-resource-recursos-humanos .fi-ta-filters-actions-ctn button {
+    height: 32px !important; /* Altura compacta a juego con inputs */
+    white-space: nowrap !important;
+    padding: 2px 10px !important;
+    font-size: 0.75rem !important;
+}
+
+/* Ocultar el header de filtros redundante (contiene la palabra filtros y Resetear) o reacomodarlo */
+.fi-resource-recursos-humanos .fi-ta-filters-header {
+    display: none !important; /* Ocultar para ganar espacio vertical */
+}
+
+/* Ancho máximo para la columna Nombre para evitar que expanda la tabla */
+.fi-resource-recursos-humanos .fi-ta-cell:nth-child(2) {
+    max-width: 250px !important;
+    overflow: hidden !important;
+}
+
+
 
