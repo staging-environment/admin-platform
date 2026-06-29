@@ -58,7 +58,7 @@ class EmpleadosTable
                     ->color('gray')
                     ->default('—'),
 
-                TextColumn::make('localidad')
+                 TextColumn::make('gasolinera.Poblacion')
                     ->label('Localidad')
                     ->size('xs')
                     ->color('gray')
@@ -68,8 +68,7 @@ class EmpleadosTable
                     ->label('Puesto')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—')
-                    ->visibleFrom('md'),
+                    ->default('—'),
             ])
             ->striped()
             ->defaultSort('apellidos', 'asc')
@@ -77,13 +76,20 @@ class EmpleadosTable
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
                     ->label('Localidad')
                     ->options(function () {
-                        return \App\Models\Empleado::query()
-                            ->select('localidad')
-                            ->whereNotNull('localidad')
-                            ->where('localidad', '!=', '')
+                        return \App\Models\Gasolinera::query()
+                            ->whereNotNull('Poblacion')
+                            ->where('Poblacion', '!=', '')
                             ->distinct()
-                            ->pluck('localidad', 'localidad')
+                            ->pluck('Poblacion', 'Poblacion')
                             ->toArray();
+                    })
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['value'],
+                            fn (\Illuminate\Database\Eloquent\Builder $query, $poblacion) => $query->whereHas('gasolinera', function ($q) use ($poblacion) {
+                                $q->where('Poblacion', $poblacion);
+                            })
+                        );
                     }),
                 \Filament\Tables\Filters\Filter::make('search')
                     ->form([
