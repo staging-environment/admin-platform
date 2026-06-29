@@ -374,43 +374,76 @@ button.fi-topbar-trigger {
     display: none !important;
 }
 
-/* Forzar distribución de anchos de columna óptima sin romper el layout */
+/* Forzar distribución de anchos de columna óptima sin romper el layout y sin scroll */
 .fi-resource-recursos-humanos table {
-    table-layout: auto !important;
+    table-layout: fixed !important; /* Volvemos a fixed pero con porcentajes correctos */
     width: 100% !important;
 }
 
-/* Columna Nombre: Más ancha para que no rompa en 2 filas */
+/* Columna 1: Checkbox (Ultra-estrecho) */
+.fi-resource-recursos-humanos th:nth-child(1),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(1) {
+    width: 40px !important;
+    max-width: 40px !important;
+}
+
+/* Columna 2: Foto (Pequeño espacio para la imagen) */
+.fi-resource-recursos-humanos th:nth-child(2),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
+    width: 50px !important;
+    max-width: 50px !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    text-align: center !important;
+}
+
+/* Columna 3: Nombre (~30% del espacio de pantalla) */
 .fi-resource-recursos-humanos th:nth-child(3),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
-    width: 320px !important;
-    max-width: 350px !important;
+    width: 30% !important;
+    max-width: 30% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columnas secundarias: Más estrechas para que quepan */
+/* Columna 4: Teléfono */
 .fi-resource-recursos-humanos th:nth-child(4),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
+    width: 15% !important;
+    max-width: 18% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Columna 5: Localidad */
 .fi-resource-recursos-humanos th:nth-child(5),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 110px !important;
-    max-width: 120px !important;
+    width: 20% !important;
+    max-width: 25% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna Puesto */
+/* Columna 6: Puesto */
 .fi-resource-recursos-humanos th:nth-child(6),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(6) {
-    width: 100px !important;
-    max-width: 120px !important;
+    width: 20% !important;
+    max-width: 25% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
+
+/* Columna 7: Acciones (Editar/Borrar) */
+.fi-resource-recursos-humanos th:nth-child(7),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(7) {
+    width: 70px !important;
+    max-width: 80px !important;
+}
+
 
 
 
