@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Facades\Hash; // Importante por si acaso
 
 class UserForm
@@ -42,7 +44,25 @@ class UserForm
 
                 CheckboxList::make('roles')
                     ->relationship('roles', 'name')
-                    ->columns(2),
+                    ->columns(2)
+                    ->live(),
+
+                Toggle::make('usuario_activo')
+                    ->label('Usuario activo')
+                    ->live()
+                    ->afterStateHydrated(function (Toggle $component, $record) {
+                        if ($record) {
+                            $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                            $component->state($empleado ? !$empleado->trashed() : true);
+                        } else {
+                            $component->state(true);
+                        }
+                    })
+                    ->visible(function (Get $get) {
+                        $roles = $get('roles') ?? [];
+                        $empleadoRole = \Spatie\Permission\Models\Role::where('name', 'Empleado')->first();
+                        return $empleadoRole && in_array($empleadoRole->id, $roles);
+                    }),
             ]);
     }
 }

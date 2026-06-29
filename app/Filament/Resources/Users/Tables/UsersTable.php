@@ -84,6 +84,30 @@ class UsersTable
                 EditAction::make(),
                 \Filament\Actions\DeleteAction::make()
                     ->visible(fn () => auth()->user()->can('gestion_eliminar_usuarios')),
+                \Filament\Tables\Actions\Action::make('restoreEmpleado')
+                    ->label('Restaurar')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('¿Restaurar empleado?')
+                    ->modalDescription('Esta acción volverá a activar al empleado y te redirigirá a su edición.')
+                    ->visible(function ($record) {
+                        if (!$record->hasRole('Empleado')) {
+                            return false;
+                        }
+                        $empleado = \App\Models\Empleado::onlyTrashed()->where('email', $record->email)->first();
+                        return $empleado !== null;
+                    })
+                    ->action(function ($record) {
+                        $empleado = \App\Models\Empleado::onlyTrashed()->where('email', $record->email)->first();
+                        if ($empleado) {
+                            $empleado->restore();
+                            if (!$record->hasRole('Empleado')) {
+                                $record->assignRole('Empleado');
+                            }
+                            return redirect()->to(route('filament.admin.resources.recursos-humanos.edit', ['record' => $empleado->id]));
+                        }
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

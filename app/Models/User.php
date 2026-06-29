@@ -63,4 +63,35 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     {
         return $this->hasOne(\App\Models\Empleado::class, 'email', 'email');
     }
+
+    public $usuario_activo;
+
+    protected static function booted()
+    {
+        static::deleted(function ($user) {
+            $empleado = \App\Models\Empleado::withTrashed()->where('email', $user->email)->first();
+            if ($empleado) {
+                $empleado->forceDelete();
+            }
+        });
+
+        static::saved(function ($user) {
+            if ($user->hasRole('Empleado')) {
+                $empleado = \App\Models\Empleado::withTrashed()->where('email', $user->email)->first();
+                
+                if (isset($user->usuario_activo)) {
+                    $isActive = filter_var($user->usuario_activo, FILTER_VALIDATE_BOOLEAN);
+                    if ($isActive) {
+                        if ($empleado && $empleado->trashed()) {
+                            $empleado->restore();
+                        }
+                    } else {
+                        if ($empleado && !$empleado->trashed()) {
+                            $empleado->delete();
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
