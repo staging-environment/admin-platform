@@ -86,9 +86,10 @@ class EmpleadosTable
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
                             $data['value'],
-                            fn (\Illuminate\Database\Eloquent\Builder $query, $nombre) => $query->whereHas('gasolinera', function ($q) use ($nombre) {
-                                $q->where('Nombre', $nombre);
-                            })
+                            function (\Illuminate\Database\Eloquent\Builder $query, $nombre) {
+                                $codigos = \App\Models\Gasolinera::where('Nombre', $nombre)->pluck('Codigo')->toArray();
+                                return $query->whereIn('gasolinera_codigo', $codigos);
+                            }
                         );
                     }),
                 \Filament\Tables\Filters\Filter::make('search')
