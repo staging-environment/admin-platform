@@ -227,7 +227,18 @@ button.fi-topbar-trigger {
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Quitar fondo/sombra/borde del card container exterior y forzar no scroll */
-.fi-resource-recursos-humanos .fi-ta-ctn,
+.fi-resource-recursos-humanos .fi-ta-ctn {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    max-width: 950px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
 .fi-resource-recursos-humanos .fi-ta-content,
 .fi-resource-recursos-humanos .fi-ta-content-ctn {
     border: none !important;
@@ -239,14 +250,14 @@ button.fi-topbar-trigger {
 }
 
 
-/* Filas ultra-compactas y fuentes reducidas */
+/* Filas compactas con fuentes ampliadas */
 .fi-resource-recursos-humanos .fi-ta-cell,
 .fi-resource-recursos-humanos tr.fi-ta-row > td.fi-ta-cell {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    height: 24px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 32px !important;
 }
 
 /* Remover altura y padding de contenedores internos */
@@ -262,26 +273,26 @@ button.fi-topbar-trigger {
 }
 
 .fi-resource-recursos-humanos tr.fi-ta-row {
-    height: 24px !important;
+    height: 32px !important;
 }
 
 .fi-resource-recursos-humanos .fi-ta-row td * {
-    font-size: 0.75rem !important; /* Texto muy pequeño */
+    font-size: 0.85rem !important; /* Fuente ampliada */
 }
 
-/* Reducir aún más el tamaño específico de la columna del nombre */
+/* Tamaño de la columna del nombre */
 .fi-resource-recursos-humanos .fi-ta-row td .fi-ta-text-item {
-    font-size: 0.75rem !important;
+    font-size: 0.875rem !important; /* Nombre ligeramente más grande */
     font-weight: 600 !important;
 }
 
-/* Cabecera de tabla compacta y letra pequeña */
+/* Cabecera de tabla */
 .fi-resource-recursos-humanos .fi-ta-header th {
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    font-size: 0.7rem !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.8rem !important; /* Cabecera ampliada */
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
@@ -388,21 +399,21 @@ button.fi-topbar-trigger {
     width: 100% !important;
 }
 
-/* Columna 1: Nombre (Toma todo el espacio restante) */
+/* Columna 1: Nombre */
 .fi-resource-recursos-humanos th:nth-child(1),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(1) {
-    width: auto !important;
-    max-width: none !important;
+    width: 320px !important;
+    max-width: 320px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 2: Teléfono (Ajustado al tamaño de un teléfono) */
+/* Columna 2: Teléfono */
 .fi-resource-recursos-humanos th:nth-child(2),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
-    width: 90px !important;
-    max-width: 90px !important;
+    width: 110px !important;
+    max-width: 110px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -411,8 +422,8 @@ button.fi-topbar-trigger {
 /* Columna 3: Localidad */
 .fi-resource-recursos-humanos th:nth-child(3),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
-    width: 140px !important;
-    max-width: 140px !important;
+    width: 160px !important;
+    max-width: 160px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -421,8 +432,8 @@ button.fi-topbar-trigger {
 /* Columna 4: Puesto */
 .fi-resource-recursos-humanos th:nth-child(4),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
-    width: 120px !important;
-    max-width: 120px !important;
+    width: 150px !important;
+    max-width: 150px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -431,7 +442,7 @@ button.fi-topbar-trigger {
 /* Columna 5: Acciones (Editar/Borrar) */
 .fi-resource-recursos-humanos th:nth-child(5),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 70px !important;
+    width: 80px !important;
     max-width: 80px !important;
 }
 
