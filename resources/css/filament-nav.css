@@ -234,9 +234,6 @@ button.fi-topbar-trigger {
     border-radius: 0 !important;
     overflow-x: hidden !important;
     overflow-y: hidden !important;
-    max-width: 950px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
 }
 
 .fi-resource-recursos-humanos .fi-ta-content,
@@ -402,8 +399,7 @@ button.fi-topbar-trigger {
 /* Columna 1: Nombre */
 .fi-resource-recursos-humanos th:nth-child(1),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(1) {
-    width: 320px !important;
-    max-width: 320px !important;
+    width: 32% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -412,8 +408,7 @@ button.fi-topbar-trigger {
 /* Columna 2: Teléfono */
 .fi-resource-recursos-humanos th:nth-child(2),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
-    width: 110px !important;
-    max-width: 110px !important;
+    width: 15% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -422,8 +417,7 @@ button.fi-topbar-trigger {
 /* Columna 3: Localidad */
 .fi-resource-recursos-humanos th:nth-child(3),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
-    width: 160px !important;
-    max-width: 160px !important;
+    width: 25% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -432,8 +426,7 @@ button.fi-topbar-trigger {
 /* Columna 4: Puesto */
 .fi-resource-recursos-humanos th:nth-child(4),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
-    width: 150px !important;
-    max-width: 150px !important;
+    width: 20% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -442,8 +435,8 @@ button.fi-topbar-trigger {
 /* Columna 5: Acciones (Editar/Borrar) */
 .fi-resource-recursos-humanos th:nth-child(5),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 80px !important;
-    max-width: 80px !important;
+    width: 8% !important;
+    min-width: 75px !important;
 }
 
 
