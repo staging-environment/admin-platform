@@ -23,7 +23,7 @@ class ViewEmpleado extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            EditAction::make()->label('Modificar datos'),
             \Filament\Actions\Action::make('manageDocuments')
                 ->label('Documentación')
                 ->icon('heroicon-o-document-duplicate')
