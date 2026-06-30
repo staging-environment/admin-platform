@@ -39,7 +39,6 @@ class EmpleadosTable
                     })
                     ->weight(\Filament\Support\Enums\FontWeight::Bold)
                     ->size('sm')
-                    ->wrap()
                     ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
