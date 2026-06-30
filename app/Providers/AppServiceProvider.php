@@ -20,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->runningInConsole()) {
+            return;
+        }
+
         $host = request()->header('X-Forwarded-Host') ?? request()->header('Host');
         if ($host) {
             $host = trim(explode(',', $host)[0]);
