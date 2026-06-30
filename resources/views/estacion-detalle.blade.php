@@ -177,9 +177,11 @@
                 <button @click="tab = 'donde_estamos'; setTimeout(() => { window.dispatchEvent(new Event('resize')); initMap(); }, 50)" :class="tab === 'donde_estamos' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
                     Dónde Estamos
                 </button>
+                {{-- 
                 <button @click="tab = 'contacto'; setTimeout(() => { window.dispatchEvent(new Event('resize')); initContactMap(); }, 50)" :class="tab === 'contacto' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors uppercase tracking-wider outline-none">
                     Contacto
                 </button>
+                --}}
             </nav>
         </div>
     </div>
@@ -365,7 +367,7 @@
                 </div>
 
                 <!-- Pestaña: Contacto -->
-                <div x-show="tab === 'contacto'" 
+                <div x-show="false" 
                      style="display: none;" 
                      x-transition:enter="transition ease-out duration-300 delay-100" 
                      x-transition:enter-start="opacity-0 transform translate-y-4" 
@@ -626,9 +628,11 @@
                         <li>
                             <a href="#" @click.prevent="tab = 'donde_estamos'; window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => { window.dispatchEvent(new Event('resize')); initMap(); }, 50)" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Dónde Estamos</a>
                         </li>
+                        {{-- 
                         <li>
                             <a href="#" @click.prevent="tab = 'contacto'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Contacto</a>
                         </li>
+                        --}}
                     </ul>
                 </div>
 

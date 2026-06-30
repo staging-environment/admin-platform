@@ -118,6 +118,7 @@ Route::get('/estacion/{slug}', function ($slug) {
 })->name('estacion.show');
 
 Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
+    abort(404); // DESACTIVADO TEMPORALMENTE
     $estacion = Gasolinera::get()->first(function ($e) use ($slug) {
         return \Illuminate\Support\Str::slug($e->Nombre) === $slug || $e->Codigo == $slug;
     });
@@ -164,6 +165,7 @@ Route::post('/estacion/{slug}/contacto', function (Request $request, $slug) {
 })->name('estacion.contacto');
 
 Route::post('/contacto', function (Request $request) {
+    abort(404); // DESACTIVADO TEMPORALMENTE
     // Honeypot check: if filled, silently succeed without saving to DB
     if ($request->filled('website_url_check')) {
         return redirect()->back()->with('success', 'Tu mensaje ha sido enviado correctamente.');

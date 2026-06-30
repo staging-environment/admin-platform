@@ -57,7 +57,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen relative overflow-x-hidden" x-data="{ tab: (new URLSearchParams(window.location.search)).get('tab') || 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+<body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen relative overflow-x-hidden" x-data="{ tab: (new URLSearchParams(window.location.search)).get('tab') === 'contacto' ? 'inicio' : ((new URLSearchParams(window.location.search)).get('tab') || 'inicio'), showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
 
     <!-- Glowing background orbs for modern depth -->
     <div class="absolute top-[40vh] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[120vh] pointer-events-none overflow-hidden z-0 opacity-40">
@@ -217,11 +217,13 @@
                         class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Quiénes Somos
                 </button>
+                {{-- 
                 <button @click="tab = 'contacto'" 
                         :class="tab === 'contacto' ? 'bg-white text-blue-600 shadow-sm border-slate-200/30 font-extrabold' : 'text-slate-500 hover:text-slate-800 font-bold'" 
                         class="whitespace-nowrap py-2 px-5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 outline-none border border-transparent">
                     Contacto
                 </button>
+                --}}
             </div>
         </div>
     </div>
@@ -454,7 +456,7 @@
         </div>
 
         <!-- Tab 3: Contacto -->
-        <div x-show="tab === 'contacto'" 
+        <div x-show="false" 
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform translate-y-4"
              x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -617,9 +619,11 @@
                         <li>
                             <a href="#" @click.prevent="tab = 'quienes_somos'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Quiénes Somos</a>
                         </li>
+                        {{-- 
                         <li>
                             <a href="#" @click.prevent="tab = 'contacto'; window.scrollTo({top: 0, behavior: 'smooth'})" class="text-xs text-slate-400 hover:text-white transition-colors font-medium">Contacto</a>
                         </li>
+                        --}}
                     </ul>
                 </div>
 
