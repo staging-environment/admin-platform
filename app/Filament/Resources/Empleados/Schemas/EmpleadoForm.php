@@ -132,6 +132,22 @@ class EmpleadoForm
                                             ->label('¿Tiene discapacidad?')
                                             ->live()
                                             ->columnSpanFull(),
+
+                                        Toggle::make('tiene_incapacidad')
+                                            ->label('¿Tiene incapacidad?')
+                                            ->live()
+                                            ->columnSpanFull(),
+
+                                        Select::make('tipo_incapacidad')
+                                            ->label('Tipo de Incapacidad')
+                                            ->multiple()
+                                            ->options([
+                                                'Físico' => 'Físico',
+                                                'Psíquico' => 'Psíquico',
+                                            ])
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                            ->columnSpanFull(),
                                         
                                         Select::make('tipo_discapacidad')
                                             ->label('Tipo de Discapacidad')

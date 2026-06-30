@@ -15,6 +15,8 @@ class Empleado extends Model
         'tiene_discapacidad' => 'boolean',
         'pertenece_andalucia' => 'boolean',
         'tipo_discapacidad' => 'array',
+        'tiene_incapacidad' => 'boolean',
+        'tipo_incapacidad' => 'array',
         'fecha_resolucion_discapacidad' => 'date',
         'fecha_vencimiento_contrato' => 'date',
         'gasolinera_codigo' => 'integer',
