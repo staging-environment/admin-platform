@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandLogo(fn () => view('components.logo'))
-            ->favicon(asset('ronda_norte_logo.svg'))
+            ->favicon('/ronda_norte_logo.svg')
             ->topNavigation()
             ->topbar(false)
             ->colors([
