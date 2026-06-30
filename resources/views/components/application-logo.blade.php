@@ -1,1 +1,1 @@
-<img src="{{ asset('logo_utrecar.svg') }}" {{ $attributes }} alt="Utrecar" />
+<img src="{{ asset('ronda_norte_logo.svg') }}" {{ $attributes }} alt="Utrecar" />

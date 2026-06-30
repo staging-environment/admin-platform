@@ -1,5 +1,5 @@
 <div class="flex items-center gap-3">
-    <img src="{{ asset('logo_symbol.svg') }}" class="w-9 h-9 object-contain" alt="Utrecar" />
+    <img src="{{ asset('ronda_norte_logo.svg') }}" class="w-9 h-9 object-contain" alt="Utrecar" />
     <div class="flex flex-col items-start">
         <p class="font-black text-lg tracking-tight leading-none text-slate-900 dark:text-white">Utrecar</p>
         <div class="flex items-center gap-1 mt-0.5">
