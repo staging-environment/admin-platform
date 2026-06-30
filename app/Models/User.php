@@ -91,9 +91,6 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
                     if (!$empleado->trashed()) {
                         $empleado->delete();
                     }
-                    if ($user->hasRole('Empleado')) {
-                        $user->removeRole('Empleado');
-                    }
                 }
             }
         });

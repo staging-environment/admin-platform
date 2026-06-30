@@ -56,10 +56,6 @@ class Empleado extends Model
 
         static::deleted(function ($empleado) {
             if (method_exists($empleado, 'isForceDeleting') && !$empleado->isForceDeleting()) {
-                $user = \App\Models\User::where('email', $empleado->email)->first();
-                if ($user) {
-                    $user->removeRole('Empleado');
-                }
                 return;
             }
 
