@@ -19,7 +19,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-56 h-auto drop-shadow-md hover:scale-105 transition-transform duration-300" />
+                    <x-application-logo class="w-56 h-[150px] object-contain drop-shadow-md hover:scale-105 transition-transform duration-300" />
                 </a>
             </div>
 
