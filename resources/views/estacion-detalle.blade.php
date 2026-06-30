@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $estacion->Nombre }} | Utrecar</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('logo_symbol.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Leaflet para el mapa -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -596,9 +597,7 @@
                 <!-- Col 1: Brand & Logo -->
                 <div class="space-y-4 md:col-span-2">
                     <div class="flex items-center gap-3">
-                        <div class="bg-gradient-to-tr from-blue-600 to-cyan-500 text-white w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg shadow-md">
-                            U
-                        </div>
+                        <img src="{{ asset('logo_symbol.svg') }}" class="w-9 h-9 object-contain" alt="Utrecar" />
                         <div>
                             <p class="font-black text-sm tracking-tight leading-none text-white">Utrecar</p>
                             <div class="flex items-center gap-1 mt-0.5">

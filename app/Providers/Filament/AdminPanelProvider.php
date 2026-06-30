@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandLogo(fn () => view('components.logo'))
+            ->favicon(asset('logo_symbol.svg'))
             ->topNavigation()
             ->topbar(false)
             ->colors([

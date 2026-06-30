@@ -1,8 +1,5 @@
 <div class="flex items-center gap-3">
-    <!-- Inline style to ensure gradient and white text always works in any CSS context (Filament/Breeze) -->
-    <div style="background-image: linear-gradient(to top right, #2563eb, #06b6d4); color: white;" class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg shadow-lg">
-        U
-    </div>
+    <img src="{{ asset('logo_symbol.svg') }}" class="w-9 h-9 object-contain" alt="Utrecar" />
     <div class="flex flex-col items-start">
         <p class="font-black text-lg tracking-tight leading-none text-slate-900 dark:text-white">Utrecar</p>
         <div class="flex items-center gap-1 mt-0.5">
