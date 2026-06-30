@@ -235,6 +235,7 @@ button.fi-topbar-trigger {
     background: transparent !important;
     border-radius: 0 !important;
     overflow-x: hidden !important;
+    overflow-y: hidden !important;
 }
 
 

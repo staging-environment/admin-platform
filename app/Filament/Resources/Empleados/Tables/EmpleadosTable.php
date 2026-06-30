@@ -17,6 +17,7 @@ class EmpleadosTable
     {
         return $table
             ->recordUrl(fn (\App\Models\Empleado $record): string => \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]))
+            ->defaultPaginationPageOption(20)
             ->columns([
                 TextColumn::make('nombre_completo')
                     ->label('Nombre')
