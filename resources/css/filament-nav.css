@@ -394,21 +394,21 @@ button.fi-topbar-trigger {
     max-width: 40px !important;
 }
 
-/* Columna 2: Nombre (~30% del espacio de pantalla) */
+/* Columna 2: Nombre (Toma todo el espacio restante) */
 .fi-resource-recursos-humanos th:nth-child(2),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
-    width: 45% !important;
-    max-width: 45% !important;
+    width: auto !important;
+    max-width: none !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 3: Teléfono */
+/* Columna 3: Teléfono (Ajustado al tamaño de un teléfono) */
 .fi-resource-recursos-humanos th:nth-child(3),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
-    width: 12% !important;
-    max-width: 12% !important;
+    width: 90px !important;
+    max-width: 90px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -417,8 +417,8 @@ button.fi-topbar-trigger {
 /* Columna 4: Localidad */
 .fi-resource-recursos-humanos th:nth-child(4),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
-    width: 20% !important;
-    max-width: 20% !important;
+    width: 140px !important;
+    max-width: 140px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -427,8 +427,8 @@ button.fi-topbar-trigger {
 /* Columna 5: Puesto */
 .fi-resource-recursos-humanos th:nth-child(5),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 18% !important;
-    max-width: 18% !important;
+    width: 120px !important;
+    max-width: 120px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
