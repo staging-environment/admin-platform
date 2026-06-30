@@ -447,7 +447,7 @@
                 <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
             </h2>
             <div class="prose max-w-none text-slate-600 leading-relaxed mt-6">
-                @if($homeConfig && $homeConfig->quienes_somos)
+                @if($homeConfig && $homeConfig->quienes_somos && trim(strip_tags($homeConfig->quienes_somos, '<img><iframe>')) !== '')
                     {!! $homeConfig->quienes_somos !!}
                 @else
                     <p>Bienvenido a nuestra red de estaciones de servicio. Nos esforzamos por ofrecer combustibles de la más alta calidad y un excelente servicio de atención al cliente en cada una de nuestras estaciones distribuidas estratégicamente por todo el territorio.</p>

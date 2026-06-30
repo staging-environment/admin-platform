@@ -223,7 +223,7 @@
                             <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
                         </h2>
                         <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6 space-y-4">
-                            @if($contenido && $contenido->texto_inicio)
+                            @if($contenido && $contenido->texto_inicio && trim(strip_tags($contenido->texto_inicio, '<img><iframe>')) !== '')
                                 {!! $contenido->texto_inicio !!}
                             @else
                                 <p>Bienvenido a <strong>{{ $estacion->Nombre }}</strong>, parte de la red de estaciones de servicio <strong>Utrecar</strong>. Nos esforzamos diariamente para brindarte una experiencia de repostaje excepcional, combinando combustibles de última generación con una atención al cliente cercana y profesional.</p>
@@ -272,7 +272,7 @@
                             <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
                         </h2>
                         <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6 space-y-4">
-                            @if($contenido && $contenido->quienes_somos)
+                            @if($contenido && $contenido->quienes_somos && trim(strip_tags($contenido->quienes_somos, '<img><iframe>')) !== '')
                                 {!! $contenido->quienes_somos !!}
                             @else
                                 <p><strong>Utrecar</strong> es una red de estaciones de servicio comprometida con ofrecer el máximo estándar de calidad y un servicio excelente. Nos basamos en tres pilares fundamentales: <strong>Combustibles Premium</strong>, <strong>Atención Cercana</strong> e <strong>Instalaciones Confortables</strong>.</p>
