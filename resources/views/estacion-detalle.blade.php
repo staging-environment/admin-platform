@@ -222,11 +222,12 @@
                             Bienvenido a {{ $estacion->Nombre }}
                             <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
                         </h2>
-                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6">
+                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6 space-y-4">
                             @if($contenido && $contenido->texto_inicio)
                                 {!! $contenido->texto_inicio !!}
                             @else
-                                <p>Encuentra los mejores precios and el mejor servicio en nuestra estación. Abierto para ofrecerte la máxima calidad en carburantes y servicios adicionales para tu vehículo.</p>
+                                <p>Bienvenido a <strong>{{ $estacion->Nombre }}</strong>, parte de la red de estaciones de servicio <strong>Utrecar</strong>. Nos esforzamos diariamente para brindarte una experiencia de repostaje excepcional, combinando combustibles de última generación con una atención al cliente cercana y profesional.</p>
+                                <p>En nuestras instalaciones encontrarás carburantes de alta gama formulados con aditivos de última generación que optimizan el rendimiento del motor, protegen los componentes frente a la corrosión y reducen el consumo y las emisiones contaminantes. Todo ello garantizando siempre precios altamente competitivos y la máxima fiabilidad en el suministro.</p>
                             @endif
                         </div>
                         
@@ -270,11 +271,13 @@
                             Sobre Nosotros
                             <span class="absolute bottom-0 left-0 w-16 h-1 bg-blue-600 rounded-full"></span>
                         </h2>
-                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6">
+                        <div class="prose max-w-none text-lg text-slate-600 leading-relaxed mt-6 space-y-4">
                             @if($contenido && $contenido->quienes_somos)
                                 {!! $contenido->quienes_somos !!}
                             @else
-                                <p>Información no disponible por el momento. Trabajamos día a día para brindarte el mejor servicio.</p>
+                                <p><strong>Utrecar</strong> es una red de estaciones de servicio comprometida con ofrecer el máximo estándar de calidad y un servicio excelente. Nos basamos en tres pilares fundamentales: <strong>Combustibles Premium</strong>, <strong>Atención Cercana</strong> e <strong>Instalaciones Confortables</strong>.</p>
+                                <p>Nuestra misión es suministrar energía eficiente para la movilidad de personas y flotas profesionales. Controlamos de forma rigurosa cada paso de la cadena de distribución del combustible para asegurar que el carburante entregado a tu vehículo posea las mejores propiedades protectoras y de rendimiento.</p>
+                                <p>Apostamos firmemente por el desarrollo local y el respeto al medio ambiente, adaptando constantemente nuestros servicios para ser tu punto de parada de confianza y hacer de cada repostaje una parada cómoda y segura.</p>
                             @endif
                         </div>
                     </div>
