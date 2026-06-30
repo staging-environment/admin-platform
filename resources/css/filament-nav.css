@@ -388,16 +388,9 @@ button.fi-topbar-trigger {
     width: 100% !important;
 }
 
-/* Columna 1: Checkbox (Ultra-estrecho) */
+/* Columna 1: Nombre (Toma todo el espacio restante) */
 .fi-resource-recursos-humanos th:nth-child(1),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(1) {
-    width: 40px !important;
-    max-width: 40px !important;
-}
-
-/* Columna 2: Nombre (Toma todo el espacio restante) */
-.fi-resource-recursos-humanos th:nth-child(2),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
     width: auto !important;
     max-width: none !important;
     white-space: nowrap !important;
@@ -405,9 +398,9 @@ button.fi-topbar-trigger {
     text-overflow: ellipsis !important;
 }
 
-/* Columna 3: Teléfono (Ajustado al tamaño de un teléfono) */
-.fi-resource-recursos-humanos th:nth-child(3),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
+/* Columna 2: Teléfono (Ajustado al tamaño de un teléfono) */
+.fi-resource-recursos-humanos th:nth-child(2),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
     width: 90px !important;
     max-width: 90px !important;
     white-space: nowrap !important;
@@ -415,9 +408,9 @@ button.fi-topbar-trigger {
     text-overflow: ellipsis !important;
 }
 
-/* Columna 4: Localidad */
-.fi-resource-recursos-humanos th:nth-child(4),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
+/* Columna 3: Localidad */
+.fi-resource-recursos-humanos th:nth-child(3),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
     width: 140px !important;
     max-width: 140px !important;
     white-space: nowrap !important;
@@ -425,9 +418,9 @@ button.fi-topbar-trigger {
     text-overflow: ellipsis !important;
 }
 
-/* Columna 5: Puesto */
-.fi-resource-recursos-humanos th:nth-child(5),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
+/* Columna 4: Puesto */
+.fi-resource-recursos-humanos th:nth-child(4),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
     width: 120px !important;
     max-width: 120px !important;
     white-space: nowrap !important;
@@ -435,9 +428,9 @@ button.fi-topbar-trigger {
     text-overflow: ellipsis !important;
 }
 
-/* Columna 6: Acciones (Editar/Borrar) */
-.fi-resource-recursos-humanos th:nth-child(6),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(6) {
+/* Columna 5: Acciones (Editar/Borrar) */
+.fi-resource-recursos-humanos th:nth-child(5),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
     width: 70px !important;
     max-width: 80px !important;
 }

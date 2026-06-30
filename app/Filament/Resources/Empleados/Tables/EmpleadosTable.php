@@ -109,11 +109,6 @@ class EmpleadosTable
             ->actions([
                 EditAction::make()->iconButton(),
                 \Filament\Actions\DeleteAction::make()->iconButton(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
