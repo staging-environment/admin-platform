@@ -245,7 +245,7 @@ button.fi-topbar-trigger {
     padding-bottom: 0px !important;
     padding-left: 4px !important;
     padding-right: 4px !important;
-    height: auto !important;
+    height: 24px !important;
 }
 
 /* Remover altura y padding de contenedores internos */
@@ -258,6 +258,10 @@ button.fi-topbar-trigger {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
     min-height: 0px !important;
+}
+
+.fi-resource-recursos-humanos tr.fi-ta-row {
+    height: 24px !important;
 }
 
 .fi-resource-recursos-humanos .fi-ta-row td * {
@@ -390,29 +394,19 @@ button.fi-topbar-trigger {
     max-width: 40px !important;
 }
 
-/* Columna 2: Foto (Pequeño espacio para la imagen) */
+/* Columna 2: Nombre (~30% del espacio de pantalla) */
 .fi-resource-recursos-humanos th:nth-child(2),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
-    width: 50px !important;
-    max-width: 50px !important;
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-    text-align: center !important;
-}
-
-/* Columna 3: Nombre (~30% del espacio de pantalla) */
-.fi-resource-recursos-humanos th:nth-child(3),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
-    width: 30% !important;
-    max-width: 30% !important;
+    width: 35% !important;
+    max-width: 35% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 4: Teléfono */
-.fi-resource-recursos-humanos th:nth-child(4),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
+/* Columna 3: Teléfono */
+.fi-resource-recursos-humanos th:nth-child(3),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
     width: 15% !important;
     max-width: 18% !important;
     white-space: nowrap !important;
@@ -420,29 +414,29 @@ button.fi-topbar-trigger {
     text-overflow: ellipsis !important;
 }
 
-/* Columna 5: Localidad */
+/* Columna 4: Localidad */
+.fi-resource-recursos-humanos th:nth-child(4),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
+    width: 25% !important;
+    max-width: 25% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Columna 5: Puesto */
 .fi-resource-recursos-humanos th:nth-child(5),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 20% !important;
+    width: 25% !important;
     max-width: 25% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 6: Puesto */
+/* Columna 6: Acciones (Editar/Borrar) */
 .fi-resource-recursos-humanos th:nth-child(6),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(6) {
-    width: 20% !important;
-    max-width: 25% !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* Columna 7: Acciones (Editar/Borrar) */
-.fi-resource-recursos-humanos th:nth-child(7),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(7) {
     width: 70px !important;
     max-width: 80px !important;
 }

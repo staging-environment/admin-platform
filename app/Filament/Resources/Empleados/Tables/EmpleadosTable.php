@@ -18,13 +18,6 @@ class EmpleadosTable
         return $table
             ->recordUrl(fn (\App\Models\Empleado $record): string => \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]))
             ->columns([
-                ImageColumn::make('foto')
-                    ->label('')
-                    ->circular()
-                    ->defaultImageUrl(url('https://ui-avatars.com/api/?background=f59e0b&color=fff&name=E+M'))
-                    ->size(28)
-                    ->grow(false),
-
                 TextColumn::make('nombre_completo')
                     ->label('Nombre')
                     ->state(function (\App\Models\Empleado $record) {
