@@ -13,6 +13,14 @@
             });
         </script>
 
+        <style>
+            .custom-table-compact th,
+            .custom-table-compact td {
+                padding-left: 0.35rem !important; /* px-1.5 */
+                padding-right: 0.35rem !important; /* px-1.5 */
+            }
+        </style>
+
     <div class="space-y-6">
 
         {{-- ═══════════════════════════════════════════════════════════════ --}}
@@ -386,7 +394,7 @@
                 </div>
 
                 {{-- Tabla --}}
-                <div class="overflow-x-auto no-print">
+                <div class="overflow-x-auto no-print custom-table-compact">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
 
                         @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
@@ -672,7 +680,7 @@
                 </div>
 
                 {{-- Tabla para impresión (completa, sin paginar) --}}
-                <div class="overflow-x-auto print-only">
+                <div class="overflow-x-auto print-only custom-table-compact">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
 
                         @if(in_array($resultType, ['tienda_margen', 'lavado_margen']))
