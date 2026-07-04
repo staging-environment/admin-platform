@@ -56,7 +56,7 @@ class ReportService
             })
             ->select([
                 'd.CodigoDeProducto',
-                DB::raw('SUM(d.Cantidad * d.Precio) / SUM(d.Cantidad) as precio_compra'),
+                DB::raw('SUM(d.Importe) / SUM(d.Cantidad) as precio_compra'),
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva_compra'),
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
                 DB::raw('MAX(f.FechaYHoraDeFactura) as fecha_ultima_compra'),
@@ -127,7 +127,7 @@ class ReportService
                           ->on('f.Numero', '=', 'd.Numero');
                     })
                     ->select([
-                        'd.Precio as precio_compra',
+                        DB::raw('CASE WHEN d.Cantidad <> 0 THEN d.Importe / d.Cantidad ELSE d.Precio END as precio_compra'),
                         'd.PorcentajeDeIVA as pct_iva_compra',
                         'f.FechaYHoraDeFactura as fecha_ultima_compra'
                     ])
@@ -254,7 +254,7 @@ class ReportService
             })
             ->select([
                 'd.CodigoDeProducto',
-                DB::raw('SUM(d.Cantidad * d.Precio) / SUM(d.Cantidad) as precio_compra_medio'),
+                DB::raw('SUM(d.Importe) / SUM(d.Cantidad) as precio_compra_medio'),
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva_compra'),
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
                 DB::raw('SUM(d.Importe) as coste_total'),
@@ -463,7 +463,7 @@ class ReportService
             })
             ->select([
                 'd.CodigoDeProducto',
-                DB::raw('SUM(d.Cantidad * d.Precio) / SUM(d.Cantidad) as precio_compra_medio'),
+                DB::raw('SUM(d.Importe) / SUM(d.Cantidad) as precio_compra_medio'),
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva'),
                 DB::raw('SUM(d.Cantidad) as total_unidades'),
                 DB::raw('COUNT(d.ID) as num_lineas'),
