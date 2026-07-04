@@ -405,6 +405,9 @@
                                 <th wire:click="sortBy('precio_compra')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
+                                <th wire:click="sortBy('descuento_compra_pct')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % Dto.<span class="font-normal">{{ $ico('descuento_compra_pct') }}</span>
+                                </th>
                                 <th wire:click="sortBy('pct_iva_compra')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
@@ -464,6 +467,9 @@
                                 <th wire:click="sortBy('precio_compra')" class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
+                                <th wire:click="sortBy('descuento_compra_pct')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
+                                    % Dto.<span class="font-normal">{{ $ico('descuento_compra_pct') }}</span>
+                                </th>
                                 <th wire:click="sortBy('pct_iva_compra')" class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider {{ $thS }}">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
@@ -518,6 +524,15 @@
                                     </td>
                                     <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @if(($row['descuento_compra_pct'] ?? 0) > 0)
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border bg-blue-50 text-blue-700 border-blue-200">
+                                                {{ number_format($row['descuento_compra_pct'], 1, ',', '.') }}%
+                                            </span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
                                     </td>
                                     <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php
@@ -608,6 +623,15 @@
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
                                     </td>
                                     <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @if(($row['descuento_compra_pct'] ?? 0) > 0)
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border bg-blue-50 text-blue-700 border-blue-200">
+                                                {{ number_format($row['descuento_compra_pct'], 1, ',', '.') }}%
+                                            </span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php
                                             $ivaC = $row['pct_iva_compra'] ?? 0;
                                             $ivaCBadge = $ivaC >= 21 ? 'bg-orange-50 text-orange-700 border-orange-200'
@@ -667,6 +691,9 @@
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
                                 <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % Dto.<span class="font-normal">{{ $ico('descuento_compra_pct') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
                                 <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
@@ -723,6 +750,9 @@
                                     P.Compra s/IVA<span class="font-normal">{{ $ico('precio_compra') }}</span>
                                 </th>
                                 <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                    % Dto.<span class="font-normal">{{ $ico('descuento_compra_pct') }}</span>
+                                </th>
+                                <th class="px-2 py-2 text-center text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                     % IVA Compra<span class="font-normal">{{ $ico('pct_iva_compra') }}</span>
                                 </th>
                                 <th class="px-2 py-2 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">
@@ -770,6 +800,15 @@
                                     </td>
                                     <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-600 whitespace-nowrap">
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @if(($row['descuento_compra_pct'] ?? 0) > 0)
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border bg-blue-50 text-blue-700 border-blue-200">
+                                                {{ number_format($row['descuento_compra_pct'], 1, ',', '.') }}%
+                                            </span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
                                     </td>
                                     <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php
@@ -857,6 +896,15 @@
                                     <td class="px-2 py-1.5 text-xs text-gray-500 whitespace-nowrap">{{ $row['grupo_nombre'] }}</td>
                                     <td class="px-2 py-1.5 text-right font-mono text-xs text-gray-700 whitespace-nowrap">
                                         {{ number_format($row['precio_compra'], 4, ',', '.') }}&nbsp;€
+                                    </td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        @if(($row['descuento_compra_pct'] ?? 0) > 0)
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border bg-blue-50 text-blue-700 border-blue-200">
+                                                {{ number_format($row['descuento_compra_pct'], 1, ',', '.') }}%
+                                            </span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
                                     </td>
                                     <td class="px-2 py-1.5 text-center whitespace-nowrap">
                                         @php

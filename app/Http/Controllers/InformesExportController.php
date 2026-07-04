@@ -122,11 +122,11 @@ class InformesExportController extends Controller
 
         $headers = match ($reportType) {
             'margen_mercaderia' => [
-                'Código', 'Descripción', 'Grupo', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'PVP con IVA (€)',
+                'Código', 'Descripción', 'Grupo', 'P.Compra (€)', '% Dto. Compra', '% IVA Compra', 'P.Compra con IVA (€)', 'PVP con IVA (€)',
                 '% IVA', 'PVP sin IVA (€)', '% Margen', 'Uds. Compradas',
             ],
             'tienda_margen', 'lavado_margen' => [
-                'Código', 'Descripción', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)',
+                'Código', 'Descripción', 'P.Compra (€)', '% Dto. Compra', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)',
                 '% IVA', 'PVP con IVA (€)', 'Uds. Compradas', 'Uds. Vendidas',
                 'Total Comprado (€)', 'Total Facturado (€)', 'Beneficio (€)', '% Margen',
             ],
@@ -146,6 +146,7 @@ class InformesExportController extends Controller
                         $row['descripcion'],
                         $row['grupo_nombre'],
                         number_format($row['precio_compra'], 4, ',', '.'),
+                        number_format($row['descuento_compra_pct'] ?? 0, 1, ',', '.') . '%',
                         number_format($row['pct_iva_compra'] ?? 0, 1, ',', '.') . '%',
                         number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.'),
                         number_format($row['pvp_con_iva'], 2, ',', '.'),
@@ -158,6 +159,7 @@ class InformesExportController extends Controller
                         $row['codigo'],
                         $row['descripcion'],
                         number_format($row['precio_compra'], 4, ',', '.'),
+                        number_format($row['descuento_compra_pct'] ?? 0, 1, ',', '.') . '%',
                         number_format($row['pct_iva_compra'] ?? 0, 1, ',', '.') . '%',
                         number_format($row['precio_compra_con_iva'] ?? $row['precio_compra'], 4, ',', '.'),
                         $row['fecha_ultima_compra'] ?? '—',
@@ -200,7 +202,7 @@ class InformesExportController extends Controller
                     <Table>';
 
         if ($reportType === 'margen_mercaderia') {
-            $cols = ['Código','Descripción','Grupo','P.Compra (€)','% IVA Compra','P.Compra con IVA (€)','PVP con IVA (€)','% IVA','PVP sin IVA (€)','% Margen','Uds. Compradas'];
+            $cols = ['Código','Descripción','Grupo','P.Compra (€)','% Dto. Compra','% IVA Compra','P.Compra con IVA (€)','PVP con IVA (€)','% IVA','PVP sin IVA (€)','% Margen','Uds. Compradas'];
             $html .= '<Row>';
             foreach ($cols as $col) {
                 $html .= '<Cell ss:StyleID="header"><Data ss:Type="String">' . htmlspecialchars($col) . '</Data></Cell>';
@@ -213,6 +215,7 @@ class InformesExportController extends Controller
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['descripcion']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['grupo_nombre']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['precio_compra'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['descuento_compra_pct'] ?? 0) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . ($row['pct_iva_compra'] ?? 0) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . ($row['precio_compra_con_iva'] ?? $row['precio_compra']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['pvp_con_iva'] . '</Data></Cell>';
@@ -223,7 +226,7 @@ class InformesExportController extends Controller
                 $html .= '</Row>';
             }
         } elseif (in_array($reportType, ['tienda_margen', 'lavado_margen'])) {
-            $cols = ['Código', 'Descripción', 'P.Compra (€)', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)', '% IVA', 'PVP con IVA (€)', 'Uds. Compradas', 'Uds. Vendidas', 'Total Comprado (€)', 'Total Facturado (€)', 'Beneficio (€)', '% Margen'];
+            $cols = ['Código', 'Descripción', 'P.Compra (€)', '% Dto. Compra', '% IVA Compra', 'P.Compra con IVA (€)', 'Últ. Compra', 'PVP sin IVA (€)', '% IVA', 'PVP con IVA (€)', 'Uds. Compradas', 'Uds. Vendidas', 'Total Comprado (€)', 'Total Facturado (€)', 'Beneficio (€)', '% Margen'];
             $html .= '<Row>';
             foreach ($cols as $col) {
                 $html .= '<Cell ss:StyleID="header"><Data ss:Type="String">' . htmlspecialchars($col) . '</Data></Cell>';
@@ -235,6 +238,7 @@ class InformesExportController extends Controller
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['codigo']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['descripcion']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . $row['precio_compra'] . '</Data></Cell>';
+                $html .= '<Cell><Data ss:Type="Number">' . ($row['descuento_compra_pct'] ?? 0) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . ($row['pct_iva_compra'] ?? 0) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="Number">' . ($row['precio_compra_con_iva'] ?? $row['precio_compra']) . '</Data></Cell>';
                 $html .= '<Cell><Data ss:Type="String">' . htmlspecialchars($row['fecha_ultima_compra'] ?? '') . '</Data></Cell>';
