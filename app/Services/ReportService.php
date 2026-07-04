@@ -60,6 +60,7 @@ class ReportService
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva_compra'),
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
                 DB::raw('MAX(f.FechaYHoraDeFactura) as fecha_ultima_compra'),
+                DB::raw('AVG(CASE WHEN d.Cantidad * d.Precio > 0 THEN (1 - (d.Importe / (d.Cantidad * d.Precio))) * 100 ELSE 0 END) as dto_compra_pct'),
             ])
             ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
@@ -117,6 +118,7 @@ class ReportService
             $pctIvaCompra   = $compra ? (float) $compra->pct_iva_compra : 0.0;
             $udsCompradas   = $compra ? (float) $compra->uds_compradas : 0.0;
             $fechaUltCompra = $compra ? $compra->fecha_ultima_compra : null;
+            $dtoCompraPct   = $compra ? (float) $compra->dto_compra_pct : 0.0;
 
             if (!$compra) {
                 // Intentar obtener el último precio de compra registrado antes del fin del período
@@ -129,7 +131,8 @@ class ReportService
                     ->select([
                         DB::raw('CASE WHEN d.Cantidad <> 0 THEN d.Importe / d.Cantidad ELSE d.Precio END as precio_compra'),
                         'd.PorcentajeDeIVA as pct_iva_compra',
-                        'f.FechaYHoraDeFactura as fecha_ultima_compra'
+                        'f.FechaYHoraDeFactura as fecha_ultima_compra',
+                        DB::raw('CASE WHEN d.Cantidad * d.Precio > 0 THEN (1 - (d.Importe / (d.Cantidad * d.Precio))) * 100 ELSE 0 END as dto_compra_pct')
                     ])
                     ->where('d.CodigoDeProducto', $codigo)
                     ->where('f.FechaYHoraDeFactura', '<=', $dateTo . ' 23:59:59')
@@ -140,6 +143,7 @@ class ReportService
                     $precioCompra   = (float) $fallback->precio_compra;
                     $pctIvaCompra   = (float) $fallback->pct_iva_compra;
                     $fechaUltCompra = $fallback->fecha_ultima_compra;
+                    $dtoCompraPct   = (float) $fallback->dto_compra_pct;
                 }
             }
 
@@ -171,6 +175,7 @@ class ReportService
 
                 'precio_compra'          => round($precioCompra, 4),
                 'pct_iva_compra'         => round($pctIvaCompra, 1),
+                'descuento_compra_pct'   => max(0.0, round($dtoCompraPct, 1)),
                 'precio_compra_con_iva'  => round($precioCompraConIva, 4),
                 'precio_venta'    => $precioVenta !== null ? round($precioVenta, 4) : null,
                 'uds_compradas'   => $udsCompradas,
@@ -258,6 +263,7 @@ class ReportService
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva_compra'),
                 DB::raw('SUM(d.Cantidad) as uds_compradas'),
                 DB::raw('SUM(d.Importe) as coste_total'),
+                DB::raw('AVG(CASE WHEN d.Cantidad * d.Precio > 0 THEN (1 - (d.Importe / (d.Cantidad * d.Precio))) * 100 ELSE 0 END) as dto_compra_pct'),
             ])
             ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
@@ -380,6 +386,7 @@ class ReportService
                 // Compra
                 'precio_compra'          => round($precioCompra, 4),
                 'pct_iva_compra'         => round($pctIvaC, 1),
+                'descuento_compra_pct'   => max(0.0, round((float) $compra->dto_compra_pct, 1)),
                 'precio_compra_con_iva'  => round($precioCompra * (1 + $pctIvaC / 100), 4),
                 'uds_compradas'          => (float) $compra->uds_compradas,
                 'coste_total'            => round((float) $compra->coste_total, 2),
@@ -467,6 +474,7 @@ class ReportService
                 DB::raw('MAX(d.PorcentajeDeIVA) as pct_iva'),
                 DB::raw('SUM(d.Cantidad) as total_unidades'),
                 DB::raw('COUNT(d.ID) as num_lineas'),
+                DB::raw('AVG(CASE WHEN d.Cantidad * d.Precio > 0 THEN (1 - (d.Importe / (d.Cantidad * d.Precio))) * 100 ELSE 0 END) as dto_compra_pct'),
             ])
             ->whereIn('d.CodigoDeProducto', $productosDeGrupo)
             ->whereBetween(DB::raw('DATE(f.FechaYHoraDeFactura)'), [$dateFrom, $dateTo]);
@@ -547,6 +555,7 @@ class ReportService
                 'grupo_nombre'       => $producto->GrupoNombre,
                 'precio_compra'          => round($precioCompra, 4),
                 'pct_iva_compra'         => round($pctIva, 1),
+                'descuento_compra_pct'   => max(0.0, round((float) $compra->dto_compra_pct, 1)),
                 'precio_compra_con_iva'  => round($precioCompraConIva, 4),
                 'pvp_con_iva'        => round($pvpConIva, 4),
                 'pct_iva'            => $pctIva,
