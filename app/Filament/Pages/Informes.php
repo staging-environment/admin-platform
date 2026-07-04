@@ -324,9 +324,10 @@ class Informes extends Page implements HasForms
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 $this->dispatch('chart-ev-data-ready', chartEvolucionData: $this->chartEvolucionData);
                 
-                // Ordenar por defecto por beneficio (menor a mayor)
-                $this->sortColumn = '';
-                $this->sortBy('beneficio');
+                // Ordenar por defecto por margen_pct (mayor a menor)
+                $this->sortColumn = 'margen_pct';
+                $this->sortDirection = 'asc'; // Se invierte a desc en sortBy
+                $this->sortBy('margen_pct');
                 
                 break;
 
@@ -369,8 +370,9 @@ class Informes extends Page implements HasForms
                 // Disparar evento Alpine para re-crear el gráfico
                 $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 
-                // Ordenar por defecto por margen_pct (menor a mayor)
-                $this->sortColumn = '';
+                // Ordenar por defecto por margen_pct (mayor a menor)
+                $this->sortColumn = 'margen_pct';
+                $this->sortDirection = 'asc'; // Se invierte a desc en sortBy
                 $this->sortBy('margen_pct');
                 
                 break;
@@ -414,8 +416,9 @@ class Informes extends Page implements HasForms
                     $this->dispatch('chart-data-ready', chartData: $this->chartData);
                 }
                 
-                // Ordenar por defecto por margen_real_pct (menor a mayor)
-                $this->sortColumn = '';
+                // Ordenar por defecto por margen_real_pct (mayor a menor)
+                $this->sortColumn = 'margen_real_pct';
+                $this->sortDirection = 'asc'; // Se invierte a desc en sortBy
                 $this->sortBy('margen_real_pct');
                 
                 break;
