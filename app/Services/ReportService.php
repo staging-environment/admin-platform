@@ -118,6 +118,31 @@ class ReportService
             $udsCompradas   = $compra ? (float) $compra->uds_compradas : 0.0;
             $fechaUltCompra = $compra ? $compra->fecha_ultima_compra : null;
 
+            if (!$compra) {
+                // Intentar obtener el último precio de compra registrado antes del fin del período
+                $fallback = $db->table('detalledefacturasdecompra as d')
+                    ->join('facturasdecompra as f', function ($j) {
+                        $j->on('f.CodigoDeEmpresaPropia', '=', 'd.CodigoDeEmpresaPropia')
+                          ->on('f.Serie', '=', 'd.Serie')
+                          ->on('f.Numero', '=', 'd.Numero');
+                    })
+                    ->select([
+                        'd.Precio as precio_compra',
+                        'd.PorcentajeDeIVA as pct_iva_compra',
+                        'f.FechaYHoraDeFactura as fecha_ultima_compra'
+                    ])
+                    ->where('d.CodigoDeProducto', $codigo)
+                    ->where('f.FechaYHoraDeFactura', '<=', $dateTo . ' 23:59:59')
+                    ->orderBy('f.FechaYHoraDeFactura', 'desc')
+                    ->first();
+
+                if ($fallback) {
+                    $precioCompra   = (float) $fallback->precio_compra;
+                    $pctIvaCompra   = (float) $fallback->pct_iva_compra;
+                    $fechaUltCompra = $fallback->fecha_ultima_compra;
+                }
+            }
+
             $precioCompraConIva = $precioCompra * (1 + $pctIvaCompra / 100);
 
             $venta          = $ventas[$codigo] ?? null;
