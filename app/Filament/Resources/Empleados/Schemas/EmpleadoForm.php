@@ -47,7 +47,10 @@ class EmpleadoForm
                                             ->label('Apellidos')
                                             ->required()
                                             ->maxLength(255),
-                                        Grid::make(3)
+                                        Grid::make([
+                                            'default' => 1,
+                                            'md' => 3,
+                                        ])
                                             ->schema([
                                                 TextInput::make('dni')
                                                     ->label('DNI / NIE')
@@ -254,7 +257,10 @@ class EmpleadoForm
                             ]),
 
                         // Información de Contratación
-                        Grid::make(3)
+                        Grid::make([
+                            'default' => 1,
+                            'md' => 3,
+                        ])
                             ->schema([
                                 Select::make('tipo_contrato')
                                     ->label('Tipo de Contrato')
