@@ -80,13 +80,13 @@ class EmpleadoForm
                                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
                                                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
-                                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
                                                                         </div>
                                                                     ");
                                                                 } elseif ($extension === 'pdf') {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
                                                                             <iframe src='{$url}' class='w-full h-full border-none'></iframe>
                                                                         </div>
                                                                     ");
@@ -289,13 +289,13 @@ class EmpleadoForm
                                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
                                                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
-                                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
                                                                         </div>
                                                                     ");
                                                                 } elseif ($extension === 'pdf') {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
                                                                             <iframe src='{$url}' class='w-full h-full border-none'></iframe>
                                                                         </div>
                                                                     ");
@@ -350,13 +350,13 @@ class EmpleadoForm
                                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
                                                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
-                                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
                                                                         </div>
                                                                     ");
                                                                 } elseif ($extension === 'pdf') {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
                                                                             <iframe src='{$url}' class='w-full h-full border-none'></iframe>
                                                                         </div>
                                                                     ");
@@ -411,13 +411,13 @@ class EmpleadoForm
                                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
                                                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
-                                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
                                                                         </div>
                                                                     ");
                                                                 } elseif ($extension === 'pdf') {
                                                                     return new \Illuminate\Support\HtmlString("
-                                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
                                                                             <iframe src='{$url}' class='w-full h-full border-none'></iframe>
                                                                         </div>
                                                                     ");
@@ -514,19 +514,19 @@ class EmpleadoForm
                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
                                                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                                                     return new \Illuminate\Support\HtmlString("
-                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
-                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
                                                         </div>
                                                     ");
                                                 } elseif ($extension === 'pdf') {
                                                     return new \Illuminate\Support\HtmlString("
-                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
                                                             <iframe src='{$url}' class='w-full h-full border-none'></iframe>
                                                         </div>
                                                     ");
                                                 }
                                                 return new \Illuminate\Support\HtmlString("
-                                                    <div class='text-center p-4'>
+                                                    <div class='text-center p-4' style='min-height: 100px;'>
                                                         <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Contrato</a>
                                                     </div>
                                                 ");
