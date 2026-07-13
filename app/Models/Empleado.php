@@ -18,6 +18,7 @@ class Empleado extends Model
         'tiene_incapacidad' => 'boolean',
         'tipo_incapacidad' => 'array',
         'fecha_resolucion_discapacidad' => 'date',
+        'fecha_reconocimiento' => 'date',
         'fecha_vencimiento_contrato' => 'date',
         'gasolinera_codigo' => 'integer',
     ];

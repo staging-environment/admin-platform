@@ -153,10 +153,10 @@ class EmpleadoForm
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
-                                        TextInput::make('incapacidad')
-                                            ->label('Incapacidad')
-                                            ->maxLength(255)
-                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                        DatePicker::make('fecha_reconocimiento')
+                                            ->label('Fecha de reconocimiento')
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                                         DatePicker::make('fecha_resolucion_discapacidad')
                                             ->label('Fecha de resolución')

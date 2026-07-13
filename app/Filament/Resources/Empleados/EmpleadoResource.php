@@ -118,8 +118,9 @@ class EmpleadoResource extends Resource
                                     ->label('Porcentaje de Discapacidad')
                                     ->suffix('%')
                                     ->placeholder('N/A'),
-                                \Filament\Infolists\Components\TextEntry::make('incapacidad')
-                                    ->label('Incapacidad')
+                                \Filament\Infolists\Components\TextEntry::make('fecha_reconocimiento')
+                                    ->label('Fecha de reconocimiento')
+                                    ->date('d/m/Y')
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('tipo_incapacidad')
                                     ->label('Tipo de Incapacidad')
