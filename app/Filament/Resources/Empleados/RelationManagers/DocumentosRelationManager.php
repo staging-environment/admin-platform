@@ -60,7 +60,6 @@ class DocumentosRelationManager extends RelationManager
                     ->options([
                         'DNI' => 'DNI / NIE',
                         'Certificados' => 'Certificados',
-                        'Contratos' => 'Contratos',
                         'Titulaciones' => 'Titulaciones',
                         'Carnets' => 'Carnets',
                         'Otros' => 'Otros documentos',

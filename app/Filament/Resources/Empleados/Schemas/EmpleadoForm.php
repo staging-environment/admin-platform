@@ -223,7 +223,7 @@ class EmpleadoForm
                             ]),
 
                         // Información de Contratación
-                        Grid::make(2)
+                        Grid::make(3)
                             ->schema([
                                 Select::make('tipo_contrato')
                                     ->label('Tipo de Contrato')
@@ -238,6 +238,33 @@ class EmpleadoForm
                                     ->label('Fecha de vencimiento')
                                     ->visible(fn (Get $get) => $get('tipo_contrato') === 'Eventual')
                                     ->required(fn (Get $get) => $get('tipo_contrato') === 'Eventual'),
+
+                                FileUpload::make('contrato_file')
+                                    ->label('Adjuntar Contrato')
+                                    ->directory('empleados/documentos')
+                                    ->disk('local')
+                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                    ->afterStateHydrated(function ($component, $record) {
+                                        if ($record) {
+                                            $doc = $record->documentos()->where('tipo', 'Contratos')->first();
+                                            $component->state($doc ? $doc->file_path : null);
+                                        }
+                                    })
+                                    ->dehydrated(false)
+                                    ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                        if (empty($state)) {
+                                            $record->documentos()->where('tipo', 'Contratos')->delete();
+                                            return;
+                                        }
+
+                                        $record->documentos()->updateOrCreate(
+                                            ['tipo' => 'Contratos'],
+                                            [
+                                                'nombre' => 'Contrato ' . $record->nombre . ' ' . $record->apellidos,
+                                                'file_path' => $state,
+                                            ]
+                                        );
+                                    }),
                             ]),
                     ]),
 
@@ -253,7 +280,6 @@ class EmpleadoForm
                                     ->options([
                                         'DNI' => 'DNI / NIE',
                                         'Certificados' => 'Certificados',
-                                        'Contratos' => 'Contratos',
                                         'Titulaciones' => 'Titulaciones',
                                         'Carnets' => 'Carnets',
                                         'Otros' => 'Otros documentos',

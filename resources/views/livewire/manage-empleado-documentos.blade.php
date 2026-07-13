@@ -28,7 +28,6 @@
                     <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
                         <option value="DNI">DNI / NIE</option>
                         <option value="Certificados">Certificados</option>
-                        <option value="Contratos">Contratos</option>
                         <option value="Titulaciones">Titulaciones</option>
                         <option value="Carnets">Carnets</option>
                         <option value="Otros">Otros documentos</option>
