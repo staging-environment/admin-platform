@@ -155,11 +155,13 @@ class EmpleadoForm
 
                                         DatePicker::make('fecha_reconocimiento')
                                             ->label('Fecha de reconocimiento')
+                                            ->beforeOrEqual('fecha_resolucion_discapacidad')
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                                         DatePicker::make('fecha_resolucion_discapacidad')
                                             ->label('Fecha de resolución')
+                                            ->afterOrEqual('fecha_reconocimiento')
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
