@@ -122,6 +122,13 @@ class EmpleadoResource extends Resource
                                     ->label('Fecha de reconocimiento')
                                     ->date('d/m/Y')
                                     ->placeholder('Ninguna'),
+                                \Filament\Infolists\Components\TextEntry::make('pertenece_andalucia')
+                                    ->label('¿Pertenece a Andalucía?')
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
+                                \Filament\Infolists\Components\TextEntry::make('comunidad_autonoma')
+                                    ->label('Comunidad Autónoma')
+                                    ->visible(fn ($record) => ! $record->pertenece_andalucia)
+                                    ->placeholder('N/A'),
                                 \Filament\Infolists\Components\TextEntry::make('tipo_incapacidad')
                                     ->label('Tipo de Incapacidad')
                                     ->placeholder('Ninguna'),

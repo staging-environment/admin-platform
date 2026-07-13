@@ -166,7 +166,33 @@ class EmpleadoForm
                                         Toggle::make('pertenece_andalucia')
                                             ->label('¿Pertenece a Andalucía?')
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                            ->default(false),
+                                            ->default(true)
+                                            ->live(),
+
+                                        Select::make('comunidad_autonoma')
+                                            ->label('Comunidad Autónoma')
+                                            ->options([
+                                                'Aragón' => 'Aragón',
+                                                'Principado de Asturias' => 'Principado de Asturias',
+                                                'Illes Balears' => 'Illes Balears',
+                                                'Canarias' => 'Canarias',
+                                                'Cantabria' => 'Cantabria',
+                                                'Castilla y León' => 'Castilla y León',
+                                                'Castilla-La Mancha' => 'Castilla-La Mancha',
+                                                'Cataluña' => 'Cataluña',
+                                                'Comunitat Valenciana' => 'Comunitat Valenciana',
+                                                'Extremadura' => 'Extremadura',
+                                                'Galicia' => 'Galicia',
+                                                'Comunidad de Madrid' => 'Comunidad de Madrid',
+                                                'Región de Murcia' => 'Región de Murcia',
+                                                'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
+                                                'País Vasco' => 'País Vasco',
+                                                'La Rioja' => 'La Rioja',
+                                                'Ceuta' => 'Ceuta',
+                                                'Melilla' => 'Melilla',
+                                            ])
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
 
                                         FileUpload::make('resolucion_discapacidad')
                                             ->label('Resolución de Discapacidad (Archivo)')
