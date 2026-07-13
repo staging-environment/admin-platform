@@ -72,7 +72,7 @@ class EmpleadoForm
                                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'DNI')->exists())
                                                             ->modalSubmitAction(false)
                                                             ->modalCancelActionLabel('Cerrar')
-                                                            ->modalWidth('xl')
+                                                            ->modalWidth('7xl')
                                                             ->modalContent(function ($record) {
                                                                 $doc = $record->documentos()->where('tipo', 'DNI')->first();
                                                                 if (!$doc) return null;
@@ -281,7 +281,7 @@ class EmpleadoForm
                                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists())
                                                             ->modalSubmitAction(false)
                                                             ->modalCancelActionLabel('Cerrar')
-                                                            ->modalWidth('xl')
+                                                            ->modalWidth('7xl')
                                                             ->modalContent(function ($record) {
                                                                 $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                                                                 if (!$doc) return null;
@@ -342,7 +342,7 @@ class EmpleadoForm
                                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Dictamen Técnico')->exists())
                                                             ->modalSubmitAction(false)
                                                             ->modalCancelActionLabel('Cerrar')
-                                                            ->modalWidth('xl')
+                                                            ->modalWidth('7xl')
                                                             ->modalContent(function ($record) {
                                                                 $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                                                                 if (!$doc) return null;
@@ -403,7 +403,7 @@ class EmpleadoForm
                                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists())
                                                             ->modalSubmitAction(false)
                                                             ->modalCancelActionLabel('Cerrar')
-                                                            ->modalWidth('xl')
+                                                            ->modalWidth('7xl')
                                                             ->modalContent(function ($record) {
                                                                 $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
                                                                 if (!$doc) return null;
@@ -506,7 +506,7 @@ class EmpleadoForm
                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Contratos')->exists())
                                             ->modalSubmitAction(false)
                                             ->modalCancelActionLabel('Cerrar')
-                                            ->modalWidth('xl')
+                                            ->modalWidth('7xl')
                                             ->modalContent(function ($record) {
                                                 $doc = $record->documentos()->where('tipo', 'Contratos')->first();
                                                 if (!$doc) return null;
