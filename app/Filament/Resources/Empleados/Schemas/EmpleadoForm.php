@@ -65,7 +65,7 @@ class EmpleadoForm
                                                     ->required()
                                                     ->previewable(false)
                                                     ->hintAction(
-                                                        \Filament\Forms\Components\Actions\Action::make('ver_dni')
+                                                        \Filament\Actions\Action::make('ver_dni')
                                                             ->label('Ver DNI')
                                                             ->icon('heroicon-o-eye')
                                                             ->color('warning')
@@ -318,7 +318,7 @@ class EmpleadoForm
                                     ->acceptedFileTypes(['application/pdf', 'image/*'])
                                     ->previewable(false)
                                     ->hintAction(
-                                        \Filament\Forms\Components\Actions\Action::make('ver_contrato')
+                                        \Filament\Actions\Action::make('ver_contrato')
                                             ->label('Ver Contrato')
                                             ->icon('heroicon-o-eye')
                                             ->color('warning')
