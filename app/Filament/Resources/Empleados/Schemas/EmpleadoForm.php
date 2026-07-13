@@ -271,17 +271,80 @@ class EmpleadoForm
                                                     ->label('Resolución de Discapacidad (Archivo)')
                                                     ->directory('empleados/resoluciones')
                                                     ->disk('local')
-                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->afterStateHydrated(function ($component, $record) {
+                                                        if ($record) {
+                                                            $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                                                            $component->state($doc ? $doc->file_path : null);
+                                                        }
+                                                    })
+                                                    ->dehydrated(false)
+                                                    ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                                        if (empty($state)) {
+                                                            $record->documentos()->where('tipo', 'Resolución Discapacidad')->delete();
+                                                            return;
+                                                        }
+
+                                                        $record->documentos()->updateOrCreate(
+                                                            ['tipo' => 'Resolución Discapacidad'],
+                                                            [
+                                                                'nombre' => 'Resolución de Discapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                                                'file_path' => $state,
+                                                            ]
+                                                        );
+                                                    }),
                                                 FileUpload::make('dictamen_tecnico')
                                                     ->label('Dictamen técnico facultativo')
                                                     ->directory('empleados/resoluciones')
                                                     ->disk('local')
-                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->afterStateHydrated(function ($component, $record) {
+                                                        if ($record) {
+                                                            $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                                                            $component->state($doc ? $doc->file_path : null);
+                                                        }
+                                                    })
+                                                    ->dehydrated(false)
+                                                    ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                                        if (empty($state)) {
+                                                            $record->documentos()->where('tipo', 'Dictamen Técnico')->delete();
+                                                            return;
+                                                        }
+
+                                                        $record->documentos()->updateOrCreate(
+                                                            ['tipo' => 'Dictamen Técnico'],
+                                                            [
+                                                                'nombre' => 'Dictamen Técnico Facultativo ' . $record->nombre . ' ' . $record->apellidos,
+                                                                'file_path' => $state,
+                                                            ]
+                                                        );
+                                                    }),
                                                 FileUpload::make('certificado_discapacidad')
                                                     ->label('Certificado de discapacidad')
                                                     ->directory('empleados/resoluciones')
                                                     ->disk('local')
-                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->afterStateHydrated(function ($component, $record) {
+                                                        if ($record) {
+                                                            $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                                                            $component->state($doc ? $doc->file_path : null);
+                                                        }
+                                                    })
+                                                    ->dehydrated(false)
+                                                    ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                                        if (empty($state)) {
+                                                            $record->documentos()->where('tipo', 'Certificado Discapacidad')->delete();
+                                                            return;
+                                                        }
+
+                                                        $record->documentos()->updateOrCreate(
+                                                            ['tipo' => 'Certificado Discapacidad'],
+                                                            [
+                                                                'nombre' => 'Certificado de Discapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                                                'file_path' => $state,
+                                                            ]
+                                                        );
+                                                    }),
                                             ])
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->columnSpanFull(),

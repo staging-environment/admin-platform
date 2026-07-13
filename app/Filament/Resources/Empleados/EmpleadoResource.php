@@ -134,15 +134,36 @@ class EmpleadoResource extends Resource
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
-                                    ->url(fn ($record) => $record->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
+                                    ->state(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                                        return $doc ? basename($doc->file_path) : null;
+                                    })
+                                    ->url(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                    })
                                     ->placeholder('Sin documento adjunto'),
                                 \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
                                     ->label('Dictamen técnico facultativo')
-                                    ->url(fn ($record) => $record->dictamen_tecnico ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->dictamen_tecnico) : null)
+                                    ->state(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                                        return $doc ? basename($doc->file_path) : null;
+                                    })
+                                    ->url(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                    })
                                     ->placeholder('Sin documento adjunto'),
                                 \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
                                     ->label('Certificado de discapacidad')
-                                    ->url(fn ($record) => $record->certificado_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->certificado_discapacidad) : null)
+                                    ->state(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                                        return $doc ? basename($doc->file_path) : null;
+                                    })
+                                    ->url(function ($record) {
+                                        $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                    })
                                     ->placeholder('Sin documento adjunto'),
                             ]),
                     ])
