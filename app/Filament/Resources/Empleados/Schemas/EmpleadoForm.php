@@ -265,11 +265,24 @@ class EmpleadoForm
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
                                             ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
 
-                                        FileUpload::make('resolucion_discapacidad')
-                                            ->label('Resolución de Discapacidad (Archivo)')
-                                            ->directory('empleados/resoluciones')
-                                            ->disk('local')
-                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                        Grid::make(3)
+                                            ->schema([
+                                                FileUpload::make('resolucion_discapacidad')
+                                                    ->label('Resolución de Discapacidad (Archivo)')
+                                                    ->directory('empleados/resoluciones')
+                                                    ->disk('local')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                FileUpload::make('dictamen_tecnico')
+                                                    ->label('Dictamen técnico facultativo')
+                                                    ->directory('empleados/resoluciones')
+                                                    ->disk('local')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                                FileUpload::make('certificado_discapacidad')
+                                                    ->label('Certificado de discapacidad')
+                                                    ->directory('empleados/resoluciones')
+                                                    ->disk('local')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*']),
+                                            ])
                                             ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->columnSpanFull(),
 

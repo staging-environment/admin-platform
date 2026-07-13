@@ -136,6 +136,14 @@ class EmpleadoResource extends Resource
                                     ->label('Resolución de Discapacidad')
                                     ->url(fn ($record) => $record->resolucion_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->resolucion_discapacidad) : null)
                                     ->placeholder('Sin documento adjunto'),
+                                \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
+                                    ->label('Dictamen técnico facultativo')
+                                    ->url(fn ($record) => $record->dictamen_tecnico ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->dictamen_tecnico) : null)
+                                    ->placeholder('Sin documento adjunto'),
+                                \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
+                                    ->label('Certificado de discapacidad')
+                                    ->url(fn ($record) => $record->certificado_discapacidad ? \Illuminate\Support\Facades\Storage::disk('local')->url($record->certificado_discapacidad) : null)
+                                    ->placeholder('Sin documento adjunto'),
                             ]),
                     ])
             ]);
