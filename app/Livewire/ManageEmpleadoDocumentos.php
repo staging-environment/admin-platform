@@ -21,7 +21,7 @@ class ManageEmpleadoDocumentos extends Component
 
     // Validation rules
     protected $rules = [
-        'tipo' => 'required|in:DNI,Certificados,Titulaciones,Carnets,Otros',
+        'tipo' => 'required|in:Certificados,Titulaciones,Carnets,Otros',
         'nombre' => 'required|string|max:255',
         'file' => 'required|file|max:10240', // 10MB max
     ];

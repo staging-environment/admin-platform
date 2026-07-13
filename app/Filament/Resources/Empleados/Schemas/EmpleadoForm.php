@@ -47,14 +47,45 @@ class EmpleadoForm
                                             ->label('Apellidos')
                                             ->required()
                                             ->maxLength(255),
-                                        TextInput::make('dni')
-                                            ->label('DNI / NIE')
-                                            ->required()
-                                            ->unique(ignoreRecord: true)
-                                            ->maxLength(255),
-                                        DatePicker::make('fecha_nacimiento')
-                                            ->label('Fecha de Nacimiento')
-                                            ->required(),
+                                        Grid::make(3)
+                                            ->schema([
+                                                TextInput::make('dni')
+                                                    ->label('DNI / NIE')
+                                                    ->required()
+                                                    ->unique(ignoreRecord: true)
+                                                    ->maxLength(255),
+                                                FileUpload::make('dni_file')
+                                                    ->label('Adjuntar DNI')
+                                                    ->directory('empleados/documentos')
+                                                    ->disk('local')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->required()
+                                                    ->afterStateHydrated(function ($component, $record) {
+                                                        if ($record) {
+                                                            $doc = $record->documentos()->where('tipo', 'DNI')->first();
+                                                            $component->state($doc ? $doc->file_path : null);
+                                                        }
+                                                    })
+                                                    ->dehydrated(false)
+                                                    ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                                        if (empty($state)) {
+                                                            $record->documentos()->where('tipo', 'DNI')->delete();
+                                                            return;
+                                                        }
+
+                                                        $record->documentos()->updateOrCreate(
+                                                            ['tipo' => 'DNI'],
+                                                            [
+                                                                'nombre' => 'DNI ' . $record->nombre . ' ' . $record->apellidos,
+                                                                'file_path' => $state,
+                                                            ]
+                                                        );
+                                                    }),
+                                                DatePicker::make('fecha_nacimiento')
+                                                    ->label('Fecha de Nacimiento')
+                                                    ->required(),
+                                            ])
+                                            ->columnSpanFull(),
                                         Select::make('gasolinera_codigo')
                                             ->label('Ubicación de trabajo')
                                             ->options(function () {
@@ -278,7 +309,6 @@ class EmpleadoForm
                                 Select::make('tipo')
                                     ->label('Tipo de Documento')
                                     ->options([
-                                        'DNI' => 'DNI / NIE',
                                         'Certificados' => 'Certificados',
                                         'Titulaciones' => 'Titulaciones',
                                         'Carnets' => 'Carnets',

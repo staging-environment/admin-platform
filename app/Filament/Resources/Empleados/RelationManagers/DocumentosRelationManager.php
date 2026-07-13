@@ -58,7 +58,6 @@ class DocumentosRelationManager extends RelationManager
                 Select::make('tipo')
                     ->label('Tipo de Documento')
                     ->options([
-                        'DNI' => 'DNI / NIE',
                         'Certificados' => 'Certificados',
                         'Titulaciones' => 'Titulaciones',
                         'Carnets' => 'Carnets',
