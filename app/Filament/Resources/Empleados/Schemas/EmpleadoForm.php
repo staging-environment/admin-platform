@@ -63,6 +63,41 @@ class EmpleadoForm
                                                     ->disk('local')
                                                     ->acceptedFileTypes(['application/pdf', 'image/*'])
                                                     ->required()
+                                                    ->previewable(false)
+                                                    ->hintAction(
+                                                        \Filament\Forms\Components\Actions\Action::make('ver_dni')
+                                                            ->label('Ver DNI')
+                                                            ->icon('heroicon-o-eye')
+                                                            ->color('warning')
+                                                            ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'DNI')->exists())
+                                                            ->modalSubmitAction(false)
+                                                            ->modalCancelActionLabel('Cerrar')
+                                                            ->modalWidth('xl')
+                                                            ->modalContent(function ($record) {
+                                                                $doc = $record->documentos()->where('tipo', 'DNI')->first();
+                                                                if (!$doc) return null;
+                                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                                    return new \Illuminate\Support\HtmlString("
+                                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
+                                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                                        </div>
+                                                                    ");
+                                                                } elseif ($extension === 'pdf') {
+                                                                    return new \Illuminate\Support\HtmlString("
+                                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                                        </div>
+                                                                    ");
+                                                                }
+                                                                return new \Illuminate\Support\HtmlString("
+                                                                    <div class='text-center p-4'>
+                                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar DNI</a>
+                                                                    </div>
+                                                                ");
+                                                            })
+                                                    )
                                                     ->afterStateHydrated(function ($component, $record) {
                                                         if ($record) {
                                                             $doc = $record->documentos()->where('tipo', 'DNI')->first();
@@ -281,6 +316,41 @@ class EmpleadoForm
                                     ->directory('empleados/documentos')
                                     ->disk('local')
                                     ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                    ->previewable(false)
+                                    ->hintAction(
+                                        \Filament\Forms\Components\Actions\Action::make('ver_contrato')
+                                            ->label('Ver Contrato')
+                                            ->icon('heroicon-o-eye')
+                                            ->color('warning')
+                                            ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Contratos')->exists())
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->where('tipo', 'Contratos')->first();
+                                                if (!$doc) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto max-h-[70vh]'>
+                                                            <img src='{$url}' class='object-contain max-h-[60vh] rounded shadow-sm' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden h-[70vh]'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Contrato</a>
+                                                    </div>
+                                                ");
+                                            })
+                                    )
                                     ->afterStateHydrated(function ($component, $record) {
                                         if ($record) {
                                             $doc = $record->documentos()->where('tipo', 'Contratos')->first();
