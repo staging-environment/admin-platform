@@ -439,6 +439,64 @@ button.fi-topbar-trigger {
     min-width: 75px !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   RECURSOS HUMANOS — Compactar la Vista de Ficha de Empleado
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Reducir padding de las secciones en la vista de ficha */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-section,
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-section > div {
+    padding: 10px 16px !important;
+}
+
+/* Reducir espacio superior e inferior del header de la ficha */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-section-header {
+    padding-bottom: 4px !important;
+    margin-bottom: 6px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+.dark .fi-resource-view-record-page.fi-resource-recursos-humanos .fi-section-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Reducir el gap de los grids para juntar la información */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-grid {
+    gap: 12px 16px !important;
+}
+
+/* Compactar márgenes de los campos (labels e inputs/text) */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-in-entry-wrp {
+    margin-bottom: 0px !important;
+}
+
+/* Estilo para los labels de los campos */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-in-entry-wrp-label dt,
+.fi-resource-view-record-page.fi-resource-recursos-humanos dt {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
+    margin-bottom: 2px !important;
+}
+.dark .fi-resource-view-record-page.fi-resource-recursos-humanos dt {
+    color: #9ca3af !important;
+}
+
+/* Estilo para el valor del campo */
+.fi-resource-view-record-page.fi-resource-recursos-humanos .fi-in-text,
+.fi-resource-view-record-page.fi-resource-recursos-humanos dd {
+    font-size: 0.85rem !important;
+    color: #1f2937 !important;
+}
+.dark .fi-resource-view-record-page.fi-resource-recursos-humanos dd {
+    color: #f3f4f6 !important;
+}
+
+/* Reducir el margen vertical del hr */
+.fi-resource-view-record-page.fi-resource-recursos-humanos hr {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}
+
 
 
 

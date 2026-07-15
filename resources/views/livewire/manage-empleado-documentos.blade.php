@@ -22,14 +22,47 @@
                 Añadir Nuevo Documento
             </h3>
             
+            @php
+                $options = [];
+                if ($family === 'dni') {
+                    $options = ['DNI' => 'DNI'];
+                } elseif ($family === 'contratos') {
+                    $options = ['Contratos' => 'Contrato'];
+                } elseif ($family === 'formacion') {
+                    $options = [
+                        'Certificados' => 'Certificado',
+                        'Titulaciones' => 'Titulación',
+                        'Carnets' => 'Carnet',
+                        'Otros' => 'Otros documentos',
+                    ];
+                } elseif ($family === 'discapacidad') {
+                    $options = [
+                        'Resolución Discapacidad' => 'Resolución Discapacidad',
+                        'Dictamen Técnico' => 'Dictamen Técnico Facultativo',
+                        'Certificado Discapacidad' => 'Certificado Discapacidad',
+                    ];
+                } else {
+                    $options = [
+                        'DNI' => 'DNI',
+                        'Contratos' => 'Contrato',
+                        'Certificados' => 'Certificado',
+                        'Titulaciones' => 'Titulación',
+                        'Carnets' => 'Carnet',
+                        'Resolución Discapacidad' => 'Resolución Discapacidad',
+                        'Dictamen Técnico' => 'Dictamen Técnico',
+                        'Certificado Discapacidad' => 'Certificado Discapacidad',
+                        'Otros' => 'Otros documentos',
+                    ];
+                }
+            @endphp
+            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Documento</label>
-                    <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                        <option value="Certificados">Certificados</option>
-                        <option value="Titulaciones">Titulaciones</option>
-                        <option value="Carnets">Carnets</option>
-                        <option value="Otros">Otros documentos</option>
+                    <select wire:model="tipo" @if(count($options) <= 1) disabled @endif class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm disabled:opacity-75 disabled:cursor-not-allowed">
+                        @foreach ($options as $val => $lbl)
+                            <option value="{{ $val }}">{{ $lbl }}</option>
+                        @endforeach
                     </select>
                     @error('tipo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>

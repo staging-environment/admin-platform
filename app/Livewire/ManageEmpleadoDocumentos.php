@@ -13,6 +13,7 @@ class ManageEmpleadoDocumentos extends Component
     use WithFileUploads;
 
     public $empleadoId;
+    public $family;
     
     // Form fields for uploading a new document
     public $tipo = 'Otros';
@@ -21,14 +22,26 @@ class ManageEmpleadoDocumentos extends Component
 
     // Validation rules
     protected $rules = [
-        'tipo' => 'required|in:Certificados,Titulaciones,Carnets,Otros',
+        'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Otros',
         'nombre' => 'required|string|max:255',
         'file' => 'required|file|max:10240', // 10MB max
     ];
 
-    public function mount($empleadoId)
+    public function mount($empleadoId, $family = null)
     {
         $this->empleadoId = $empleadoId;
+        $this->family = $family;
+
+        // Set default tipo depending on family
+        if ($this->family === 'dni') {
+            $this->tipo = 'DNI';
+        } elseif ($this->family === 'contratos') {
+            $this->tipo = 'Contratos';
+        } elseif ($this->family === 'formacion') {
+            $this->tipo = 'Certificados';
+        } elseif ($this->family === 'discapacidad') {
+            $this->tipo = 'Resolución Discapacidad';
+        }
     }
 
     public function getEmpleadoProperty()
@@ -38,7 +51,17 @@ class ManageEmpleadoDocumentos extends Component
 
     public function getDocumentosProperty()
     {
-        return $this->empleado->documentos()->orderBy('created_at', 'desc')->get();
+        $query = $this->empleado->documentos();
+        if ($this->family === 'dni') {
+            $query->where('tipo', 'DNI');
+        } elseif ($this->family === 'contratos') {
+            $query->where('tipo', 'Contratos');
+        } elseif ($this->family === 'formacion') {
+            $query->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros']);
+        } elseif ($this->family === 'discapacidad') {
+            $query->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad']);
+        }
+        return $query->orderBy('created_at', 'desc')->get();
     }
 
     public function uploadDocument()
@@ -61,7 +84,17 @@ class ManageEmpleadoDocumentos extends Component
 
         // Reset form fields
         $this->reset(['nombre', 'file']);
-        $this->tipo = 'Otros';
+        if ($this->family === 'dni') {
+            $this->tipo = 'DNI';
+        } elseif ($this->family === 'contratos') {
+            $this->tipo = 'Contratos';
+        } elseif ($this->family === 'formacion') {
+            $this->tipo = 'Certificados';
+        } elseif ($this->family === 'discapacidad') {
+            $this->tipo = 'Resolución Discapacidad';
+        } else {
+            $this->tipo = 'Otros';
+        }
 
         session()->flash('message', 'Documento añadido correctamente.');
     }

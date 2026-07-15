@@ -52,13 +52,13 @@ class EmpleadoResource extends Resource
                     ->columnSpanFull()
                     ->schema([
                         // Datos Personales
-                        \Filament\Schemas\Components\Grid::make(3)
+                        \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
                                     ->label('Foto de perfil')
                                     ->circular()
                                     ->columnSpan(1),
-                                \Filament\Schemas\Components\Grid::make(2)
+                                \Filament\Schemas\Components\Grid::make(3)
                                     ->schema([
                                         \Filament\Infolists\Components\TextEntry::make('nombre')
                                             ->label('Nombre')
@@ -72,14 +72,14 @@ class EmpleadoResource extends Resource
                                             ->label('Fecha de Nacimiento')
                                             ->date(),
                                     ])
-                                    ->columnSpan(2),
+                                    ->columnSpan(3),
                             ]),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
                             ->columnSpan('full'),
 
                         // Contacto y Dirección
-                        \Filament\Schemas\Components\Grid::make(3)
+                        \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
                                     ->label('Ubicación de trabajo')
@@ -87,6 +87,11 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('puesto')
                                     ->label('Puesto')
                                     ->placeholder('No asignado'),
+                                \Filament\Infolists\Components\TextEntry::make('telefono_principal')
+                                    ->label('Teléfono Principal'),
+                                \Filament\Infolists\Components\TextEntry::make('telefono_secundario')
+                                    ->label('Teléfono Secundario')
+                                    ->placeholder('No especificado'),
                                 \Filament\Infolists\Components\TextEntry::make('direccion')
                                     ->label('Dirección'),
                                 \Filament\Infolists\Components\TextEntry::make('localidad')
@@ -95,21 +100,16 @@ class EmpleadoResource extends Resource
                                     ->label('Código Postal'),
                                 \Filament\Infolists\Components\TextEntry::make('provincia')
                                     ->label('Provincia'),
-                                \Filament\Infolists\Components\TextEntry::make('telefono_principal')
-                                    ->label('Teléfono Principal'),
-                                \Filament\Infolists\Components\TextEntry::make('telefono_secundario')
-                                    ->label('Teléfono Secundario')
-                                    ->placeholder('No especificado'),
                                 \Filament\Infolists\Components\TextEntry::make('email')
                                     ->label('Correo Electrónico')
-                                    ->columnSpan(3),
+                                    ->columnSpan(4),
                             ]),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
                             ->columnSpan('full'),
 
                         // Discapacidad / Incapacidad
-                        \Filament\Schemas\Components\Grid::make(2)
+                        \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
