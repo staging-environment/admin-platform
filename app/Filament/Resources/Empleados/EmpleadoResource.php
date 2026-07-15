@@ -69,7 +69,7 @@ class EmpleadoResource extends Resource
                                         \Filament\Infolists\Components\TextEntry::make('dni')
                                             ->label('DNI / NIE')
                                             ->hintAction(
-                                                \Filament\Infolists\Components\Actions\Action::make('ver_dni')
+                                                \Filament\Actions\Action::make('ver_dni')
                                                     ->label('Ver DNI')
                                                     ->url(function ($record) {
                                                         $doc = $record->documentos()->where('tipo', 'DNI')->first();
@@ -116,7 +116,7 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
                                     ->label('Tipo de Contrato')
                                     ->hintAction(
-                                        \Filament\Infolists\Components\Actions\Action::make('ver_contrato')
+                                        \Filament\Actions\Action::make('ver_contrato')
                                             ->label('Ver Contrato')
                                             ->url(function ($record) {
                                                 $doc = $record->documentos()->where('tipo', 'Contratos')->first();
