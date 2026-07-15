@@ -59,7 +59,7 @@ class EditEmpleado extends EditRecord
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    return ($record->tiene_discapacidad || $hasDocs) ? 'warning' : 'danger';
                 })
                 ->modalHeading('Documentos Discapacidad')
                 ->modalSubmitAction(false)
@@ -71,7 +71,7 @@ class EditEmpleado extends EditRecord
                 ->icon('heroicon-o-shield-check')
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    return ($record->tiene_incapacidad || $hasDocs) ? 'warning' : 'danger';
                 })
                 ->modalHeading('Documentos Incapacidad')
                 ->modalSubmitAction(false)
