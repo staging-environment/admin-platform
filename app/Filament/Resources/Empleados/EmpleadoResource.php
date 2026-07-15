@@ -67,7 +67,17 @@ class EmpleadoResource extends Resource
                                             ->label('Apellidos')
                                             ->weight(\Filament\Support\Enums\FontWeight::Bold),
                                         \Filament\Infolists\Components\TextEntry::make('dni')
-                                            ->label('DNI / NIE'),
+                                            ->label('DNI / NIE')
+                                            ->hint(function ($record) {
+                                                if (!$record) return null;
+                                                return $record->documentos()->where('tipo', 'DNI')->exists() ? 'Ver DNI' : null;
+                                            })
+                                            ->hintUrl(function ($record) {
+                                                if (!$record) return null;
+                                                $doc = $record->documentos()->where('tipo', 'DNI')->first();
+                                                return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                            }, shouldOpenInNewTab: true)
+                                            ->hintColor('warning'),
                                         \Filament\Infolists\Components\TextEntry::make('fecha_nacimiento')
                                             ->label('Fecha de Nacimiento')
                                             ->date(),
@@ -103,6 +113,25 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('email')
                                     ->label('Correo Electrónico')
                                     ->columnSpan(4),
+                                \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
+                                    ->label('Tipo de Contrato')
+                                    ->hint(function ($record) {
+                                        if (!$record) return null;
+                                        return $record->documentos()->where('tipo', 'Contratos')->exists() ? 'Ver Contrato' : null;
+                                    })
+                                    ->hintUrl(function ($record) {
+                                        if (!$record) return null;
+                                        $doc = $record->documentos()->where('tipo', 'Contratos')->first();
+                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                    }, shouldOpenInNewTab: true)
+                                    ->hintColor('warning')
+                                    ->columnSpan(2),
+                                \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
+                                    ->label('Vencimiento de Contrato')
+                                    ->date()
+                                    ->visible(fn ($record) => $record && $record->tipo_contrato === 'Eventual')
+                                    ->placeholder('N/A')
+                                    ->columnSpan(2),
                             ]),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')

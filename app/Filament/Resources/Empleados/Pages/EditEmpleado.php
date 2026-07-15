@@ -54,7 +54,13 @@ class EditEmpleado extends EditRecord
             \Filament\Actions\Action::make('discapacidadDocuments')
                 ->label('Discapacidad')
                 ->icon('heroicon-o-heart')
-                ->color(fn ($record) => $record->tiene_discapacidad ? 'warning' : 'gray')
+                ->color(function ($record) {
+                    if (!$record->tiene_discapacidad) {
+                        return 'gray';
+                    }
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
+                    return $hasDocs ? 'warning' : 'danger';
+                })
                 ->modalHeading('Documentos Discapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -63,7 +69,13 @@ class EditEmpleado extends EditRecord
             \Filament\Actions\Action::make('incapacidadDocuments')
                 ->label('Incapacidad')
                 ->icon('heroicon-o-shield-check')
-                ->color(fn ($record) => $record->tiene_incapacidad ? 'warning' : 'gray')
+                ->color(function ($record) {
+                    if (!$record->tiene_incapacidad) {
+                        return 'gray';
+                    }
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+                    return $hasDocs ? 'warning' : 'danger';
+                })
                 ->modalHeading('Documentos Incapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
