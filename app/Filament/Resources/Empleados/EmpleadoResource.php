@@ -111,29 +111,41 @@ class EmpleadoResource extends Resource
                         // Discapacidad / Incapacidad
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
+                                    ->label('Discapacidad / Incapacidad')
+                                    ->state('No tiene Discapacidad ni Incapacidad')
+                                    ->visible(fn ($record) => $record && !$record->tiene_discapacidad && !$record->tiene_incapacidad)
+                                    ->columnSpanFull(),
+
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
                                     ->suffix('%')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->placeholder('N/A'),
                                 \Filament\Infolists\Components\TextEntry::make('fecha_reconocimiento')
                                     ->label('Fecha de reconocimiento')
                                     ->date('d/m/Y')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('pertenece_andalucia')
                                     ->label('¿Pertenece a Andalucía?')
-                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad),
                                 \Filament\Infolists\Components\TextEntry::make('comunidad_autonoma')
                                     ->label('Comunidad Autónoma')
-                                    ->visible(fn ($record) => ! $record->pertenece_andalucia)
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad && !$record->pertenece_andalucia)
                                     ->placeholder('N/A'),
                                 \Filament\Infolists\Components\TextEntry::make('tipo_incapacidad')
                                     ->label('Tipo de Incapacidad')
+                                    ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->state(function ($record) {
                                         $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                                         return $doc ? basename($doc->file_path) : null;
@@ -145,6 +157,7 @@ class EmpleadoResource extends Resource
                                     ->placeholder('Sin documento adjunto'),
                                 \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
                                     ->label('Dictamen técnico facultativo')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->state(function ($record) {
                                         $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                                         return $doc ? basename($doc->file_path) : null;
@@ -156,6 +169,7 @@ class EmpleadoResource extends Resource
                                     ->placeholder('Sin documento adjunto'),
                                 \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
                                     ->label('Certificado de discapacidad')
+                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->state(function ($record) {
                                         $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
                                         return $doc ? basename($doc->file_path) : null;
