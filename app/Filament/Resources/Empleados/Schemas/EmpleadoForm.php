@@ -472,7 +472,7 @@ class EmpleadoForm
 
                                         FileUpload::make('incapacidad_file')
                                             ->label('Adjuntar Documentación de Incapacidad')
-                                            ->directory('empleados/incapacidades')
+                                            ->directory('empleados/documentos')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                                             ->previewable(false)
@@ -517,23 +517,26 @@ class EmpleadoForm
                                                 }
                                             })
                                             ->dehydrated(false)
-                                            ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                            ->saveRelationshipsUsing(function ($component, $record, $state, Get $get) {
                                                 if (empty($state)) {
                                                     $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
                                                     return;
                                                 }
 
                                                 $tipo = 'Incapacidad Física';
-                                                if ($record->tipo_incapacidad && count($record->tipo_incapacidad) > 0) {
-                                                    $first = $record->tipo_incapacidad[0];
+                                                $tipoIncapacidad = $get('tipo_incapacidad') ?? [];
+                                                if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
+                                                    $first = $tipoIncapacidad[0];
                                                     $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
                                                 }
+
+                                                $filePath = is_array($state) ? reset($state) : $state;
 
                                                 $record->documentos()->updateOrCreate(
                                                     ['tipo' => $tipo],
                                                     [
                                                         'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
-                                                        'file_path' => $state,
+                                                        'file_path' => $filePath,
                                                     ]
                                                 );
                                             })
