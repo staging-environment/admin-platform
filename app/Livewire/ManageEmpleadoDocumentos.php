@@ -22,7 +22,7 @@ class ManageEmpleadoDocumentos extends Component
 
     // Validation rules
     protected $rules = [
-        'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Otros',
+        'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Otros',
         'nombre' => 'required|string|max:255',
         'file' => 'required|file|max:10240', // 10MB max
     ];
@@ -41,6 +41,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo = 'Certificados';
         } elseif ($this->family === 'discapacidad') {
             $this->tipo = 'Resolución Discapacidad';
+        } elseif ($this->family === 'incapacidad') {
+            $this->tipo = 'Incapacidad';
         }
     }
 
@@ -60,6 +62,8 @@ class ManageEmpleadoDocumentos extends Component
             $query->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros']);
         } elseif ($this->family === 'discapacidad') {
             $query->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad']);
+        } elseif ($this->family === 'incapacidad') {
+            $query->where('tipo', 'Incapacidad');
         }
         return $query->orderBy('created_at', 'desc')->get();
     }
@@ -92,6 +96,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo = 'Certificados';
         } elseif ($this->family === 'discapacidad') {
             $this->tipo = 'Resolución Discapacidad';
+        } elseif ($this->family === 'incapacidad') {
+            $this->tipo = 'Incapacidad';
         } else {
             $this->tipo = 'Otros';
         }

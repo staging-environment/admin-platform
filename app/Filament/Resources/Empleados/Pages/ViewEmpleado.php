@@ -60,6 +60,15 @@ class ViewEmpleado extends ViewRecord
                 ->modalCancelActionLabel('Cerrar')
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'discapacidad']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
+            \Filament\Actions\Action::make('incapacidadDocuments')
+                ->label('Incapacidad')
+                ->icon('heroicon-o-shield-check')
+                ->color('warning')
+                ->modalHeading('Documentos Incapacidad')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'incapacidad']))
+                ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
         ];
     }
 }

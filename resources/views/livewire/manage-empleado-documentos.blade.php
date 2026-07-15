@@ -41,6 +41,10 @@
                         'Dictamen Técnico' => 'Dictamen Técnico Facultativo',
                         'Certificado Discapacidad' => 'Certificado Discapacidad',
                     ];
+                } elseif ($family === 'incapacidad') {
+                    $options = [
+                        'Incapacidad' => 'Incapacidad',
+                    ];
                 } else {
                     $options = [
                         'DNI' => 'DNI',
@@ -51,6 +55,7 @@
                         'Resolución Discapacidad' => 'Resolución Discapacidad',
                         'Dictamen Técnico' => 'Dictamen Técnico',
                         'Certificado Discapacidad' => 'Certificado Discapacidad',
+                        'Incapacidad' => 'Incapacidad',
                         'Otros' => 'Otros documentos',
                     ];
                 }

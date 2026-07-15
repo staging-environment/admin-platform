@@ -469,6 +469,70 @@ class EmpleadoForm
                                             ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                                             ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                                             ->columnSpanFull(),
+
+                                        FileUpload::make('incapacidad_file')
+                                            ->label('Adjuntar Documentación de Incapacidad')
+                                            ->directory('empleados/incapacidades')
+                                            ->disk('local')
+                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                            ->previewable(false)
+                                            ->hintAction(
+                                                \Filament\Actions\Action::make('ver_incapacidad')
+                                                    ->label('Ver Incapacidad')
+                                                    ->icon('heroicon-o-eye')
+                                                    ->color('warning')
+                                                    ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Incapacidad')->exists())
+                                                    ->modalSubmitAction(false)
+                                                    ->modalCancelActionLabel('Cerrar')
+                                                    ->modalWidth('7xl')
+                                                    ->modalContent(function ($record) {
+                                                        $doc = $record->documentos()->where('tipo', 'Incapacidad')->first();
+                                                        if (!$doc) return null;
+                                                        $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                        $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                            return new \Illuminate\Support\HtmlString("
+                                                                <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                    <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                                </div>
+                                                            ");
+                                                        } elseif ($extension === 'pdf') {
+                                                            return new \Illuminate\Support\HtmlString("
+                                                                <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                                    <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                                </div>
+                                                            ");
+                                                        }
+                                                        return new \Illuminate\Support\HtmlString("
+                                                            <div class='text-center p-4'>
+                                                                <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Archivo</a>
+                                                            </div>
+                                                        ");
+                                                    })
+                                            )
+                                            ->afterStateHydrated(function ($component, $record) {
+                                                if ($record) {
+                                                    $doc = $record->documentos()->where('tipo', 'Incapacidad')->first();
+                                                    $component->state($doc ? $doc->file_path : null);
+                                                }
+                                            })
+                                            ->dehydrated(false)
+                                            ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                                if (empty($state)) {
+                                                    $record->documentos()->where('tipo', 'Incapacidad')->delete();
+                                                    return;
+                                                }
+
+                                                $record->documentos()->updateOrCreate(
+                                                    ['tipo' => 'Incapacidad'],
+                                                    [
+                                                        'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                                        'file_path' => $state,
+                                                    ]
+                                                );
+                                            })
+                                            ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                            ->columnSpanFull(),
                                     ]),
                             ]),
 
@@ -554,6 +618,37 @@ class EmpleadoForm
                                         );
                                     }),
                             ]),
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        FileUpload::make('formacion_files')
+                            ->label('Adjuntar Cursos / Formación (Múltiple)')
+                            ->multiple()
+                            ->directory('empleados/documentos')
+                            ->disk('local')
+                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                            ->previewable(false)
+                            ->afterStateHydrated(function ($component, $record) {
+                                if ($record) {
+                                    $docs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->pluck('file_path')->toArray();
+                                    $component->state($docs);
+                                }
+                            })
+                            ->dehydrated(false)
+                            ->saveRelationshipsUsing(function ($component, $record, $state) {
+                                $state = array_filter((array) $state);
+                                $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->whereNotIn('file_path', $state)->delete();
+                                foreach ($state as $file_path) {
+                                    $record->documentos()->firstOrCreate(
+                                        ['file_path' => $file_path],
+                                        [
+                                            'tipo' => 'Certificados',
+                                            'nombre' => basename($file_path),
+                                        ]
+                                    );
+                                }
+                            })
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Documentación Inicial')
@@ -574,6 +669,7 @@ class EmpleadoForm
                                         'Resolución Discapacidad' => 'Resolución Discapacidad',
                                         'Dictamen Técnico' => 'Dictamen Técnico Facultativo (Discapacidad)',
                                         'Certificado Discapacidad' => 'Certificado Discapacidad',
+                                        'Incapacidad' => 'Incapacidad',
                                         'Otros' => 'Otros documentos (Formación)',
                                     ])
                                     ->required(),
