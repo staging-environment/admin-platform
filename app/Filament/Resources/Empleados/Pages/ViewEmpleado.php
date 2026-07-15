@@ -44,7 +44,10 @@ class ViewEmpleado extends ViewRecord
             \Filament\Actions\Action::make('formacionDocuments')
                 ->label('Formación')
                 ->icon('heroicon-o-academic-cap')
-                ->color('warning')
+                ->color(function ($record) {
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->exists();
+                    return $hasDocs ? 'warning' : 'danger';
+                })
                 ->modalHeading('Documentos Formación')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
