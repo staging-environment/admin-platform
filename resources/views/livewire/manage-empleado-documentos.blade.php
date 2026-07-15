@@ -43,7 +43,8 @@
                     ];
                 } elseif ($family === 'incapacidad') {
                     $options = [
-                        'Incapacidad' => 'Incapacidad',
+                        'Incapacidad Física' => 'Incapacidad Física',
+                        'Incapacidad Psíquica' => 'Incapacidad Psíquica',
                     ];
                 } else {
                     $options = [
@@ -55,7 +56,8 @@
                         'Resolución Discapacidad' => 'Resolución Discapacidad',
                         'Dictamen Técnico' => 'Dictamen Técnico',
                         'Certificado Discapacidad' => 'Certificado Discapacidad',
-                        'Incapacidad' => 'Incapacidad',
+                        'Incapacidad Física' => 'Incapacidad Física',
+                        'Incapacidad Psíquica' => 'Incapacidad Psíquica',
                         'Otros' => 'Otros documentos',
                     ];
                 }

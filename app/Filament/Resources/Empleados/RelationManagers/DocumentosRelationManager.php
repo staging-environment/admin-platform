@@ -66,6 +66,8 @@ class DocumentosRelationManager extends RelationManager
                         'Resolución Discapacidad' => 'Resolución Discapacidad',
                         'Dictamen Técnico' => 'Dictamen Técnico Facultativo (Discapacidad)',
                         'Certificado Discapacidad' => 'Certificado Discapacidad',
+                        'Incapacidad Física' => 'Incapacidad Física',
+                        'Incapacidad Psíquica' => 'Incapacidad Psíquica',
                         'Otros' => 'Otros documentos (Formación)',
                     ])
                     ->required(),

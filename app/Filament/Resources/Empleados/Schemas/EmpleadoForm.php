@@ -481,12 +481,12 @@ class EmpleadoForm
                                                     ->label('Ver Incapacidad')
                                                     ->icon('heroicon-o-eye')
                                                     ->color('warning')
-                                                    ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Incapacidad')->exists())
+                                                    ->visible(fn ($record) => $record && $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists())
                                                     ->modalSubmitAction(false)
                                                     ->modalCancelActionLabel('Cerrar')
                                                     ->modalWidth('7xl')
                                                     ->modalContent(function ($record) {
-                                                        $doc = $record->documentos()->where('tipo', 'Incapacidad')->first();
+                                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
                                                         if (!$doc) return null;
                                                         $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
                                                         $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
@@ -512,19 +512,25 @@ class EmpleadoForm
                                             )
                                             ->afterStateHydrated(function ($component, $record) {
                                                 if ($record) {
-                                                    $doc = $record->documentos()->where('tipo', 'Incapacidad')->first();
+                                                    $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
                                                     $component->state($doc ? $doc->file_path : null);
                                                 }
                                             })
                                             ->dehydrated(false)
                                             ->saveRelationshipsUsing(function ($component, $record, $state) {
                                                 if (empty($state)) {
-                                                    $record->documentos()->where('tipo', 'Incapacidad')->delete();
+                                                    $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
                                                     return;
                                                 }
 
+                                                $tipo = 'Incapacidad Física';
+                                                if ($record->tipo_incapacidad && count($record->tipo_incapacidad) > 0) {
+                                                    $first = $record->tipo_incapacidad[0];
+                                                    $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                                                }
+
                                                 $record->documentos()->updateOrCreate(
-                                                    ['tipo' => 'Incapacidad'],
+                                                    ['tipo' => $tipo],
                                                     [
                                                         'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
                                                         'file_path' => $state,
