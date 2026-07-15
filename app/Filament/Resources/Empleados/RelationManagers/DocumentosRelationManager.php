@@ -58,10 +58,15 @@ class DocumentosRelationManager extends RelationManager
                 Select::make('tipo')
                     ->label('Tipo de Documento')
                     ->options([
-                        'Certificados' => 'Certificados',
-                        'Titulaciones' => 'Titulaciones',
-                        'Carnets' => 'Carnets',
-                        'Otros' => 'Otros documentos',
+                        'DNI' => 'DNI',
+                        'Contratos' => 'Contrato',
+                        'Certificados' => 'Certificados (Formación)',
+                        'Titulaciones' => 'Titulaciones (Formación)',
+                        'Carnets' => 'Carnets (Formación)',
+                        'Resolución Discapacidad' => 'Resolución Discapacidad',
+                        'Dictamen Técnico' => 'Dictamen Técnico Facultativo (Discapacidad)',
+                        'Certificado Discapacidad' => 'Certificado Discapacidad',
+                        'Otros' => 'Otros documentos (Formación)',
                     ])
                     ->required(),
                 TextInput::make('nombre')
