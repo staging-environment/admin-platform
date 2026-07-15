@@ -23,7 +23,6 @@ class ViewEmpleado extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make()->label('Modificar datos'),
             \Filament\Actions\Action::make('dniDocuments')
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
@@ -54,7 +53,7 @@ class ViewEmpleado extends ViewRecord
             \Filament\Actions\Action::make('discapacidadDocuments')
                 ->label('Discapacidad')
                 ->icon('heroicon-o-heart')
-                ->color('warning')
+                ->color(fn ($record) => $record->tiene_discapacidad ? 'warning' : 'gray')
                 ->modalHeading('Documentos Discapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -63,12 +62,15 @@ class ViewEmpleado extends ViewRecord
             \Filament\Actions\Action::make('incapacidadDocuments')
                 ->label('Incapacidad')
                 ->icon('heroicon-o-shield-check')
-                ->color('warning')
+                ->color(fn ($record) => $record->tiene_incapacidad ? 'warning' : 'gray')
                 ->modalHeading('Documentos Incapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'incapacidad']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
+            EditAction::make()
+                ->label('Modificar datos')
+                ->color('info'),
         ];
     }
 }
