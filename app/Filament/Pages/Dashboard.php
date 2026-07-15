@@ -28,6 +28,12 @@ class Dashboard extends \Filament\Pages\Dashboard
 
     public function mount(): void
     {
+        $user = auth()->user();
+        if ($user && !$user->hasRole('Admin') && !$user->can('ver_dashboard') && $user->can('gestion_recursos_humanos')) {
+            redirect()->to('/admin/recursos-humanos');
+            return;
+        }
+
         // Si no hay datos en caché, los obtenemos inmediatamente (primer acceso)
         $fuelService    = app(FuelMarketsService::class);
         $mineturService = app(MineturService::class);
@@ -67,6 +73,8 @@ class Dashboard extends \Filament\Pages\Dashboard
         $user = auth()->user();
         if (! $user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('ver_dashboard');
+        return $user->hasRole('Admin') 
+            || $user->can('ver_dashboard')
+            || $user->can('gestion_recursos_humanos');
     }
 }
