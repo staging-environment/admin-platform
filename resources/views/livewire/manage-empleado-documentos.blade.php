@@ -132,7 +132,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
-                            {{ $doc->created_at->format('d/m/Y H:i') }}
+                            {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 text-right space-x-1.5">
                             {{-- Previsualizar --}}
