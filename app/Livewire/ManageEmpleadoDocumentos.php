@@ -128,6 +128,18 @@ class ManageEmpleadoDocumentos extends Component
 
         $documento->delete();
 
+        if ($this->family === 'discapacidad') {
+            $hasRemaining = $this->empleado->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
+            if (!$hasRemaining) {
+                $this->empleado->update(['tiene_discapacidad' => false]);
+            }
+        } elseif ($this->family === 'incapacidad') {
+            $hasRemaining = $this->empleado->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+            if (!$hasRemaining) {
+                $this->empleado->update(['tiene_incapacidad' => false]);
+            }
+        }
+
         session()->flash('message', 'Documento eliminado correctamente.');
     }
 
