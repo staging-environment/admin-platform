@@ -54,9 +54,6 @@ class ViewEmpleado extends ViewRecord
                 ->label('Discapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
-                    if (!$record->tiene_discapacidad) {
-                        return 'gray';
-                    }
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
                     return $hasDocs ? 'warning' : 'danger';
                 })
@@ -69,9 +66,6 @@ class ViewEmpleado extends ViewRecord
                 ->label('Incapacidad')
                 ->icon('heroicon-o-shield-check')
                 ->color(function ($record) {
-                    if (!$record->tiene_incapacidad) {
-                        return 'gray';
-                    }
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
                     return $hasDocs ? 'warning' : 'danger';
                 })
