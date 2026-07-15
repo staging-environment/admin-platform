@@ -451,7 +451,7 @@ class EmpleadoForm
                                                         );
                                                     }),
                                             ])
-                                            ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                                            ->visible(fn (Get $get, $record) => (bool) ($get('tiene_discapacidad') ?? ($record?->tiene_discapacidad ?? false)))
                                             ->columnSpanFull(),
 
                                         Toggle::make('tiene_incapacidad')
@@ -540,7 +540,7 @@ class EmpleadoForm
                                                     ]
                                                 );
                                             })
-                                            ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                            ->visible(fn (Get $get, $record) => (bool) ($get('tiene_incapacidad') ?? ($record?->tiene_incapacidad ?? false)))
                                             ->columnSpanFull(),
                                     ]),
                             ]),
