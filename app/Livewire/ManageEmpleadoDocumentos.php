@@ -86,6 +86,12 @@ class ManageEmpleadoDocumentos extends Component
             'file_path' => $path,
         ]);
 
+        if ($this->family === 'discapacidad') {
+            $this->empleado->update(['tiene_discapacidad' => true]);
+        } elseif ($this->family === 'incapacidad') {
+            $this->empleado->update(['tiene_incapacidad' => true]);
+        }
+
         // Reset form fields
         $this->reset(['nombre', 'file']);
         if ($this->family === 'dni') {
