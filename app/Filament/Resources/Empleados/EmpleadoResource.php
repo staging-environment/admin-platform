@@ -71,12 +71,36 @@ class EmpleadoResource extends Resource
                                             ->hintAction(
                                                 \Filament\Actions\Action::make('ver_dni')
                                                     ->label('Ver DNI')
-                                                    ->url(function ($record) {
-                                                        $doc = $record->documentos()->where('tipo', 'DNI')->first();
-                                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                                    }, shouldOpenInNewTab: true)
                                                     ->color('warning')
+                                                    ->icon('heroicon-o-eye')
                                                     ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'DNI')->exists())
+                                                    ->modalSubmitAction(false)
+                                                    ->modalCancelActionLabel('Cerrar')
+                                                    ->modalWidth('7xl')
+                                                    ->modalContent(function ($record) {
+                                                        $doc = $record->documentos()->where('tipo', 'DNI')->first();
+                                                        if (!$doc) return null;
+                                                        $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                        $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                            return new \Illuminate\Support\HtmlString("
+                                                                <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                                    <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                                </div>
+                                                            ");
+                                                        } elseif ($extension === 'pdf') {
+                                                            return new \Illuminate\Support\HtmlString("
+                                                                <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                                    <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                                </div>
+                                                            ");
+                                                        }
+                                                        return new \Illuminate\Support\HtmlString("
+                                                            <div class='text-center p-4'>
+                                                                <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar DNI</a>
+                                                            </div>
+                                                        ");
+                                                    })
                                             ),
                                         \Filament\Infolists\Components\TextEntry::make('fecha_nacimiento')
                                             ->label('Fecha de Nacimiento')
@@ -118,12 +142,36 @@ class EmpleadoResource extends Resource
                                     ->hintAction(
                                         \Filament\Actions\Action::make('ver_contrato')
                                             ->label('Ver Contrato')
-                                            ->url(function ($record) {
-                                                $doc = $record->documentos()->where('tipo', 'Contratos')->first();
-                                                return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                            }, shouldOpenInNewTab: true)
                                             ->color('warning')
+                                            ->icon('heroicon-o-eye')
                                             ->visible(fn ($record) => $record && $record->documentos()->where('tipo', 'Contratos')->exists())
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->where('tipo', 'Contratos')->first();
+                                                if (!$doc) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Contrato</a>
+                                                    </div>
+                                                ");
+                                            })
                                     )
                                     ->columnSpan(2),
                                 \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
