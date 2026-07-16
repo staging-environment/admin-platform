@@ -172,18 +172,7 @@ class EmpleadoResource extends Resource
                                     ->label('Tipo de Incapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
-                                \Filament\Infolists\Components\TextEntry::make('incapacidad_file')
-                                    ->label('Documentación de Incapacidad')
-                                    ->visible(fn ($record) => $record && $record->tiene_incapacidad)
-                                    ->state(function ($record) {
-                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                        return $doc ? basename($doc->file_path) : null;
-                                    })
-                                    ->url(function ($record) {
-                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                    })
-                                    ->placeholder('Sin documento adjunto'),
+
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
