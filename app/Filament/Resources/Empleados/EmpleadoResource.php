@@ -182,6 +182,13 @@ class EmpleadoResource extends Resource
                                     ->visible(fn ($record) => $record && $record->tipo_contrato === 'Eventual')
                                     ->placeholder('N/A')
                                     ->columnSpan(2),
+                            ]),
+
+                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
+                            ->columnSpan('full'),
+
+                        \Filament\Schemas\Components\Grid::make(1)
+                            ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('formacion_list')
                                     ->label('Formación y Títulos')
                                     ->html()
@@ -204,7 +211,7 @@ class EmpleadoResource extends Resource
                                         $html .= "</ul>";
                                         return $html;
                                     })
-                                    ->columnSpan(4),
+                                    ->columnSpanFull(),
                             ]),
 
                         \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
