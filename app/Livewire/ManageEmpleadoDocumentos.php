@@ -19,6 +19,7 @@ class ManageEmpleadoDocumentos extends Component
     public $tipo = 'Otros';
     public $nombre = '';
     public $file;
+    public $selectedIncapacidad = [];
 
     // Validation rules
     protected $rules = [
@@ -43,6 +44,7 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo = 'Resolución Discapacidad';
         } elseif ($this->family === 'incapacidad') {
             $this->tipo = 'Incapacidad Física';
+            $this->selectedIncapacidad = $this->empleado->tipo_incapacidad ?? [];
         }
     }
 
@@ -141,6 +143,21 @@ class ManageEmpleadoDocumentos extends Component
         }
 
         session()->flash('message', 'Documento eliminado correctamente.');
+    }
+
+    public function saveIncapacidad()
+    {
+        if (!auth()->user()->can('editar_documentacion_empleados')) {
+            session()->flash('error', 'No tienes permisos para editar la incapacidad.');
+            return;
+        }
+
+        $empleado = $this->empleado;
+        $empleado->tipo_incapacidad = $this->selectedIncapacidad;
+        $empleado->tiene_incapacidad = !empty($this->selectedIncapacidad);
+        $empleado->save();
+
+        session()->flash('message', 'Tipo de incapacidad guardado correctamente.');
     }
 
     public function render()
