@@ -149,6 +149,16 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
+                                    ->state(function ($record) {
+                                        if ($record && !empty($record->tipo_discapacidad)) {
+                                            return $record->tipo_discapacidad;
+                                        }
+                                        return $record ? $record->documentos()
+                                            ->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])
+                                            ->pluck('tipo')
+                                            ->toArray() : [];
+                                    })
+                                    ->separator(', ')
                                     ->placeholder('Ninguna'),
                                 \Filament\Infolists\Components\TextEntry::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
