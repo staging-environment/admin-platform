@@ -68,6 +68,7 @@ class EmpleadoResource extends Resource
                                             ->weight(\Filament\Support\Enums\FontWeight::Bold),
                                         \Filament\Infolists\Components\TextEntry::make('dni')
                                             ->label('DNI / NIE')
+                                            ->extraAttributes(['style' => 'width: fit-content;'])
                                             ->suffixAction(
                                                 \Filament\Actions\Action::make('ver_dni')
                                                     ->icon('heroicon-m-eye')
@@ -139,6 +140,7 @@ class EmpleadoResource extends Resource
                                     ->columnSpan(4),
                                 \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
                                     ->label('Tipo de Contrato')
+                                    ->extraAttributes(['style' => 'width: fit-content;'])
                                     ->suffixAction(
                                         \Filament\Actions\Action::make('ver_contrato')
                                             ->icon('heroicon-m-eye')
