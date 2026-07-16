@@ -27,7 +27,10 @@ class EditEmpleado extends EditRecord
             \Filament\Actions\Action::make('dniDocuments')
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
-                ->color('warning')
+                ->color(function ($record) {
+                    $hasDocs = $record->documentos()->where('tipo', 'DNI')->exists();
+                    return $hasDocs ? 'warning' : 'danger';
+                })
                 ->modalHeading('Documentos DNI')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -36,7 +39,10 @@ class EditEmpleado extends EditRecord
             \Filament\Actions\Action::make('contratosDocuments')
                 ->label('Contratos')
                 ->icon('heroicon-o-document-text')
-                ->color('warning')
+                ->color(function ($record) {
+                    $hasDocs = $record->documentos()->where('tipo', 'Contratos')->exists();
+                    return $hasDocs ? 'warning' : 'danger';
+                })
                 ->modalHeading('Documentos Contratos')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
