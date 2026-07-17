@@ -152,10 +152,11 @@ class EmpleadoResource extends Resource
                                     ->label('Puesto')
                                     ->placeholder('No asignado'),
                                  \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
-                                     ->label('Tipo de Contrato')
-                                     ->state(fn ($record) => $record && $record->tipo_contrato === 'Indefinido' ? 'Fijo' : ($record ? $record->tipo_contrato : null))
-                                     ->extraAttributes(['style' => 'width: fit-content;'])
-                                     ->suffixAction(
+                                      ->label('Tipo de Contrato')
+                                      ->state(fn ($record) => $record && $record->tipo_contrato === 'Indefinido' ? 'Fijo' : ($record ? $record->tipo_contrato : null))
+                                      ->placeholder('Sin contrato registrado')
+                                      ->extraAttributes(['style' => 'width: fit-content;'])
+                                      ->suffixAction(
                                         \Filament\Actions\Action::make('ver_contrato')
                                             ->icon('heroicon-m-eye')
                                             ->color('warning')
