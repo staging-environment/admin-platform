@@ -192,16 +192,21 @@
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         <th scope="col" class="px-6 py-3.5">Nombre</th>
-                        @if ($family !== 'dni')
-                            <th scope="col" class="px-6 py-3.5">Tipo</th>
-                        @endif
-                        <th scope="col" class="px-6 py-3.5">
-                            @if ($family === 'dni')
-                                Fecha de Caducidad
-                            @else
-                                Fecha de Subida
+                        @if ($family === 'contratos')
+                            <th scope="col" class="px-6 py-3.5">Tipo de Contrato</th>
+                            <th scope="col" class="px-6 py-3.5">Fecha de Finalización</th>
+                        @else
+                            @if ($family !== 'dni')
+                                <th scope="col" class="px-6 py-3.5">Tipo</th>
                             @endif
-                        </th>
+                            <th scope="col" class="px-6 py-3.5">
+                                @if ($family === 'dni')
+                                    Fecha de Caducidad
+                                @else
+                                    Fecha de Subida
+                                @endif
+                            </th>
+                        @endif
                         <th scope="col" class="px-6 py-3.5 text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -233,20 +238,38 @@
                                     @endif
                                 </span>
                             </td>
-                            @if ($family !== 'dni')
+                            @if ($family === 'contratos')
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
-                                        {{ $doc->tipo }}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400' : 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' }}">
+                                        {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
                                     </span>
                                 </td>
-                            @endif
-                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
-                                @if ($family === 'dni')
-                                    {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
-                                @else
-                                    {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                    @if (($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual')
+                                        @php
+                                            $date = $doc->fecha_vencimiento_contrato ?? $this->empleado->fecha_vencimiento_contrato;
+                                        @endphp
+                                        {{ $date ? (\Carbon\Carbon::parse($date)->format('d/m/Y')) : 'No especificada' }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            @else
+                                @if ($family !== 'dni')
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
+                                            {{ $doc->tipo }}
+                                        </span>
+                                    </td>
                                 @endif
-                            </td>
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                    @if ($family === 'dni')
+                                        {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
+                                    @else
+                                        {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
+                                    @endif
+                                </td>
+                            @endif
                             <td class="whitespace-nowrap px-6 py-4 text-right space-x-1.5">
                                 {{-- Previsualizar --}}
                                 @php

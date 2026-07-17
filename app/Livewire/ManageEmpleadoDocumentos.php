@@ -109,6 +109,8 @@ class ManageEmpleadoDocumentos extends Component
             'tipo' => $this->tipo,
             'nombre' => $this->nombre,
             'file_path' => $path,
+            'tipo_contrato' => $this->family === 'contratos' ? ($this->tipo_contrato ?: null) : null,
+            'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
         ]);
 
         if ($this->family === 'discapacidad') {
