@@ -20,7 +20,7 @@ class EmpleadosTable
             ->defaultPaginationPageOption(20)
             ->paginationPageOptions([10, 20, 50, 100])
             ->columns([
-                 TextColumn::make('nombre_completo')
+                 TextColumn::make('apellidos')
                     ->label('Nombre')
                     ->state(function (\App\Models\Empleado $record) {
                         $nombre = trim($record->nombre);
@@ -69,7 +69,7 @@ class EmpleadosTable
                     ->sortable(),
             ])
             ->striped()
-            ->defaultSort('nombre_completo', 'asc')
+            ->defaultSort('apellidos', 'asc')
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
                     ->label('Localidad')
