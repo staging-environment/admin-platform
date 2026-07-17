@@ -213,7 +213,7 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
                     @forelse ($this->documentos as $doc)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all">
-                            <td class="px-6 py-4 font-medium">
+                            <td class="px-6 py-4 font-medium" style="width: 100%; min-width: 300px;">
                                 <div class="flex items-center gap-3">
                                     {{-- Icono según tipo --}}
                                     <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400">
@@ -246,7 +246,7 @@
                                         {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 180px !important; min-width: 180px !important;">
                                     @if (($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual')
                                         @php
                                             $date = $doc->fecha_vencimiento_contrato ?? $this->empleado->fecha_vencimiento_contrato;
@@ -264,7 +264,7 @@
                                         </span>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 180px !important; min-width: 180px !important;">
                                     @if ($family === 'dni')
                                         {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
                                     @else
