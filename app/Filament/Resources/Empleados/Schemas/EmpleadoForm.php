@@ -106,13 +106,12 @@ class EmpleadoForm
                                      ->label('Teléfono')
                                      ->required()
                                      ->maxLength(255),
-                                TextInput::make('email')
-                                    ->label('Correo Electrónico')
-                                    ->email()
-                                    ->required()
-                                    ->unique(ignoreRecord: true)
-                                    ->maxLength(255)
-                                    ->columnSpan(3),
+                                 TextInput::make('email')
+                                     ->label('Correo Electrónico')
+                                     ->email()
+                                     ->required()
+                                     ->unique(ignoreRecord: true)
+                                     ->maxLength(255),
                             ]),
                     ]),
 
