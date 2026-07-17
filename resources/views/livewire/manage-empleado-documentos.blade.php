@@ -187,19 +187,19 @@
         @endif
 
         {{-- Listado de documentos --}}
-        <div class="border rounded-xl bg-white dark:bg-white/5 dark:border-white/10 overflow-hidden shadow-sm">
+        <div class="border rounded-xl bg-white dark:bg-white/5 dark:border-white/10 overflow-x-auto shadow-sm">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10 text-left text-sm">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full">Nombre</th>
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 120px !important; overflow: visible !important;">Tipo</th>
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 180px !important; overflow: visible !important;">Fecha de Finalización</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Fecha de Finalización</th>
                         @else
                             @if ($family !== 'dni')
-                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 120px !important; overflow: visible !important;">Tipo</th>
+                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
                             @endif
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 180px !important; overflow: visible !important;">
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
                                 @else
@@ -241,12 +241,12 @@
                                 </div>
                             </td>
                             @if ($family === 'contratos')
-                                <td class="px-6 py-4" style="width: 120px !important; min-width: 120px !important;">
+                                <td class="px-6 py-4" style="width: 90px !important; min-width: 90px !important;">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400' : 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' }}">
                                         {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 180px !important; min-width: 180px !important;">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 140px !important; min-width: 140px !important;">
                                     @if (($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual')
                                         @php
                                             $date = $doc->fecha_vencimiento_contrato ?? $this->empleado->fecha_vencimiento_contrato;
@@ -258,13 +258,13 @@
                                 </td>
                             @else
                                 @if ($family !== 'dni')
-                                    <td class="px-6 py-4" style="width: 120px !important; min-width: 120px !important;">
+                                    <td class="px-6 py-4" style="width: 90px !important; min-width: 90px !important;">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
                                             {{ $doc->tipo }}
                                         </span>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 180px !important; min-width: 180px !important;">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 140px !important; min-width: 140px !important;">
                                     @if ($family === 'dni')
                                         {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
                                     @else
