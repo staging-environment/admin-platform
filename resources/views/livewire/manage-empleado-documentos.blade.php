@@ -89,12 +89,7 @@
                     @if ($family === 'dni')
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Caducidad del DNI</label>
-                            <div class="flex gap-2">
-                                <input type="date" wire:model="fecha_caducidad_dni" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                <button type="button" wire:click="saveFechaCaducidad" class="inline-flex items-center justify-center px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
-                                    Guardar
-                                </button>
-                            </div>
+                            <input type="date" wire:model="fecha_caducidad_dni" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                             @error('fecha_caducidad_dni') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div class="md:col-span-2 flex items-center gap-3">

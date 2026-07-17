@@ -83,6 +83,9 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
             $this->nombre = 'DNI ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
+            $this->empleado->update([
+                'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
+            ]);
         }
 
         $this->validate();
