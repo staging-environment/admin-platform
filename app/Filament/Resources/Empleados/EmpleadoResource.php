@@ -201,9 +201,9 @@ class EmpleadoResource extends Resource
                             ]),
                     ]),
 
-                // BLOQUE 3: Discapacidad / Incapacidad
                 \Filament\Schemas\Components\Section::make('Discapacidad / Incapacidad')
                     ->columnSpanFull()
+                    ->visible(false)
                     ->schema([
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
@@ -289,9 +289,9 @@ class EmpleadoResource extends Resource
                             ]),
                     ]),
 
-                // BLOQUE 4: Formación y Títulos
                 \Filament\Schemas\Components\Section::make('Formación y Títulos')
                     ->columnSpanFull()
+                    ->visible(false)
                     ->schema([
                         \Filament\Schemas\Components\Grid::make(1)
                             ->schema([
