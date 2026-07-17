@@ -1,4 +1,4 @@
-<div class="flex items-center gap-3 px-4 py-3" @click.stop>
+<div style="display: flex; align-items: center; gap: 12px; justify-content: flex-start; text-align: left; width: 100%;">
     @php
         $record = $getRecord();
         $nombre = trim($record->nombre);
@@ -24,7 +24,9 @@
     
     <!-- El nombre del empleado con enlace a la ficha -->
     <a href="{{ \App\Filament\Resources\Empleados\EmpleadoResource::getUrl('view', ['record' => $record]) }}" 
-       class="font-bold text-sm text-gray-900 dark:text-white hover:underline">
+       style="font-weight: bold; font-size: 14px; color: currentColor; text-decoration: none;"
+       onmouseover="this.style.textDecoration='underline'"
+       onmouseout="this.style.textDecoration='none'">
         {{ $name }}
     </a>
 </div>

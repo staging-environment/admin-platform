@@ -23,6 +23,10 @@ class EmpleadosTable
                 \Filament\Tables\Columns\ViewColumn::make('apellidos')
                     ->label('Nombre')
                     ->view('filament.tables.columns.nombre-con-alerta')
+                    ->alignStart()
+                    ->extraAttributes([
+                        'onclick' => 'event.stopPropagation()',
+                    ])
                     ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
