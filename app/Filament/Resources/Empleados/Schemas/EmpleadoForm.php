@@ -58,7 +58,8 @@ class EmpleadoForm
                                                      ->unique(ignoreRecord: true)
                                                      ->maxLength(255),
                                                  DatePicker::make('fecha_caducidad_dni')
-                                                     ->label('Fecha de Caducidad DNI'),
+                                                     ->label('Fecha de Caducidad DNI')
+                                                     ->visible(false),
                                                  DatePicker::make('fecha_nacimiento')
                                                      ->label('Fecha de Nacimiento')
                                                      ->required(),
