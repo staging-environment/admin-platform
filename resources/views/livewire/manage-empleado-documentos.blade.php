@@ -213,30 +213,32 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
                     @forelse ($this->documentos as $doc)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all">
-                            <td class="px-6 py-4 font-medium flex items-center gap-3">
-                                {{-- Icono según tipo --}}
-                                <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400">
-                                    @if ($doc->tipo === 'Contratos')
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    @elseif ($doc->tipo === 'DNI')
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.333 0 4 .667 4 2v1H9v-1c0-1.333 2.667-2 4-2z" />
-                                        </svg>
-                                    @else
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                        </svg>
-                                    @endif
+                            <td class="px-6 py-4 font-medium">
+                                <div class="flex items-center gap-3">
+                                    {{-- Icono según tipo --}}
+                                    <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400">
+                                        @if ($doc->tipo === 'Contratos')
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        @elseif ($doc->tipo === 'DNI')
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.333 0 4 .667 4 2v1H9v-1c0-1.333 2.667-2 4-2z" />
+                                            </svg>
+                                        @else
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <span class="whitespace-nowrap">
+                                        @if ($family === 'dni')
+                                            {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
+                                        @else
+                                            {{ $doc->nombre }}
+                                        @endif
+                                    </span>
                                 </div>
-                                <span class="whitespace-nowrap">
-                                    @if ($family === 'dni')
-                                        {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
-                                    @else
-                                        {{ $doc->nombre }}
-                                    @endif
-                                </span>
                             </td>
                             @if ($family === 'contratos')
                                 <td class="px-6 py-4">
