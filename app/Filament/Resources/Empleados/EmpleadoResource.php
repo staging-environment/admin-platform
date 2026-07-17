@@ -325,12 +325,6 @@ class EmpleadoResource extends Resource
         return EmpleadosTable::configure($table);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
-    {
-        return parent::getEloquentQuery()
-            ->orderBy('apellidos', 'asc')
-            ->orderBy('nombre', 'asc');
-    }
 
     public static function getRelations(): array
     {
