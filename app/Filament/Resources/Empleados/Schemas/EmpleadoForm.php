@@ -122,7 +122,7 @@ class EmpleadoForm
                 Section::make('Información Laboral y Cargo')
                     ->columnSpanFull()
                     ->schema([
-                        Grid::make(3)
+                        Grid::make(2)
                             ->schema([
                                 Select::make('gasolinera_codigo')
                                     ->label('Ubicación de trabajo')
@@ -135,18 +135,6 @@ class EmpleadoForm
                                     ->label('Puesto')
                                     ->placeholder('Ej: Expendedor, Encargado...')
                                     ->maxLength(255),
-                                Select::make('tipo_contrato')
-                                    ->label('Tipo de Contrato')
-                                    ->options([
-                                        'Eventual' => 'Eventual',
-                                        'Indefinido' => 'Indefinido',
-                                    ])
-                                    ->required()
-                                    ->live(),
-                                DatePicker::make('fecha_vencimiento_contrato')
-                                    ->label('Fecha de vencimiento')
-                                    ->visible(fn (Get $get) => $get('tipo_contrato') === 'Eventual')
-                                    ->required(fn (Get $get) => $get('tipo_contrato') === 'Eventual'),
                             ]),
                     ]),
 
