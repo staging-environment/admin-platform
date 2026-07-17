@@ -58,8 +58,7 @@ class EmpleadosTable
                     ->label('Localidad')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—')
-                    ->sortable(),
+                    ->default('—'),
 
                 TextColumn::make('puesto')
                     ->label('Puesto')
