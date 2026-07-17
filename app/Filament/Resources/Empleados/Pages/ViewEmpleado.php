@@ -162,29 +162,30 @@ class ViewEmpleado extends ViewRecord
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
                         ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
 
-                    FileUpload::make('resolucion_discapacidad')
-                        ->label('Resolución de Discapacidad (Archivo)')
-                        ->directory('empleados/resoluciones')
-                        ->disk('local')
-                        ->acceptedFileTypes(['application/pdf', 'image/*'])
-                        ->previewable(false)
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                    Grid::make(3)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->schema([
+                            FileUpload::make('resolucion_discapacidad')
+                                ->label('Resolución de Discapacidad (Archivo)')
+                                ->directory('empleados/resoluciones')
+                                ->disk('local')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->previewable(false),
 
-                    FileUpload::make('dictamen_tecnico')
-                        ->label('Dictamen técnico facultativo')
-                        ->directory('empleados/resoluciones')
-                        ->disk('local')
-                        ->acceptedFileTypes(['application/pdf', 'image/*'])
-                        ->previewable(false)
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                            FileUpload::make('dictamen_tecnico')
+                                ->label('Dictamen técnico facultativo')
+                                ->directory('empleados/resoluciones')
+                                ->disk('local')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->previewable(false),
 
-                    FileUpload::make('certificado_discapacidad')
-                        ->label('Certificado de discapacidad')
-                        ->directory('empleados/resoluciones')
-                        ->disk('local')
-                        ->acceptedFileTypes(['application/pdf', 'image/*'])
-                        ->previewable(false)
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                            FileUpload::make('certificado_discapacidad')
+                                ->label('Certificado de discapacidad')
+                                ->directory('empleados/resoluciones')
+                                ->disk('local')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->previewable(false),
+                        ]),
 
                     Toggle::make('tiene_incapacidad')
                         ->label('¿Tiene incapacidad?')
