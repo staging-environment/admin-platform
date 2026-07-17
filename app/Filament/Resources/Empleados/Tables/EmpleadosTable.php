@@ -51,8 +51,7 @@ class EmpleadosTable
                     ->label('Teléfono')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—')
-                    ->sortable(),
+                    ->default('—'),
 
                  TextColumn::make('gasolinera.Nombre')
                     ->label('Localidad')
@@ -64,8 +63,7 @@ class EmpleadosTable
                     ->label('Puesto')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—')
-                    ->sortable(),
+                    ->default('—'),
             ])
             ->striped()
             ->defaultSort('apellidos', 'asc')
