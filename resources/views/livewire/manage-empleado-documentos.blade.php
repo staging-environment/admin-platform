@@ -87,13 +87,19 @@
                 
                 @if ($family === 'dni')
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</label>
-                            <input type="file" wire:model="file" class="w-[145px] overflow-hidden whitespace-nowrap text-transparent text-xs dark:text-transparent file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-950/20 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 transition-all cursor-pointer" />
+                        <div class="flex flex-col">
+                            <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
+                            <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
+                                Seleccionar archivo
+                                <input type="file" wire:model="file" class="hidden" />
+                            </label>
+                            @if ($file)
+                                <span class="text-[10px] text-green-600 dark:text-green-400 mt-1 truncate max-w-[150px] font-medium">✓ Archivo cargado</span>
+                            @endif
                             @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Caducidad del DNI</label>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de caducidad</label>
                             <input type="date" wire:model="fecha_caducidad_dni" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                             @error('fecha_caducidad_dni') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
@@ -111,9 +117,15 @@
                     </div>
                 @elseif ($family === 'contratos')
                     <div class="grid grid-cols-1 {{ $tipo_contrato === 'Eventual' ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-4 items-end w-full">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</label>
-                            <input type="file" wire:model="file" class="w-[145px] overflow-hidden whitespace-nowrap text-transparent text-xs dark:text-transparent file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-950/20 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 transition-all cursor-pointer" />
+                        <div class="flex flex-col">
+                            <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
+                            <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
+                                Seleccionar archivo
+                                <input type="file" wire:model="file" class="hidden" />
+                            </label>
+                            @if ($file)
+                                <span class="text-[10px] text-green-600 dark:text-green-400 mt-1 truncate max-w-[150px] font-medium">✓ Archivo cargado</span>
+                            @endif
                             @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
@@ -166,9 +178,15 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <div class="flex-1">
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</label>
-                                <input type="file" wire:model="file" class="w-[145px] overflow-hidden whitespace-nowrap text-transparent text-xs dark:text-transparent file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-950/20 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 transition-all cursor-pointer" />
+                            <div class="flex-1 flex flex-col">
+                                <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
+                                <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
+                                    Seleccionar archivo
+                                    <input type="file" wire:model="file" class="hidden" />
+                                </label>
+                                @if ($file)
+                                    <span class="text-[10px] text-green-600 dark:text-green-400 mt-1 truncate max-w-[150px] font-medium">✓ Archivo cargado</span>
+                                @endif
                                 @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
                             <button type="button" wire:click="uploadDocument" class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px] min-w-[80px]">

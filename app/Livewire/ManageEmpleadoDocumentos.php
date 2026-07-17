@@ -39,7 +39,7 @@ class ManageEmpleadoDocumentos extends Component
         // Set default tipo depending on family
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
-            $this->fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni?->format('Y-m-d');
+            $this->fecha_caducidad_dni = null;
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
             $this->tipo_contrato = $this->empleado->tipo_contrato;
@@ -87,21 +87,29 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
             $this->nombre = 'DNI ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
-            $this->empleado->update([
-                'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
-            ]);
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
             if (empty($this->nombre)) {
                 $this->nombre = 'Contrato ' . ($this->tipo_contrato ?: '') . ' ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
             }
+        }
+
+        $rules = $this->rules;
+        if ($this->family === 'dni') {
+            $rules['fecha_caducidad_dni'] = 'required|date';
+        }
+        $this->validate($rules);
+
+        if ($this->family === 'dni') {
+            $this->empleado->update([
+                'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
+            ]);
+        } elseif ($this->family === 'contratos') {
             $this->empleado->update([
                 'tipo_contrato' => $this->tipo_contrato ?: null,
                 'fecha_vencimiento_contrato' => ($this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             ]);
         }
-
-        $this->validate();
 
         $path = $this->file->store('empleados/documentos', 'local');
 
