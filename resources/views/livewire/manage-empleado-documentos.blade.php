@@ -241,7 +241,7 @@
                                 </div>
                             </td>
                             @if ($family === 'contratos')
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4" style="width: 120px !important; min-width: 120px !important;">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400' : 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' }}">
                                         {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
                                     </span>
@@ -258,7 +258,7 @@
                                 </td>
                             @else
                                 @if ($family !== 'dni')
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4" style="width: 120px !important; min-width: 120px !important;">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
                                             {{ $doc->tipo }}
                                         </span>
