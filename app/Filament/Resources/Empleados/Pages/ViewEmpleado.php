@@ -131,36 +131,39 @@ class ViewEmpleado extends ViewRecord
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                         ]),
 
-                    Toggle::make('pertenece_andalucia')
-                        ->label('¿Pertenece a Andalucía?')
+                    Grid::make(2)
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                        ->default(true)
-                        ->live(),
+                        ->schema([
+                            Toggle::make('pertenece_andalucia')
+                                ->label('¿Pertenece a Andalucía?')
+                                ->default(true)
+                                ->live(),
 
-                    Select::make('comunidad_autonoma')
-                        ->label('Comunidad Autónoma')
-                        ->options([
-                            'Aragón' => 'Aragón',
-                            'Principado de Asturias' => 'Principado de Asturias',
-                            'Illes Balears' => 'Illes Balears',
-                            'Canarias' => 'Canarias',
-                            'Cantabria' => 'Cantabria',
-                            'Castilla y León' => 'Castilla y León',
-                            'Castilla-La Mancha' => 'Castilla-La Mancha',
-                            'Cataluña' => 'Cataluña',
-                            'Comunitat Valenciana' => 'Comunitat Valenciana',
-                            'Extremadura' => 'Extremadura',
-                            'Galicia' => 'Galicia',
-                            'Comunidad de Madrid' => 'Comunidad de Madrid',
-                            'Región de Murcia' => 'Región de Murcia',
-                            'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
-                            'País Vasco' => 'País Vasco',
-                            'La Rioja' => 'La Rioja',
-                            'Ceuta' => 'Ceuta',
-                            'Melilla' => 'Melilla',
-                        ])
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
+                            Select::make('comunidad_autonoma')
+                                ->label('Comunidad Autónoma')
+                                ->options([
+                                    'Aragón' => 'Aragón',
+                                    'Principado de Asturias' => 'Principado de Asturias',
+                                    'Illes Balears' => 'Illes Balears',
+                                    'Canarias' => 'Canarias',
+                                    'Cantabria' => 'Cantabria',
+                                    'Castilla y León' => 'Castilla y León',
+                                    'Castilla-La Mancha' => 'Castilla-La Mancha',
+                                    'Cataluña' => 'Cataluña',
+                                    'Comunitat Valenciana' => 'Comunitat Valenciana',
+                                    'Extremadura' => 'Extremadura',
+                                    'Galicia' => 'Galicia',
+                                    'Comunidad de Madrid' => 'Comunidad de Madrid',
+                                    'Región de Murcia' => 'Región de Murcia',
+                                    'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
+                                    'País Vasco' => 'País Vasco',
+                                    'La Rioja' => 'La Rioja',
+                                    'Ceuta' => 'Ceuta',
+                                    'Melilla' => 'Melilla',
+                                ])
+                                ->visible(fn (Get $get) => ! $get('pertenece_andalucia'))
+                                ->required(fn (Get $get) => ! $get('pertenece_andalucia')),
+                        ]),
 
                     Grid::make(3)
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
@@ -191,23 +194,25 @@ class ViewEmpleado extends ViewRecord
                         ->label('¿Tiene incapacidad?')
                         ->live(),
 
-                    Select::make('tipo_incapacidad')
-                        ->label('Tipo de Incapacidad')
-                        ->multiple()
-                        ->options([
-                            'Físico' => 'Físico',
-                            'Psíquico' => 'Psíquico',
-                        ])
+                    Grid::make(2)
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                        ->schema([
+                            Select::make('tipo_incapacidad')
+                                ->label('Tipo de Incapacidad')
+                                ->multiple()
+                                ->options([
+                                    'Físico' => 'Físico',
+                                    'Psíquico' => 'Psíquico',
+                                ])
+                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
 
-                    FileUpload::make('incapacidad_file')
-                        ->label('Adjuntar Documentación de Incapacidad')
-                        ->directory('empleados/documentos')
-                        ->disk('local')
-                        ->acceptedFileTypes(['application/pdf', 'image/*'])
-                        ->previewable(false)
-                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                            FileUpload::make('incapacidad_file')
+                                ->label('Adjuntar Documentación de Incapacidad')
+                                ->directory('empleados/documentos')
+                                ->disk('local')
+                                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->previewable(false),
+                        ]),
                 ])
                 ->action(function ($record, array $data) {
                     $record->update([
