@@ -5,14 +5,18 @@
     @endphp
 
     @if ($count > 0)
-        <button type="button" @click.stop="open = true" class="inline-flex items-center gap-1 px-2.5 py-1 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all shadow-sm shrink-0 animate-pulse">
-            <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <button type="button" 
+                @click.stop="open = true" 
+                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; height: 24px; min-width: 24px; border-radius: 9999px; background-color: #dc2626; color: white; font-family: inherit; font-size: 12px; font-weight: bold; border: none; cursor: pointer; line-height: 1; transition: background-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; outline: none;"
+                onmouseover="this.style.backgroundColor='#b91c1c'"
+                onmouseout="this.style.backgroundColor='#dc2626'">
+            <svg style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; flex-shrink: 0;" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span>{{ $count }}</span>
+            <span style="font-family: inherit; font-size: 12px; font-weight: 800; line-height: 1;">{{ $count }}</span>
         </button>
     @else
-        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-green-600 text-white text-[10px] font-bold shadow-sm shrink-0 select-none">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 9999px; background-color: #16a34a; color: white; font-family: inherit; font-size: 12px; font-weight: bold; line-height: 1; select-none: none; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
             ✓
         </div>
     @endif

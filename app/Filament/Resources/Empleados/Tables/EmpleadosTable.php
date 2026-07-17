@@ -20,32 +20,9 @@ class EmpleadosTable
             ->defaultPaginationPageOption(20)
             ->paginationPageOptions([10, 20, 50, 100])
             ->columns([
-                  TextColumn::make('apellidos')
+                \Filament\Tables\Columns\ViewColumn::make('apellidos')
                     ->label('Nombre')
-                    ->html()
-                    ->state(function (\App\Models\Empleado $record) {
-                        $nombre = trim($record->nombre);
-                        $apellidos = trim($record->apellidos ?? '');
-
-                        if (empty($apellidos)) {
-                            $name = mb_strtoupper($nombre);
-                        } else {
-                            $parts = preg_split('/\s+/', $apellidos);
-                            $primerApellido = array_shift($parts);
-                            $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
-
-                            if ($segundoApellido !== '') {
-                                $name = mb_strtoupper($primerApellido) . ' ' . mb_strtoupper($segundoApellido) . ', ' . mb_strtoupper($nombre);
-                            } else {
-                                $name = mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
-                            }
-                        }
-
-                        $badgeHtml = view('filament.components.alerts-badge', ['record' => $record])->render();
-                        return '<div class="flex items-center gap-3">' . $badgeHtml . '<span>' . e($name) . '</span></div>';
-                    })
-                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
-                    ->size('sm')
+                    ->view('filament.tables.columns.nombre-con-alerta')
                     ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
