@@ -20,6 +20,7 @@ class ManageEmpleadoDocumentos extends Component
     public $nombre = '';
     public $file;
     public $selectedIncapacidad = [];
+    public $fecha_caducidad_dni;
 
     // Validation rules
     protected $rules = [
@@ -36,6 +37,7 @@ class ManageEmpleadoDocumentos extends Component
         // Set default tipo depending on family
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
+            $this->fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni?->format('Y-m-d');
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
         } elseif ($this->family === 'formacion') {
@@ -76,6 +78,11 @@ class ManageEmpleadoDocumentos extends Component
         if (!auth()->user()->can('editar_documentacion_empleados')) {
             session()->flash('error', 'No tienes permisos para añadir documentos.');
             return;
+        }
+
+        if ($this->family === 'dni') {
+            $this->tipo = 'DNI';
+            $this->nombre = 'DNI ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
         }
 
         $this->validate();
@@ -158,6 +165,20 @@ class ManageEmpleadoDocumentos extends Component
         $empleado->save();
 
         session()->flash('message', 'Tipo de incapacidad guardado correctamente.');
+    }
+
+    public function saveFechaCaducidad()
+    {
+        if (!auth()->user()->can('editar_documentacion_empleados')) {
+            session()->flash('error', 'No tienes permisos para editar la fecha de caducidad.');
+            return;
+        }
+
+        $this->empleado->update([
+            'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
+        ]);
+
+        session()->flash('message', 'Fecha de caducidad del DNI guardada correctamente.');
     }
 
     public function render()

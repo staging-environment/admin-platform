@@ -21,6 +21,7 @@ class Empleado extends Model
         'fecha_reconocimiento' => 'date',
         'fecha_vencimiento_contrato' => 'date',
         'gasolinera_codigo' => 'integer',
+        'fecha_caducidad_dni' => 'date',
     ];
 
 

@@ -120,9 +120,12 @@ class EmpleadoForm
                                                             ]
                                                         );
                                                     }),
-                                                DatePicker::make('fecha_nacimiento')
-                                                    ->label('Fecha de Nacimiento')
-                                                    ->required(),
+                                                 DatePicker::make('fecha_nacimiento')
+                                                     ->label('Fecha de Nacimiento')
+                                                     ->required(),
+                                                 DatePicker::make('fecha_caducidad_dni')
+                                                     ->label('Fecha de Caducidad DNI')
+                                                     ->visible(fn ($context) => $context !== 'create'),
                                             ])
                                             ->columnSpanFull(),
                                         Select::make('sexo')

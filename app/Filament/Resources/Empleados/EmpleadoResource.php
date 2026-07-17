@@ -106,6 +106,10 @@ class EmpleadoResource extends Resource
                                         \Filament\Infolists\Components\TextEntry::make('fecha_nacimiento')
                                             ->label('Fecha de Nacimiento')
                                             ->date(),
+                                        \Filament\Infolists\Components\TextEntry::make('fecha_caducidad_dni')
+                                            ->label('Fecha de Caducidad DNI')
+                                            ->date('d/m/Y')
+                                            ->placeholder('No especificada'),
                                         \Filament\Infolists\Components\TextEntry::make('sexo')
                                             ->label('Sexo')
                                             ->placeholder('No especificado'),
