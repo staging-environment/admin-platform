@@ -628,6 +628,7 @@ class EmpleadoForm
                 // BLOQUE 4: Formación y Títulos
                 Section::make('Formación y Títulos')
                     ->columnSpanFull()
+                    ->visible(fn ($context) => $context !== 'create')
                     ->schema([
                         FileUpload::make('formacion_files')
                             ->label('Adjuntar Cursos / Formación (Múltiple)')
@@ -657,43 +658,6 @@ class EmpleadoForm
                                 }
                             })
                             ->columnSpanFull(),
-                    ]),
-
-                // BLOQUE 5: Documentación Inicial (sólo en alta/create)
-                Section::make('Documentación Inicial')
-                    ->description('Adjuntar documentos iniciales del empleado')
-                    ->visible(fn ($context) => $context === 'create')
-                    ->schema([
-                        Repeater::make('documentos')
-                            ->relationship('documentos')
-                            ->schema([
-                                Select::make('tipo')
-                                    ->label('Tipo de Documento')
-                                    ->options([
-                                        'DNI' => 'DNI',
-                                        'Contratos' => 'Contrato',
-                                        'Certificados' => 'Certificados (Formación)',
-                                        'Titulaciones' => 'Titulaciones (Formación)',
-                                        'Carnets' => 'Carnets (Formación)',
-                                        'Resolución Discapacidad' => 'Resolución Discapacidad',
-                                        'Dictamen Técnico' => 'Dictamen Técnico Facultativo (Discapacidad)',
-                                        'Certificado Discapacidad' => 'Certificado Discapacidad',
-                                        'Incapacidad' => 'Incapacidad',
-                                        'Otros' => 'Otros documentos (Formación)',
-                                    ])
-                                    ->required(),
-                                TextInput::make('nombre')
-                                    ->label('Nombre del Documento')
-                                    ->required(),
-                                FileUpload::make('file_path')
-                                    ->label('Archivo')
-                                    ->directory('empleados/documentos')
-                                    ->disk('local')
-                                    ->required(),
-                            ])
-                            ->columns(3)
-                            ->label('Documentos')
-                            ->createItemButtonLabel('Añadir otro documento'),
                     ]),
             ]);
     }
