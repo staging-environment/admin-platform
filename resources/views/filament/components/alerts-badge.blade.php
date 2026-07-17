@@ -1,3 +1,9 @@
+<style>
+    @keyframes badge-pulse-animation {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+</style>
 <div x-data="{ open: false }" class="inline-block">
     @php
         $count = $record ? $record->alertas()->count() : 0;
@@ -8,7 +14,7 @@
         <button type="button" 
                 @click.stop="open = true" 
                 onclick="event.stopPropagation()"
-                style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 0 10px !important; height: 24px !important; min-width: 24px !important; border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 12px !important; font-weight: bold !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: background-color 0.2s !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; flex-shrink: 0 !important; outline: none !important;"
+                style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 0 10px !important; height: 24px !important; min-width: 24px !important; border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 12px !important; font-weight: bold !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: background-color 0.2s !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; flex-shrink: 0 !important; outline: none !important; animation: badge-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'">
             <svg style="width: 14px !important; height: 14px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2.5 !important; flex-shrink: 0 !important;" viewBox="0 0 24 24">
@@ -31,8 +37,8 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-gray-950/50 backdrop-blur-sm"
-             style="display: none;"
+             class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/50 backdrop-blur-sm"
+             style="display: none; z-index: 999999 !important;"
              @click="open = false"
              @keydown.escape.window="open = false">
              
