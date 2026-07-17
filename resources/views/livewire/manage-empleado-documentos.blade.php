@@ -109,23 +109,25 @@
                             </button>
                         </div>
                     @else
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Documento</label>
-                            <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                                @foreach ($options as $val => $lbl)
-                                    <option value="{{ $val }}">{{ $lbl }}</option>
-                                @endforeach
-                            </select>
-                            @error('tipo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
+                        @if ($family !== 'contratos')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Documento</label>
+                                <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                    @foreach ($options as $val => $lbl)
+                                        <option value="{{ $val }}">{{ $lbl }}</option>
+                                    @endforeach
+                                </select>
+                                @error('tipo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
 
-                        <div>
+                        <div class="{{ $family === 'contratos' ? 'md:col-span-1' : '' }}">
                             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nombre del Documento</label>
-                            <input type="text" wire:model="nombre" placeholder="Ej. DNI Cara A" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                            <input type="text" wire:model="nombre" placeholder="Ej. Contrato indefinido completo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                             @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 {{ $family === 'contratos' ? 'md:col-span-2' : '' }}">
                             <div class="flex-1">
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</label>
                                 <input type="file" wire:model="file" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 dark:file:bg-amber-950/20 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-100 transition-all cursor-pointer" />
