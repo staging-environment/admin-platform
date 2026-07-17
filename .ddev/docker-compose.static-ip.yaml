@@ -1,0 +1,14 @@
+services:
+  web:
+    networks:
+      ddev_default:
+        ipv4_address: 172.18.0.9
+  db:
+    networks:
+      ddev_default:
+        ipv4_address: 172.18.0.12
+
+networks:
+  ddev_default:
+    external: true
+    name: ddev-admin-platform_default
