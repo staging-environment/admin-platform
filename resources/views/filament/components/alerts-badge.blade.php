@@ -51,6 +51,7 @@
                  x-transition:leave-start="opacity-100 scale-100"
                  x-transition:leave-end="opacity-0 scale-95"
                  class="w-full max-w-lg p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl space-y-4 text-left"
+                 style="max-width: 450px !important; width: 90% !important; margin: 0 auto !important;"
                  @click.stop>
                  
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-white/10">
