@@ -16,4 +16,14 @@ class ListEmpleados extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getDefaultTableSortColumn(): ?string
+    {
+        return 'apellidos';
+    }
+
+    protected function getDefaultTableSortDirection(): ?string
+    {
+        return 'asc';
+    }
 }
