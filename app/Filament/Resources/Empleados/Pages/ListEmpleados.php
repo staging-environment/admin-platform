@@ -19,4 +19,14 @@ class ListEmpleados extends ListRecords
 
     public ?string $tableSortColumn = 'apellidos';
     public ?string $tableSortDirection = 'asc';
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        if (!$this->tableSortColumn) {
+            $this->tableSortColumn = 'apellidos';
+            $this->tableSortDirection = 'asc';
+        }
+    }
 }
