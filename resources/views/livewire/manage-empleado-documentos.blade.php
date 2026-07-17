@@ -231,7 +231,7 @@
                                             </svg>
                                         @endif
                                     </div>
-                                    <span class="whitespace-nowrap">
+                                    <span class="whitespace-nowrap truncate block max-w-[320px]" title="{{ $family === 'dni' ? $this->empleado->nombre . ' ' . $this->empleado->apellidos : $doc->nombre }}">
                                         @if ($family === 'dni')
                                             {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
                                         @else
