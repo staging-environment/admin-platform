@@ -191,15 +191,15 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10 text-left text-sm">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
-                        <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Nombre</th>
+                        <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 150px !important; overflow: visible !important;">Nombre</th>
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Tipo</th>
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Fecha de Finalización</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 120px !important; overflow: visible !important;">Tipo</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 180px !important; overflow: visible !important;">Fecha de Finalización</th>
                         @else
                             @if ($family !== 'dni')
-                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Tipo</th>
+                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 120px !important; overflow: visible !important;">Tipo</th>
                             @endif
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 180px !important; overflow: visible !important;">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
                                 @else
@@ -207,7 +207,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-6 py-3.5 text-right whitespace-nowrap">Acciones</th>
+                        <th scope="col" class="px-6 py-3.5 text-right whitespace-nowrap" style="width: auto !important; max-width: none !important; overflow: visible !important;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
