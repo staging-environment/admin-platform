@@ -23,38 +23,32 @@ class FuelMarketsService
     }
 
     /**
-     * Intenta raspar el precio real de London Gas Oil (ICE) desde Investing.com.
+     * Obtiene el precio de London Gas Oil (ICE) desde el scanner de TradingView (ICEEUR:ULS1!).
      */
-    public function fetchGasoilFromInvesting(): ?array
+    public function fetchGasoilFromTradingView(): ?array
     {
         try {
             $response = Http::timeout(8)
                 ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-                    'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'User-Agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                    'Content-Type' => 'application/json',
                 ])
-                ->get('https://www.investing.com/commodities/london-gas-oil');
+                ->post('https://scanner.tradingview.com/futures/scan', [
+                    'symbols' => [
+                        'tickers' => ['ICEEUR:ULS1!'],
+                    ],
+                    'columns' => ['close', 'change', 'change_abs'],
+                ]);
 
             if ($response->successful()) {
-                $html = $response->body();
+                $data = $response->json();
+                $tickerData = $data['data'][0]['d'] ?? null;
 
-                $price = null;
-                $change = null;
-                $changePct = null;
+                if ($tickerData && count($tickerData) >= 3) {
+                    $price     = (float) $tickerData[0];
+                    $changePct = (float) $tickerData[1];
+                    $change    = (float) $tickerData[2];
 
-                if (preg_match('/data-test="instrument-price-last">([^<]+)</', $html, $matches)) {
-                    $price = (float) str_replace(',', '', $matches[1]);
-                }
-
-                if (preg_match('/data-test="instrument-price-change">([^<]+)</', $html, $matches)) {
-                    $change = (float) str_replace(',', '', $matches[1]);
-                }
-
-                if (preg_match('/data-test="instrument-price-change-percent">\(([^%]+)%?\)</', $html, $matches)) {
-                    $changePct = (float) $matches[1];
-                }
-
-                if ($price !== null && $change !== null && $changePct !== null) {
                     return [
                         'symbol'     => 'LGO',
                         'price'      => $price,
@@ -67,7 +61,7 @@ class FuelMarketsService
                 }
             }
         } catch (\Throwable $e) {
-            Log::warning('FuelMarketsService: Failed to fetch Gasoil from Investing: ' . $e->getMessage());
+            Log::warning('FuelMarketsService: Failed to fetch Gasoil from TradingView: ' . $e->getMessage());
         }
         return null;
     }
@@ -78,11 +72,11 @@ class FuelMarketsService
      */
     public function refresh(): void
     {
-        // 1. Intentamos obtener el Gasoil Londres directamente de Investing.com
-        $gasoilPayload = $this->fetchGasoilFromInvesting();
+        // 1. Intentamos obtener el Gasoil Londres directamente de TradingView
+        $gasoilPayload = $this->fetchGasoilFromTradingView();
         if ($gasoilPayload) {
             Cache::put(self::GASOIL_CACHE_KEY, $gasoilPayload, self::CACHE_TTL);
-            Log::info('FuelMarketsService: Updated London Gasoil via Investing.com');
+            Log::info('FuelMarketsService: Updated London Gasoil via TradingView');
         }
 
         try {
