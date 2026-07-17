@@ -5,6 +5,12 @@ namespace App\Filament\Resources\Empleados\Pages;
 use App\Filament\Resources\Empleados\EmpleadoResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Get;
 
 class ViewEmpleado extends ViewRecord
 {
@@ -59,29 +65,222 @@ class ViewEmpleado extends ViewRecord
                 ->modalCancelActionLabel('Cerrar')
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'formacion']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
-            \Filament\Actions\Action::make('discapacidadDocuments')
-                ->label('Discapacidad')
+            \Filament\Actions\Action::make('discapacidadIncapacidad')
+                ->label('Discapacidad / Incapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
-                    $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
-                    return ($record->tiene_discapacidad || $hasDocs) ? 'warning' : 'danger';
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad', 'Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+                    return ($record->tiene_discapacidad || $record->tiene_incapacidad || $hasDocs) ? 'warning' : 'danger';
                 })
-                ->modalHeading('Documentos Discapacidad')
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Cerrar')
-                ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'discapacidad']))
-                ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
-            \Filament\Actions\Action::make('incapacidadDocuments')
-                ->label('Incapacidad')
-                ->icon('heroicon-o-shield-check')
-                ->color(function ($record) {
-                    $hasDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
-                    return ($record->tiene_incapacidad || $hasDocs) ? 'warning' : 'danger';
+                ->modalHeading('Discapacidad / Incapacidad')
+                ->fillForm(function ($record) {
+                    $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                    $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                    $cert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                    $incap = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                    
+                    return [
+                        'tiene_discapacidad' => $record->tiene_discapacidad,
+                        'tipo_discapacidad' => $record->tipo_discapacidad,
+                        'porcentaje_discapacidad' => $record->porcentaje_discapacidad,
+                        'fecha_reconocimiento' => $record->fecha_reconocimiento,
+                        'fecha_resolucion_discapacidad' => $record->fecha_resolucion_discapacidad,
+                        'pertenece_andalucia' => $record->pertenece_andalucia,
+                        'comunidad_autonoma' => $record->comunidad_autonoma,
+                        'resolucion_discapacidad' => $res?->file_path,
+                        'dictamen_tecnico' => $dict?->file_path,
+                        'certificado_discapacidad' => $cert?->file_path,
+                        'tiene_incapacidad' => $record->tiene_incapacidad,
+                        'tipo_incapacidad' => $record->tipo_incapacidad,
+                        'incapacidad_file' => $incap?->file_path,
+                    ];
                 })
-                ->modalHeading('Documentos Incapacidad')
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Cerrar')
-                ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'incapacidad']))
+                ->form([
+                    Toggle::make('tiene_discapacidad')
+                        ->label('¿Tiene discapacidad?')
+                        ->live(),
+                    
+                    Select::make('tipo_discapacidad')
+                        ->label('Tipo de Discapacidad')
+                        ->multiple()
+                        ->options([
+                            'Física' => 'Física',
+                            'Psíquica' => 'Psíquica',
+                            'Sensorial' => 'Sensorial',
+                        ])
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                    
+                    TextInput::make('porcentaje_discapacidad')
+                        ->label('Porcentaje de Discapacidad')
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(100)
+                        ->suffix('%')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    DatePicker::make('fecha_reconocimiento')
+                        ->label('Fecha de reconocimiento')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    DatePicker::make('fecha_resolucion_discapacidad')
+                        ->label('Fecha de resolución')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    Toggle::make('pertenece_andalucia')
+                        ->label('¿Pertenece a Andalucía?')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
+                        ->default(true)
+                        ->live(),
+
+                    Select::make('comunidad_autonoma')
+                        ->label('Comunidad Autónoma')
+                        ->options([
+                            'Aragón' => 'Aragón',
+                            'Principado de Asturias' => 'Principado de Asturias',
+                            'Illes Balears' => 'Illes Balears',
+                            'Canarias' => 'Canarias',
+                            'Cantabria' => 'Cantabria',
+                            'Castilla y León' => 'Castilla y León',
+                            'Castilla-La Mancha' => 'Castilla-La Mancha',
+                            'Cataluña' => 'Cataluña',
+                            'Comunitat Valenciana' => 'Comunitat Valenciana',
+                            'Extremadura' => 'Extremadura',
+                            'Galicia' => 'Galicia',
+                            'Comunidad de Madrid' => 'Comunidad de Madrid',
+                            'Región de Murcia' => 'Región de Murcia',
+                            'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
+                            'País Vasco' => 'País Vasco',
+                            'La Rioja' => 'La Rioja',
+                            'Ceuta' => 'Ceuta',
+                            'Melilla' => 'Melilla',
+                        ])
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
+
+                    FileUpload::make('resolucion_discapacidad')
+                        ->label('Resolución de Discapacidad (Archivo)')
+                        ->directory('empleados/resoluciones')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    FileUpload::make('dictamen_tecnico')
+                        ->label('Dictamen técnico facultativo')
+                        ->directory('empleados/resoluciones')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    FileUpload::make('certificado_discapacidad')
+                        ->label('Certificado de discapacidad')
+                        ->directory('empleados/resoluciones')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    Toggle::make('tiene_incapacidad')
+                        ->label('¿Tiene incapacidad?')
+                        ->live(),
+
+                    Select::make('tipo_incapacidad')
+                        ->label('Tipo de Incapacidad')
+                        ->multiple()
+                        ->options([
+                            'Físico' => 'Físico',
+                            'Psíquico' => 'Psíquico',
+                        ])
+                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+
+                    FileUpload::make('incapacidad_file')
+                        ->label('Adjuntar Documentación de Incapacidad')
+                        ->directory('empleados/documentos')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                ])
+                ->action(function ($record, array $data) {
+                    $record->update([
+                        'tiene_discapacidad' => $data['tiene_discapacidad'],
+                        'tipo_discapacidad' => $data['tiene_discapacidad'] ? $data['tipo_discapacidad'] : null,
+                        'porcentaje_discapacidad' => $data['tiene_discapacidad'] ? $data['porcentaje_discapacidad'] : null,
+                        'fecha_reconocimiento' => $data['tiene_discapacidad'] ? $data['fecha_reconocimiento'] : null,
+                        'fecha_resolucion_discapacidad' => $data['tiene_discapacidad'] ? $data['fecha_resolucion_discapacidad'] : null,
+                        'pertenece_andalucia' => $data['tiene_discapacidad'] ? $data['pertenece_andalucia'] : true,
+                        'comunidad_autonoma' => ($data['tiene_discapacidad'] && !$data['pertenece_andalucia']) ? $data['comunidad_autonoma'] : null,
+                        'tiene_incapacidad' => $data['tiene_incapacidad'],
+                        'tipo_incapacidad' => $data['tiene_incapacidad'] ? $data['tipo_incapacidad'] : null,
+                    ]);
+                    
+                    // Save documents
+                    if ($data['tiene_discapacidad']) {
+                        if (!empty($data['resolucion_discapacidad'])) {
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => 'Resolución Discapacidad'],
+                                [
+                                    'nombre' => 'Resolución de Discapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['resolucion_discapacidad'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->where('tipo', 'Resolución Discapacidad')->delete();
+                        }
+                        if (!empty($data['dictamen_tecnico'])) {
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => 'Dictamen Técnico'],
+                                [
+                                    'nombre' => 'Dictamen Técnico Facultativo ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['dictamen_tecnico'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->where('tipo', 'Dictamen Técnico')->delete();
+                        }
+                        if (!empty($data['certificado_discapacidad'])) {
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => 'Certificado Discapacidad'],
+                                [
+                                    'nombre' => 'Certificado de Discapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['certificado_discapacidad'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->where('tipo', 'Certificado Discapacidad')->delete();
+                        }
+                    } else {
+                        $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->delete();
+                    }
+                    
+                    if ($data['tiene_incapacidad']) {
+                        if (!empty($data['incapacidad_file'])) {
+                            $tipo = 'Incapacidad Física';
+                            $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
+                            if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
+                                $first = $tipoIncapacidad[0];
+                                $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                            }
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => $tipo],
+                                [
+                                    'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['incapacidad_file'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                        }
+                    } else {
+                        $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                    }
+                })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             EditAction::make()
                 ->label('Modificar datos')

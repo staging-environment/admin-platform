@@ -276,6 +276,7 @@ class EmpleadoForm
                 // BLOQUE 3: Discapacidad / Incapacidad
                 Section::make('Discapacidad / Incapacidad')
                     ->columnSpanFull()
+                    ->visible(fn ($context) => $context !== 'create')
                     ->schema([
                         Grid::make(2)
                             ->schema([
