@@ -67,11 +67,5 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\View::share('homeConfig', null);
         }
         \Illuminate\Support\Facades\View::share('gasolineras', []);
-
-        \Illuminate\Support\Facades\DB::listen(function($query) {
-            if (str_contains($query->sql, 'empleados')) {
-                \Illuminate\Support\Facades\Log::warning('SQL: ' . $query->sql . ' | Bindings: ' . json_encode($query->bindings));
-            }
-        });
     }
 }
