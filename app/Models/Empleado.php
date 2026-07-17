@@ -121,4 +121,17 @@ class Empleado extends Model
     {
         return $this->hasMany(EmpleadoComentario::class);
     }
+
+    public function syncLatestContract(): void
+    {
+        $latest = $this->documentos()
+            ->where('tipo', 'Contratos')
+            ->latest('id')
+            ->first();
+
+        $this->update([
+            'tipo_contrato' => $latest?->tipo_contrato,
+            'fecha_vencimiento_contrato' => ($latest?->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
+        ]);
+    }
 }

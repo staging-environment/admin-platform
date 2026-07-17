@@ -104,11 +104,6 @@ class ManageEmpleadoDocumentos extends Component
             $this->empleado->update([
                 'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
             ]);
-        } elseif ($this->family === 'contratos') {
-            $this->empleado->update([
-                'tipo_contrato' => $this->tipo_contrato ?: null,
-                'fecha_vencimiento_contrato' => ($this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
-            ]);
         }
 
         $path = $this->file->store('empleados/documentos', 'local');
@@ -121,7 +116,10 @@ class ManageEmpleadoDocumentos extends Component
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
         ]);
 
-        if ($this->family === 'discapacidad') {
+        if ($this->family === 'contratos') {
+            $this->empleado->syncLatestContract();
+            $this->refreshContratoFields();
+        } elseif ($this->family === 'discapacidad') {
             $this->empleado->update(['tiene_discapacidad' => true]);
         } elseif ($this->family === 'incapacidad') {
             $this->empleado->update(['tiene_incapacidad' => true]);
@@ -146,6 +144,12 @@ class ManageEmpleadoDocumentos extends Component
         session()->flash('message', 'Documento añadido correctamente.');
     }
 
+    protected function refreshContratoFields()
+    {
+        $this->tipo_contrato = $this->empleado->tipo_contrato;
+        $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
+    }
+
     public function deleteDocument($id)
     {
         // Check permission
@@ -163,7 +167,10 @@ class ManageEmpleadoDocumentos extends Component
 
         $documento->delete();
 
-        if ($this->family === 'discapacidad') {
+        if ($this->family === 'contratos') {
+            $this->empleado->syncLatestContract();
+            $this->refreshContratoFields();
+        } elseif ($this->family === 'discapacidad') {
             $hasRemaining = $this->empleado->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->exists();
             if (!$hasRemaining) {
                 $this->empleado->update(['tiene_discapacidad' => false]);

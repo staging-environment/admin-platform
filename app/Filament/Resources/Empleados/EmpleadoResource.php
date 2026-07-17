@@ -164,7 +164,7 @@ class EmpleadoResource extends Resource
                                             ->modalCancelActionLabel('Cerrar')
                                             ->modalWidth('7xl')
                                             ->modalContent(function ($record) {
-                                                $doc = $record->documentos()->where('tipo', 'Contratos')->first();
+                                                $doc = $record->documentos()->where('tipo', 'Contratos')->latest('id')->first();
                                                 if (!$doc) return null;
                                                 $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
                                                 $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
