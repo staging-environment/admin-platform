@@ -28,6 +28,7 @@ class ManageEmpleadoDocumentos extends Component
     public $editingDocumentId = null;
     public $edit_tipo_contrato;
     public $edit_fecha_vencimiento_contrato;
+    public $edit_fecha_caducidad_dni;
 
     // Validation rules
     protected $rules = [
@@ -227,8 +228,13 @@ class ManageEmpleadoDocumentos extends Component
     {
         $doc = EmpleadoDocumento::findOrFail($id);
         $this->editingDocumentId = $id;
-        $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
-        $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
+        
+        if ($this->family === 'contratos') {
+            $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
+            $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
+        } elseif ($this->family === 'dni') {
+            $this->edit_fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
+        }
     }
 
     public function cancelEdit()
@@ -244,17 +250,25 @@ class ManageEmpleadoDocumentos extends Component
         }
 
         $doc = EmpleadoDocumento::findOrFail($this->editingDocumentId);
-        $doc->update([
-            'tipo_contrato' => $this->edit_tipo_contrato ?: null,
-            'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
-        ]);
+        
+        if ($this->family === 'contratos') {
+            $doc->update([
+                'tipo_contrato' => $this->edit_tipo_contrato ?: null,
+                'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
+            ]);
+            $this->empleado->syncLatestContract();
+            $this->refreshContratoFields();
+        } elseif ($this->family === 'dni') {
+            $this->empleado->update([
+                'fecha_caducidad_dni' => $this->edit_fecha_caducidad_dni ?: null,
+            ]);
+            $this->fecha_caducidad_dni = $this->edit_fecha_caducidad_dni;
+        }
 
-        $this->empleado->syncLatestContract();
-        $this->refreshContratoFields();
         $this->empleado->actualizarAlertas();
         $this->editingDocumentId = null;
         
-        session()->flash('message', 'Contrato actualizado correctamente.');
+        session()->flash('message', 'Documento actualizado correctamente.');
     }
 
     public function render()

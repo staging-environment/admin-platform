@@ -303,7 +303,11 @@
                                 @endif
                                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="{{ $family === 'dni' ? 'width: 100%;' : 'width: 140px !important; min-width: 140px !important;' }}">
                                     @if ($family === 'dni')
-                                        {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
+                                        @if ($editingDocumentId === $doc->id)
+                                            <input type="date" wire:model="edit_fecha_caducidad_dni" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                        @else
+                                            {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
+                                        @endif
                                     @else
                                         {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
                                     @endif
@@ -345,7 +349,7 @@
                                     </a>
 
                                     {{-- Editar --}}
-                                    @if (auth()->user()->can('editar_documentacion_empleados') && $family === 'contratos')
+                                    @if (auth()->user()->can('editar_documentacion_empleados') && ($family === 'contratos' || $family === 'dni'))
                                         <button type="button" wire:click="editDocument({{ $doc->id }})" class="inline-flex items-center justify-center p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-lg transition-all" title="Editar">
                                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
