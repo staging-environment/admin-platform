@@ -29,4 +29,11 @@ class ListEmpleados extends ListRecords
             $this->tableSortDirection = 'asc';
         }
     }
+
+    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getTableQuery();
+        \Illuminate\Support\Facades\Log::warning('TABLE QUERY SQL: ' . $query->toSql() . ' | Orders: ' . json_encode($query->getQuery()->orders));
+        return $query;
+    }
 }
