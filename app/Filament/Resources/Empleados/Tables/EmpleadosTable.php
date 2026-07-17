@@ -45,7 +45,7 @@ class EmpleadosTable
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
                     }))
-                    ->sortable(['apellidos', 'nombre']),
+                    ->sortable(['nombre', 'apellidos']),
 
                 TextColumn::make('telefono_principal')
                     ->label('Teléfono')
