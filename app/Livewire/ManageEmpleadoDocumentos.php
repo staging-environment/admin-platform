@@ -21,6 +21,8 @@ class ManageEmpleadoDocumentos extends Component
     public $file;
     public $selectedIncapacidad = [];
     public $fecha_caducidad_dni;
+    public $tipo_contrato;
+    public $fecha_vencimiento_contrato;
 
     // Validation rules
     protected $rules = [
@@ -40,6 +42,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni?->format('Y-m-d');
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
+            $this->tipo_contrato = $this->empleado->tipo_contrato;
+            $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Certificados';
         } elseif ($this->family === 'discapacidad') {
@@ -85,6 +89,15 @@ class ManageEmpleadoDocumentos extends Component
             $this->nombre = 'DNI ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
             $this->empleado->update([
                 'fecha_caducidad_dni' => $this->fecha_caducidad_dni ?: null
+            ]);
+        } elseif ($this->family === 'contratos') {
+            $this->tipo = 'Contratos';
+            if (empty($this->nombre)) {
+                $this->nombre = 'Contrato ' . ($this->tipo_contrato ?: '') . ' ' . $this->empleado->nombre . ' ' . $this->empleado->apellidos;
+            }
+            $this->empleado->update([
+                'tipo_contrato' => $this->tipo_contrato ?: null,
+                'fecha_vencimiento_contrato' => ($this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             ]);
         }
 
