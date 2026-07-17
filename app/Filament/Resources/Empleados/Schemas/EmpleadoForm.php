@@ -138,10 +138,9 @@ class EmpleadoForm
                             ]),
                     ]),
 
-                // BLOQUE 3: Discapacidad / Incapacidad
                 Section::make('Discapacidad / Incapacidad')
                     ->columnSpanFull()
-                    ->visible(fn ($context) => $context !== 'create')
+                    ->visible(false)
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -493,10 +492,9 @@ class EmpleadoForm
                             ]),
                     ]),
 
-                // BLOQUE 4: Formación y Títulos
                 Section::make('Formación y Títulos')
                     ->columnSpanFull()
-                    ->visible(fn ($context) => $context !== 'create')
+                    ->visible(false)
                     ->schema([
                         FileUpload::make('formacion_files')
                             ->label('Adjuntar Cursos / Formación (Múltiple)')
