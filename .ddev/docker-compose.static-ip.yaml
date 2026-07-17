@@ -2,11 +2,15 @@ services:
   web:
     networks:
       ddev_default:
-        ipv4_address: 172.18.0.9
+        ipv4_address: 172.18.0.101
   db:
     networks:
       ddev_default:
-        ipv4_address: 172.18.0.12
+        ipv4_address: 172.18.0.102
+  phpmyadmin:
+    networks:
+      ddev_default:
+        ipv4_address: 172.18.0.103
 
 networks:
   ddev_default:
