@@ -7,16 +7,17 @@
     @if ($count > 0)
         <button type="button" 
                 @click.stop="open = true" 
-                style="position: relative; z-index: 15; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; height: 24px; min-width: 24px; border-radius: 9999px; background-color: #dc2626; color: white; font-family: inherit; font-size: 12px; font-weight: bold; border: none; cursor: pointer; line-height: 1; transition: background-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; outline: none;"
+                onclick="event.stopPropagation()"
+                style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; padding: 0 10px !important; height: 24px !important; min-width: 24px !important; border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 12px !important; font-weight: bold !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: background-color 0.2s !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; flex-shrink: 0 !important; outline: none !important;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'">
-            <svg style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; flex-shrink: 0;" viewBox="0 0 24 24">
+            <svg style="width: 14px !important; height: 14px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2.5 !important; flex-shrink: 0 !important;" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span style="font-family: inherit; font-size: 12px; font-weight: 800; line-height: 1;">{{ $count }}</span>
+            <span style="font-family: inherit !important; font-size: 12px !important; font-weight: 800 !important; line-height: 1 !important;">{{ $count }}</span>
         </button>
     @else
-        <div style="position: relative; z-index: 15; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 9999px; background-color: #16a34a; color: white; font-family: inherit; font-size: 12px; font-weight: bold; line-height: 1; select-none: none; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <div style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 24px !important; height: 24px !important; border-radius: 9999px !important; background-color: #16a34a !important; color: white !important; font-family: inherit !important; font-size: 12px !important; font-weight: bold !important; line-height: 1 !important; select-none: none !important; flex-shrink: 0 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;">
             ✓
         </div>
     @endif
