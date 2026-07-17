@@ -191,15 +191,15 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10 text-left text-sm">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
-                        <th scope="col" class="px-6 py-3.5">Nombre</th>
+                        <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Nombre</th>
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5">Tipo</th>
-                            <th scope="col" class="px-6 py-3.5">Fecha de Finalización</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Tipo</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Fecha de Finalización</th>
                         @else
                             @if ($family !== 'dni')
-                                <th scope="col" class="px-6 py-3.5">Tipo</th>
+                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap">Tipo</th>
                             @endif
-                            <th scope="col" class="px-6 py-3.5">
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
                                 @else
@@ -207,7 +207,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-6 py-3.5 text-right">Acciones</th>
+                        <th scope="col" class="px-6 py-3.5 text-right whitespace-nowrap">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
