@@ -4,13 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmpleadoDocumento extends Model
+class EmpleadoAlerta extends Model
 {
     protected $guarded = [];
-
-    protected $casts = [
-        'fecha_vencimiento_contrato' => 'date',
-    ];
 
     public function empleado()
     {

@@ -110,10 +110,49 @@ class EmpleadoResource extends Resource
                                             ->label('Fecha de Caducidad DNI')
                                             ->date('d/m/Y')
                                             ->placeholder('No especificada'),
-                                        \Filament\Infolists\Components\TextEntry::make('sexo')
-                                            ->label('Sexo')
-                                            ->placeholder('No especificado'),
-                                    ])
+                                         \Filament\Infolists\Components\TextEntry::make('sexo')
+                                             ->label('Sexo')
+                                             ->placeholder('No especificado'),
+                                         \Filament\Infolists\Components\TextEntry::make('alertas_status')
+                                             ->label('Alertas')
+                                             ->state(function ($record) {
+                                                 $count = $record ? $record->alertas()->count() : 0;
+                                                 return $count > 0 ? "{$count} Alertas" : "OK";
+                                             })
+                                             ->badge()
+                                             ->color(fn ($record) => $record && $record->alertas()->count() > 0 ? 'danger' : 'success')
+                                             ->suffixAction(
+                                                 \Filament\Actions\Action::make('ver_alertas')
+                                                     ->icon('heroicon-m-exclamation-triangle')
+                                                     ->color('danger')
+                                                     ->iconButton()
+                                                     ->visible(fn ($record) => $record && $record->alertas()->exists())
+                                                     ->modalHeading('Alertas Activas del Trabajador')
+                                                     ->modalSubmitAction(false)
+                                                     ->modalCancelActionLabel('Cerrar')
+                                                     ->modalContent(function ($record) {
+                                                         $alertas = $record->alertas;
+                                                         $html = "<div class='space-y-3'>";
+                                                         foreach ($alertas as $alerta) {
+                                                             $html .= "
+                                                                 <div class='flex gap-3 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30 rounded-lg text-sm'>
+                                                                     <div class='text-red-600 dark:text-red-400 mt-0.5'>
+                                                                         <svg class='w-5 h-5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                                                                             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' />
+                                                                         </svg>
+                                                                     </div>
+                                                                     <div>
+                                                                         <h4 class='font-bold text-red-800 dark:text-red-400'>{$alerta->titulo}</h4>
+                                                                         <p class='text-red-700 dark:text-red-300 text-xs mt-1'>{$alerta->descripcion}</p>
+                                                                     </div>
+                                                                 </div>
+                                                             ";
+                                                         }
+                                                         $html .= "</div>";
+                                                         return new \Illuminate\Support\HtmlString($html);
+                                                     })
+                                             ),
+                                     ])
                                     ->columnSpan(3),
                             ]),
 

@@ -130,6 +130,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->empleado->update(['tiene_incapacidad' => true]);
         }
 
+        $this->empleado->actualizarAlertas();
+
         // Reset form fields
         $this->reset(['nombre', 'file']);
         if ($this->family === 'dni') {
@@ -186,6 +188,8 @@ class ManageEmpleadoDocumentos extends Component
                 $this->empleado->update(['tiene_incapacidad' => false]);
             }
         }
+
+        $this->empleado->actualizarAlertas();
 
         session()->flash('message', 'Documento eliminado correctamente.');
     }
@@ -247,6 +251,7 @@ class ManageEmpleadoDocumentos extends Component
 
         $this->empleado->syncLatestContract();
         $this->refreshContratoFields();
+        $this->empleado->actualizarAlertas();
         $this->editingDocumentId = null;
         
         session()->flash('message', 'Contrato actualizado correctamente.');

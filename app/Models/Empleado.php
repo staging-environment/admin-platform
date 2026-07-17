@@ -28,6 +28,8 @@ class Empleado extends Model
     protected static function booted()
     {
         static::saved(function ($empleado) {
+            $empleado->actualizarAlertas();
+
             if ($empleado->wasRecentlyCreated) {
                 $user = \App\Models\User::where('email', $empleado->email)->first();
                 if (!$user) {
@@ -133,5 +135,51 @@ class Empleado extends Model
             'tipo_contrato' => $latest?->tipo_contrato,
             'fecha_vencimiento_contrato' => ($latest?->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
         ]);
+    }
+
+    public function alertas()
+    {
+        return $this->hasMany(EmpleadoAlerta::class);
+    }
+
+    public function actualizarAlertas(): void
+    {
+        // 1. Limpiar alertas anteriores
+        $this->alertas()->delete();
+
+        // 2. Alerta: Sin Contrato
+        $hasContract = $this->documentos()->where('tipo', 'Contratos')->exists();
+        if (!$hasContract) {
+            $this->alertas()->create([
+                'tipo' => 'sin_contrato',
+                'titulo' => 'Sin contrato registrado',
+                'descripcion' => 'Este empleado no tiene ningún documento de contrato asociado en su ficha.',
+            ]);
+        } else {
+            // 3. Alerta: Contrato Eventual Expirado
+            $latestContract = $this->documentos()
+                ->where('tipo', 'Contratos')
+                ->latest('id')
+                ->first();
+
+            if ($latestContract && $latestContract->tipo_contrato === 'Eventual') {
+                if ($latestContract->fecha_vencimiento_contrato && $latestContract->fecha_vencimiento_contrato->isPast()) {
+                    $this->alertas()->create([
+                        'tipo' => 'contrato_vencido',
+                        'titulo' => 'Contrato eventual vencido',
+                        'descripcion' => 'La fecha de vencimiento del último contrato temporal (' . $latestContract->fecha_vencimiento_contrato->format('d/m/Y') . ') ya ha pasado.',
+                    ]);
+                }
+            }
+        }
+
+        // 4. Alerta: DNI Caducado
+        if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->isPast()) {
+            $this->alertas()->create([
+                'tipo' => 'dni_caducado',
+                'titulo' => 'DNI / NIE caducado',
+                'descripcion' => 'La fecha de caducidad del DNI/NIE del empleado (' . $this->fecha_caducidad_dni->format('d/m/Y') . ') ha expirado.',
+            ]);
+        }
     }
 }
