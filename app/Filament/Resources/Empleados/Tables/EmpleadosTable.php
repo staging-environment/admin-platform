@@ -47,6 +47,11 @@ class EmpleadosTable
                     }))
                     ->sortable(['nombre', 'apellidos']),
 
+                TextColumn::make('alertas')
+                    ->label('Alertas')
+                    ->html()
+                    ->state(fn (\App\Models\Empleado $record) => view('filament.components.alerts-badge', ['record' => $record])->render()),
+
                 TextColumn::make('telefono_principal')
                     ->label('Teléfono')
                     ->size('xs')
