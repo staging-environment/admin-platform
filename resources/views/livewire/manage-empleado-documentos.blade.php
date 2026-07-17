@@ -152,7 +152,9 @@
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         <th scope="col" class="px-6 py-3.5">Nombre</th>
-                        <th scope="col" class="px-6 py-3.5">Tipo</th>
+                        @if ($family !== 'dni')
+                            <th scope="col" class="px-6 py-3.5">Tipo</th>
+                        @endif
                         <th scope="col" class="px-6 py-3.5">
                             @if ($family === 'dni')
                                 Fecha de Caducidad
@@ -183,13 +185,21 @@
                                         </svg>
                                     @endif
                                 </div>
-                                <span>{{ $doc->nombre }}</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
-                                    {{ $doc->tipo }}
+                                <span>
+                                    @if ($family === 'dni')
+                                        {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
+                                    @else
+                                        {{ $doc->nombre }}
+                                    @endif
                                 </span>
                             </td>
+                            @if ($family !== 'dni')
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
+                                        {{ $doc->tipo }}
+                                    </span>
+                                </td>
+                            @endif
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
                                 @if ($family === 'dni')
                                     {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
@@ -230,7 +240,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ $family === 'dni' ? 3 : 4 }}" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center justify-center space-y-2">
                                     <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5" />
