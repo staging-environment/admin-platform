@@ -158,7 +158,13 @@
                     <tr>
                         <th scope="col" class="px-6 py-3.5">Nombre</th>
                         <th scope="col" class="px-6 py-3.5">Tipo</th>
-                        <th scope="col" class="px-6 py-3.5">Fecha de Subida</th>
+                        <th scope="col" class="px-6 py-3.5">
+                            @if ($family === 'dni')
+                                Fecha de Caducidad
+                            @else
+                                Fecha de Subida
+                            @endif
+                        </th>
                         <th scope="col" class="px-6 py-3.5 text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -190,7 +196,11 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
-                                {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
+                                @if ($family === 'dni')
+                                    {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
+                                @else
+                                    {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
+                                @endif
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-right space-x-1.5">
                                 {{-- Previsualizar --}}
