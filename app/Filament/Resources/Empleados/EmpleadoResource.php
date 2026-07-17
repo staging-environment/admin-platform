@@ -60,6 +60,11 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
                                     ->label('Foto de perfil')
                                     ->circular()
+                                    ->defaultImageUrl(fn ($record) => match ($record?->sexo) {
+                                        'Masculino' => asset('images/avatar-male.svg'),
+                                        'Femenino' => asset('images/avatar-female.svg'),
+                                        default => asset('images/avatar-generic.svg'),
+                                    })
                                     ->columnSpan(1),
                                 \Filament\Schemas\Components\Grid::make(3)
                                     ->schema([
