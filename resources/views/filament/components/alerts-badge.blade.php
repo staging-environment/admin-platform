@@ -7,7 +7,7 @@
     @if ($count > 0)
         <button type="button" 
                 @click.stop="open = true" 
-                style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; height: 24px; min-width: 24px; border-radius: 9999px; background-color: #dc2626; color: white; font-family: inherit; font-size: 12px; font-weight: bold; border: none; cursor: pointer; line-height: 1; transition: background-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; outline: none;"
+                style="position: relative; z-index: 15; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; height: 24px; min-width: 24px; border-radius: 9999px; background-color: #dc2626; color: white; font-family: inherit; font-size: 12px; font-weight: bold; border: none; cursor: pointer; line-height: 1; transition: background-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-shrink: 0; outline: none;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'">
             <svg style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; flex-shrink: 0;" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
             <span style="font-family: inherit; font-size: 12px; font-weight: 800; line-height: 1;">{{ $count }}</span>
         </button>
     @else
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 9999px; background-color: #16a34a; color: white; font-family: inherit; font-size: 12px; font-weight: bold; line-height: 1; select-none: none; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <div style="position: relative; z-index: 15; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 9999px; background-color: #16a34a; color: white; font-family: inherit; font-size: 12px; font-weight: bold; line-height: 1; select-none: none; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
             ✓
         </div>
     @endif
