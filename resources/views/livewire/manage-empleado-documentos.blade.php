@@ -191,7 +191,7 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10 text-left text-sm">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
-                        @if ($family !== 'contratos')
+                        @if ($family !== 'contratos' && $family !== 'dni')
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
@@ -201,7 +201,7 @@
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
                             @endif
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap {{ $family === 'dni' ? 'w-full' : '' }}" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
                                 @else
@@ -215,7 +215,7 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
                     @forelse ($this->documentos as $doc)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all">
-                            @if ($family !== 'contratos')
+                            @if ($family !== 'contratos' && $family !== 'dni')
                                 <td class="px-6 py-4 font-medium" style="width: 100%; min-width: 300px;">
                                     <div class="flex items-center gap-3">
                                         {{-- Icono según tipo --}}
@@ -268,7 +268,7 @@
                                         </span>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 140px !important; min-width: 140px !important;">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="{{ $family === 'dni' ? 'width: 100%;' : 'width: 140px !important; min-width: 140px !important;' }}">
                                     @if ($family === 'dni')
                                         {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
                                     @else
