@@ -20,7 +20,7 @@ class EmpleadosTable
             ->defaultPaginationPageOption(20)
             ->paginationPageOptions([10, 20, 50, 100])
             ->columns([
-                TextColumn::make('nombre_completo')
+                 TextColumn::make('nombre_completo')
                     ->label('Nombre')
                     ->state(function (\App\Models\Empleado $record) {
                         $nombre = trim($record->nombre);
@@ -44,28 +44,32 @@ class EmpleadosTable
                     ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
-                    })),
+                    }))
+                    ->sortable(['apellidos', 'nombre']),
 
                 TextColumn::make('telefono_principal')
                     ->label('Teléfono')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—'),
+                    ->default('—')
+                    ->sortable(),
 
                  TextColumn::make('gasolinera.Nombre')
                     ->label('Localidad')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—'),
+                    ->default('—')
+                    ->sortable(),
 
                 TextColumn::make('puesto')
                     ->label('Puesto')
                     ->size('xs')
                     ->color('gray')
-                    ->default('—'),
+                    ->default('—')
+                    ->sortable(),
             ])
             ->striped()
-            ->defaultSort('apellidos', 'asc')
+            ->defaultSort('nombre_completo', 'asc')
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('localidad')
                     ->label('Localidad')
