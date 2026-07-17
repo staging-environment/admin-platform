@@ -63,19 +63,19 @@ class EmpleadoForm
                                                  DatePicker::make('fecha_nacimiento')
                                                      ->label('Fecha de Nacimiento')
                                                      ->required(),
+                                                 Select::make('sexo')
+                                                     ->label('Sexo')
+                                                     ->options([
+                                                         'Masculino' => 'Masculino',
+                                                         'Femenino' => 'Femenino',
+                                                         'No binario' => 'No binario',
+                                                         'Género fluido' => 'Género fluido',
+                                                         'Queer' => 'Queer',
+                                                     ])
+                                                     ->required()
+                                                     ->live(),
                                              ])
                                             ->columnSpanFull(),
-                                        Select::make('sexo')
-                                            ->label('Sexo')
-                                            ->options([
-                                                'Masculino' => 'Masculino',
-                                                'Femenino' => 'Femenino',
-                                                'No binario' => 'No binario',
-                                                'Género fluido' => 'Género fluido',
-                                                'Queer' => 'Queer',
-                                            ])
-                                            ->required()
-                                            ->live(),
                                     ])
                                     ->columnSpan(2),
                             ]),
