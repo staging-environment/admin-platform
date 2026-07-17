@@ -48,10 +48,10 @@ class EmpleadoResource extends Resource
         return $schema
             ->columns(1)
             ->schema([
-                \Filament\Schemas\Components\Section::make('Ficha del Empleado')
+                // BLOQUE 1: Datos Personales del Trabajador
+                \Filament\Schemas\Components\Section::make('Datos Personales del Trabajador')
                     ->columnSpanFull()
                     ->schema([
-                        // Datos Personales
                         \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
@@ -106,6 +106,9 @@ class EmpleadoResource extends Resource
                                         \Filament\Infolists\Components\TextEntry::make('fecha_nacimiento')
                                             ->label('Fecha de Nacimiento')
                                             ->date(),
+                                        \Filament\Infolists\Components\TextEntry::make('sexo')
+                                            ->label('Sexo')
+                                            ->placeholder('No especificado'),
                                     ])
                                     ->columnSpan(3),
                             ]),
@@ -116,12 +119,6 @@ class EmpleadoResource extends Resource
                         // Contacto y Dirección
                         \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
-                                \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
-                                    ->label('Ubicación de trabajo')
-                                    ->placeholder('No asignada'),
-                                \Filament\Infolists\Components\TextEntry::make('puesto')
-                                    ->label('Puesto')
-                                    ->placeholder('No asignado'),
                                 \Filament\Infolists\Components\TextEntry::make('telefono_principal')
                                     ->label('Teléfono Principal'),
                                 \Filament\Infolists\Components\TextEntry::make('telefono_secundario')
@@ -137,7 +134,22 @@ class EmpleadoResource extends Resource
                                     ->label('Provincia'),
                                 \Filament\Infolists\Components\TextEntry::make('email')
                                     ->label('Correo Electrónico')
-                                    ->columnSpan(4),
+                                    ->columnSpan(2),
+                            ]),
+                    ]),
+
+                // BLOQUE 2: Información Laboral y Cargo
+                \Filament\Schemas\Components\Section::make('Información Laboral y Cargo')
+                    ->columnSpanFull()
+                    ->schema([
+                        \Filament\Schemas\Components\Grid::make(4)
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
+                                    ->label('Ubicación de trabajo')
+                                    ->placeholder('No asignada'),
+                                \Filament\Infolists\Components\TextEntry::make('puesto')
+                                    ->label('Puesto')
+                                    ->placeholder('No asignado'),
                                 \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
                                     ->label('Tipo de Contrato')
                                     ->extraAttributes(['style' => 'width: fit-content;'])
@@ -183,41 +195,12 @@ class EmpleadoResource extends Resource
                                     ->placeholder('N/A')
                                     ->columnSpan(2),
                             ]),
+                    ]),
 
-                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
-                            ->columnSpan('full'),
-
-                        \Filament\Schemas\Components\Grid::make(1)
-                            ->schema([
-                                \Filament\Infolists\Components\TextEntry::make('formacion_list')
-                                    ->label('Formación y Títulos')
-                                    ->html()
-                                    ->state(function ($record) {
-                                        $docs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->get();
-                                        if ($docs->isEmpty()) {
-                                            return "<span class='text-gray-500 italic'>No tiene formación registrada</span>";
-                                        }
-                                        
-                                        $html = "<ul class='space-y-1.5'>";
-                                        foreach ($docs as $doc) {
-                                            $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
-                                            $html .= "<li>
-                                                <a href='{$url}' target='_blank' class='inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-700 hover:underline font-medium'>
-                                                    <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'/></svg>
-                                                    {$doc->nombre} ({$doc->tipo})
-                                                </a>
-                                            </li>";
-                                        }
-                                        $html .= "</ul>";
-                                        return $html;
-                                    })
-                                    ->columnSpanFull(),
-                            ]),
-
-                        \Filament\Schemas\Components\Html::make('<hr class="border-gray-200 dark:border-white/10 my-4" />')
-                            ->columnSpan('full'),
-
-                        // Discapacidad / Incapacidad
+                // BLOQUE 3: Discapacidad / Incapacidad
+                \Filament\Schemas\Components\Section::make('Discapacidad / Incapacidad')
+                    ->columnSpanFull()
+                    ->schema([
                         \Filament\Schemas\Components\Grid::make(3)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
@@ -300,7 +283,39 @@ class EmpleadoResource extends Resource
                                     })
                                     ->placeholder('Sin documento adjunto'),
                             ]),
-                    ])
+                    ]),
+
+                // BLOQUE 4: Formación y Títulos
+                \Filament\Schemas\Components\Section::make('Formación y Títulos')
+                    ->columnSpanFull()
+                    ->schema([
+                        \Filament\Schemas\Components\Grid::make(1)
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('formacion_list')
+                                    ->label('Formación y Títulos')
+                                    ->html()
+                                    ->state(function ($record) {
+                                        $docs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->get();
+                                        if ($docs->isEmpty()) {
+                                            return "<span class='text-gray-500 italic'>No tiene formación registrada</span>";
+                                        }
+
+                                        $html = "<ul class='space-y-1.5'>";
+                                        foreach ($docs as $doc) {
+                                            $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                            $html .= "<li>
+                                                <a href='{$url}' target='_blank' class='inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-700 hover:underline font-medium'>
+                                                    <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'/></svg>
+                                                    {$doc->nombre} ({$doc->tipo})
+                                                </a>
+                                            </li>";
+                                        }
+                                        $html .= "</ul>";
+                                        return $html;
+                                    })
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
             ]);
     }
 
