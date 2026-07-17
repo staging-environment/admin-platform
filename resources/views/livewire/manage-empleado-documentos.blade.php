@@ -193,7 +193,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-3.5">Nombre</th>
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5">Tipo de Contrato</th>
+                            <th scope="col" class="px-6 py-3.5">Tipo</th>
                             <th scope="col" class="px-6 py-3.5">Fecha de Finalización</th>
                         @else
                             @if ($family !== 'dni')
