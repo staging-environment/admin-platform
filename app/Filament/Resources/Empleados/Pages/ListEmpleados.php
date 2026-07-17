@@ -17,13 +17,6 @@ class ListEmpleados extends ListRecords
         ];
     }
 
-    protected function getDefaultTableSortColumn(): ?string
-    {
-        return 'apellidos';
-    }
-
-    protected function getDefaultTableSortDirection(): ?string
-    {
-        return 'asc';
-    }
+    public ?string $tableSortColumn = 'apellidos';
+    public ?string $tableSortDirection = 'asc';
 }
