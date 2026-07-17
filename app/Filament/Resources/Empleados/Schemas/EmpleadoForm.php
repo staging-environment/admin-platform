@@ -102,13 +102,10 @@ class EmpleadoForm
                                     ->label('Provincia')
                                     ->required()
                                     ->maxLength(255),
-                                TextInput::make('telefono_principal')
-                                    ->label('Teléfono Principal')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('telefono_secundario')
-                                    ->label('Teléfono Secundario')
-                                    ->maxLength(255),
+                                 TextInput::make('telefono_principal')
+                                     ->label('Teléfono')
+                                     ->required()
+                                     ->maxLength(255),
                                 TextInput::make('email')
                                     ->label('Correo Electrónico')
                                     ->email()
