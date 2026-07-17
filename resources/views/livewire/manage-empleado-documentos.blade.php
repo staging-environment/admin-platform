@@ -191,7 +191,7 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-white/10 text-left text-sm">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
-                        <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 150px !important; overflow: visible !important;">Nombre</th>
+                        <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full">Nombre</th>
                         @if ($family === 'contratos')
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 120px !important; overflow: visible !important;">Tipo</th>
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 180px !important; overflow: visible !important;">Fecha de Finalización</th>
@@ -230,7 +230,7 @@
                                         </svg>
                                     @endif
                                 </div>
-                                <span>
+                                <span class="whitespace-nowrap">
                                     @if ($family === 'dni')
                                         {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
                                     @else
