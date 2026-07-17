@@ -46,7 +46,7 @@
             <div class="p-5 border rounded-xl bg-gray-50 dark:bg-white/5 dark:border-white/10 space-y-4 shadow-sm">
                 <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                     <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin='round' stroke-width='2' d='M12 4v16m8-8H4' />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Añadir Nuevo Documento
                 </h3>
@@ -116,7 +116,7 @@
                         </div>
                     </div>
                 @elseif ($family === 'contratos')
-                    <div class="grid grid-cols-1 {{ $tipo_contrato === 'Eventual' ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-4 items-end w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end w-full">
                         <div class="flex flex-col">
                             <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
                             <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
@@ -144,6 +144,24 @@
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Finalización</label>
                                 <input type="date" wire:model="fecha_vencimiento_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                                 @error('fecha_vencimiento_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Jornada</label>
+                            <select wire:model.live="tipo_jornada" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                <option value="Jornada completa">Jornada completa</option>
+                                <option value="Media Jornada">Media Jornada</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                            @error('tipo_jornada') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        @if ($tipo_jornada === 'Otros')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Información adicional</label>
+                                <input type="text" wire:model="tipo_jornada_otro" placeholder="Detalle de jornada" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                @error('tipo_jornada_otro') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
                         @endif
 
@@ -213,8 +231,9 @@
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Fecha de Finalización</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
@@ -263,7 +282,7 @@
                                 </td>
                             @endif
                             @if ($family === 'contratos')
-                                <td class="px-6 py-4" style="width: 100%; min-width: 90px;">
+                                <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
                                     @if ($editingDocumentId === $doc->id)
                                         <select wire:model.live="edit_tipo_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1">
                                             <option value="Indefinido">Fijo</option>
@@ -275,7 +294,7 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: 140px !important; min-width: 140px !important;">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: auto !important; min-width: 140px !important;">
                                     @if ($editingDocumentId === $doc->id)
                                         @if ($edit_tipo_contrato === 'Eventual')
                                             <input type="date" wire:model="edit_fecha_vencimiento_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
@@ -293,10 +312,32 @@
                                         @endif
                                     @endif
                                 </td>
+                                <td class="px-6 py-4" style="width: 100%; min-width: 140px;">
+                                    @if ($editingDocumentId === $doc->id)
+                                        <div class="flex flex-col space-y-1.5">
+                                            <select wire:model.live="edit_tipo_jornada" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1">
+                                                <option value="Jornada completa">Jornada completa</option>
+                                                <option value="Media Jornada">Media Jornada</option>
+                                                <option value="Otros">Otros</option>
+                                            </select>
+                                            @if ($edit_tipo_jornada === 'Otros')
+                                                <input type="text" wire:model="edit_tipo_jornada_otro" placeholder="Detalle de jornada" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-700 dark:text-gray-300">
+                                            @if (($doc->tipo_jornada ?? '') === 'Otros')
+                                                {{ $doc->tipo_jornada_otro ?: 'Otros (no especificado)' }}
+                                            @else
+                                                {{ $doc->tipo_jornada ?: 'No especificada' }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                </td>
                             @else
                                 @if ($family !== 'dni')
-                                    <td class="px-6 py-4" style="width: 90px !important; min-width: 90px !important;">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200">
+                                    <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-300">
                                             {{ $doc->tipo }}
                                         </span>
                                     </td>

@@ -23,12 +23,16 @@ class ManageEmpleadoDocumentos extends Component
     public $fecha_caducidad_dni;
     public $tipo_contrato;
     public $fecha_vencimiento_contrato;
+    public $tipo_jornada = 'Jornada completa';
+    public $tipo_jornada_otro;
 
     // Properties for inline editing
     public $editingDocumentId = null;
     public $edit_tipo_contrato;
     public $edit_fecha_vencimiento_contrato;
     public $edit_fecha_caducidad_dni;
+    public $edit_tipo_jornada;
+    public $edit_tipo_jornada_otro;
 
     // Validation rules
     protected $rules = [
@@ -50,6 +54,7 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo = 'Contratos';
             $this->tipo_contrato = $this->empleado->tipo_contrato;
             $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
+            $this->tipo_jornada = 'Jornada completa';
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Certificados';
         } elseif ($this->family === 'discapacidad') {
@@ -104,6 +109,10 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'dni') {
             $rules['fecha_caducidad_dni'] = 'required|date';
         }
+        if ($this->family === 'contratos') {
+            $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
+            $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
+        }
         $this->validate($rules);
 
         if ($this->family === 'dni') {
@@ -120,6 +129,8 @@ class ManageEmpleadoDocumentos extends Component
             'file_path' => $path,
             'tipo_contrato' => $this->family === 'contratos' ? ($this->tipo_contrato ?: null) : null,
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
+            'tipo_jornada' => $this->family === 'contratos' ? ($this->tipo_jornada ?: null) : null,
+            'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
         ]);
 
         if ($this->family === 'contratos') {
@@ -134,11 +145,12 @@ class ManageEmpleadoDocumentos extends Component
         $this->empleado->actualizarAlertas();
 
         // Reset form fields
-        $this->reset(['nombre', 'file']);
+        $this->reset(['nombre', 'file', 'tipo_jornada', 'tipo_jornada_otro']);
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
+            $this->tipo_jornada = 'Jornada completa';
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Certificados';
         } elseif ($this->family === 'discapacidad') {
@@ -232,6 +244,8 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'contratos') {
             $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
             $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
+            $this->edit_tipo_jornada = $doc->tipo_jornada ?: 'Jornada completa';
+            $this->edit_tipo_jornada_otro = $doc->tipo_jornada_otro;
         } elseif ($this->family === 'dni') {
             $this->edit_fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
         }
@@ -252,9 +266,17 @@ class ManageEmpleadoDocumentos extends Component
         $doc = EmpleadoDocumento::findOrFail($this->editingDocumentId);
         
         if ($this->family === 'contratos') {
+            $rules = [
+                'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
+                'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
+            ];
+            $this->validate($rules);
+
             $doc->update([
                 'tipo_contrato' => $this->edit_tipo_contrato ?: null,
                 'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
+                'tipo_jornada' => $this->edit_tipo_jornada ?: null,
+                'tipo_jornada_otro' => ($this->edit_tipo_jornada === 'Otros') ? $this->edit_tipo_jornada_otro : null,
             ]);
             $this->empleado->syncLatestContract();
             $this->refreshContratoFields();
