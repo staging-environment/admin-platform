@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 
 class ViewEmpleado extends ViewRecord
@@ -100,35 +101,35 @@ class ViewEmpleado extends ViewRecord
                         ->label('¿Tiene discapacidad?')
                         ->live(),
                     
-                    Select::make('tipo_discapacidad')
-                        ->label('Tipo de Discapacidad')
-                        ->multiple()
-                        ->options([
-                            'Física' => 'Física',
-                            'Psíquica' => 'Psíquica',
-                            'Sensorial' => 'Sensorial',
-                        ])
+                    Grid::make(4)
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
-                    
-                    TextInput::make('porcentaje_discapacidad')
-                        ->label('Porcentaje de Discapacidad')
-                        ->numeric()
-                        ->minValue(0)
-                        ->maxValue(100)
-                        ->suffix('%')
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                        ->schema([
+                            Select::make('tipo_discapacidad')
+                                ->label('Tipo de Discapacidad')
+                                ->multiple()
+                                ->options([
+                                    'Física' => 'Física',
+                                    'Psíquica' => 'Psíquica',
+                                    'Sensorial' => 'Sensorial',
+                                ])
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                            
+                            TextInput::make('porcentaje_discapacidad')
+                                ->label('Porcentaje de Discapacidad')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->suffix('%')
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
-                    DatePicker::make('fecha_reconocimiento')
-                        ->label('Fecha de reconocimiento')
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                            DatePicker::make('fecha_reconocimiento')
+                                ->label('Fecha de reconocimiento')
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
-                    DatePicker::make('fecha_resolucion_discapacidad')
-                        ->label('Fecha de resolución')
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                            DatePicker::make('fecha_resolucion_discapacidad')
+                                ->label('Fecha de resolución')
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                        ]),
 
                     Toggle::make('pertenece_andalucia')
                         ->label('¿Pertenece a Andalucía?')
