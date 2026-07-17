@@ -17,23 +17,14 @@ class ListEmpleados extends ListRecords
         ];
     }
 
-    public ?string $tableSortColumn = 'apellidos';
-    public ?string $tableSortDirection = 'asc';
+    public ?string $tableSort = 'apellidos:asc';
 
     public function mount(): void
     {
         parent::mount();
 
-        if (!$this->tableSortColumn) {
-            $this->tableSortColumn = 'apellidos';
-            $this->tableSortDirection = 'asc';
+        if (!$this->tableSort) {
+            $this->tableSort = 'apellidos:asc';
         }
-    }
-
-    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
-    {
-        $query = parent::getTableQuery();
-        \Illuminate\Support\Facades\Log::warning('TABLE QUERY SQL: ' . $query->toSql() . ' | Orders: ' . json_encode($query->getQuery()->orders));
-        return $query;
     }
 }
