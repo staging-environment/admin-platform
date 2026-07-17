@@ -173,7 +173,17 @@ class Empleado extends Model
             }
         }
 
-        // 4. Alerta: DNI Caducado
+        // 4. Alerta: Sin DNI
+        $hasDNI = $this->documentos()->where('tipo', 'DNI')->exists();
+        if (!$hasDNI) {
+            $this->alertas()->create([
+                'tipo' => 'sin_dni',
+                'titulo' => 'Sin DNI / NIE registrado',
+                'descripcion' => 'Este empleado no tiene ningún documento de DNI/NIE asociado en su ficha.',
+            ]);
+        }
+
+        // 5. Alerta: DNI Caducado
         if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->isPast()) {
             $this->alertas()->create([
                 'tipo' => 'dni_caducado',
