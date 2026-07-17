@@ -24,6 +24,11 @@ class ManageEmpleadoDocumentos extends Component
     public $tipo_contrato;
     public $fecha_vencimiento_contrato;
 
+    // Properties for inline editing
+    public $editingDocumentId = null;
+    public $edit_tipo_contrato;
+    public $edit_fecha_vencimiento_contrato;
+
     // Validation rules
     protected $rules = [
         'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros',
@@ -212,6 +217,39 @@ class ManageEmpleadoDocumentos extends Component
         ]);
 
         session()->flash('message', 'Fecha de caducidad del DNI guardada correctamente.');
+    }
+
+    public function editDocument($id)
+    {
+        $doc = EmpleadoDocumento::findOrFail($id);
+        $this->editingDocumentId = $id;
+        $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
+        $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
+    }
+
+    public function cancelEdit()
+    {
+        $this->editingDocumentId = null;
+    }
+
+    public function saveDocumentEdit()
+    {
+        if (!auth()->user()->can('editar_documentacion_empleados')) {
+            session()->flash('error', 'No tienes permisos para editar documentos.');
+            return;
+        }
+
+        $doc = EmpleadoDocumento::findOrFail($this->editingDocumentId);
+        $doc->update([
+            'tipo_contrato' => $this->edit_tipo_contrato ?: null,
+            'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
+        ]);
+
+        $this->empleado->syncLatestContract();
+        $this->refreshContratoFields();
+        $this->editingDocumentId = null;
+        
+        session()->flash('message', 'Contrato actualizado correctamente.');
     }
 
     public function render()
