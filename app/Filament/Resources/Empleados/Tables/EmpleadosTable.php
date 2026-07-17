@@ -24,6 +24,7 @@ class EmpleadosTable
                     ->label('Nombre')
                     ->view('filament.tables.columns.nombre-con-alerta')
                     ->alignStart()
+                    ->disabledClick()
                     ->extraAttributes([
                         'onclick' => 'event.stopPropagation()',
                     ])
