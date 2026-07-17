@@ -37,7 +37,7 @@ class EditEmpleado extends EditRecord
                     $hasDocs = $record->documentos()->where('tipo', 'DNI')->exists();
                     return $hasDocs ? 'warning' : 'danger';
                 })
-                ->modalHeading('Documentos DNI')
+                ->modalHeading("DNI's asociados al empleado")
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'dni']))
