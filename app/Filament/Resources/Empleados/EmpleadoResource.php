@@ -105,7 +105,7 @@ class EmpleadoResource extends Resource
                                             ),
                                         \Filament\Infolists\Components\TextEntry::make('fecha_nacimiento')
                                             ->label('Fecha de Nacimiento')
-                                            ->date(),
+                                            ->date('d/m/Y'),
                                         \Filament\Infolists\Components\TextEntry::make('fecha_caducidad_dni')
                                             ->label('Fecha de Caducidad DNI')
                                             ->date('d/m/Y')
@@ -194,7 +194,7 @@ class EmpleadoResource extends Resource
                                     ->columnSpan(2),
                                 \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
                                     ->label('Vencimiento de Contrato')
-                                    ->date()
+                                    ->date('d/m/Y')
                                     ->visible(fn ($record) => $record && $record->tipo_contrato === 'Eventual')
                                     ->placeholder('N/A')
                                     ->columnSpan(2),
