@@ -33,6 +33,7 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_fecha_caducidad_dni;
     public $edit_tipo_jornada;
     public $edit_tipo_jornada_otro;
+    public $edit_file;
 
     // Validation rules
     protected $rules = [
@@ -240,6 +241,7 @@ class ManageEmpleadoDocumentos extends Component
     {
         $doc = EmpleadoDocumento::findOrFail($id);
         $this->editingDocumentId = $id;
+        $this->edit_file = null;
         
         if ($this->family === 'contratos') {
             $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
@@ -254,6 +256,7 @@ class ManageEmpleadoDocumentos extends Component
     public function cancelEdit()
     {
         $this->editingDocumentId = null;
+        $this->edit_file = null;
     }
 
     public function saveDocumentEdit()
@@ -270,9 +273,21 @@ class ManageEmpleadoDocumentos extends Component
                 'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
                 'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
             ];
+            if ($this->edit_file) {
+                $rules['edit_file'] = 'file|max:10240';
+            }
             $this->validate($rules);
 
+            $path = $doc->file_path;
+            if ($this->edit_file) {
+                if ($doc->file_path && Storage::disk('local')->exists($doc->file_path)) {
+                    Storage::disk('local')->delete($doc->file_path);
+                }
+                $path = $this->edit_file->store('empleados/documentos', 'local');
+            }
+
             $doc->update([
+                'file_path' => $path,
                 'tipo_contrato' => $this->edit_tipo_contrato ?: null,
                 'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
                 'tipo_jornada' => $this->edit_tipo_jornada ?: null,
@@ -281,6 +296,14 @@ class ManageEmpleadoDocumentos extends Component
             $this->empleado->syncLatestContract();
             $this->refreshContratoFields();
         } elseif ($this->family === 'dni') {
+            if ($this->edit_file) {
+                $this->validate(['edit_file' => 'file|max:10240']);
+                if ($doc->file_path && Storage::disk('local')->exists($doc->file_path)) {
+                    Storage::disk('local')->delete($doc->file_path);
+                }
+                $path = $this->edit_file->store('empleados/documentos', 'local');
+                $doc->update(['file_path' => $path]);
+            }
             $this->empleado->update([
                 'fecha_caducidad_dni' => $this->edit_fecha_caducidad_dni ?: null,
             ]);
@@ -289,6 +312,7 @@ class ManageEmpleadoDocumentos extends Component
 
         $this->empleado->actualizarAlertas();
         $this->editingDocumentId = null;
+        $this->edit_file = null;
         
         session()->flash('message', 'Documento actualizado correctamente.');
     }

@@ -284,10 +284,26 @@
                             @if ($family === 'contratos')
                                 <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
                                     @if ($editingDocumentId === $doc->id)
-                                        <select wire:model.live="edit_tipo_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1">
-                                            <option value="Indefinido">Fijo</option>
-                                            <option value="Eventual">Eventual</option>
-                                        </select>
+                                        <div class="flex flex-col space-y-2.5">
+                                            <div>
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Tipo</label>
+                                                <select wire:model.live="edit_tipo_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full font-medium">
+                                                    <option value="Indefinido">Fijo</option>
+                                                    <option value="Eventual">Eventual</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Archivo actual: <span class="font-normal text-gray-500">{{ basename($doc->file_path) }}</span></label>
+                                                <label class="inline-flex items-center justify-center px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-[10px] font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10">
+                                                    Cambiar archivo (opcional)
+                                                    <input type="file" wire:model="edit_file" class="hidden" />
+                                                </label>
+                                                @if ($edit_file)
+                                                    <span class="text-[10px] text-green-600 dark:text-green-400 block mt-1">✓ Nuevo archivo seleccionado</span>
+                                                @endif
+                                                @error('edit_file') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400' : 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' }}">
                                             {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
@@ -345,7 +361,23 @@
                                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="{{ $family === 'dni' ? 'width: 100%;' : 'width: 140px !important; min-width: 140px !important;' }}">
                                     @if ($family === 'dni')
                                         @if ($editingDocumentId === $doc->id)
-                                            <input type="date" wire:model="edit_fecha_caducidad_dni" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                            <div class="flex flex-col space-y-2.5">
+                                                <div>
+                                                    <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Fecha de Caducidad</label>
+                                                    <input type="date" wire:model="edit_fecha_caducidad_dni" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Archivo actual: <span class="font-normal text-gray-500">{{ basename($doc->file_path) }}</span></label>
+                                                    <label class="inline-flex items-center justify-center px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-[10px] font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10">
+                                                        Cambiar archivo (opcional)
+                                                        <input type="file" wire:model="edit_file" class="hidden" />
+                                                    </label>
+                                                    @if ($edit_file)
+                                                        <span class="text-[10px] text-green-600 dark:text-green-400 block mt-1">✓ Nuevo archivo seleccionado</span>
+                                                    @endif
+                                                    @error('edit_file') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                                </div>
+                                            </div>
                                         @else
                                             {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
                                         @endif
