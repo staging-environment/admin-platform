@@ -25,6 +25,7 @@ class ManageEmpleadoDocumentos extends Component
     public $fecha_vencimiento_contrato;
     public $tipo_jornada = 'Jornada completa';
     public $tipo_jornada_otro;
+    public $fecha_realizacion;
 
     // Properties for inline editing
     public $editingDocumentId = null;
@@ -34,10 +35,13 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_tipo_jornada;
     public $edit_tipo_jornada_otro;
     public $edit_file;
+    public $edit_fecha_realizacion;
+    public $edit_tipo;
+    public $edit_nombre;
 
     // Validation rules
     protected $rules = [
-        'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros',
+        'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros,Prevención de riesgos laborales,Manipulación de alimentos',
         'nombre' => 'required|string|max:255',
         'file' => 'required|file|max:10240', // 10MB max
     ];
@@ -57,7 +61,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
             $this->tipo_jornada = 'Jornada completa';
         } elseif ($this->family === 'formacion') {
-            $this->tipo = 'Certificados';
+            $this->tipo = 'Prevención de riesgos laborales';
+            $this->fecha_realizacion = null;
         } elseif ($this->family === 'discapacidad') {
             $this->tipo = 'Resolución Discapacidad';
         } elseif ($this->family === 'incapacidad') {
@@ -79,7 +84,7 @@ class ManageEmpleadoDocumentos extends Component
         } elseif ($this->family === 'contratos') {
             $query->where('tipo', 'Contratos');
         } elseif ($this->family === 'formacion') {
-            $query->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros']);
+            $query->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos']);
         } elseif ($this->family === 'discapacidad') {
             $query->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad']);
         } elseif ($this->family === 'incapacidad') {
@@ -114,6 +119,9 @@ class ManageEmpleadoDocumentos extends Component
             $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
             $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
         }
+        if ($this->family === 'formacion') {
+            $rules['fecha_realizacion'] = 'required|date';
+        }
         $this->validate($rules);
 
         if ($this->family === 'dni') {
@@ -132,6 +140,7 @@ class ManageEmpleadoDocumentos extends Component
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             'tipo_jornada' => $this->family === 'contratos' ? ($this->tipo_jornada ?: null) : null,
             'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
+            'fecha_realizacion' => $this->family === 'formacion' ? $this->fecha_realizacion : null,
         ]);
 
         if ($this->family === 'contratos') {
@@ -146,14 +155,14 @@ class ManageEmpleadoDocumentos extends Component
         $this->empleado->actualizarAlertas();
 
         // Reset form fields
-        $this->reset(['nombre', 'file', 'tipo_jornada', 'tipo_jornada_otro']);
+        $this->reset(['nombre', 'file', 'tipo_jornada', 'tipo_jornada_otro', 'fecha_realizacion']);
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
         } elseif ($this->family === 'contratos') {
             $this->tipo = 'Contratos';
             $this->tipo_jornada = 'Jornada completa';
         } elseif ($this->family === 'formacion') {
-            $this->tipo = 'Certificados';
+            $this->tipo = 'Prevención de riesgos laborales';
         } elseif ($this->family === 'discapacidad') {
             $this->tipo = 'Resolución Discapacidad';
         } elseif ($this->family === 'incapacidad') {
@@ -250,6 +259,10 @@ class ManageEmpleadoDocumentos extends Component
             $this->edit_tipo_jornada_otro = $doc->tipo_jornada_otro;
         } elseif ($this->family === 'dni') {
             $this->edit_fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
+        } elseif ($this->family === 'formacion') {
+            $this->edit_tipo = $doc->tipo;
+            $this->edit_nombre = $doc->nombre;
+            $this->edit_fecha_realizacion = $doc->fecha_realizacion ? $doc->fecha_realizacion->format('Y-m-d') : null;
         }
     }
 
@@ -308,6 +321,31 @@ class ManageEmpleadoDocumentos extends Component
                 'fecha_caducidad_dni' => $this->edit_fecha_caducidad_dni ?: null,
             ]);
             $this->fecha_caducidad_dni = $this->edit_fecha_caducidad_dni;
+        } elseif ($this->family === 'formacion') {
+            $rules = [
+                'edit_tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros,Prevención de riesgos laborales,Manipulación de alimentos',
+                'edit_nombre' => 'required|string|max:255',
+                'edit_fecha_realizacion' => 'required|date',
+            ];
+            if ($this->edit_file) {
+                $rules['edit_file'] = 'file|max:10240';
+            }
+            $this->validate($rules);
+
+            $path = $doc->file_path;
+            if ($this->edit_file) {
+                if ($doc->file_path && Storage::disk('local')->exists($doc->file_path)) {
+                    Storage::disk('local')->delete($doc->file_path);
+                }
+                $path = $this->edit_file->store('empleados/documentos', 'local');
+            }
+
+            $doc->update([
+                'tipo' => $this->edit_tipo,
+                'nombre' => $this->edit_nombre,
+                'file_path' => $path,
+                'fecha_realizacion' => $this->edit_fecha_realizacion,
+            ]);
         }
 
         $this->empleado->actualizarAlertas();
