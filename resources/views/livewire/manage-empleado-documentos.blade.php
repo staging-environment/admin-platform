@@ -176,6 +176,7 @@
                             </button>
                         </div>
                     </div>
+                @else
                     @if ($family === 'formacion')
                         <div class="grid grid-cols-1 {{ $tipo === 'Otros' ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-4 items-end">
                             <div>
