@@ -59,6 +59,11 @@
             <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
 
             @can('recibir_notificaciones_competencia')
+                <div class="mt-4 mb-4">
+                    <x-input-label for="telegram_chat_id" :value="__('ID de Telegram')" />
+                    <x-text-input id="telegram_chat_id" name="telegram_chat_id" type="text" class="mt-1 block w-full bg-gray-100 text-gray-500 cursor-not-allowed" :value="$user->telegram_chat_id ?? 'No asociado'" disabled readonly />
+                </div>
+
                 <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm text-blue-900 space-y-2">
                     <p class="font-semibold flex items-center gap-1">
                         📢 Tienes activo el permiso para recibir alertas de competencia. Sigue estos pasos para configurar las alertas en tu móvil:
