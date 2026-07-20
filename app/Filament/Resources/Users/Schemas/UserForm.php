@@ -32,15 +32,29 @@ class UserForm
                     ->maxLength(50)
                     ->disabled(fn () => auth()->user()?->email !== 'jarodriguezbonilla@gmail.com'),
 
+                // --- EL CAMPO QUE FALTABA ---
+                TextInput::make('password')
+                    ->label('Contraseña')
+                    ->password()
+                    // Solo obligatorio cuando estamos CREANDO un usuario
+                    ->required(fn ($context) => $context === 'create')
+                    // Evita que se sobrescriba con vacío si editamos y no ponemos nada
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->revealable()
+                    ->maxLength(255),
+                // ----------------------------
+
                 TextInput::make('telegram_chat_id')
                     ->label('ID de Telegram')
                     ->disabled()
                     ->dehydrated(false)
                     ->placeholder('No asociado')
+                    ->columnSpanFull()
                     ->visible(fn ($record) => $record && $record->can('recibir_notificaciones_competencia')),
 
                 Placeholder::make('telegram_instructions')
                     ->label('')
+                    ->columnSpanFull()
                     ->visible(fn ($record) => $record && $record->can('recibir_notificaciones_competencia'))
                     ->content(new HtmlString('
                         <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm text-blue-900 space-y-2">
@@ -62,24 +76,13 @@ class UserForm
 
                 Placeholder::make('telegram_no_permission')
                     ->label('')
+                    ->columnSpanFull()
                     ->visible(fn ($record) => $record && !$record->can('recibir_notificaciones_competencia'))
                     ->content(new HtmlString('
                         <div class="mt-4 p-4 bg-gray-50 border-l-4 border-gray-400 rounded-r-md text-sm text-gray-700">
                             ℹ️ No tienes activo el permiso para recibir alertas de competencia. Si lo necesitas, solicita su activación en la Matriz de Permisos.
                         </div>
                     ')),
-
-                // --- EL CAMPO QUE FALTABA ---
-                TextInput::make('password')
-                    ->label('Contraseña')
-                    ->password()
-                    // Solo obligatorio cuando estamos CREANDO un usuario
-                    ->required(fn ($context) => $context === 'create')
-                    // Evita que se sobrescriba con vacío si editamos y no ponemos nada
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->revealable()
-                    ->maxLength(255),
-                // ----------------------------
 
                 CheckboxList::make('roles')
                     ->relationship('roles', 'name')
