@@ -61,6 +61,7 @@
                         $options = [
                             'Prevención de riesgos laborales' => 'Prevención de riesgos laborales',
                             'Manipulación de alimentos' => 'Manipulación de alimentos',
+                            'Otros' => 'Otros',
                         ];
                     } elseif ($family === 'discapacidad') {
                         $options = [
@@ -175,12 +176,11 @@
                             </button>
                         </div>
                     </div>
-                @else
                     @if ($family === 'formacion')
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div class="grid grid-cols-1 {{ $tipo === 'Otros' ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Curso</label>
-                                <select wire:model="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
                                     @foreach ($options as $val => $lbl)
                                         <option value="{{ $val }}">{{ $lbl }}</option>
                                     @endforeach
@@ -188,11 +188,13 @@
                                 @error('tipo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
 
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nombre del Curso</label>
-                                <input type="text" wire:model="nombre" placeholder="Ej. Curso Prevención" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                            </div>
+                            @if ($tipo === 'Otros')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nombre del Curso</label>
+                                    <input type="text" wire:model="nombre" placeholder="Ej. Curso Prevención" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                    @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
 
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Realización</label>
@@ -320,13 +322,25 @@
                                                 </svg>
                                             @endif
                                         </div>
-                                        <span class="whitespace-nowrap truncate block max-w-[320px]" title="{{ $family === 'dni' ? $this->empleado->nombre . ' ' . $this->empleado->apellidos : $doc->nombre }}">
-                                            @if ($family === 'dni')
-                                                {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
+                                        @if ($editingDocumentId === $doc->id && $family === 'formacion')
+                                            @if ($edit_tipo === 'Otros')
+                                                <div class="flex flex-col space-y-1.5 w-full">
+                                                    <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400">Nombre del Curso</label>
+                                                    <input type="text" wire:model="edit_nombre" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full" />
+                                                    @error('edit_nombre') <span class="text-[10px] text-red-500">{{ $message }}</span> @enderror
+                                                </div>
                                             @else
-                                                {{ $doc->nombre }}
+                                                <span class="text-xs text-gray-500">Auto ({{ $edit_tipo }})</span>
                                             @endif
-                                        </span>
+                                        @else
+                                            <span class="whitespace-nowrap truncate block max-w-[320px]" title="{{ $family === 'dni' ? $this->empleado->nombre . ' ' . $this->empleado->apellidos : $doc->nombre }}">
+                                                @if ($family === 'dni')
+                                                    {{ $this->empleado->nombre }} {{ $this->empleado->apellidos }}
+                                                @else
+                                                    {{ $doc->nombre }}
+                                                @endif
+                                            </span>
+                                        @endif
                                     </div>
                                 </td>
                             @endif
@@ -403,7 +417,7 @@
                                 @if ($family !== 'dni')
                                     <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
                                         @if ($editingDocumentId === $doc->id && $family === 'formacion')
-                                            <select wire:model="edit_tipo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full font-medium">
+                                            <select wire:model.live="edit_tipo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full font-medium">
                                                 @foreach ($options as $val => $lbl)
                                                     <option value="{{ $val }}">{{ $lbl }}</option>
                                                 @endforeach

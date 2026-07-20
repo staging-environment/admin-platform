@@ -121,6 +121,12 @@ class ManageEmpleadoDocumentos extends Component
         }
         if ($this->family === 'formacion') {
             $rules['fecha_realizacion'] = 'required|date';
+            if ($this->tipo === 'Otros') {
+                $rules['nombre'] = 'required|string|max:255';
+            } else {
+                $this->nombre = $this->tipo;
+                unset($rules['nombre']);
+            }
         }
         $this->validate($rules);
 
@@ -324,9 +330,13 @@ class ManageEmpleadoDocumentos extends Component
         } elseif ($this->family === 'formacion') {
             $rules = [
                 'edit_tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros,Prevención de riesgos laborales,Manipulación de alimentos',
-                'edit_nombre' => 'required|string|max:255',
                 'edit_fecha_realizacion' => 'required|date',
             ];
+            if ($this->edit_tipo === 'Otros') {
+                $rules['edit_nombre'] = 'required|string|max:255';
+            } else {
+                $this->edit_nombre = $this->edit_tipo;
+            }
             if ($this->edit_file) {
                 $rules['edit_file'] = 'file|max:10240';
             }
