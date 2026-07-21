@@ -138,6 +138,12 @@
                             @error('tipo_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
 
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Inicio <span class="text-red-500">*</span></label>
+                            <input type="date" wire:model="fecha_inicio_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                            @error('fecha_inicio_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
                         @if ($tipo_contrato === 'Eventual')
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Finalización</label>
@@ -299,6 +305,7 @@
                         @endif
                         @if ($family === 'contratos')
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
+                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 130px !important; overflow: visible !important;">Fecha de Inicio</th>
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Fecha de Finalización</th>
                             <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Jornada</th>
                         @else
@@ -389,6 +396,14 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400' : 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400' }}">
                                             {{ ($doc->tipo_contrato ?? $this->empleado->tipo_contrato) === 'Eventual' ? 'Eventual' : 'Fijo' }}
                                         </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: auto !important; min-width: 130px !important;">
+                                    @if ($editingDocumentId === $doc->id)
+                                        <input type="date" wire:model="edit_fecha_inicio_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                        @error('edit_fecha_inicio_contrato') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                    @else
+                                        {{ $doc->fecha_inicio_contrato ? $doc->fecha_inicio_contrato->format('d/m/Y') : 'No especificada' }}
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: auto !important; min-width: 140px !important;">

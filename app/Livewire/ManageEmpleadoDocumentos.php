@@ -22,6 +22,7 @@ class ManageEmpleadoDocumentos extends Component
     public $selectedIncapacidad = [];
     public $fecha_caducidad_dni;
     public $tipo_contrato;
+    public $fecha_inicio_contrato;
     public $fecha_vencimiento_contrato;
     public $tipo_jornada = 'Jornada completa';
     public $tipo_jornada_otro;
@@ -32,6 +33,7 @@ class ManageEmpleadoDocumentos extends Component
     // Properties for inline editing
     public $editingDocumentId = null;
     public $edit_tipo_contrato;
+    public $edit_fecha_inicio_contrato;
     public $edit_fecha_vencimiento_contrato;
     public $edit_fecha_caducidad_dni;
     public $edit_tipo_jornada;
@@ -122,6 +124,7 @@ class ManageEmpleadoDocumentos extends Component
             $rules['fecha_caducidad_dni'] = 'required|date';
         }
         if ($this->family === 'contratos') {
+            $rules['fecha_inicio_contrato'] = 'required|date';
             $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
             $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
             $rules['gasolinera_codigo'] = 'required|integer|exists:gasolineras,Codigo';
@@ -151,6 +154,7 @@ class ManageEmpleadoDocumentos extends Component
             'nombre' => $this->nombre,
             'file_path' => $path,
             'tipo_contrato' => $this->family === 'contratos' ? ($this->tipo_contrato ?: null) : null,
+            'fecha_inicio_contrato' => ($this->family === 'contratos' && $this->fecha_inicio_contrato) ? $this->fecha_inicio_contrato : null,
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             'tipo_jornada' => $this->family === 'contratos' ? ($this->tipo_jornada ?: null) : null,
             'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
@@ -272,6 +276,7 @@ class ManageEmpleadoDocumentos extends Component
         
         if ($this->family === 'contratos') {
             $this->edit_tipo_contrato = $doc->tipo_contrato ?: 'Indefinido';
+            $this->edit_fecha_inicio_contrato = $doc->fecha_inicio_contrato ? $doc->fecha_inicio_contrato->format('Y-m-d') : null;
             $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
             $this->edit_tipo_jornada = $doc->tipo_jornada ?: 'Jornada completa';
             $this->edit_tipo_jornada_otro = $doc->tipo_jornada_otro;
@@ -303,6 +308,7 @@ class ManageEmpleadoDocumentos extends Component
         
         if ($this->family === 'contratos') {
             $rules = [
+                'edit_fecha_inicio_contrato' => 'required|date',
                 'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
                 'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
                 'edit_gasolinera_codigo' => 'required|integer|exists:gasolineras,Codigo',
@@ -324,6 +330,7 @@ class ManageEmpleadoDocumentos extends Component
             $doc->update([
                 'file_path' => $path,
                 'tipo_contrato' => $this->edit_tipo_contrato ?: null,
+                'fecha_inicio_contrato' => $this->edit_fecha_inicio_contrato ?: null,
                 'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
                 'tipo_jornada' => $this->edit_tipo_jornada ?: null,
                 'tipo_jornada_otro' => ($this->edit_tipo_jornada === 'Otros') ? $this->edit_tipo_jornada_otro : null,

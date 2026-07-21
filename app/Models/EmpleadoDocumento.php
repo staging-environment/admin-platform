@@ -9,6 +9,7 @@ class EmpleadoDocumento extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'fecha_inicio_contrato' => 'date',
         'fecha_vencimiento_contrato' => 'date',
         'fecha_realizacion' => 'date',
     ];
