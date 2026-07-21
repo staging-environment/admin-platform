@@ -115,7 +115,7 @@
                         </div>
                     </div>
                 @elseif ($family === 'contratos')
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-end w-full">
                         <div class="flex flex-col">
                             <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
                             <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
@@ -304,10 +304,10 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[8%]">Tipo</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[15%]">Inicio</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[17%]">Finalización</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[20%]">Jornada</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[12%]">Tipo</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[20%]">Inicio</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[20%]">Finalización</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[24%]">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-[40%]">Acciones</th>
+                        <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap w-[24%]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -530,7 +530,7 @@
                                 </td>
                             @endif
                             <td class="px-2.5 py-2.5">
-                                <div class="flex items-center justify-start gap-1">
+                                <div class="flex items-center justify-end gap-1.5">
                                     @if ($editingDocumentId === $doc->id)
                                         {{-- Guardar --}}
                                         <button type="button" wire:click="saveDocumentEdit" class="inline-flex items-center justify-center p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-lg transition-all" title="Guardar">
