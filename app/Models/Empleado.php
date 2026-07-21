@@ -131,12 +131,14 @@ class Empleado extends Model
             ->latest('id')
             ->first();
 
-        $this->update([
-            'tipo_contrato' => $latest?->tipo_contrato,
-            'fecha_vencimiento_contrato' => ($latest?->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
-            'gasolinera_codigo' => $latest?->gasolinera_codigo ?? $this->gasolinera_codigo,
-            'puesto' => $latest?->puesto ?? $this->puesto,
-        ]);
+        if ($latest) {
+            $this->update([
+                'tipo_contrato' => $latest->tipo_contrato,
+                'fecha_vencimiento_contrato' => ($latest->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
+                'gasolinera_codigo' => $latest->gasolinera_codigo ?: $this->gasolinera_codigo,
+                'puesto' => $latest->puesto ?: $this->puesto,
+            ]);
+        }
     }
 
     public function alertas()
