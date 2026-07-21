@@ -101,10 +101,20 @@ class ManageEmpleadoDocumentos extends Component
         return $query->orderBy('created_at', 'desc')->get();
     }
 
+    public function canEditDocumentation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        return $user->can('editar_documentacion_empleados') 
+            || $user->can('gestion_editar_empleados') 
+            || $user->hasRole('Super Admin') 
+            || $user->hasRole('Administrador');
+    }
+
     public function uploadDocument()
     {
         // Check permission
-        if (!auth()->user()->can('editar_documentacion_empleados')) {
+        if (!$this->canEditDocumentation()) {
             session()->flash('error', 'No tienes permisos para añadir documentos.');
             return;
         }
@@ -206,7 +216,7 @@ class ManageEmpleadoDocumentos extends Component
     public function deleteDocument($id)
     {
         // Check permission
-        if (!auth()->user()->can('editar_documentacion_empleados')) {
+        if (!$this->canEditDocumentation()) {
             session()->flash('error', 'No tienes permisos para borrar documentos.');
             return;
         }
@@ -242,7 +252,7 @@ class ManageEmpleadoDocumentos extends Component
 
     public function saveIncapacidad()
     {
-        if (!auth()->user()->can('editar_documentacion_empleados')) {
+        if (!$this->canEditDocumentation()) {
             session()->flash('error', 'No tienes permisos para editar la incapacidad.');
             return;
         }
@@ -257,7 +267,7 @@ class ManageEmpleadoDocumentos extends Component
 
     public function saveFechaCaducidad()
     {
-        if (!auth()->user()->can('editar_documentacion_empleados')) {
+        if (!$this->canEditDocumentation()) {
             session()->flash('error', 'No tienes permisos para editar la fecha de caducidad.');
             return;
         }
@@ -300,7 +310,7 @@ class ManageEmpleadoDocumentos extends Component
 
     public function saveDocumentEdit()
     {
-        if (!auth()->user()->can('editar_documentacion_empleados')) {
+        if (!$this->canEditDocumentation()) {
             session()->flash('error', 'No tienes permisos para editar documentos.');
             return;
         }
