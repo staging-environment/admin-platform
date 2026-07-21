@@ -132,7 +132,10 @@ class EmpleadoResource extends Resource
                         \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('telefono_principal')
-                                    ->label('Teléfono'),
+                                    ->label('Teléfono Principal'),
+                                \Filament\Infolists\Components\TextEntry::make('telefono_secundario')
+                                    ->label('Teléfono Secundario')
+                                    ->placeholder('No especificado'),
                                 \Filament\Infolists\Components\TextEntry::make('direccion')
                                     ->label('Dirección'),
                                 \Filament\Infolists\Components\TextEntry::make('localidad')

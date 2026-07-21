@@ -103,8 +103,12 @@ class EmpleadoForm
                                     ->required()
                                     ->maxLength(255),
                                  TextInput::make('telefono_principal')
-                                     ->label('Teléfono')
+                                     ->label('Teléfono Principal')
                                      ->required()
+                                     ->maxLength(255),
+                                 TextInput::make('telefono_secundario')
+                                     ->label('Teléfono Secundario')
+                                     ->nullable()
                                      ->maxLength(255),
                                  TextInput::make('email')
                                      ->label('Correo Electrónico')
