@@ -125,6 +125,7 @@ class ManageEmpleadoDocumentos extends Component
         }
         if ($this->family === 'contratos') {
             $rules['fecha_inicio_contrato'] = 'required|date';
+            $rules['fecha_vencimiento_contrato'] = 'required_if:tipo_contrato,Eventual|nullable|date';
             $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
             $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
             $rules['gasolinera_codigo'] = 'required|integer|exists:gasolineras,Codigo';
@@ -309,6 +310,7 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'contratos') {
             $rules = [
                 'edit_fecha_inicio_contrato' => 'required|date',
+                'edit_fecha_vencimiento_contrato' => 'required_if:edit_tipo_contrato,Eventual|nullable|date',
                 'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
                 'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
                 'edit_gasolinera_codigo' => 'required|integer|exists:gasolineras,Codigo',
