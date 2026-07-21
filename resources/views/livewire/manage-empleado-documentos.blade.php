@@ -297,17 +297,17 @@
 
         {{-- Listado de documentos --}}
         <div class="border rounded-xl bg-white dark:bg-white/5 dark:border-white/10 overflow-hidden shadow-sm">
-            <table class="w-full table-fixed divide-y divide-gray-200 dark:divide-white/10 text-left text-xs">
+            <table class="w-full text-left text-xs divide-y divide-gray-200 dark:divide-white/10">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         @if ($family !== 'contratos' && $family !== 'dni')
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" style="width: 75px; max-width: 75px;" class="px-2 py-2.5 whitespace-nowrap">Tipo</th>
-                            <th scope="col" style="width: 105px;" class="px-2 py-2.5 whitespace-nowrap">Inicio</th>
-                            <th scope="col" style="width: 105px;" class="px-2 py-2.5 whitespace-nowrap">Finalización</th>
-                            <th scope="col" style="width: 130px;" class="px-2 py-2.5 whitespace-nowrap">Jornada</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-16">Tipo</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-24">Inicio</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-24">Finalización</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-32">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" style="width: auto;" class="px-2 py-2.5 text-left whitespace-nowrap">Acciones</th>
+                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-36">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -370,7 +370,7 @@
                                 </td>
                             @endif
                             @if ($family === 'contratos')
-                                <td style="width: 75px; max-width: 75px;" class="px-2 py-2.5">
+                                <td class="px-2.5 py-2.5 whitespace-nowrap w-16">
                                     @if ($editingDocumentId === $doc->id)
                                         <div class="flex flex-col space-y-2.5">
                                             <div>
