@@ -6,38 +6,73 @@ $kernel->bootstrap();
 
 use Illuminate\Support\Facades\DB;
 
-echo "=== USER DAVID INFO ===\n";
-$users = DB::table('users')->where('name', 'LIKE', '%David%')->orWhere('email', 'LIKE', '%david%')->get();
-foreach ($users as $u) {
-    print_r($u);
-}
-
-echo "\n=== EMPLEADO DAVID INFO ===\n";
-$empleados = DB::table('empleados')->where('nombre', 'LIKE', '%David%')->orWhere('apellidos', 'LIKE', '%David%')->get();
-foreach ($empleados as $e) {
-    print_r($e);
-}
-
-echo "\n=== RECENT PAGE VIEWS / LOGS FOR DAVID ===\n";
-if (Schema::hasTable('page_views')) {
-    $userIds = $users->pluck('id')->toArray();
-    $views = DB::table('page_views')
-        ->whereIn('user_id', $userIds)
-        ->orderBy('created_at', 'desc')
-        ->limit(100)
-        ->get();
-    foreach ($views as $v) {
-        print_r($v);
+echo "=== 1. SEARCHING ALL DATABASE TABLES FOR 'DAVID' ===\n";
+$tables = DB::select("SHOW TABLES");
+foreach ($tables as $t) {
+    $tableName = array_values((array)$t)[0];
+    try {
+        $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
+        $query = DB::table($tableName);
+        $hasStringCols = false;
+        foreach ($columns as $col) {
+            $type = DB::getSchemaBuilder()->getColumnType($tableName, $col);
+            if (in_array($type, ['string', 'text', 'varchar', 'char'])) {
+                if (!$hasStringCols) {
+                    $query->where($col, 'LIKE', '%David%');
+                    $hasStringCols = true;
+                } else {
+                    $query->orWhere($col, 'LIKE', '%David%');
+                }
+            }
+        }
+        if ($hasStringCols) {
+            $results = $query->limit(10)->get();
+            if ($results->count() > 0) {
+                echo "Table [$tableName] matches (" . $results->count() . " rows):\n";
+                foreach ($results as $r) {
+                    print_r($r);
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        // continue
     }
 }
 
-echo "\n=== SESSIONS FOR DAVID ===\n";
-if (Schema::hasTable('sessions')) {
-    $userIds = $users->pluck('id')->toArray();
-    $sessions = DB::table('sessions')
-        ->whereIn('user_id', $userIds)
-        ->get();
-    foreach ($sessions as $s) {
-        print_r($s);
+echo "\n=== 2. LARAVEL LOG FILES SEARCH FOR 'DAVID' ===\n";
+$logFile = storage_path('logs/laravel.log');
+if (file_exists($logFile)) {
+    $lines = file($logFile);
+    $davidLines = array_filter($lines, fn($line) => stripos($line, 'david') !== false);
+    echo "Found " . count($davidLines) . " matching log lines in laravel.log:\n";
+    foreach (array_slice($davidLines, -20) as $dl) {
+        echo $dl;
+    }
+} else {
+    echo "laravel.log does not exist.\n";
+}
+
+echo "\n=== 3. CHECKING SYSTEM & NGINX LOGS FOR DAVID / VPN IPs ===\n";
+$systemLogs = [
+    '/var/log/auth.log',
+    '/var/log/nginx/access.log',
+    '/var/log/nginx/error.log',
+    '/var/log/syslog'
+];
+foreach ($systemLogs as $sysLog) {
+    if (file_exists($sysLog) && is_readable($sysLog)) {
+        $content = shell_exec("grep -i 'david' " . escapeshellarg($sysLog) . " | tail -n 20");
+        if ($content) {
+            echo "Matches in $sysLog:\n$content\n";
+        }
+    }
+}
+
+echo "\n=== 4. CHECKING RECENT PAGE VIEWS / SESSIONS BY IP & USER ===\n";
+if (Schema::hasTable('page_views')) {
+    $recentViews = DB::table('page_views')->orderBy('created_at', 'desc')->limit(30)->get();
+    echo "Recent Page Views (Top 30):\n";
+    foreach ($recentViews as $pv) {
+        echo "Time: {$pv->created_at} | User ID: " . ($pv->user_id ?? 'Guest') . " | IP: " . ($pv->ip_address ?? 'N/A') . " | URL: " . ($pv->url ?? 'N/A') . "\n";
     }
 }
