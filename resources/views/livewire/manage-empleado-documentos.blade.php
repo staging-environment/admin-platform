@@ -304,10 +304,10 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[12%]">Tipo</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[20%]">Inicio</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[20%]">Finalización</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[24%]">Jornada</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[50px] max-w-[60px]">Tipo</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[14%]">Inicio</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[14%]">Finalización</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[18%]">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-[24%]">Acciones</th>
+                        <th scope="col" class="px-2 py-2.5 text-left whitespace-nowrap w-[50%]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -370,7 +370,7 @@
                                 </td>
                             @endif
                             @if ($family === 'contratos')
-                                <td class="px-3.5 py-3">
+                                <td class="px-2 py-2.5 w-[50px] max-w-[60px]">
                                     @if ($editingDocumentId === $doc->id)
                                         <div class="flex flex-col space-y-2.5">
                                             <div>
