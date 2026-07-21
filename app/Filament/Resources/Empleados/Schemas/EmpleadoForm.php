@@ -283,6 +283,7 @@ class EmpleadoForm
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                                             ->previewable(false)
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->hintAction(
                                                 \Filament\Actions\Action::make('ver_dictamen')
                                                     ->label('Ver Dictamen')
@@ -344,6 +345,7 @@ class EmpleadoForm
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                                             ->previewable(false)
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                                             ->hintAction(
                                                 \Filament\Actions\Action::make('ver_certificado')
                                                     ->label('Ver Certificado')

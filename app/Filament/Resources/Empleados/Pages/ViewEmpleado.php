@@ -181,14 +181,16 @@ class ViewEmpleado extends ViewRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false),
+                                ->previewable(false)
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             FileUpload::make('certificado_discapacidad')
                                 ->label('Certificado de discapacidad')
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false),
+                                ->previewable(false)
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                         ]),
 
                     Toggle::make('tiene_incapacidad')
