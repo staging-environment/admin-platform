@@ -165,6 +165,23 @@
                         @endif
 
                         <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Ubicación de trabajo <span class="text-red-500">*</span></label>
+                            <select wire:model="gasolinera_codigo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                <option value="">Selecciona ubicación...</option>
+                                @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
+                                    <option value="{{ $codigo }}">{{ $nombre }}</option>
+                                @endforeach
+                            </select>
+                            @error('gasolinera_codigo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Puesto <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="puesto" placeholder="Ej: Expendedor, Encargado..." class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                            @error('puesto') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
                             <button type="button" wire:click="uploadDocument" class="w-full inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px]">
                                 <span wire:loading.remove wire:target="file">Subir</span>
                                 <span wire:loading wire:target="file" class="flex items-center gap-1">
@@ -403,6 +420,21 @@
                                             @if ($edit_tipo_jornada === 'Otros')
                                                 <input type="text" wire:model="edit_tipo_jornada_otro" placeholder="Detalle de jornada" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
                                             @endif
+                                            <div class="pt-1 border-t border-gray-200 dark:border-gray-700">
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Ubicación de trabajo <span class="text-red-500">*</span></label>
+                                                <select wire:model="edit_gasolinera_codigo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full">
+                                                    <option value="">Selecciona ubicación...</option>
+                                                    @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
+                                                        <option value="{{ $codigo }}">{{ $nombre }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('edit_gasolinera_codigo') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Puesto <span class="text-red-500">*</span></label>
+                                                <input type="text" wire:model="edit_puesto" placeholder="Ej: Expendedor, Encargado..." class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full" />
+                                                @error('edit_puesto') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                            </div>
                                         </div>
                                     @else
                                         <span class="text-xs text-gray-700 dark:text-gray-300">

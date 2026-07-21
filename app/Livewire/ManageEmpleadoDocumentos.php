@@ -26,6 +26,8 @@ class ManageEmpleadoDocumentos extends Component
     public $tipo_jornada = 'Jornada completa';
     public $tipo_jornada_otro;
     public $fecha_realizacion;
+    public $gasolinera_codigo;
+    public $puesto;
 
     // Properties for inline editing
     public $editingDocumentId = null;
@@ -38,6 +40,8 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_fecha_realizacion;
     public $edit_tipo;
     public $edit_nombre;
+    public $edit_gasolinera_codigo;
+    public $edit_puesto;
 
     // Validation rules
     protected $rules = [
@@ -60,6 +64,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo_contrato = $this->empleado->tipo_contrato;
             $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
             $this->tipo_jornada = 'Jornada completa';
+            $this->gasolinera_codigo = $this->empleado->gasolinera_codigo;
+            $this->puesto = $this->empleado->puesto;
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Prevención de riesgos laborales';
             $this->fecha_realizacion = null;
@@ -118,6 +124,8 @@ class ManageEmpleadoDocumentos extends Component
         if ($this->family === 'contratos') {
             $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
             $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
+            $rules['gasolinera_codigo'] = 'required|integer|exists:gasolineras,Codigo';
+            $rules['puesto'] = 'required|string|max:255';
         }
         if ($this->family === 'formacion') {
             $rules['fecha_realizacion'] = 'required|date';
@@ -146,6 +154,8 @@ class ManageEmpleadoDocumentos extends Component
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             'tipo_jornada' => $this->family === 'contratos' ? ($this->tipo_jornada ?: null) : null,
             'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
+            'gasolinera_codigo' => $this->family === 'contratos' ? ($this->gasolinera_codigo ?: null) : null,
+            'puesto' => $this->family === 'contratos' ? ($this->puesto ?: null) : null,
             'fecha_realizacion' => $this->family === 'formacion' ? $this->fecha_realizacion : null,
         ]);
 
@@ -184,6 +194,8 @@ class ManageEmpleadoDocumentos extends Component
     {
         $this->tipo_contrato = $this->empleado->tipo_contrato;
         $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
+        $this->gasolinera_codigo = $this->empleado->gasolinera_codigo;
+        $this->puesto = $this->empleado->puesto;
     }
 
     public function deleteDocument($id)
@@ -263,6 +275,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
             $this->edit_tipo_jornada = $doc->tipo_jornada ?: 'Jornada completa';
             $this->edit_tipo_jornada_otro = $doc->tipo_jornada_otro;
+            $this->edit_gasolinera_codigo = $doc->gasolinera_codigo ?: $this->empleado->gasolinera_codigo;
+            $this->edit_puesto = $doc->puesto ?: $this->empleado->puesto;
         } elseif ($this->family === 'dni') {
             $this->edit_fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
         } elseif ($this->family === 'formacion') {
@@ -291,6 +305,8 @@ class ManageEmpleadoDocumentos extends Component
             $rules = [
                 'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
                 'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
+                'edit_gasolinera_codigo' => 'required|integer|exists:gasolineras,Codigo',
+                'edit_puesto' => 'required|string|max:255',
             ];
             if ($this->edit_file) {
                 $rules['edit_file'] = 'file|max:10240';
@@ -311,6 +327,8 @@ class ManageEmpleadoDocumentos extends Component
                 'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
                 'tipo_jornada' => $this->edit_tipo_jornada ?: null,
                 'tipo_jornada_otro' => ($this->edit_tipo_jornada === 'Otros') ? $this->edit_tipo_jornada_otro : null,
+                'gasolinera_codigo' => $this->edit_gasolinera_codigo ?: null,
+                'puesto' => $this->edit_puesto ?: null,
             ]);
             $this->empleado->syncLatestContract();
             $this->refreshContratoFields();

@@ -119,26 +119,6 @@ class EmpleadoForm
                             ]),
                     ]),
 
-                // BLOQUE 2: Información Laboral y Cargo
-                Section::make('Información Laboral y Cargo')
-                    ->columnSpanFull()
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('gasolinera_codigo')
-                                    ->label('Ubicación de trabajo')
-                                    ->options(function () {
-                                        return \App\Models\Gasolinera::pluck('Nombre', 'Codigo')->toArray();
-                                    })
-                                    ->placeholder('Selecciona la ubicación de trabajo')
-                                    ->required(),
-                                TextInput::make('puesto')
-                                    ->label('Puesto')
-                                    ->placeholder('Ej: Expendedor, Encargado...')
-                                    ->maxLength(255),
-                            ]),
-                    ]),
-
                 Section::make('Discapacidad / Incapacidad')
                     ->columnSpanFull()
                     ->visible(false)

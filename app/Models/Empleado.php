@@ -134,6 +134,8 @@ class Empleado extends Model
         $this->update([
             'tipo_contrato' => $latest?->tipo_contrato,
             'fecha_vencimiento_contrato' => ($latest?->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
+            'gasolinera_codigo' => $latest?->gasolinera_codigo ?? $this->gasolinera_codigo,
+            'puesto' => $latest?->puesto ?? $this->puesto,
         ]);
     }
 
