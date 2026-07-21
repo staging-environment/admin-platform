@@ -5,7 +5,7 @@ $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 Auth::loginUsingId(1);
-$html = Livewire::mount('manage-empleado-documentos', ['empleadoId' => 48, 'family' => 'contratos'])->html();
+$html = Livewire::mount('manage-empleado-documentos', ['empleadoId' => 48, 'family' => 'contratos']);
 echo "HTML LENGTH: " . strlen($html) . "\n";
 if (str_contains($html, 'title="Eliminar"')) {
     echo "SUCCESS: title=Eliminar IS PRESENT IN RENDERED HTML!\n";
