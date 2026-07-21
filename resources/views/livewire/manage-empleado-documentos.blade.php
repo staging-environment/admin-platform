@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-36">Acciones</th>
+                        <th scope="col" class="px-2 py-2 text-left whitespace-nowrap w-48">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -529,18 +529,18 @@
                                     @endif
                                 </td>
                             @endif
-                            <td class="px-2.5 py-2.5">
-                                <div class="flex items-center justify-start gap-1.5">
+                            <td class="px-2 py-2 w-48">
+                                <div class="flex items-center justify-start gap-1">
                                     @if ($editingDocumentId === $doc->id)
                                         {{-- Guardar --}}
-                                        <button type="button" wire:click="saveDocumentEdit" class="inline-flex items-center justify-center p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-lg transition-all" title="Guardar">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <button type="button" wire:click="saveDocumentEdit" class="inline-flex items-center justify-center p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-md transition-all" title="Guardar">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
                                         {{-- Cancelar --}}
-                                        <button type="button" wire:click="cancelEdit" class="inline-flex items-center justify-center p-1.5 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950/20 rounded-lg transition-all" title="Cancelar">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <button type="button" wire:click="cancelEdit" class="inline-flex items-center justify-center p-1 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950/20 rounded-md transition-all" title="Cancelar">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </button>
@@ -551,32 +551,32 @@
                                             $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
                                         @endphp
                                         
-                                        <a href="{{ $url }}" target="_blank" class="inline-flex items-center justify-center p-1.5 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-lg transition-all" title="Previsualizar">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <a href="{{ $url }}" target="_blank" class="inline-flex items-center justify-center p-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md transition-all" title="Previsualizar">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </a>
 
                                         {{-- Descargar --}}
-                                        <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) }}" target="_blank" class="inline-flex items-center justify-center p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-lg transition-all" title="Descargar">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) }}" target="_blank" class="inline-flex items-center justify-center p-1 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-md transition-all" title="Descargar">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
                                         </a>
 
                                         {{-- Editar --}}
                                         @if ($family === 'contratos' || $family === 'dni')
-                                            <a href="#" wire:click.prevent="editDocument({{ $doc->id }})" class="inline-flex items-center justify-center p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-lg transition-all" title="Editar">
-                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <a href="#" wire:click.prevent="editDocument({{ $doc->id }})" class="inline-flex items-center justify-center p-1 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-md transition-all" title="Editar">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </a>
                                         @endif
 
                                         {{-- Eliminar --}}
-                                        <a href="#" wire:click.prevent="deleteDocument({{ $doc->id }})" wire:confirm="¿Estás seguro de que deseas eliminar este documento?" class="inline-flex items-center justify-center p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all" title="Eliminar">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <a href="#" wire:click.prevent="deleteDocument({{ $doc->id }})" wire:confirm="¿Estás seguro de que deseas eliminar este documento?" class="inline-flex items-center justify-center p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-all" title="Eliminar">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </a>
