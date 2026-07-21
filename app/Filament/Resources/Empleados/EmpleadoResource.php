@@ -213,15 +213,28 @@ class EmpleadoResource extends Resource
 
                 \Filament\Schemas\Components\Section::make('Discapacidad / Incapacidad')
                     ->columnSpanFull()
-                    ->visible(false)
+                    ->visible(fn () => auth()->user()?->can('ver_documentacion_empleados') ?? true)
                     ->schema([
-                        \Filament\Schemas\Components\Grid::make(3)
+                        \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('tiene_discapacidad')
+                                    ->label('¿Tiene Discapacidad?')
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                                    ->color(fn ($state) => $state ? 'warning' : 'gray'),
+
+                                \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
+                                    ->label('¿Tiene Incapacidad?')
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                                    ->color(fn ($state) => $state ? 'warning' : 'gray'),
+
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
-                                    ->label('Discapacidad / Incapacidad')
-                                    ->state('No tiene Discapacidad ni Incapacidad')
-                                    ->visible(fn ($record) => $record && !$record->tiene_discapacidad && !$record->tiene_incapacidad)
-                                    ->columnSpanFull(),
+                                    ->label('Estado Global')
+                                    ->badge()
+                                    ->color(fn ($record) => ($record?->tiene_discapacidad || $record?->tiene_incapacidad) ? 'warning' : 'success')
+                                    ->state(fn ($record) => ($record?->tiene_discapacidad || $record?->tiene_incapacidad) ? 'Registrada' : 'Sin discapacidad ni incapacidad')
+                                    ->columnSpan(2),
 
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
@@ -237,28 +250,46 @@ class EmpleadoResource extends Resource
                                     })
                                     ->separator(', ')
                                     ->placeholder('Ninguna'),
+
                                 \Filament\Infolists\Components\TextEntry::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
                                     ->suffix('%')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->placeholder('N/A'),
+
                                 \Filament\Infolists\Components\TextEntry::make('fecha_reconocimiento')
                                     ->label('Fecha de reconocimiento')
                                     ->date('d/m/Y')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
                                     ->placeholder('Ninguna'),
+
                                 \Filament\Infolists\Components\TextEntry::make('pertenece_andalucia')
                                     ->label('¿Pertenece a Andalucía?')
                                     ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad),
+
                                 \Filament\Infolists\Components\TextEntry::make('comunidad_autonoma')
                                     ->label('Comunidad Autónoma')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad && !$record->pertenece_andalucia)
                                     ->placeholder('N/A'),
+
                                 \Filament\Infolists\Components\TextEntry::make('tipo_incapacidad')
                                     ->label('Tipo de Incapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
+
+                                \Filament\Infolists\Components\TextEntry::make('incapacidad_file')
+                                    ->label('Documento de Incapacidad')
+                                    ->visible(fn ($record) => $record && $record->tiene_incapacidad)
+                                    ->state(function ($record) {
+                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                                        return $doc ? basename($doc->file_path) : null;
+                                    })
+                                    ->url(function ($record) {
+                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
+                                    })
+                                    ->placeholder('Sin documento adjunto'),
 
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
                                     ->label('Resolución de Discapacidad')
@@ -272,6 +303,7 @@ class EmpleadoResource extends Resource
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
                                     ->placeholder('Sin documento adjunto'),
+
                                 \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
                                     ->label('Dictamen técnico facultativo')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
@@ -284,6 +316,7 @@ class EmpleadoResource extends Resource
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
                                     ->placeholder('Sin documento adjunto'),
+
                                 \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
                                     ->label('Certificado de discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)

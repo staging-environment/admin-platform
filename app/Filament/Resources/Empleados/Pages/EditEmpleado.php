@@ -174,7 +174,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false),
+                                ->previewable(false)
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             FileUpload::make('dictamen_tecnico')
                                 ->label('Dictamen técnico facultativo')
@@ -212,7 +213,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/documentos')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false),
+                                ->previewable(false)
+                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
                         ]),
                 ])
                 ->action(function ($record, array $data) {
