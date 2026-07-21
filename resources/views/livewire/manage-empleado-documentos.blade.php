@@ -304,10 +304,10 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-3 py-2.5 whitespace-nowrap">Tipo</th>
-                            <th scope="col" class="px-3 py-2.5 whitespace-nowrap">Inicio</th>
-                            <th scope="col" class="px-3 py-2.5 whitespace-nowrap">Finalización</th>
-                            <th scope="col" class="px-3 py-2.5 whitespace-nowrap">Jornada</th>
+                            <th scope="col" style="width: 70px; max-width: 70px;" class="px-2 py-2.5 whitespace-nowrap">Tipo</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Inicio</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Finalización</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-3 py-2.5 text-left whitespace-nowrap min-w-[150px]">Acciones</th>
+                        <th scope="col" style="width: 130px;" class="px-2 py-2.5 text-left whitespace-nowrap">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -370,7 +370,7 @@
                                 </td>
                             @endif
                             @if ($family === 'contratos')
-                                <td class="px-3 py-2.5 whitespace-nowrap">
+                                <td style="width: 70px; max-width: 70px;" class="px-2 py-2.5 whitespace-nowrap">
                                     @if ($editingDocumentId === $doc->id)
                                         <div class="flex flex-col space-y-2.5">
                                             <div>
@@ -529,7 +529,7 @@
                                     @endif
                                 </td>
                             @endif
-                            <td class="px-3 py-2.5 whitespace-nowrap min-w-[150px]">
+                            <td style="width: 130px;" class="px-2 py-2.5 whitespace-nowrap">
                                 <div class="flex items-center justify-start gap-1">
                                     @if ($editingDocumentId === $doc->id)
                                         {{-- Guardar --}}
