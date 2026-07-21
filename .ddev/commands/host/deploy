@@ -97,12 +97,13 @@ ddev exec npm run build
 ok "Assets compilados"
 
 echo ""
-echo "  → Limpiando cachés de Laravel..."
+echo "  → Limpiando cachés de Laravel y recargando OPcache PHP-FPM..."
 ddev exec php artisan cache:clear
 ddev exec php artisan config:clear
 ddev exec php artisan view:clear
 ddev exec php artisan route:clear
-ok "Cachés limpiadas"
+ddev exec killall -USR2 php-fpm || true
+ok "Cachés limpiadas y PHP-FPM recargado"
 
 echo ""
 echo "  → Optimizando aplicación..."
