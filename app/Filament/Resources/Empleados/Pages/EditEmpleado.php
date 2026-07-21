@@ -51,6 +51,7 @@ class EditEmpleado extends EditRecord
                     return $hasDocs ? 'warning' : 'danger';
                 })
                 ->modalHeading('Documentos Contratos')
+                ->modalWidth('7xl')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'contratos']))

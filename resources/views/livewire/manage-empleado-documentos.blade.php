@@ -301,18 +301,18 @@
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         @if ($family !== 'contratos' && $family !== 'dni')
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full">Nombre</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 130px !important; overflow: visible !important;">Fecha de Inicio</th>
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Fecha de Finalización</th>
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap w-full" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">Jornada</th>
+                            <th scope="col" class="px-3.5 py-2.5 whitespace-nowrap">Tipo</th>
+                            <th scope="col" class="px-3.5 py-2.5 whitespace-nowrap">Fecha de Inicio</th>
+                            <th scope="col" class="px-3.5 py-2.5 whitespace-nowrap">Fecha de Finalización</th>
+                            <th scope="col" class="px-3.5 py-2.5 whitespace-nowrap w-full">Jornada</th>
                         @else
                             @if ($family !== 'dni')
-                                <th scope="col" class="px-6 py-3.5 whitespace-nowrap" style="width: auto !important; max-width: none !important; min-width: 90px !important; overflow: visible !important;">Tipo</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
                             @endif
-                            <th scope="col" class="px-6 py-3.5 whitespace-nowrap {{ $family === 'dni' ? 'w-full' : '' }}" style="width: auto !important; max-width: none !important; min-width: 140px !important; overflow: visible !important;">
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap {{ $family === 'dni' ? 'w-full' : '' }}">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
                                 @elseif ($family === 'formacion')
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-6 py-3.5 text-right whitespace-nowrap" style="width: auto !important; max-width: none !important; overflow: visible !important;">Acciones</th>
+                        <th scope="col" class="px-3.5 py-2.5 text-right whitespace-nowrap">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -370,7 +370,7 @@
                                 </td>
                             @endif
                             @if ($family === 'contratos')
-                                <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
+                                <td class="px-3.5 py-3">
                                     @if ($editingDocumentId === $doc->id)
                                         <div class="flex flex-col space-y-2.5">
                                             <div>
@@ -398,7 +398,7 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: auto !important; min-width: 130px !important;">
+                                <td class="px-3.5 py-3 text-gray-500 dark:text-gray-400 text-xs">
                                     @if ($editingDocumentId === $doc->id)
                                         <input type="date" wire:model="edit_fecha_inicio_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
                                         @error('edit_fecha_inicio_contrato') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
@@ -406,7 +406,7 @@
                                         {{ $doc->fecha_inicio_contrato ? $doc->fecha_inicio_contrato->format('d/m/Y') : 'No especificada' }}
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="width: auto !important; min-width: 140px !important;">
+                                <td class="px-3.5 py-3 text-gray-500 dark:text-gray-400 text-xs">
                                     @if ($editingDocumentId === $doc->id)
                                         @if ($edit_tipo_contrato === 'Eventual')
                                             <input type="date" wire:model="edit_fecha_vencimiento_contrato" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
@@ -424,7 +424,7 @@
                                         @endif
                                     @endif
                                 </td>
-                                <td class="px-6 py-4" style="width: 100%; min-width: 140px;">
+                                <td class="px-3.5 py-3">
                                     @if ($editingDocumentId === $doc->id)
                                         <div class="flex flex-col space-y-1.5">
                                             <select wire:model.live="edit_tipo_jornada" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1">
