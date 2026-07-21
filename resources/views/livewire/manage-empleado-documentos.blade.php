@@ -296,7 +296,7 @@
         @endif
 
         {{-- Listado de documentos --}}
-        <div class="border rounded-xl bg-white dark:bg-white/5 dark:border-white/10 overflow-hidden shadow-sm">
+        <div class="border rounded-xl bg-white dark:bg-white/5 dark:border-white/10 overflow-x-auto shadow-sm">
             <table class="w-full text-left text-xs divide-y divide-gray-200 dark:divide-white/10">
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-3 py-2.5 text-left whitespace-nowrap">Acciones</th>
+                        <th scope="col" class="px-3 py-2.5 text-left whitespace-nowrap min-w-[150px]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -529,7 +529,7 @@
                                     @endif
                                 </td>
                             @endif
-                            <td class="px-3 py-2.5 whitespace-nowrap">
+                            <td class="px-3 py-2.5 whitespace-nowrap min-w-[150px]">
                                 <div class="flex items-center justify-start gap-1">
                                     @if ($editingDocumentId === $doc->id)
                                         {{-- Guardar --}}
