@@ -304,10 +304,10 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[10%]">Tipo</th>
-                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[18%]">Inicio</th>
-                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[20%]">Finalización</th>
-                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[22%]">Jornada</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-20">Tipo</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-28">Inicio</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-28">Finalización</th>
+                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-36">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap w-[30%]">Acciones</th>
+                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-32">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -529,7 +529,7 @@
                                     @endif
                                 </td>
                             @endif
-                            <td class="whitespace-nowrap px-2.5 py-2.5 text-right space-x-1">
+                            <td class="whitespace-nowrap px-2.5 py-2.5 text-left space-x-1">
                                 @if ($editingDocumentId === $doc->id)
                                     {{-- Guardar --}}
                                     <button type="button" wire:click="saveDocumentEdit" class="inline-flex items-center justify-center p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-lg transition-all" title="Guardar">
