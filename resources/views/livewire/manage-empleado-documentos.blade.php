@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap w-[24%]">Acciones</th>
+                        <th scope="col" class="px-2.5 py-2.5 text-left whitespace-nowrap w-[24%]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
@@ -530,7 +530,7 @@
                                 </td>
                             @endif
                             <td class="px-2.5 py-2.5">
-                                <div class="flex items-center justify-end gap-1.5">
+                                <div class="flex items-center justify-start gap-1.5">
                                     @if ($editingDocumentId === $doc->id)
                                         {{-- Guardar --}}
                                         <button type="button" wire:click="saveDocumentEdit" class="inline-flex items-center justify-center p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-lg transition-all" title="Guardar">
