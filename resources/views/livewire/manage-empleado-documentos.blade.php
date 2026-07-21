@@ -304,10 +304,10 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[12%]">Tipo</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[23%]">Fecha de Inicio</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[24%]">Fecha de Finalización</th>
-                            <th scope="col" class="px-2.5 py-2.5 whitespace-nowrap w-[23%]">Jornada</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[10%]">Tipo</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[18%]">Inicio</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[20%]">Finalización</th>
+                            <th scope="col" class="px-2 py-2.5 whitespace-nowrap w-[22%]">Jornada</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -322,7 +322,7 @@
                                 @endif
                             </th>
                         @endif
-                        <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap w-[18%]">Acciones</th>
+                        <th scope="col" class="px-2.5 py-2.5 text-right whitespace-nowrap w-[30%]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10 text-gray-800 dark:text-gray-200">
