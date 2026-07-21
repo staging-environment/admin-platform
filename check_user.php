@@ -1,12 +1,13 @@
 <?php
-require 'vendor/autoload.php';
-$app = require 'bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-$u = \App\Models\User::where('email', 'jarodriguezbonilla@gmail.com')->first();
-if ($u) {
-    echo "User: " . $u->email . "\n";
-    echo "Roles: " . $u->roles->pluck('name')->implode(', ') . "\n";
-    echo "Permissions: " . $u->getAllPermissions()->pluck('name')->implode(', ') . "\n";
-} else {
-    echo "User not found\n";
+require __DIR__ . '/vendor/autoload.php';
+$app = require __DIR__ . '/bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
+echo "--- ALL USERS ---\n";
+foreach (App\Models\User::all() as $u) {
+    echo "ID: {$u->id} | Name: {$u->name} | Email: {$u->email}\n";
+    echo "Roles: " . implode(', ', $u->getRoleNames()->toArray()) . "\n";
+    echo "Permissions: " . implode(', ', $u->getAllPermissions()->pluck('name')->toArray()) . "\n";
+    echo "-------------------\n";
 }

@@ -105,10 +105,13 @@ class ManageEmpleadoDocumentos extends Component
     {
         $user = auth()->user();
         if (!$user) return false;
+
+        if ($user->hasRole(['Admin', 'Gestor', 'Super Admin', 'Administrador'])) {
+            return true;
+        }
+
         return $user->can('editar_documentacion_empleados') 
-            || $user->can('gestion_editar_empleados') 
-            || $user->hasRole('Super Admin') 
-            || $user->hasRole('Administrador');
+            || $user->can('gestion_editar_empleados');
     }
 
     public function uploadDocument()
