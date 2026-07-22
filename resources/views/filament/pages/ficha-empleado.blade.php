@@ -145,9 +145,7 @@
                             <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Entrada</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Marcaje Real Entrada</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Salida</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Marcaje Real Salida</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Horas Trabajadas</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase text-right">Acciones</th>
                             </tr>
@@ -161,14 +159,8 @@
                                     <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '-' }}
                                     </td>
-                                    <td class="p-4 text-xs text-gray-400">
-                                        {{ $fichaje->server_checkin_at ? $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m H:i:s') : '-' }}
-                                    </td>
                                     <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $fichaje->hora_salida ? \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') : '-' }}
-                                    </td>
-                                    <td class="p-4 text-xs text-gray-400">
-                                        {{ $fichaje->server_checkout_at ? $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m H:i:s') : '-' }}
                                     </td>
                                     <td class="p-4 text-sm font-semibold text-amber-600 dark:text-amber-400">
                                         @if($fichaje->hora_entrada && $fichaje->hora_salida)
@@ -195,7 +187,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    <td colspan="5" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                         Aún no has registrado ningún fichaje.
                                     </td>
                                 </tr>
