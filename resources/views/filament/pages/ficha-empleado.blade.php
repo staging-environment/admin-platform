@@ -332,6 +332,30 @@
                 </div>
             </div>
 
+            @if(count($missingCheckInDays) > 0)
+                <!-- Missing Check-Ins Alert Banner -->
+                <div class="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-3xl flex items-start gap-4 shadow-sm animate-pulse">
+                    <div class="p-3 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-900 dark:text-amber-200">Alerta: Fichaje Faltante detectado</h3>
+                        <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                            No se ha registrado ningún fichaje en los siguientes días laborables. Si corresponde a un error o ausencia no justificada, ponte en contacto con tu administrador:
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            @foreach($missingCheckInDays as $day)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-bold font-mono">
+                                    {{ $day['formatted'] }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Fichaje Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Check-in Card -->

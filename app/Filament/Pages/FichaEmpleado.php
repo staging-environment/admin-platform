@@ -45,6 +45,7 @@ class FichaEmpleado extends Page
     public $ausencias = [];
     public $selectedSolicitud = null;
     public $selectedSolicitudType = null;
+    public $missingCheckInDays = [];
 
     // Form fields for vacations
     public $vacacion_fecha_inicio;
@@ -207,6 +208,8 @@ class FichaEmpleado extends Page
             ->orderBy('hora_entrada', 'desc')
             ->limit(30)
             ->get();
+
+        $this->checkMissingCheckIns();
     }
 
     public function render(): \Illuminate\Contracts\View\View
@@ -511,5 +514,66 @@ class FichaEmpleado extends Page
     {
         $this->selectedSolicitud = null;
         $this->selectedSolicitudType = null;
+    }
+
+    public function checkMissingCheckIns(): void
+    {
+        if (!$this->empleado) {
+            $this->missingCheckInDays = [];
+            return;
+        }
+
+        $missing = [];
+        $start = Carbon::today()->subDays(14);
+        $end = Carbon::yesterday();
+
+        for ($date = clone $start; $date->lte($end); $date->addDay()) {
+            if ($date->isWeekend()) {
+                continue;
+            }
+
+            $dateStr = $date->format('Y-m-d');
+
+            // 1. Check if check-in exists
+            $hasFichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+                ->where('fecha', $dateStr)
+                ->exists();
+
+            if ($hasFichaje) {
+                continue;
+            }
+
+            // 2. Check if approved vacation covers this date
+            $hasVacacion = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+                ->where('estado', 'Aceptada')
+                ->where('fecha_inicio', '<=', $dateStr)
+                ->where('fecha_fin', '>=', $dateStr)
+                ->exists();
+
+            if ($hasVacacion) {
+                continue;
+            }
+
+            // 3. Check if approved absence covers this date
+            $hasAusencia = \App\Models\EmpleadoAusencia::where('empleado_id', $this->empleado->id)
+                ->where('estado', 'Aceptada')
+                ->where('fecha_inicio', '<=', $dateStr)
+                ->where(function($q) use ($dateStr) {
+                    $q->where('fecha_fin', '>=', $dateStr)
+                      ->orWhereNull('fecha_fin');
+                })
+                ->exists();
+
+            if ($hasAusencia) {
+                continue;
+            }
+
+            $missing[] = [
+                'date' => $dateStr,
+                'formatted' => $date->translatedFormat('l, d \d\e F')
+            ];
+        }
+
+        $this->missingCheckInDays = $missing;
     }
 }
