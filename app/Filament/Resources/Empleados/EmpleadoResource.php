@@ -219,64 +219,151 @@ class EmpleadoResource extends Resource
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('tiene_discapacidad')
                                     ->label('¿Tiene Discapacidad?')
-                                    ->html()
-                                    ->state(function (?\App\Models\Empleado $record) {
-                                        if (!$record || !$record->tiene_discapacidad) {
-                                            return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>');
-                                        }
-                                        
-                                        $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
-                                        
-                                        $docs = [
-                                            'Resolución' => $record->documentos()->where('tipo', 'Resolución Discapacidad')->first(),
-                                            'Dictamen' => $record->documentos()->where('tipo', 'Dictamen Técnico')->first(),
-                                            'Certificado' => $record->documentos()->where('tipo', 'Certificado Discapacidad')->first(),
-                                        ];
-                                        
-                                        $iconsHtml = '';
-                                        foreach ($docs as $label => $doc) {
-                                            if ($doc && !empty($doc->file_path)) {
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                                    ->color(fn ($state) => $state ? 'warning' : 'gray')
+                                    ->suffixActions([
+                                        \Filament\Actions\Action::make('ver_resolucion')
+                                            ->icon('heroicon-m-eye')
+                                            ->color('info')
+                                            ->iconButton()
+                                            ->visible(fn ($record) => $record && $record->tiene_discapacidad && $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists())
+                                            ->modalHeading('Resolución de Discapacidad')
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                                                if (!$doc) return null;
                                                 $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
-                                                $iconsHtml .= '
-                                                    <a href="' . $url . '" target="_blank" title="Ver ' . $label . ' Discapacidad" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: #0891b2; transition: all 0.2s;" class="hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md">
-                                                        <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                    </a>
-                                                ';
-                                            }
-                                        }
-                                        
-                                        return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconsHtml . '</div>');
-                                    }),
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Resolución</a>
+                                                    </div>
+                                                ");
+                                            }),
+                                        \Filament\Actions\Action::make('ver_dictamen')
+                                            ->icon('heroicon-m-eye')
+                                            ->color('info')
+                                            ->iconButton()
+                                            ->visible(fn ($record) => $record && $record->tiene_discapacidad && $record->documentos()->where('tipo', 'Dictamen Técnico')->exists())
+                                            ->modalHeading('Dictamen Técnico Facultativo')
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                                                if (!$doc) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Dictamen</a>
+                                                    </div>
+                                                ");
+                                            }),
+                                        \Filament\Actions\Action::make('ver_certificado')
+                                            ->icon('heroicon-m-eye')
+                                            ->color('info')
+                                            ->iconButton()
+                                            ->visible(fn ($record) => $record && $record->tiene_discapacidad && $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists())
+                                            ->modalHeading('Certificado de Discapacidad')
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                                                if (!$doc) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Certificado</a>
+                                                    </div>
+                                                ");
+                                            }),
+                                    ]),
 
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
                                     ->label('¿Tiene Incapacidad?')
-                                    ->html()
-                                    ->state(function (?\App\Models\Empleado $record) {
-                                        if (!$record || !$record->tiene_incapacidad) {
-                                            return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>');
-                                        }
-                                        
-                                        $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
-                                        
-                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                        $iconHtml = '';
-                                        if ($doc && !empty($doc->file_path)) {
-                                            $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
-                                            $iconHtml = '
-                                                <a href="' . $url . '" target="_blank" title="Ver Documento Incapacidad" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: #0891b2; transition: all 0.2s;" class="hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md">
-                                                    <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                </a>
-                                            ';
-                                        }
-                                        
-                                        return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>');
-                                    }),
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                                    ->color(fn ($state) => $state ? 'warning' : 'gray')
+                                    ->suffixAction(
+                                        \Filament\Actions\Action::make('ver_incapacidad')
+                                            ->icon('heroicon-m-eye')
+                                            ->color('info')
+                                            ->iconButton()
+                                            ->visible(fn ($record) => $record && $record->tiene_incapacidad && $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists())
+                                            ->modalHeading('Documento de Incapacidad')
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                                                if (!$doc) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Documento</a>
+                                                    </div>
+                                                ");
+                                            })
+                                    ),
 
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
                                     ->label('Estado Global')
