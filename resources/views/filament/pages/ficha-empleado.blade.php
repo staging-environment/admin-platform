@@ -17,6 +17,39 @@
                     </span>
                 </div>
 
+                <!-- Filters Section -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
+                    <!-- Date Filter (First position as requested: "Sobre todo la fecha que aparezca en primer lugar") -->
+                    <div>
+                        <label for="filterDate" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Filtrar por Fecha</label>
+                        <div class="relative">
+                            <input type="date" id="filterDate" wire:model.live="filterDate" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3" />
+                            @if($filterDate)
+                                <button type="button" wire:click="$set('filterDate', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Search Filter (Second position) -->
+                    <div>
+                        <label for="filterSearch" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Buscar Empleado (Nombre, Apellidos o Email)</label>
+                        <div class="relative">
+                            <input type="text" id="filterSearch" wire:model.live.debounce.300ms="filterSearch" placeholder="Ej. José, Bonilla, empleado@utrecar.com..." class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3 pr-10" />
+                            @if($filterSearch)
+                                <button type="button" wire:click="$set('filterSearch', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>

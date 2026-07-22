@@ -26,6 +26,8 @@ class FichaEmpleado extends Page
 
     public $isViewingAdminList = false;
     public $todosLosFichajes = [];
+    public $filterDate = '';
+    public $filterSearch = '';
 
     public $hora_entrada;
     public $hora_salida;
@@ -109,7 +111,22 @@ class FichaEmpleado extends Page
     public function loadFichajes(): void
     {
         if ($this->isViewingAdminList) {
-            $this->todosLosFichajes = EmpleadoFichaje::with('empleado')
+            $query = EmpleadoFichaje::with('empleado');
+
+            if ($this->filterDate) {
+                $query->where('fecha', $this->filterDate);
+            }
+
+            if ($this->filterSearch) {
+                $search = '%' . $this->filterSearch . '%';
+                $query->whereHas('empleado', function($q) use ($search) {
+                    $q->where('nombre', 'like', $search)
+                      ->orWhere('apellidos', 'like', $search)
+                      ->orWhere('email', 'like', $search);
+                });
+            }
+
+            $this->todosLosFichajes = $query
                 ->orderBy('fecha', 'desc')
                 ->orderBy('hora_entrada', 'desc')
                 ->get();
@@ -133,6 +150,12 @@ class FichaEmpleado extends Page
             ->orderBy('hora_entrada', 'desc')
             ->limit(30)
             ->get();
+    }
+
+    public function render(): \Illuminate\Contracts\View\View
+    {
+        $this->loadFichajes();
+        return parent::render();
     }
 
     public function checkIn($latitude = null, $longitude = null): void
