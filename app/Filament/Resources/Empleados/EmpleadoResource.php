@@ -326,7 +326,6 @@ class EmpleadoResource extends Resource
                                     ->label('Tipo de Incapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
-                                    ->placeholder('Sin documento adjunto'),
                             ]),
                     ]),
 
