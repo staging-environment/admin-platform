@@ -219,15 +219,66 @@ class EmpleadoResource extends Resource
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('tiene_discapacidad')
                                     ->label('¿Tiene Discapacidad?')
-                                    ->badge()
-                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
-                                    ->color(fn ($state) => $state ? 'warning' : 'gray'),
+                                    ->html()
+                                    ->state(function ($record) {
+                                        if (!$record) return 'No';
+                                        if (!$record->tiene_discapacidad) {
+                                            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
+                                        }
+                                        
+                                        $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
+                                        
+                                        $docs = [
+                                            'Resolución' => $record->documentos()->where('tipo', 'Resolución Discapacidad')->first(),
+                                            'Dictamen' => $record->documentos()->where('tipo', 'Dictamen Técnico')->first(),
+                                            'Certificado' => $record->documentos()->where('tipo', 'Certificado Discapacidad')->first(),
+                                        ];
+                                        
+                                        $iconsHtml = '';
+                                        foreach ($docs as $label => $doc) {
+                                            if ($doc && !empty($doc->file_path)) {
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                $iconsHtml .= '
+                                                    <a href="' . $url . '" target="_blank" title="Ver ' . $label . ' Discapacidad" class="inline-flex items-center justify-center p-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md transition-all">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                    </a>
+                                                ';
+                                            }
+                                        }
+                                        
+                                        return '<div class="flex items-center gap-1.5">' . $badge . $iconsHtml . '</div>';
+                                    }),
 
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
                                     ->label('¿Tiene Incapacidad?')
-                                    ->badge()
-                                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
-                                    ->color(fn ($state) => $state ? 'warning' : 'gray'),
+                                    ->html()
+                                    ->state(function ($record) {
+                                        if (!$record) return 'No';
+                                        if (!$record->tiene_incapacidad) {
+                                            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
+                                        }
+                                        
+                                        $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
+                                        
+                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                                        $iconHtml = '';
+                                        if ($doc && !empty($doc->file_path)) {
+                                            $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                            $iconHtml = '
+                                                <a href="' . $url . '" target="_blank" title="Ver Documento Incapacidad" class="inline-flex items-center justify-center p-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md transition-all">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </a>
+                                            ';
+                                        }
+                                        
+                                        return '<div class="flex items-center gap-1.5">' . $badge . $iconHtml . '</div>';
+                                    }),
 
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
                                     ->label('Estado Global')
@@ -289,6 +340,7 @@ class EmpleadoResource extends Resource
                                         $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
+                                    ->openUrlInNewTab()
                                     ->placeholder('Sin documento adjunto'),
 
                                 \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
@@ -302,6 +354,7 @@ class EmpleadoResource extends Resource
                                         $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
+                                    ->openUrlInNewTab()
                                     ->placeholder('Sin documento adjunto'),
 
                                 \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
@@ -315,6 +368,7 @@ class EmpleadoResource extends Resource
                                         $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
+                                    ->openUrlInNewTab()
                                     ->placeholder('Sin documento adjunto'),
 
                                 \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
@@ -328,6 +382,7 @@ class EmpleadoResource extends Resource
                                         $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
                                         return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
                                     })
+                                    ->openUrlInNewTab()
                                     ->placeholder('Sin documento adjunto'),
                             ]),
                     ]),
