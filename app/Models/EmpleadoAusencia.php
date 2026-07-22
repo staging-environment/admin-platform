@@ -20,7 +20,8 @@ class EmpleadoAusencia extends Model
                             'Bajas médicas',
                             \Carbon\Carbon::parse($model->fecha_inicio)->format('d/m/Y'),
                             $model->fecha_fin ? \Carbon\Carbon::parse($model->fecha_fin)->format('d/m/Y') : null,
-                            $model->estado
+                            $model->estado,
+                            $model->comentario_aprobador
                         ));
                     }
                 } catch (\Exception $e) {

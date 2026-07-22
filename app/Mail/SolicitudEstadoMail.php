@@ -15,14 +15,16 @@ class SolicitudEstadoMail extends Mailable
     public $fechaInicio;
     public $fechaFin;
     public $estado;
+    public $comentario;
 
-    public function __construct($nombre, $tipo, $fechaInicio, $fechaFin, $estado)
+    public function __construct($nombre, $tipo, $fechaInicio, $fechaFin, $estado, $comentario = null)
     {
         $this->nombre = $nombre;
         $this->tipo = $tipo;
         $this->fechaInicio = $fechaInicio;
         $this->fechaFin = $fechaFin;
         $this->estado = $estado;
+        $this->comentario = $comentario;
     }
 
     public function build()
@@ -60,6 +62,11 @@ class SolicitudEstadoMail extends Mailable
                                 <td style='padding: 6px 0; text-align: right; font-weight: bold; color: {$color};'>{$estadoTxt}</td>
                             </tr>
                         </table>
+                        " . ($this->comentario ? "
+                        <div style='margin-top: 15px; padding: 12px; background-color: #f3f4f6; border-left: 4px solid {$color}; border-radius: 4px; font-style: italic; color: #374151;'>
+                            <strong>Motivo/Comentario del aprobador:</strong> {$this->comentario}
+                        </div>
+                        " : "") . "
                     </div>
                     <p style='font-size: 11px; color: #9ca3af; margin-top: 20px; text-align: center;'>Este es un mensaje automático enviado desde el portal de administración de Utrecar. Por favor, no respondas a este correo.</p>
                 </div>

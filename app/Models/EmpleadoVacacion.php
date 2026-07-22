@@ -20,7 +20,8 @@ class EmpleadoVacacion extends Model
                             $model->tipo,
                             \Carbon\Carbon::parse($model->fecha_inicio)->format('d/m/Y'),
                             $model->fecha_fin ? \Carbon\Carbon::parse($model->fecha_fin)->format('d/m/Y') : \Carbon\Carbon::parse($model->fecha_inicio)->format('d/m/Y'),
-                            $model->estado
+                            $model->estado,
+                            $model->comentario_aprobador
                         ));
                     }
                 } catch (\Exception $e) {

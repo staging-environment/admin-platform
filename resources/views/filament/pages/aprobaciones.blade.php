@@ -30,6 +30,7 @@
                             <th class="py-3 px-4">Tipo</th>
                             <th class="py-3 px-4">Fechas</th>
                             <th class="py-3 px-4">Días</th>
+                            <th class="py-3 px-4" style="min-width: 250px;">Comentario / Razón</th>
                             <th class="py-3 px-4 text-right">Acciones</th>
                         </tr>
                     </thead>
@@ -50,6 +51,9 @@
                                 <td class="py-4 px-4 font-bold text-gray-700 dark:text-gray-300">
                                     {{ $vac->dias_solicitados }}
                                 </td>
+                                <td class="py-4 px-4">
+                                    <input type="text" wire:model="comentariosVacaciones.{{ $vac->id }}" placeholder="Escribe la razón aquí..." class="w-full text-xs rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm py-1" />
+                                </td>
                                 <td class="py-4 px-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <button type="button" wire:click="aprobarVacacion({{ $vac->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
@@ -63,7 +67,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
                                     No hay solicitudes de vacaciones pendientes de aprobación.
                                 </td>
                             </tr>
@@ -98,6 +102,7 @@
                             <th class="py-3 px-4">Inicio</th>
                             <th class="py-3 px-4">Fin Previsto</th>
                             <th class="py-3 px-4">Justificante</th>
+                            <th class="py-3 px-4" style="min-width: 250px;">Comentario / Razón</th>
                             <th class="py-3 px-4 text-right">Acciones</th>
                         </tr>
                     </thead>
@@ -130,6 +135,9 @@
                                         <span class="text-xs text-gray-400 italic">No adjuntado</span>
                                     @endif
                                 </td>
+                                <td class="py-4 px-4">
+                                    <input type="text" wire:model="comentariosBajas.{{ $baja->id }}" placeholder="Escribe la razón aquí..." class="w-full text-xs rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-rose-500 focus:ring-rose-500 shadow-sm py-1" />
+                                </td>
                                 <td class="py-4 px-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <button type="button" wire:click="aprobarBaja({{ $baja->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
@@ -143,7 +151,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                <td colspan="7" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
                                     No hay solicitudes de baja médica pendientes de aprobación.
                                 </td>
                             </tr>
