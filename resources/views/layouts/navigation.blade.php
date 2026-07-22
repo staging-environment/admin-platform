@@ -38,9 +38,15 @@
                                 </x-slot>
  
                                 <x-slot name="content">
-                                    <x-dropdown-link href="/admin/recursos-humanos" :active="request()->is('admin/recursos-humanos*')">
-                                        {{ __('Empleados') }}
-                                    </x-dropdown-link>
+                                     <x-dropdown-link href="/admin/recursos-humanos" :active="request()->is('admin/recursos-humanos*')">
+                                         {{ __('Empleados') }}
+                                     </x-dropdown-link>
+                                     
+                                     @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
+                                     <x-dropdown-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
+                                         {{ __('Aprobación de Solicitudes') }}
+                                     </x-dropdown-link>
+                                     @endif
                                     
                                     <div x-data="{ openSub: {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'true' : 'false' }} }">
                                         <button @click.stop="openSub = !openSub" class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out text-start text-left">
@@ -209,6 +215,12 @@
                         <x-responsive-nav-link href="/admin/recursos-humanos" :active="request()->is('admin/recursos-humanos*')">
                             {{ __('Empleados') }}
                         </x-responsive-nav-link>
+
+                        @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
+                        <x-responsive-nav-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
+                            {{ __('Aprobación de Solicitudes') }}
+                        </x-responsive-nav-link>
+                        @endif
                         <div x-data="{ openSub: {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'true' : 'false' }} }">
                             <button @click="openSub = !openSub" class="w-full flex items-center justify-between ps-3 pe-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition duration-150 ease-in-out">
                                 <span>{{ __('Ofertas de Empleo') }}</span>
