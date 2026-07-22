@@ -26,8 +26,11 @@ class FichaEmpleado extends Page
 
     public $isViewingAdminList = false;
     public $todosLosFichajes = [];
+    public $todasLasVacaciones = [];
+    public $todasLasBajas = [];
     public $filterDate = '';
     public $filterSearch = '';
+    public $filterType = 'fichajes'; // 'fichajes', 'vacaciones', 'bajas'
 
     public $hora_entrada;
     public $hora_salida;
@@ -111,25 +114,75 @@ class FichaEmpleado extends Page
     public function loadFichajes(): void
     {
         if ($this->isViewingAdminList) {
-            $query = EmpleadoFichaje::with('empleado');
+            $search = $this->filterSearch ? '%' . $this->filterSearch . '%' : null;
 
-            if ($this->filterDate) {
-                $query->where('fecha', $this->filterDate);
+            if ($this->filterType === 'fichajes') {
+                $query = EmpleadoFichaje::with('empleado');
+
+                if ($this->filterDate) {
+                    $query->where('fecha', $this->filterDate);
+                }
+
+                if ($search) {
+                    $query->whereHas('empleado', function($q) use ($search) {
+                        $q->where('nombre', 'like', $search)
+                          ->orWhere('apellidos', 'like', $search)
+                          ->orWhere('email', 'like', $search);
+                    });
+                }
+
+                $this->todosLosFichajes = $query
+                    ->orderBy('fecha', 'desc')
+                    ->orderBy('hora_entrada', 'desc')
+                    ->get();
+                $this->todasLasVacaciones = [];
+                $this->todasLasBajas = [];
+            } elseif ($this->filterType === 'vacaciones') {
+                $query = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', 'Aceptada');
+
+                if ($this->filterDate) {
+                    $query->where('fecha_inicio', '<=', $this->filterDate)
+                          ->where('fecha_fin', '>=', $this->filterDate);
+                }
+
+                if ($search) {
+                    $query->whereHas('empleado', function($q) use ($search) {
+                        $q->where('nombre', 'like', $search)
+                          ->orWhere('apellidos', 'like', $search)
+                          ->orWhere('email', 'like', $search);
+                    });
+                }
+
+                $this->todasLasVacaciones = $query
+                    ->orderBy('fecha_inicio', 'desc')
+                    ->get();
+                $this->todosLosFichajes = [];
+                $this->todasLasBajas = [];
+            } elseif ($this->filterType === 'bajas') {
+                $query = \App\Models\EmpleadoAusencia::with('empleado')->where('estado', 'Aceptada');
+
+                if ($this->filterDate) {
+                    $query->where('fecha_inicio', '<=', $this->filterDate)
+                          ->where(function($q) {
+                              $q->where('fecha_fin', '>=', $this->filterDate)
+                                ->orWhereNull('fecha_fin');
+                          });
+                }
+
+                if ($search) {
+                    $query->whereHas('empleado', function($q) use ($search) {
+                        $q->where('nombre', 'like', $search)
+                          ->orWhere('apellidos', 'like', $search)
+                          ->orWhere('email', 'like', $search);
+                    });
+                }
+
+                $this->todasLasBajas = $query
+                    ->orderBy('fecha_inicio', 'desc')
+                    ->get();
+                $this->todosLosFichajes = [];
+                $this->todasLasVacaciones = [];
             }
-
-            if ($this->filterSearch) {
-                $search = '%' . $this->filterSearch . '%';
-                $query->whereHas('empleado', function($q) use ($search) {
-                    $q->where('nombre', 'like', $search)
-                      ->orWhere('apellidos', 'like', $search)
-                      ->orWhere('email', 'like', $search);
-                });
-            }
-
-            $this->todosLosFichajes = $query
-                ->orderBy('fecha', 'desc')
-                ->orderBy('hora_entrada', 'desc')
-                ->get();
             $this->fichajeDelDia = null;
             $this->recentFichajes = collect();
             return;
