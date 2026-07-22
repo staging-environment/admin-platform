@@ -50,6 +50,10 @@ class Empleado extends Model
                         $user->password = bcrypt($defaultPass);
                     }
                 }
+                
+                if ($user && $empleado->password) {
+                    $user->password = bcrypt($empleado->password);
+                }
             }
 
             $user->name = $empleado->nombre . ' ' . $empleado->apellidos;

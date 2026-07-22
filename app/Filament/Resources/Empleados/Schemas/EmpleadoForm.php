@@ -119,9 +119,10 @@ class EmpleadoForm
                                  TextInput::make('password')
                                      ->label('Contraseña de acceso')
                                      ->password()
-                                     ->default('1234')
+                                     ->default(fn (string $context) => $context === 'create' ? '1234' : null)
                                      ->required(fn (string $context) => $context === 'create')
-                                     ->visible(fn (string $context) => $context === 'create')
+                                     ->helperText(fn (string $context) => $context === 'edit' ? 'Dejar en blanco para mantener la contraseña actual.' : null)
+                                     ->dehydrated(fn ($state) => filled($state))
                                      ->maxLength(255),
                             ]),
                     ]),
