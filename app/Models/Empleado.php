@@ -103,6 +103,11 @@ class Empleado extends Model
         return $this->belongsTo(Gasolinera::class, 'gasolinera_codigo', 'Codigo');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
+    }
+
     public function documentos()
     {
         return $this->hasMany(EmpleadoDocumento::class);

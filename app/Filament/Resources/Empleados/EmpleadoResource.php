@@ -33,6 +33,14 @@ class EmpleadoResource extends Resource
         return $user->can('gestion_recursos_humanos');
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->whereHas('user', function ($query) {
+                $query->role('Empleado');
+            });
+    }
+
     public static function getNavigationLabel(): string
     {
         return 'Recursos humanos';
