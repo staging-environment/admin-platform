@@ -124,6 +124,30 @@ class AdminPanelProvider extends PanelProvider
                 \Filament\View\PanelsRenderHook::BODY_START,
                 fn (): string => \Illuminate\Support\Facades\Blade::render('@include("layouts.navigation")'),
             )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
+                function (): string {
+                    $quotes = [
+                        "Y verás que la vida es hermosa, si te paras a ver cómo crecen las cosas.",
+                        "Vivir a la deriva, sentir que cada día es el primero.",
+                        "Dejaré que el viento sople a mi favor, y que me lleve donde quiera, sin buscar explicación.",
+                        "Me colé por la rendija de tu alma y me quedé a vivir allí.",
+                        "No quiero saber si el cielo es azul o gris, solo quiero saber si estás aquí."
+                    ];
+                    $quoteText = $quotes[array_rand($quotes)];
+                    
+                    return \Illuminate\Support\Facades\Blade::render('
+                        <div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-center shadow-inner">
+                            <p class="text-sm italic font-medium text-amber-800 dark:text-amber-300">
+                                "{{ $quoteText }}"
+                            </p>
+                            <span class="block text-[10px] uppercase font-bold text-amber-500 dark:text-amber-400 tracking-widest mt-2">
+                                — Robe (Roberto Iniesta)
+                            </span>
+                        </div>
+                    ', ['quoteText' => $quoteText]);
+                }
+            )
             ->authMiddleware([
                 Authenticate::class,
             ]);
