@@ -72,6 +72,8 @@
                         ],
                         'LANDING / PORTAL EMPLEADO' => [
                             'acceder_ficha_empleado' => 'Acceder a la ficha del empleado',
+                            'solicitar_ver_vacaciones' => 'Solicitar / Ver vacaciones',
+                            'solicitud_baja_enfermedad' => 'Solicitud de baja por enfermedad',
                         ]
                     ];
 
