@@ -237,12 +237,12 @@
                                             </svg>
                                             Editar
                                         </button>
-                                        <button wire:click="deleteFichaje({{ $fichaje->id }})" wire:confirm="¿Estás seguro de que deseas eliminar este registro de fichaje?" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                            Eliminar
-                                        </button>
+                                         <button type="button" @click="$wire.set('deletingFichajeId', {{ $fichaje->id }}); $dispatch('open-modal', { id: 'delete-fichaje-modal' })" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                             </svg>
+                                             Eliminar
+                                         </button>
                                     </td>
                                 </tr>
                             @empty
@@ -281,6 +281,29 @@
                         </x-filament::button>
                         <x-filament::button color="warning" wire:click="updateFichaje">
                             Guardar Cambios
+                        </x-filament::button>
+                    </div>
+                </x-slot>
+            </x-filament::modal>
+
+            <x-filament::modal id="delete-fichaje-modal" width="md">
+                <x-slot name="heading">
+                    ¿Eliminar registro de fichaje?
+                </x-slot>
+
+                <div class="py-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        ¿Estás seguro de que deseas eliminar este registro de fichaje? Esta acción no se puede deshacer y borrará el historial de entrada y salida del día correspondiente.
+                    </p>
+                </div>
+
+                <x-slot name="footer">
+                    <div class="flex justify-end gap-3">
+                        <x-filament::button color="gray" x-on:click="$dispatch('close-modal', { id: 'delete-fichaje-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="danger" wire:click="confirmDeleteFichaje">
+                            Eliminar Registro
                         </x-filament::button>
                     </div>
                 </x-slot>

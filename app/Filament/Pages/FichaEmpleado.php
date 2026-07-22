@@ -28,6 +28,7 @@ class FichaEmpleado extends Page
     public $editingFecha = null;
     public $editingHoraEntrada = null;
     public $editingHoraSalida = null;
+    public $deletingFichajeId = null;
 
     public static function canAccess(): bool
     {
@@ -213,22 +214,26 @@ class FichaEmpleado extends Page
         $this->loadFichajes();
     }
 
-    public function deleteFichaje($id): void
+    public function confirmDeleteFichaje(): void
     {
-        $fichaje = EmpleadoFichaje::find($id);
-        if (!$fichaje || $fichaje->empleado_id !== $this->empleado->id) {
+        if (!$this->deletingFichajeId) {
             return;
         }
 
-        $fechaFormatted = Carbon::parse($fichaje->fecha)->format('d/m/Y');
-        $fichaje->delete();
+        $fichaje = EmpleadoFichaje::find($this->deletingFichajeId);
+        if ($fichaje && $fichaje->empleado_id === $this->empleado->id) {
+            $fechaFormatted = Carbon::parse($fichaje->fecha)->format('d/m/Y');
+            $fichaje->delete();
 
-        Notification::make()
-            ->title('Fichaje Eliminado')
-            ->body('El registro del día ' . $fechaFormatted . ' ha sido eliminado con éxito.')
-            ->success()
-            ->send();
+            Notification::make()
+                ->title('Fichaje Eliminado')
+                ->body('El registro del día ' . $fechaFormatted . ' ha sido eliminado con éxito.')
+                ->success()
+                ->send();
+        }
 
+        $this->deletingFichajeId = null;
+        $this->dispatch('close-modal', id: 'delete-fichaje-modal');
         $this->loadFichajes();
     }
 }
