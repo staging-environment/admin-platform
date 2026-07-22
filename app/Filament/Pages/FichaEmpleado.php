@@ -24,6 +24,11 @@ class FichaEmpleado extends Page
     public $hora_entrada;
     public $hora_salida;
 
+    public $editingFichajeId = null;
+    public $editingFecha = null;
+    public $editingHoraEntrada = null;
+    public $editingHoraSalida = null;
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -159,6 +164,48 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->loadFichajes();
+    }
+
+    public function editFichaje($id): void
+    {
+        $fichaje = EmpleadoFichaje::find($id);
+        if (!$fichaje || $fichaje->empleado_id !== $this->empleado->id) {
+            return;
+        }
+
+        $this->editingFichajeId = $id;
+        $this->editingFecha = $fichaje->fecha;
+        $this->editingHoraEntrada = $fichaje->hora_entrada ? Carbon::parse($fichaje->hora_entrada)->format('H:i') : null;
+        $this->editingHoraSalida = $fichaje->hora_salida ? Carbon::parse($fichaje->hora_salida)->format('H:i') : null;
+
+        $this->dispatch('open-modal', id: 'edit-fichaje-modal');
+    }
+
+    public function updateFichaje(): void
+    {
+        $this->validate([
+            'editingHoraEntrada' => 'nullable',
+            'editingHoraSalida' => 'nullable',
+        ]);
+
+        $fichaje = EmpleadoFichaje::find($this->editingFichajeId);
+        if (!$fichaje || $fichaje->empleado_id !== $this->empleado->id) {
+            return;
+        }
+
+        $fichaje->update([
+            'hora_entrada' => $this->editingHoraEntrada ?: null,
+            'hora_salida' => $this->editingHoraSalida ?: null,
+        ]);
+
+        Notification::make()
+            ->title('Fichaje Actualizado')
+            ->body('El registro del día ' . Carbon::parse($fichaje->fecha)->format('d/m/Y') . ' ha sido modificado con éxito.')
+            ->success()
+            ->send();
+
+        $this->dispatch('close-modal', id: 'edit-fichaje-modal');
         $this->loadFichajes();
     }
 }

@@ -149,6 +149,7 @@
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Salida</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Marcaje Real Salida</th>
                                 <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Horas Trabajadas</th>
+                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-white/5">
@@ -183,10 +184,18 @@
                                             -
                                         @endif
                                     </td>
+                                    <td class="p-4 text-sm text-right">
+                                        <button wire:click="editFichaje({{ $fichaje->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                            </svg>
+                                            Editar
+                                        </button>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    <td colspan="7" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                         Aún no has registrado ningún fichaje.
                                     </td>
                                 </tr>
@@ -195,6 +204,35 @@
                     </table>
                 </div>
             </div>
+
+            <x-filament::modal id="edit-fichaje-modal" width="md">
+                <x-slot name="heading">
+                    Editar Fichaje del {{ $editingFecha ? \Carbon\Carbon::parse($editingFecha)->format('d/m/Y') : '' }}
+                </x-slot>
+
+                <div class="space-y-4 py-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Entrada</label>
+                        <input type="time" wire:model="editingHoraEntrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Salida</label>
+                        <input type="time" wire:model="editingHoraSalida" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                    </div>
+                </div>
+
+                <x-slot name="footer">
+                    <div class="flex justify-end gap-3">
+                        <x-filament::button color="gray" x-on:click="$dispatch('close-modal', { id: 'edit-fichaje-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="warning" wire:click="updateFichaje">
+                            Guardar Cambios
+                        </x-filament::button>
+                    </div>
+                </x-slot>
+            </x-filament::modal>
         @endif
     </div>
 </x-filament-panels::page>
