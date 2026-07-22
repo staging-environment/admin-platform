@@ -214,15 +214,15 @@ class Empleado extends Model
                 'titulo' => 'Sin DNI / NIE registrado',
                 'descripcion' => 'Este empleado no tiene ningún documento de DNI/NIE asociado en su ficha.',
             ]);
-        }
-
-        // 5. Alerta: DNI Caducado
-        if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->isPast()) {
-            $this->alertas()->create([
-                'tipo' => 'dni_caducado',
-                'titulo' => 'DNI / NIE caducado',
-                'descripcion' => 'La fecha de caducidad del DNI/NIE del empleado (' . $this->fecha_caducidad_dni->format('d/m/Y') . ') ha expirado.',
-            ]);
+        } else {
+            // 5. Alerta: DNI Caducado
+            if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->isPast()) {
+                $this->alertas()->create([
+                    'tipo' => 'dni_caducado',
+                    'titulo' => 'DNI / NIE caducado',
+                    'descripcion' => 'La fecha de caducidad del DNI/NIE del empleado (' . $this->fecha_caducidad_dni->format('d/m/Y') . ') ha expirado.',
+                ]);
+            }
         }
     }
 }
