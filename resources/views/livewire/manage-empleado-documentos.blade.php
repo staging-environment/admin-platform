@@ -485,6 +485,7 @@
                                                 <div>
                                                     <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Fecha de Caducidad</label>
                                                     <input type="date" wire:model="edit_fecha_caducidad_dni" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                                    @error('edit_fecha_caducidad_dni') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
                                                 </div>
                                                 <div>
                                                     <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Archivo actual: <span class="font-normal text-gray-500">{{ basename($doc->file_path) }}</span></label>

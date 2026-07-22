@@ -45,11 +45,20 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_gasolinera_codigo;
     public $edit_puesto;
 
-    // Validation rules
     protected $rules = [
         'tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros,Prevención de riesgos laborales,Manipulación de alimentos',
         'nombre' => 'required|string|max:255',
         'file' => 'required|file|max:10240', // 10MB max
+    ];
+
+    protected $messages = [
+        'fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
+        'edit_fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
+    ];
+
+    protected $validationAttributes = [
+        'fecha_caducidad_dni' => 'fecha de caducidad',
+        'edit_fecha_caducidad_dni' => 'fecha de caducidad',
     ];
 
     public function mount($empleadoId, $family = null)
@@ -126,7 +135,7 @@ class ManageEmpleadoDocumentos extends Component
 
         $rules = $this->rules;
         if ($this->family === 'dni') {
-            $rules['fecha_caducidad_dni'] = 'required|date';
+            $rules['fecha_caducidad_dni'] = 'required|date|after:today';
         }
         if ($this->family === 'contratos') {
             $rules['fecha_inicio_contrato'] = 'required|date';
@@ -347,8 +356,15 @@ class ManageEmpleadoDocumentos extends Component
             $this->empleado->syncLatestContract();
             $this->refreshContratoFields();
         } elseif ($this->family === 'dni') {
+            $rules = [
+                'edit_fecha_caducidad_dni' => 'required|date|after:today',
+            ];
             if ($this->edit_file) {
-                $this->validate(['edit_file' => 'file|max:10240']);
+                $rules['edit_file'] = 'file|max:10240';
+            }
+            $this->validate($rules);
+
+            if ($this->edit_file) {
                 if ($doc->file_path && Storage::disk('local')->exists($doc->file_path)) {
                     Storage::disk('local')->delete($doc->file_path);
                 }
