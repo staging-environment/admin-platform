@@ -12,8 +12,10 @@ $emp = Empleado::find(48);
 echo "Testing Empleado 48 Infolist...\n";
 
 try {
-    $infolist = EmpleadoResource::infolist(\Filament\Infolists\Infolist::make()->record($emp));
-    echo "Infolist created successfully. Components count: " . count($infolist->getComponents()) . "\n";
+    $infolist = new \Filament\Infolists\Infolist();
+    $infolist->record($emp);
+    $res = EmpleadoResource::infolist($infolist);
+    echo "Infolist created successfully. Components count: " . count($res->getComponents()) . "\n";
     echo "SUCCESS: Page view logic for Empleado 48 executes without any error!\n";
 } catch (\Throwable $e) {
     echo "ERROR IN INFOLIST: " . $e->getMessage() . "\n";
