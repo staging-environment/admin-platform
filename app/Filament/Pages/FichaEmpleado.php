@@ -47,6 +47,11 @@ class FichaEmpleado extends Page
     public $selectedSolicitudType = null;
     public $missingCheckInDays = [];
 
+    // Retroactive check-in properties
+    public $selectedRetroactiveDate = null;
+    public $retroactive_hora_entrada = null;
+    public $retroactive_hora_salida = null;
+
     // Form fields for vacations
     public $vacacion_fecha_inicio;
     public $vacacion_fecha_fin;
@@ -575,5 +580,67 @@ class FichaEmpleado extends Page
         }
 
         $this->missingCheckInDays = $missing;
+    }
+
+    public function abrirFichajeRetroactivo($date): void
+    {
+        $this->selectedRetroactiveDate = $date;
+        $existing = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', $date)
+            ->first();
+
+        if ($existing) {
+            $this->retroactive_hora_entrada = $existing->hora_entrada ? Carbon::parse($existing->hora_entrada)->format('H:i') : null;
+            $this->retroactive_hora_salida = $existing->hora_salida ? Carbon::parse($existing->hora_salida)->format('H:i') : null;
+        } else {
+            $this->retroactive_hora_entrada = null;
+            $this->retroactive_hora_salida = null;
+        }
+    }
+
+    public function cerrarFichajeRetroactivo(): void
+    {
+        $this->selectedRetroactiveDate = null;
+        $this->retroactive_hora_entrada = null;
+        $this->retroactive_hora_salida = null;
+    }
+
+    public function guardarFichajeRetroactivo(): void
+    {
+        if (!$this->empleado) {
+            Notification::make()
+                ->title('Error')
+                ->body('Tu usuario no está asociado a ningún registro de empleado.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $this->validate([
+            'retroactive_hora_entrada' => 'required|date_format:H:i',
+            'retroactive_hora_salida' => 'nullable|date_format:H:i',
+        ]);
+
+        EmpleadoFichaje::updateOrCreate(
+            [
+                'empleado_id' => $this->empleado->id,
+                'fecha' => $this->selectedRetroactiveDate,
+            ],
+            [
+                'hora_entrada' => $this->retroactive_hora_entrada,
+                'hora_salida' => $this->retroactive_hora_salida,
+                'server_checkin_at' => Carbon::parse($this->selectedRetroactiveDate . ' ' . $this->retroactive_hora_entrada),
+                'server_checkout_at' => $this->retroactive_hora_salida ? Carbon::parse($this->selectedRetroactiveDate . ' ' . $this->retroactive_hora_salida) : null,
+            ]
+        );
+
+        Notification::make()
+            ->title('Fichaje Retroactivo Guardado')
+            ->body('Has registrado tu fichaje para el día ' . Carbon::parse($this->selectedRetroactiveDate)->format('d/m/Y') . '.')
+            ->success()
+            ->send();
+
+        $this->cerrarFichajeRetroactivo();
+        $this->loadFichajes();
     }
 }

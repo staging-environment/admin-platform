@@ -343,13 +343,16 @@
                     <div>
                         <h3 class="text-sm font-bold text-amber-900 dark:text-amber-200">Alerta: Fichaje Faltante detectado</h3>
                         <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                            No se ha registrado ningún fichaje en los siguientes días laborables. Si corresponde a un error o ausencia no justificada, ponte en contacto con tu administrador:
+                            No se ha registrado ningún fichaje en los siguientes días laborables. <strong>Haz clic en cualquier día para registrar tu fichaje de forma retroactiva</strong>:
                         </p>
                         <div class="flex flex-wrap gap-2 mt-3">
                             @foreach($missingCheckInDays as $day)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-bold font-mono">
+                                <button type="button" wire:click="abrirFichajeRetroactivo('{{ $day['date'] }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-bold font-mono transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                                    <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                    </svg>
                                     {{ $day['formatted'] }}
-                                </span>
+                                </button>
                             @endforeach
                         </div>
                     </div>
@@ -959,6 +962,56 @@
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end">
                     <button type="button" wire:click="cerrarDetallesSolicitud" style="background-color: #4f46e5; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-indigo-700">
                         Cerrar Detalles
+                    </button>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Retroactive Check-in Modal -->
+        @if($selectedRetroactiveDate)
+        <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm transition-opacity">
+            <div class="relative w-full max-w-md bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+                <!-- Header -->
+                <div class="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold">Registrar Fichaje Faltante</h3>
+                        <p class="text-xs text-amber-100 mt-0.5">
+                            Fecha: {{ \Carbon\Carbon::parse($selectedRetroactiveDate)->translatedFormat('l, d \d\e F \d\e Y') }}
+                        </p>
+                    </div>
+                    <button type="button" wire:click="cerrarFichajeRetroactivo" class="text-white hover:text-amber-100 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 space-y-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Entrada <span class="text-red-500">*</span></label>
+                            <input type="time" wire:model="retroactive_hora_entrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Salida</label>
+                            <input type="time" wire:model="retroactive_hora_salida" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                            <p class="text-[10px] text-gray-400 mt-1">Puedes dejar la salida en blanco si la jornada sigue abierta, aunque para días pasados se recomienda indicar ambas horas.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
+                    <button type="button" wire:click="cerrarFichajeRetroactivo" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/15 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-bold transition-all">
+                        Cancelar
+                    </button>
+                    <button type="button" wire:click="guardarFichajeRetroactivo" style="background-color: #16a34a; color: #ffffff;" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Guardar Fichaje
                     </button>
                 </div>
             </div>
