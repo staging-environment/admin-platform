@@ -23,5 +23,9 @@ Schedule::job(new RefreshMineturJob)->everyFifteenMinutes();
 // Envía los precios actuales de nuestras 4 gasolineras a MITECO cada 5 minutos si hay cambios.
 Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->everyFiveMinutes();
 
+// ── Alerta de Fichajes Faltantes (Comprobación diaria) ────────────────────────
+// Envía un correo a los empleados que no completaron sus registros de entrada/salida.
+Schedule::command('fichajes:send-missing-reminders')->dailyAt('21:00');
+
 
 
