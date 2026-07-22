@@ -9,6 +9,8 @@ class Empleado extends Model
 {
     use SoftDeletes;
 
+    public $password;
+
     protected $guarded = [];
 
     protected $casts = [
@@ -34,7 +36,8 @@ class Empleado extends Model
                 $user = \App\Models\User::where('email', $empleado->email)->first();
                 if (!$user) {
                     $user = new \App\Models\User();
-                    $user->password = bcrypt('12345678');
+                    $defaultPass = $empleado->password ?: '1234';
+                    $user->password = bcrypt($defaultPass);
                 }
             } else {
                 $originalEmail = $empleado->getOriginal('email');
@@ -43,7 +46,8 @@ class Empleado extends Model
                     $user = \App\Models\User::where('email', $empleado->email)->first();
                     if (!$user) {
                         $user = new \App\Models\User();
-                        $user->password = bcrypt('12345678');
+                        $defaultPass = $empleado->password ?: '1234';
+                        $user->password = bcrypt($defaultPass);
                     }
                 }
             }

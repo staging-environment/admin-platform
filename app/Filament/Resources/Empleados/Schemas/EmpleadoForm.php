@@ -116,6 +116,13 @@ class EmpleadoForm
                                      ->required()
                                      ->unique(ignoreRecord: true)
                                      ->maxLength(255),
+                                 TextInput::make('password')
+                                     ->label('Contraseña de acceso')
+                                     ->password()
+                                     ->default('1234')
+                                     ->required(fn (string $context) => $context === 'create')
+                                     ->visible(fn (string $context) => $context === 'create')
+                                     ->maxLength(255),
                             ]),
                     ]),
 
