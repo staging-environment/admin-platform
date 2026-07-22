@@ -125,17 +125,7 @@
         @endforeach
         
         <!-- Navbar Overlay -->
-        <header class="absolute top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-            <div class="flex items-center gap-3 bg-slate-950/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10">
-                <img src="{{ asset('ronda_norte_logo.svg') }}" class="w-9 h-9 object-contain" alt="Utrecar" />
-                <div>
-                    <p class="font-black text-sm tracking-tight leading-none text-white">Utrecar</p>
-                    <div class="flex items-center gap-1 mt-0.5">
-                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                        <p class="text-[7px] uppercase tracking-[0.2em] text-emerald-400 font-extrabold">Active Network</p>
-                    </div>
-                </div>
-            </div>
+        <header class="absolute top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-6 py-6 flex justify-end items-center">
             
             <nav class="flex gap-3 items-center">
                 @if (Route::has('login'))
