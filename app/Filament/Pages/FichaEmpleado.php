@@ -39,6 +39,22 @@ class FichaEmpleado extends Page
     {
         $user = auth()->user();
         $this->empleado = Empleado::where('email', $user->email)->first();
+
+        // Auto-create mock employee for admin users who also have the Empleado role (or are testing)
+        if (!$this->empleado && ($user->hasRole('Admin') || $user->hasRole('admin'))) {
+            $this->empleado = Empleado::create([
+                'nombre' => $user->name ?: 'jarodriguezbonilla',
+                'apellidos' => '(Admin)',
+                'dni' => 'ADMIN-' . substr(md5($user->email), 0, 8),
+                'fecha_nacimiento' => '1990-01-01',
+                'direccion' => 'Calle Administrador',
+                'localidad' => 'Sevilla',
+                'codigo_postal' => '41000',
+                'provincia' => 'Sevilla',
+                'telefono_principal' => $user->telefono ?: '600000000',
+                'email' => $user->email,
+            ]);
+        }
         
         // Initialize default input times to current server time
         $this->hora_entrada = Carbon::now()->format('H:i');
