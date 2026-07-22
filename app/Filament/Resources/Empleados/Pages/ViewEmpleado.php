@@ -17,6 +17,14 @@ class ViewEmpleado extends ViewRecord
 {
     protected static string $resource = EmpleadoResource::class;
 
+    public function getCachedHeaderActions(): array
+    {
+        return array_filter(
+            parent::getCachedHeaderActions(),
+            fn ($action) => method_exists($action, 'getName') && !in_array($action->getName(), ['ver_incapacidad', 'ver_resolucion', 'ver_dictamen', 'ver_certificado'])
+        );
+    }
+
     public function content(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         return $schema
