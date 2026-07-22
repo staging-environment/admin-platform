@@ -155,6 +155,94 @@
                 </table>
             </div>
         </div>
+
+        <!-- Processed Requests History Section -->
+        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+            <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span class="p-2 bg-indigo-500/10 text-indigo-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                    </span>
+                    Historial de Solicitudes Procesadas
+                </h3>
+                <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-bold">
+                    {{ count($historicoProcesadas) }} procesadas
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th class="py-3 px-4">Empleado</th>
+                            <th class="py-3 px-4">Tipo</th>
+                            <th class="py-3 px-4">Fechas</th>
+                            <th class="py-3 px-4">Estado</th>
+                            <th class="py-3 px-4">Resolución</th>
+                            <th class="py-3 px-4 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
+                        @forelse($historicoProcesadas as $record)
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                                <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
+                                    {{ $record->empleado ? $record->empleado->nombre . ' ' . $record->empleado->apellidos : 'N/A' }}
+                                </td>
+                                <td class="py-4 px-4 text-gray-600 dark:text-gray-400 font-medium text-xs">
+                                    @if(isset($record->dias_solicitados))
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-bold text-[10px] uppercase">
+                                            Vacaciones
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 font-bold text-[10px] uppercase">
+                                            Baja Médica
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-mono text-xs">
+                                    @if(isset($record->dias_solicitados))
+                                        {{ \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') }}
+                                    @else
+                                        {{ \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') }} @if($record->fecha_fin) - {{ \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') }} @else (Indefinida) @endif
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4">
+                                    @if($record->estado === 'Aceptada')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
+                                            Aprobada
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-xs font-bold">
+                                            Denegada
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4 text-gray-500 dark:text-gray-400 text-xs font-medium">
+                                    Resuelto: {{ \Carbon\Carbon::parse($record->updated_at)->translatedFormat('d \d\e F \d\e Y H:i') }}
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    <button type="button" wire:click="verDetalles({{ $record->id }}, '{{ isset($record->dias_solicitados) ? 'vacacion' : 'baja' }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        Ver Detalles
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                    No hay solicitudes resueltas en el historial.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     @if($selectedDocUrl)
@@ -214,6 +302,126 @@
                 </button>
                 <button type="button" wire:click="confirmarDenegacion" style="background-color: #dc2626; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-red-700">
                     Confirmar Denegación
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Request Details Modal -->
+    @if($viewingRecord)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="cerrarDetalles">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-xl overflow-hidden transform transition-all border border-gray-100 dark:border-white/5">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span class="p-1.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </span>
+                    Detalles de la Solicitud
+                </h3>
+                <button type="button" wire:click="cerrarDetalles" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 space-y-5">
+                <!-- Status Row -->
+                <div class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-white/5">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Estado de la Solicitud</span>
+                    @if($viewingRecord->estado === 'Aceptada')
+                        <span class="px-3 py-1 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
+                            Aprobada
+                        </span>
+                    @else
+                        <span class="px-3 py-1 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 rounded-full text-xs font-bold">
+                            Denegada
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</span>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ $viewingRecord->empleado ? $viewingRecord->empleado->nombre . ' ' . $viewingRecord->empleado->apellidos : 'N/A' }}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo de Solicitud</span>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ $viewingType === 'vacacion' ? 'Vacaciones (' . ($viewingRecord->tipo ?? 'Normal') . ')' : 'Baja Médica / Ausencia' }}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Fecha de Inicio</span>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">
+                            {{ \Carbon\Carbon::parse($viewingRecord->fecha_inicio)->format('d/m/Y') }}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Fecha Fin / Prevista</span>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">
+                            {{ $viewingRecord->fecha_fin ? \Carbon\Carbon::parse($viewingRecord->fecha_fin)->format('d/m/Y') : 'No definida' }}
+                        </p>
+                    </div>
+                    @if($viewingType === 'vacacion')
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Días Solicitados</span>
+                            <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+                                {{ $viewingRecord->dias_solicitados }}
+                            </p>
+                        </div>
+                    @endif
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Fecha de Resolución</span>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ \Carbon\Carbon::parse($viewingRecord->updated_at)->translatedFormat('d/m/Y H:i') }}
+                        </p>
+                    </div>
+                </div>
+
+                @if($viewingRecord->comentario_empleado)
+                    <div class="p-3 bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-white/5 rounded-2xl">
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Explicación del Empleado</span>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ $viewingRecord->comentario_empleado }}
+                        </p>
+                    </div>
+                @endif
+
+                @if($viewingRecord->comentario_aprobador)
+                    <div class="p-3 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
+                        <span class="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Razón / Comentario del Aprobador</span>
+                        <p class="text-sm font-medium text-amber-800 dark:text-amber-300">
+                            {{ $viewingRecord->comentario_aprobador }}
+                        </p>
+                    </div>
+                @endif
+
+                @if($viewingType === 'baja' && $viewingRecord->justificante_path)
+                    <div class="p-3 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <span class="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1">Documento Justificante</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Hay un archivo justificante adjunto.</span>
+                        </div>
+                        <button type="button" wire:click="showDocument('{{ $viewingRecord->justificante_path }}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all">
+                            Ver Justificante
+                        </button>
+                    </div>
+                @endif
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end">
+                <button type="button" wire:click="cerrarDetalles" style="background-color: #4f46e5; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-indigo-700">
+                    Cerrar Detalles
                 </button>
             </div>
         </div>

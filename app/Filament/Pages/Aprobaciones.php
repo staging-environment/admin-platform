@@ -23,6 +23,7 @@ class Aprobaciones extends Page
 
     public $vacacionesPendientes = [];
     public $bajasPendientes = [];
+    public $historicoProcesadas = [];
 
     public $comentariosVacaciones = [];
     public $comentariosBajas = [];
@@ -33,6 +34,9 @@ class Aprobaciones extends Page
     public $denyingType = null;
     public $denyingId = null;
     public $motivoDenegacion = '';
+
+    public $viewingRecord = null;
+    public $viewingType = null;
 
     public static function canAccess(): bool
     {
@@ -62,13 +66,29 @@ class Aprobaciones extends Page
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $vacs = EmpleadoVacacion::with('empleado')
+            ->whereIn('estado', ['Aceptada', 'Rechazada'])
+            ->get();
+
+        $bajas = EmpleadoAusencia::with('empleado')
+            ->whereIn('estado', ['Aceptada', 'Rechazada'])
+            ->get();
+
+        $this->historicoProcesadas = $vacs->concat($bajas)
+            ->sortByDesc('updated_at')
+            ->values()
+            ->all();
+
         // Clear comment inputs and modal state
         $this->comentariosVacaciones = [];
         $this->comentariosBajas = [];
         $this->denyingType = null;
         $this->denyingId = null;
         $this->motivoDenegacion = '';
+        $this->viewingRecord = null;
+        $this->viewingType = null;
     }
+
 
     private function checkPermission(): bool
     {
@@ -308,5 +328,22 @@ class Aprobaciones extends Page
     {
         $this->selectedDocUrl = null;
         $this->selectedDocType = null;
+    }
+
+    public function verDetalles($id, $type): void
+    {
+        if (!$this->checkPermission()) return;
+        $this->viewingType = $type;
+        if ($type === 'vacacion') {
+            $this->viewingRecord = EmpleadoVacacion::with('empleado')->find($id);
+        } else {
+            $this->viewingRecord = EmpleadoAusencia::with('empleado')->find($id);
+        }
+    }
+
+    public function cerrarDetalles(): void
+    {
+        $this->viewingRecord = null;
+        $this->viewingType = null;
     }
 }
