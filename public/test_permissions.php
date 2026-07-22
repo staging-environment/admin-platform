@@ -13,6 +13,9 @@ if ($user) {
     $panel = filament()->getPanel('admin');
     echo "Can access panel admin: " . ($user->canAccessPanel($panel) ? 'YES' : 'NO') . "\n";
     
+    $role = \Spatie\Permission\Models\Role::where('name', 'Empleado')->first();
+    echo "Role Empleado permissions: " . implode(', ', $role->permissions->pluck('name')->toArray()) . "\n";
+    
     // Check Dashboard access
     echo "Dashboard can access: " . (\App\Filament\Pages\Dashboard::canAccess() ? 'YES' : 'NO') . "\n";
 } else {
