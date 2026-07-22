@@ -43,6 +43,8 @@ class FichaEmpleado extends Page
 
     public $vacaciones = [];
     public $ausencias = [];
+    public $selectedSolicitud = null;
+    public $selectedSolicitudType = null;
 
     // Form fields for vacations
     public $vacacion_fecha_inicio;
@@ -486,5 +488,28 @@ class FichaEmpleado extends Page
                 ->send();
             $this->loadAusencias();
         }
+    }
+
+    public function verDetallesSolicitud($id, $type): void
+    {
+        $this->selectedSolicitudType = $type;
+        if ($type === 'vacacion') {
+            $sol = \App\Models\EmpleadoVacacion::find($id);
+        } else {
+            $sol = \App\Models\EmpleadoAusencia::find($id);
+        }
+        
+        // Security check: ensure the employee has access to this request or is authorized
+        if ($sol && ($sol->empleado_id === $this->empleado->id || auth()->user()->hasRole('Admin') || auth()->user()->can('aprobacion_vacaciones_bajas'))) {
+            $this->selectedSolicitud = $sol;
+        } else {
+            $this->selectedSolicitud = null;
+        }
+    }
+
+    public function cerrarDetallesSolicitud(): void
+    {
+        $this->selectedSolicitud = null;
+        $this->selectedSolicitudType = null;
     }
 }

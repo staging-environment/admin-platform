@@ -591,8 +591,14 @@
                                                     Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
                                                 </p>
                                             </div>
-                                            <div class="flex items-center gap-4">
-                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                                <button type="button" wire:click="verDetallesSolicitud({{ $v->id }}, 'vacacion')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                </button>
                                                 @if($v->estado === 'Pendiente')
                                                     <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -662,6 +668,12 @@
                                                         Ver Justificante
                                                     </a>
                                                 @endif
+                                                <button type="button" wire:click="verDetallesSolicitud({{ $a->id }}, 'baja')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                </button>
                                                 @if(($a->estado ?? 'Pendiente') === 'Pendiente')
                                                     <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de baja médica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -809,6 +821,124 @@
                     </div>
                 </form>
             </x-filament::modal>
+        @endif
+
+        <!-- Floating Modal for Solicitud Details (for employees) -->
+        @if($selectedSolicitud)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="cerrarDetallesSolicitud">
+            <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-xl overflow-hidden transform transition-all border border-gray-100 dark:border-white/5">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="p-1.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </span>
+                        Detalles de la Solicitud
+                    </h3>
+                    <button type="button" wire:click="cerrarDetallesSolicitud" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-6 space-y-5">
+                    <!-- Status Row -->
+                    <div class="flex items-center justify-between p-3 rounded-2xl bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-white/5">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Estado de la Solicitud</span>
+                        @if($selectedSolicitud->estado === 'Aceptada')
+                            <span class="px-3 py-1 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
+                                Aprobada
+                            </span>
+                        @elseif($selectedSolicitud->estado === 'Rechazada')
+                            <span class="px-3 py-1 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 rounded-full text-xs font-bold">
+                                Denegada
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold animate-pulse">
+                                Pendiente
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- Info Grid -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo de Solicitud</span>
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                {{ $selectedSolicitudType === 'vacacion' ? 'Vacaciones (' . ($selectedSolicitud->tipo ?? 'Normal') . ')' : 'Baja Médica / Ausencia' }}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Fecha de Inicio</span>
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">
+                                {{ \Carbon\Carbon::parse($selectedSolicitud->fecha_inicio)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Fecha Fin / Prevista</span>
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 font-mono">
+                                {{ $selectedSolicitud->fecha_fin ? \Carbon\Carbon::parse($selectedSolicitud->fecha_fin)->format('d/m/Y') : 'No definida' }}
+                            </p>
+                        </div>
+                        @if($selectedSolicitudType === 'vacacion')
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Días Solicitados</span>
+                                <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">
+                                    {{ $selectedSolicitud->dias_solicitados }}
+                                </p>
+                            </div>
+                        @endif
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Última Actualización</span>
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                {{ \Carbon\Carbon::parse($selectedSolicitud->updated_at)->translatedFormat('d/m/Y H:i') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    @if($selectedSolicitud->comentario_empleado)
+                        <div class="p-3 bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-white/5 rounded-2xl">
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tu Explicación</span>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                {{ $selectedSolicitud->comentario_empleado }}
+                            </p>
+                        </div>
+                    @endif
+
+                    @if($selectedSolicitud->comentario_aprobador)
+                        <div class="p-3 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
+                            <span class="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Motivo / Razón de la Resolución</span>
+                            <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                                {{ $selectedSolicitud->comentario_aprobador }}
+                            </p>
+                        </div>
+                    @endif
+
+                    @if($selectedSolicitudType === 'baja' && $selectedSolicitud->justificante_path)
+                        <div class="p-3 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1">Documento Justificante</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Hay un archivo justificante adjunto.</span>
+                            </div>
+                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $selectedSolicitud->justificante_path]) }}" target="_blank" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all text-center">
+                                Abrir Justificante
+                            </a>
+                        </div>
+                    @endif
+                </div>
+                
+                <!-- Footer -->
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end">
+                    <button type="button" wire:click="cerrarDetallesSolicitud" style="background-color: #4f46e5; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-indigo-700">
+                        Cerrar Detalles
+                    </button>
+                </div>
+            </div>
+        </div>
         @endif
     </div>
 </x-filament-panels::page>
