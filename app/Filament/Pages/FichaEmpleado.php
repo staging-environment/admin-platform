@@ -24,6 +24,9 @@ class FichaEmpleado extends Page
     public $fichajeDelDia;
     public $recentFichajes;
 
+    public $isViewingAdminList = false;
+    public $todosLosFichajes = [];
+
     public $hora_entrada;
     public $hora_salida;
 
@@ -60,10 +63,24 @@ class FichaEmpleado extends Page
     public function mount(): void
     {
         $user = auth()->user();
-        $this->empleado = Empleado::where('email', $user->email)->first();
+        $isAdmin = $user->hasRole('Admin') || $user->hasRole('Gestor') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+
+        $empleadoId = request()->query('empleado_id');
+
+        if ($isAdmin && !$empleadoId) {
+            $this->isViewingAdminList = true;
+            $this->empleado = null;
+        } else {
+            $this->isViewingAdminList = false;
+            if ($isAdmin && $empleadoId) {
+                $this->empleado = Empleado::find($empleadoId);
+            } else {
+                $this->empleado = Empleado::where('email', $user->email)->first();
+            }
+        }
 
         // Auto-create mock employee for admin users who also have the Empleado role (or are testing)
-        if (!$this->empleado && ($user->hasRole('Admin') || $user->hasRole('admin'))) {
+        if (!$this->empleado && !$this->isViewingAdminList && ($user->hasRole('Admin') || $user->hasRole('admin'))) {
             $this->empleado = Empleado::create([
                 'nombre' => $user->name ?: 'jarodriguezbonilla',
                 'apellidos' => '(Admin)',
@@ -83,12 +100,24 @@ class FichaEmpleado extends Page
         $this->hora_salida = Carbon::now()->format('H:i');
 
         $this->loadFichajes();
-        $this->loadVacaciones();
-        $this->loadAusencias();
+        if ($this->empleado) {
+            $this->loadVacaciones();
+            $this->loadAusencias();
+        }
     }
 
     public function loadFichajes(): void
     {
+        if ($this->isViewingAdminList) {
+            $this->todosLosFichajes = EmpleadoFichaje::with('empleado')
+                ->orderBy('fecha', 'desc')
+                ->orderBy('hora_entrada', 'desc')
+                ->get();
+            $this->fichajeDelDia = null;
+            $this->recentFichajes = collect();
+            return;
+        }
+
         if (!$this->empleado) {
             $this->fichajeDelDia = null;
             $this->recentFichajes = collect();
@@ -101,6 +130,7 @@ class FichaEmpleado extends Page
 
         $this->recentFichajes = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->orderBy('fecha', 'desc')
+            ->orderBy('hora_entrada', 'desc')
             ->limit(30)
             ->get();
     }

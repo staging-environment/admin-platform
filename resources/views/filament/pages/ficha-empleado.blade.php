@@ -1,6 +1,92 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        @if(!$empleado)
+        @if($isViewingAdminList)
+            <!-- Admin Dashboard: List of all employee check-ins -->
+            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+                <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="p-2 bg-amber-500/10 text-amber-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </span>
+                        Control General de Fichajes de Empleados
+                    </h3>
+                    <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
+                        {{ count($todosLosFichajes) }} registros totales
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                <th class="py-3 px-4">Empleado</th>
+                                <th class="py-3 px-4">Fecha</th>
+                                <th class="py-3 px-4">Hora Entrada</th>
+                                <th class="py-3 px-4">Hora Salida</th>
+                                <th class="py-3 px-4">Tiempo Total</th>
+                                <th class="py-3 px-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
+                            @forelse($todosLosFichajes as $fichaje)
+                                <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
+                                        {{ $fichaje->empleado ? $fichaje->empleado->nombre . ' ' . $fichaje->empleado->apellidos : 'N/A' }}
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-700 dark:text-gray-300 text-xs">
+                                        {{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F \d\e Y') }}
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-600 dark:text-gray-400">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-mono text-xs font-bold">
+                                            {{ $fichaje->hora_entrada }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-600 dark:text-gray-400">
+                                        @if($fichaje->hora_salida)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 font-mono text-xs font-bold">
+                                                {{ $fichaje->hora_salida }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-medium text-xs font-bold">
+                                                En curso
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 px-4 font-bold text-gray-700 dark:text-gray-300 text-xs">
+                                        @php
+                                            if ($fichaje->hora_salida) {
+                                                $t1 = \Carbon\Carbon::parse($fichaje->hora_entrada);
+                                                $t2 = \Carbon\Carbon::parse($fichaje->hora_salida);
+                                                $diff = $t1->diff($t2);
+                                                echo $diff->format('%h h %i m');
+                                            } else {
+                                                echo '-';
+                                            }
+                                        @endphp
+                                    </td>
+                                    <td class="py-4 px-4 text-right">
+                                        <a href="/admin/ficha-empleado?empleado_id={{ $fichaje->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            Ver Ficha / Fichajes
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                        No hay registros de fichajes en el sistema.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @elseif(!$empleado)
             <div class="p-6 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-2xl flex items-start gap-4">
                 <div class="p-3 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-xl">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,6 +99,26 @@
                 </div>
             </div>
         @else
+            @if(request()->query('empleado_id'))
+                <!-- Info Banner for Admin viewing specific employee -->
+                <div class="p-4 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900/40 rounded-2xl flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <span class="text-sm font-semibold text-indigo-900 dark:text-indigo-200">Modo de Visualización de Administrador</span>
+                            <p class="text-xs text-indigo-700 dark:text-indigo-400">Estás viendo y gestionando el portal del empleado <strong>{{ $empleado->nombre }} {{ $empleado->apellidos }}</strong>.</p>
+                        </div>
+                    </div>
+                    <a href="/admin/ficha-empleado" style="background-color: #4f46e5; color: #ffffff;" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-indigo-700">
+                        Volver al Listado General
+                    </a>
+                </div>
+            @endif
             <!-- Header Profile Info -->
             <div class="relative overflow-hidden p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-500/20 dark:border-amber-500/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
