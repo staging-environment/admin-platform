@@ -65,6 +65,7 @@
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_eliminar_empleados' => 'Eliminar empleados',
+                            'aprobacion_vacaciones_bajas' => 'Aprobación de vacaciones / Bajas médicas',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',

@@ -350,4 +350,33 @@ class FichaEmpleado extends Page
         $this->dispatch('close-modal', id: 'solicitar-baja-modal');
         $this->loadAusencias();
     }
+
+    public function deleteVacacion($id): void
+    {
+        $vac = \App\Models\EmpleadoVacacion::find($id);
+        if ($vac && $vac->empleado_id === $this->empleado->id && $vac->estado === 'Pendiente') {
+            $vac->delete();
+            Notification::make()
+                ->title('Solicitud de Vacaciones Eliminada')
+                ->success()
+                ->send();
+            $this->loadVacaciones();
+        }
+    }
+
+    public function deleteAusencia($id): void
+    {
+        $aus = \App\Models\EmpleadoAusencia::find($id);
+        if ($aus && $aus->empleado_id === $this->empleado->id && $aus->estado === 'Pendiente') {
+            if ($aus->justificante_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($aus->justificante_path)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($aus->justificante_path);
+            }
+            $aus->delete();
+            Notification::make()
+                ->title('Solicitud de Baja Médica Eliminada')
+                ->success()
+                ->send();
+            $this->loadAusencias();
+        }
+    }
 }

@@ -295,7 +295,16 @@
                                                     Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
                                                 </p>
                                             </div>
-                                            <span class="text-xs font-black text-sky-600 dark:text-sky-400">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                            <div class="flex items-center gap-4">
+                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                                @if($v->estado === 'Pendiente')
+                                                    <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     @empty
                                         <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
@@ -331,6 +340,13 @@
                                             <div>
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $a->tipo }}</span>
+                                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                                                        {{ $a->estado === 'Aceptada' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
+                                                        {{ $a->estado === 'Rechazada' ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
+                                                        {{ $a->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
+                                                    ">
+                                                        {{ $a->estado ?? 'Pendiente' }}
+                                                    </span>
                                                 </div>
                                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                     Inicio: {{ \Carbon\Carbon::parse($a->fecha_inicio)->format('d/m/Y') }}
@@ -341,14 +357,23 @@
                                                     @endif
                                                 </p>
                                             </div>
-                                            @if($a->justificante_path)
-                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                                    </svg>
-                                                    Ver Justificante
-                                                </a>
-                                            @endif
+                                            <div class="flex items-center gap-3">
+                                                @if($a->justificante_path)
+                                                    <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                        </svg>
+                                                        Ver Justificante
+                                                    </a>
+                                                @endif
+                                                @if(($a->estado ?? 'Pendiente') === 'Pendiente')
+                                                    <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de baja médica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     @empty
                                         <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
