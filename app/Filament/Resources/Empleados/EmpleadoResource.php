@@ -220,9 +220,8 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tiene_discapacidad')
                                     ->label('¿Tiene Discapacidad?')
                                     ->html()
-                                    ->state(function ($record) {
-                                        if (!$record) return 'No';
-                                        if (!$record->tiene_discapacidad) {
+                                    ->state(function ($state, ?\App\Models\Empleado $record) {
+                                        if (!$record || !$record->tiene_discapacidad) {
                                             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
                                         }
                                         
@@ -255,9 +254,8 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
                                     ->label('¿Tiene Incapacidad?')
                                     ->html()
-                                    ->state(function ($record) {
-                                        if (!$record) return 'No';
-                                        if (!$record->tiene_incapacidad) {
+                                    ->state(function ($state, ?\App\Models\Empleado $record) {
+                                        if (!$record || !$record->tiene_incapacidad) {
                                             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
                                         }
                                         
@@ -290,7 +288,7 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
-                                    ->state(function ($record) {
+                                    ->state(function ($state, ?\App\Models\Empleado $record) {
                                         if ($record && !empty($record->tipo_discapacidad)) {
                                             return $record->tipo_discapacidad;
                                         }
@@ -328,61 +326,6 @@ class EmpleadoResource extends Resource
                                     ->label('Tipo de Incapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
-
-                                \Filament\Infolists\Components\TextEntry::make('incapacidad_file')
-                                    ->label('Documento de Incapacidad')
-                                    ->visible(fn ($record) => $record && $record->tiene_incapacidad)
-                                    ->state(function ($record) {
-                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                        return $doc ? basename($doc->file_path) : null;
-                                    })
-                                    ->url(function ($record) {
-                                        $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                    })
-                                    ->openUrlInNewTab()
-                                    ->placeholder('Sin documento adjunto'),
-
-                                \Filament\Infolists\Components\TextEntry::make('resolucion_discapacidad')
-                                    ->label('Resolución de Discapacidad')
-                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
-                                    ->state(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
-                                        return $doc ? basename($doc->file_path) : null;
-                                    })
-                                    ->url(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
-                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                    })
-                                    ->openUrlInNewTab()
-                                    ->placeholder('Sin documento adjunto'),
-
-                                \Filament\Infolists\Components\TextEntry::make('dictamen_tecnico')
-                                    ->label('Dictamen técnico facultativo')
-                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
-                                    ->state(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
-                                        return $doc ? basename($doc->file_path) : null;
-                                    })
-                                    ->url(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
-                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                    })
-                                    ->openUrlInNewTab()
-                                    ->placeholder('Sin documento adjunto'),
-
-                                \Filament\Infolists\Components\TextEntry::make('certificado_discapacidad')
-                                    ->label('Certificado de discapacidad')
-                                    ->visible(fn ($record) => $record && $record->tiene_discapacidad)
-                                    ->state(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
-                                        return $doc ? basename($doc->file_path) : null;
-                                    })
-                                    ->url(function ($record) {
-                                        $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
-                                        return $doc ? route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) : null;
-                                    })
-                                    ->openUrlInNewTab()
                                     ->placeholder('Sin documento adjunto'),
                             ]),
                     ]),
