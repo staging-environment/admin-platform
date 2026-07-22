@@ -15,24 +15,34 @@ class RedirectToDefaultPanelPage
     {
         $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
-        \Illuminate\Support\Facades\Log::info("RedirectToDefaultPanelPage middleware running", [
-            'path' => $request->path(),
-            'user_email' => $user ? $user->email : null,
-            'auth_check' => auth()->check(),
-            'filament_auth_check' => \Filament\Facades\Filament::auth()->check(),
-        ]);
-
         if ($user && ($request->is('admin') || $request->is('admin/'))) {
-            $hasAdminAccess = $user->hasRole('Admin') || $user->hasRole('admin') || $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com';
+            $isAdmin = $user->hasRole('Admin') || $user->hasRole('admin') || $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
             
-            if (!$hasAdminAccess) {
-                // If it is an Employee with Ficha access, redirect them to their portal
+            if (!$isAdmin) {
+                // Check if they already checked in today
+                $empleado = \App\Models\Empleado::where('email', $user->email)->first();
+                $hasCheckedInToday = false;
+
+                if ($empleado) {
+                    $hasCheckedInToday = \App\Models\EmpleadoFichaje::where('empleado_id', $empleado->id)
+                        ->where('fecha', \Carbon\Carbon::today()->format('Y-m-d'))
+                        ->exists();
+                }
+
+                // If they haven't checked in today, they MUST go to Fichaje first
+                if (!$hasCheckedInToday) {
+                    \Illuminate\Support\Facades\Log::info("Redirecting non-admin user to check-in screen (fichaje missing today)", [
+                        'user_email' => $user->email
+                    ]);
+                    return redirect('/admin/ficha-empleado');
+                }
+
+                // If already checked in today, normal redirect logic
                 if ($user->hasRole('Empleado') && $user->can('acceder_ficha_empleado')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee to /admin/ficha-empleado");
                     return redirect('/admin/ficha-empleado');
                 }
                 
-                // If it is a Gestor with RRHH access, redirect them to Recursos Humanos
                 if ($user->can('gestion_recursos_humanos')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting gestor to /admin/recursos-humanos");
                     return redirect('/admin/recursos-humanos');
