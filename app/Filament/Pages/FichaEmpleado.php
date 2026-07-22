@@ -212,4 +212,23 @@ class FichaEmpleado extends Page
         $this->dispatch('close-modal', id: 'edit-fichaje-modal');
         $this->loadFichajes();
     }
+
+    public function deleteFichaje($id): void
+    {
+        $fichaje = EmpleadoFichaje::find($id);
+        if (!$fichaje || $fichaje->empleado_id !== $this->empleado->id) {
+            return;
+        }
+
+        $fechaFormatted = Carbon::parse($fichaje->fecha)->format('d/m/Y');
+        $fichaje->delete();
+
+        Notification::make()
+            ->title('Fichaje Eliminado')
+            ->body('El registro del día ' . $fechaFormatted . ' ha sido eliminado con éxito.')
+            ->success()
+            ->send();
+
+        $this->loadFichajes();
+    }
 }
