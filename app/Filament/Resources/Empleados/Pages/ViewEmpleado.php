@@ -294,6 +294,122 @@ class ViewEmpleado extends ViewRecord
                     }
                 })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
+            \Filament\Actions\Action::make('ver_incapacidad')
+                ->modalHeading('Documento de Incapacidad')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('7xl')
+                ->modalContent(function ($record) {
+                    $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                    if (!$doc) return null;
+                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                            </div>
+                        ");
+                    } elseif ($extension === 'pdf') {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                            </div>
+                        ");
+                    }
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='text-center p-4'>
+                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Documento</a>
+                        </div>
+                    ");
+                }),
+            \Filament\Actions\Action::make('ver_resolucion')
+                ->modalHeading('Resolución de Discapacidad')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('7xl')
+                ->modalContent(function ($record) {
+                    $doc = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
+                    if (!$doc) return null;
+                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                            </div>
+                        ");
+                    } elseif ($extension === 'pdf') {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                            </div>
+                        ");
+                    }
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='text-center p-4'>
+                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Resolución</a>
+                        </div>
+                    ");
+                }),
+            \Filament\Actions\Action::make('ver_dictamen')
+                ->modalHeading('Dictamen Técnico Facultativo')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('7xl')
+                ->modalContent(function ($record) {
+                    $doc = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
+                    if (!$doc) return null;
+                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                            </div>
+                        ");
+                    } elseif ($extension === 'pdf') {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                            </div>
+                        ");
+                    }
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='text-center p-4'>
+                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Dictamen</a>
+                        </div>
+                    ");
+                }),
+            \Filament\Actions\Action::make('ver_certificado')
+                ->modalHeading('Certificado de Discapacidad')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('7xl')
+                ->modalContent(function ($record) {
+                    $doc = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                    if (!$doc) return null;
+                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                            </div>
+                        ");
+                    } elseif ($extension === 'pdf') {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                            </div>
+                        ");
+                    }
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='text-center p-4'>
+                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Certificado</a>
+                        </div>
+                    ");
+                }),
             EditAction::make()
                 ->label('Modificar datos')
                 ->color('info'),
