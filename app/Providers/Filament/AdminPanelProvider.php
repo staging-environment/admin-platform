@@ -132,7 +132,22 @@ class AdminPanelProvider extends PanelProvider
                         "Vivir a la deriva, sentir que cada día es el primero.",
                         "Dejaré que el viento sople a mi favor, y que me lleve donde quiera, sin buscar explicación.",
                         "Me colé por la rendija de tu alma y me quedé a vivir allí.",
-                        "No quiero saber si el cielo es azul o gris, solo quiero saber si estás aquí."
+                        "No quiero saber si el cielo es azul o gris, solo quiero saber si estás aquí.",
+                        "Me pongo de puntillas y me asomo al tejado a ver pasar las nubes que tú has dibujado.",
+                        "Que no me da la gana pasar media vida buscando tu olor, que no me da la gana vivir en un mundo que no tenga color.",
+                        "A mí me gusta el viento, no sé por qué, pero me limpia la cabeza.",
+                        "Si fuera mi vida una sola canción, la cantaría contigo de principio a fin.",
+                        "Hoy es el día más hermoso de nuestra vida, el mañana no existe y el ayer ya pasó.",
+                        "Y, si cae la lluvia, que nos moje la piel; y, si sopla el viento, que nos lleve con él.",
+                        "Quiero ser tu noche y tu día, tu alegría y tu tristeza, tu sol y tu luna.",
+                        "Busco el camino que lleva al olvido, y me pierdo en tus ojos.",
+                        "No me importan los mapas si el destino eres tú.",
+                        "Y en la frontera del bien y del mal, me quedo contigo a ver qué pasa.",
+                        "Quiero que me hables de ti, del color de tus sueños, de lo que te hace feliz.",
+                        "Buscando mi destino, viviendo en diferido, sin saber dónde voy ni de dónde he venido.",
+                        "Si tú me miras, me lleno de luz; si tú me tocas, me lleno de vida.",
+                        "Y me rebelo contra el tiempo que pasa y nos roba la juventud.",
+                        "Que la vida es muy corta para vivirla con miedo."
                     ];
                     $quoteText = $quotes[array_rand($quotes)];
                     
