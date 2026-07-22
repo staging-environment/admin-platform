@@ -257,6 +257,111 @@
                 </div>
             </div>
 
+            @if(auth()->user()->can('solicitar_ver_vacaciones') || auth()->user()->can('solicitud_baja_enfermedad'))
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <!-- Vacations card -->
+                    @if(auth()->user()->can('solicitar_ver_vacaciones'))
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <span class="p-2 bg-sky-500/10 text-sky-600 rounded-lg">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </span>
+                                        Vacaciones / Permisos
+                                    </h3>
+                                    <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-vacacion-modal' })" style="background-color: #0284c7; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-sky-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                        Solicitar
+                                    </button>
+                                </div>
+
+                                <div class="py-4 max-h-[250px] overflow-y-auto space-y-3">
+                                    @forelse($vacaciones as $v)
+                                        <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $v->tipo }}</span>
+                                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                                                        {{ $v->estado === 'Aceptada' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
+                                                        {{ $v->estado === 'Rechazada' ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
+                                                        {{ $v->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
+                                                    ">
+                                                        {{ $v->estado }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
+                                                </p>
+                                            </div>
+                                            <span class="text-xs font-black text-sky-600 dark:text-sky-400">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                        </div>
+                                    @empty
+                                        <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
+                                            No tienes solicitudes de vacaciones registradas.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Absences/Sick leave card -->
+                    @if(auth()->user()->can('solicitud_baja_enfermedad'))
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <span class="p-2 bg-rose-500/10 text-rose-600 rounded-lg">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                            </svg>
+                                        </span>
+                                        Bajas Médicas
+                                    </h3>
+                                    <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-baja-modal' })" style="background-color: #e11d48; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                        Solicitar Baja
+                                    </button>
+                                </div>
+
+                                <div class="py-4 max-h-[250px] overflow-y-auto space-y-3">
+                                    @forelse($ausencias as $a)
+                                        <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $a->tipo }}</span>
+                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    Inicio: {{ \Carbon\Carbon::parse($a->fecha_inicio)->format('d/m/Y') }}
+                                                    @if($a->fecha_fin)
+                                                        | Fin: {{ \Carbon\Carbon::parse($a->fecha_fin)->format('d/m/Y') }}
+                                                    @else
+                                                        | <span class="text-rose-600 dark:text-rose-400 font-bold">Activa</span>
+                                                    @endif
+                                                </p>
+                                            </div>
+                                            @if($a->justificante_path)
+                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    Ver Justificante
+                                                </a>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
+                                            No tienes solicitudes de baja médica registradas.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <x-filament::modal id="edit-fichaje-modal" width="md">
                 <x-slot name="heading">
                     Editar Fichaje del {{ $editingFecha ? \Carbon\Carbon::parse($editingFecha)->format('d/m/Y') : '' }}
@@ -307,6 +412,81 @@
                         </x-filament::button>
                     </div>
                 </x-slot>
+            </x-filament::modal>
+
+            <!-- solicitar-vacacion-modal -->
+            <x-filament::modal id="solicitar-vacacion-modal" width="md">
+                <x-slot name="heading">
+                    Solicitar Vacaciones / Permiso
+                </x-slot>
+
+                <form wire:submit.prevent="solicitarVacacion" class="space-y-4 py-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Tipo de Solicitud</label>
+                        <select wire:model="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                            <option value="Vacaciones">Vacaciones</option>
+                            <option value="Permisos">Permiso Retribuido</option>
+                        </select>
+                        @error('vacacion_tipo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Inicio</label>
+                        <input type="date" wire:model="vacacion_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                        @error('vacacion_fecha_inicio') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Fin</label>
+                        <input type="date" wire:model="vacacion_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                        @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'solicitar-vacacion-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="info" type="submit">
+                            Enviar Solicitud
+                        </x-filament::button>
+                    </div>
+                </form>
+            </x-filament::modal>
+
+            <!-- solicitar-baja-modal -->
+            <x-filament::modal id="solicitar-baja-modal" width="md">
+                <x-slot name="heading">
+                    Solicitud de Baja Médica
+                </x-slot>
+
+                <form wire:submit.prevent="solicitarBaja" class="space-y-4 py-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Inicio de la Baja</label>
+                        <input type="date" wire:model="baja_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-rose-500 focus:ring-rose-500 shadow-sm" />
+                        @error('baja_fecha_inicio') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Finalización Estimada (Opcional)</label>
+                        <input type="date" wire:model="baja_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-rose-500 focus:ring-rose-500 shadow-sm" />
+                        @error('baja_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante Médico (PDF, Imagen)</label>
+                        <input type="file" wire:model="baja_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100" />
+                        @error('baja_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'solicitar-baja-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="danger" type="submit">
+                            Registrar Baja
+                        </x-filament::button>
+                    </div>
+                </form>
             </x-filament::modal>
         @endif
     </div>

@@ -7,9 +7,12 @@ use App\Models\Empleado;
 use App\Models\EmpleadoFichaje;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
+use Livewire\WithFileUploads;
 
 class FichaEmpleado extends Page
 {
+    use WithFileUploads;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
 
     protected static ?string $navigationLabel = 'Ficha de Empleado';
@@ -29,6 +32,19 @@ class FichaEmpleado extends Page
     public $editingHoraEntrada = null;
     public $editingHoraSalida = null;
     public $deletingFichajeId = null;
+
+    public $vacaciones = [];
+    public $ausencias = [];
+
+    // Form fields for vacations
+    public $vacacion_fecha_inicio;
+    public $vacacion_fecha_fin;
+    public $vacacion_tipo = 'Vacaciones';
+
+    // Form fields for sick leaves
+    public $baja_fecha_inicio;
+    public $baja_fecha_fin;
+    public $baja_justificante;
 
     public static function canAccess(): bool
     {
@@ -67,6 +83,8 @@ class FichaEmpleado extends Page
         $this->hora_salida = Carbon::now()->format('H:i');
 
         $this->loadFichajes();
+        $this->loadVacaciones();
+        $this->loadAusencias();
     }
 
     public function loadFichajes(): void
@@ -235,5 +253,101 @@ class FichaEmpleado extends Page
         $this->deletingFichajeId = null;
         $this->dispatch('close-modal', id: 'delete-fichaje-modal');
         $this->loadFichajes();
+    }
+
+    public function loadVacaciones(): void
+    {
+        if ($this->empleado) {
+            $this->vacaciones = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+                ->orderBy('fecha_inicio', 'desc')
+                ->get();
+        }
+    }
+
+    public function loadAusencias(): void
+    {
+        if ($this->empleado) {
+            $this->ausencias = \App\Models\EmpleadoAusencia::where('empleado_id', $this->empleado->id)
+                ->orderBy('fecha_inicio', 'desc')
+                ->get();
+        }
+    }
+
+    public function solicitarVacacion(): void
+    {
+        $this->validate([
+            'vacacion_fecha_inicio' => 'required|date|after_or_equal:today',
+            'vacacion_fecha_fin' => 'required|date|after_or_equal:vacacion_fecha_inicio',
+            'vacacion_tipo' => 'required|in:Vacaciones,Permisos',
+        ], [
+            'vacacion_fecha_inicio.required' => 'La fecha de inicio es requerida.',
+            'vacacion_fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+            'vacacion_fecha_fin.required' => 'La fecha de fin es requerida.',
+            'vacacion_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
+        ]);
+
+        $inicio = Carbon::parse($this->vacacion_fecha_inicio);
+        $fin = Carbon::parse($this->vacacion_fecha_fin);
+        $dias = $inicio->diffInDays($fin) + 1;
+
+        \App\Models\EmpleadoVacacion::create([
+            'empleado_id' => $this->empleado->id,
+            'tipo' => $this->vacacion_tipo,
+            'fecha_inicio' => $this->vacacion_fecha_inicio,
+            'fecha_fin' => $this->vacacion_fecha_fin,
+            'dias_solicitados' => $dias,
+            'estado' => 'Pendiente',
+        ]);
+
+        $this->vacacion_fecha_inicio = null;
+        $this->vacacion_fecha_fin = null;
+        $this->vacacion_tipo = 'Vacaciones';
+
+        Notification::make()
+            ->title('Solicitud de Vacaciones Enviada')
+            ->body('Tu solicitud ha sido registrada correctamente en estado Pendiente.')
+            ->success()
+            ->send();
+
+        $this->dispatch('close-modal', id: 'solicitar-vacacion-modal');
+        $this->loadVacaciones();
+    }
+
+    public function solicitarBaja(): void
+    {
+        $this->validate([
+            'baja_fecha_inicio' => 'required|date',
+            'baja_fecha_fin' => 'nullable|date|after_or_equal:baja_fecha_inicio',
+            'baja_justificante' => 'required|file|max:10240',
+        ], [
+            'baja_fecha_inicio.required' => 'La fecha de inicio de la baja es requerida.',
+            'baja_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la de inicio.',
+            'baja_justificante.required' => 'Es obligatorio subir un justificante médico.',
+            'baja_justificante.file' => 'El justificante debe ser un archivo.',
+            'baja_justificante.max' => 'El tamaño máximo del archivo es 10MB.',
+        ]);
+
+        $path = $this->baja_justificante->store('empleados/bajas', 'local');
+
+        \App\Models\EmpleadoAusencia::create([
+            'empleado_id' => $this->empleado->id,
+            'tipo' => 'Bajas médicas',
+            'fecha_inicio' => $this->baja_fecha_inicio,
+            'fecha_fin' => $this->baja_fecha_fin ?: null,
+            'justificante_path' => $path,
+        ]);
+
+        $this->baja_fecha_inicio = null;
+        $this->baja_fecha_fin = null;
+        $this->baja_justificante = null;
+
+        Notification::make()
+            ->title('Solicitud de Baja Médica Registrada')
+            ->body('Tu baja por enfermedad ha sido registrada correctamente.')
+            ->success()
+            ->send();
+
+        $this->dispatch('close-modal', id: 'solicitar-baja-modal');
+        $this->loadAusencias();
     }
 }
