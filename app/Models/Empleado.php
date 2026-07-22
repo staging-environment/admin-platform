@@ -56,12 +56,16 @@ class Empleado extends Model
                 }
             }
 
-            $user->name = $empleado->nombre . ' ' . $empleado->apellidos;
+            $isAdmin = $user->exists && ($user->hasRole('Admin') || $user->hasRole('admin'));
+
+            if (!$isAdmin) {
+                $user->name = $empleado->nombre . ' ' . $empleado->apellidos;
+            }
             $user->email = $empleado->email;
             $user->telefono = $empleado->telefono_principal;
             $user->save();
 
-            if (!$user->hasRole('Empleado')) {
+            if (!$isAdmin && !$user->hasRole('Empleado')) {
                 $user->assignRole('Empleado');
             }
         });
