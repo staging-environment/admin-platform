@@ -72,18 +72,21 @@
                                              navigator.geolocation.getCurrentPosition(
                                                  (position) => {
                                                      $wire.checkIn(position.coords.latitude, position.coords.longitude)
-                                                         .finally(() => this.loading = false);
+                                                         .then(() => { this.loading = false; })
+                                                         .catch(() => { this.loading = false; });
                                                  },
                                                  (error) => {
                                                      console.warn('Geolocation error:', error);
                                                      $wire.checkIn(null, null)
-                                                         .finally(() => this.loading = false);
+                                                         .then(() => { this.loading = false; })
+                                                         .catch(() => { this.loading = false; });
                                                  },
                                                  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                                              );
                                          } else {
                                              $wire.checkIn(null, null)
-                                                 .finally(() => this.loading = false);
+                                                 .then(() => { this.loading = false; })
+                                                 .catch(() => { this.loading = false; });
                                          }
                                      }
                                  }">
@@ -92,8 +95,9 @@
                                          <input type="time" wire:model="hora_entrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                                      </div>
                                      <button @click="doCheckIn" x-bind:disabled="loading" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                                         <span x-text="loading ? 'Obteniendo ubicación...' : 'Registrar Entrada'"></span>
+                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                                         <span x-show="!loading">Registrar Entrada</span>
+                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
                                      </button>
                                  </div>
                             @endif
@@ -142,18 +146,21 @@
                                              navigator.geolocation.getCurrentPosition(
                                                  (position) => {
                                                      $wire.checkOut(position.coords.latitude, position.coords.longitude)
-                                                         .finally(() => this.loading = false);
+                                                         .then(() => { this.loading = false; })
+                                                         .catch(() => { this.loading = false; });
                                                  },
                                                  (error) => {
                                                      console.warn('Geolocation error:', error);
                                                      $wire.checkOut(null, null)
-                                                         .finally(() => this.loading = false);
+                                                         .then(() => { this.loading = false; })
+                                                         .catch(() => { this.loading = false; });
                                                  },
                                                  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                                              );
                                          } else {
                                              $wire.checkOut(null, null)
-                                                 .finally(() => this.loading = false);
+                                                 .then(() => { this.loading = false; })
+                                                 .catch(() => { this.loading = false; });
                                          }
                                      }
                                  }">
@@ -162,8 +169,9 @@
                                          <input type="time" wire:model="hora_salida" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                                      </div>
                                      <button @click="doCheckOut" x-bind:disabled="loading" class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-600/10 hover:shadow-orange-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                                         <span x-text="loading ? 'Obteniendo ubicación...' : 'Registrar Salida'"></span>
+                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                                         <span x-show="!loading">Registrar Salida</span>
+                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
                                      </button>
                                  </div>
                             @endif
