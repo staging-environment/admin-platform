@@ -13,17 +13,14 @@ class RedirectToDefaultPanelPage
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
+        $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
-        if ($user) {
-            \Illuminate\Support\Facades\Log::info("RedirectToDefaultPanelPage middleware running", [
-                'path' => $request->path(),
-                'email' => $user->email,
-                'roles' => $user->getRoleNames()->toArray(),
-                'can_acceder_ficha' => $user->can('acceder_ficha_empleado'),
-                'is_admin' => $user->hasRole('Admin') || $user->hasRole('admin'),
-            ]);
-        }
+        \Illuminate\Support\Facades\Log::info("RedirectToDefaultPanelPage middleware running", [
+            'path' => $request->path(),
+            'user_email' => $user ? $user->email : null,
+            'auth_check' => auth()->check(),
+            'filament_auth_check' => \Filament\Facades\Filament::auth()->check(),
+        ]);
 
         if ($user && ($request->is('admin') || $request->is('admin/'))) {
             $hasAdminAccess = $user->hasRole('Admin') || $user->hasRole('admin') || $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com';
