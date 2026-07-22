@@ -30,6 +30,10 @@ class Aprobaciones extends Page
     public $selectedDocUrl = null;
     public $selectedDocType = null;
 
+    public $denyingType = null;
+    public $denyingId = null;
+    public $motivoDenegacion = '';
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -58,9 +62,12 @@ class Aprobaciones extends Page
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Clear comment inputs
+        // Clear comment inputs and modal state
         $this->comentariosVacaciones = [];
         $this->comentariosBajas = [];
+        $this->denyingType = null;
+        $this->denyingId = null;
+        $this->motivoDenegacion = '';
     }
 
     private function checkPermission(): bool
@@ -133,54 +140,106 @@ class Aprobaciones extends Page
         }
     }
 
-    public function denegarVacacion($id): void
+    public function iniciarDenegacion($id, $type): void
     {
         if (!$this->checkPermission()) return;
+        $this->denyingId = $id;
+        $this->denyingType = $type;
+        $this->motivoDenegacion = '';
+    }
 
-        $vac = EmpleadoVacacion::find($id);
-        if ($vac) {
-            $comentario = $this->comentariosVacaciones[$id] ?? null;
+    public function cancelarDenegacion(): void
+    {
+        $this->denyingId = null;
+        $this->denyingType = null;
+        $this->motivoDenegacion = '';
+    }
 
-            $vac->update([
-                'estado' => 'Rechazada',
-                'comentario_aprobador' => $comentario
-            ]);
-            
-            if ($vac->empleado && $vac->empleado->email) {
-                $user = User::where('email', $vac->empleado->email)->first();
-                if ($user) {
-                    Notification::make()
-                        ->title("Solicitud de Vacaciones Rechazada")
-                        ->body("Tu solicitud de vacaciones del " . Carbon::parse($vac->fecha_inicio)->format('d/m/Y') . " al " . Carbon::parse($vac->fecha_fin)->format('d/m/Y') . " ha sido rechazada.")
-                        ->icon('heroicon-o-x-circle')
-                        ->iconColor('danger')
-                        ->sendToDatabase($user);
+    public function confirmarDenegacion(): void
+    {
+        if (!$this->checkPermission()) return;
+        if (!$this->denyingId || !$this->denyingType) return;
+
+        if ($this->denyingType === 'vacacion') {
+            $vac = EmpleadoVacacion::find($this->denyingId);
+            if ($vac) {
+                $vac->update([
+                    'estado' => 'Rechazada',
+                    'comentario_aprobador' => $this->motivoDenegacion
+                ]);
+
+                if ($vac->empleado && $vac->empleado->email) {
+                    $user = User::where('email', $vac->empleado->email)->first();
+                    if ($user) {
+                        Notification::make()
+                            ->title("Solicitud de Vacaciones Rechazada")
+                            ->body("Tu solicitud de vacaciones del " . Carbon::parse($vac->fecha_inicio)->format('d/m/Y') . " al " . Carbon::parse($vac->fecha_fin)->format('d/m/Y') . " ha sido rechazada. Motivo: {$this->motivoDenegacion}")
+                            ->icon('heroicon-o-x-circle')
+                            ->iconColor('danger')
+                            ->sendToDatabase($user);
+                    }
                 }
-            }
 
-            // Email for the approver (actor)
-            $actor = auth()->user();
-            if ($actor && $actor->email && $vac->empleado) {
-                try {
-                    \Illuminate\Support\Facades\Mail::to($actor->email)->send(new \App\Mail\SolicitudEstadoMail(
-                        $vac->empleado->nombre,
-                        $vac->tipo,
-                        Carbon::parse($vac->fecha_inicio)->format('d/m/Y'),
-                        Carbon::parse($vac->fecha_fin)->format('d/m/Y'),
-                        'Rechazada',
-                        $comentario
-                    ));
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error("Error sending vacation rejection confirmation email to actor: " . $e->getMessage());
+                $actor = auth()->user();
+                if ($actor && $actor->email && $vac->empleado) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($actor->email)->send(new \App\Mail\SolicitudEstadoMail(
+                            $vac->empleado->nombre,
+                            $vac->tipo,
+                            Carbon::parse($vac->fecha_inicio)->format('d/m/Y'),
+                            Carbon::parse($vac->fecha_fin)->format('d/m/Y'),
+                            'Rechazada',
+                            $this->motivoDenegacion
+                        ));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Error sending vacation rejection email: " . $e->getMessage());
+                    }
                 }
-            }
 
-            Notification::make()
-                ->title('Vacaciones Denegadas')
-                ->success()
-                ->send();
-            $this->loadPendientes();
+                Notification::make()->title('Vacaciones Denegadas')->success()->send();
+            }
+        } else {
+            $baja = EmpleadoAusencia::find($this->denyingId);
+            if ($baja) {
+                $baja->update([
+                    'estado' => 'Rechazada',
+                    'comentario_aprobador' => $this->motivoDenegacion
+                ]);
+
+                if ($baja->empleado && $baja->empleado->email) {
+                    $user = User::where('email', $baja->empleado->email)->first();
+                    if ($user) {
+                        Notification::make()
+                            ->title("Solicitud de Baja Médica Rechazada")
+                            ->body("Tu solicitud de baja médica iniciada el " . Carbon::parse($baja->fecha_inicio)->format('d/m/Y') . " ha sido rechazada. Motivo: {$this->motivoDenegacion}")
+                            ->icon('heroicon-o-x-circle')
+                            ->iconColor('danger')
+                            ->sendToDatabase($user);
+                    }
+                }
+
+                $actor = auth()->user();
+                if ($actor && $actor->email && $baja->empleado) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($actor->email)->send(new \App\Mail\SolicitudEstadoMail(
+                            $baja->empleado->nombre,
+                            'Bajas médicas',
+                            Carbon::parse($baja->fecha_inicio)->format('d/m/Y'),
+                            $baja->fecha_fin ? Carbon::parse($baja->fecha_fin)->format('d/m/Y') : null,
+                            'Rechazada',
+                            $this->motivoDenegacion
+                        ));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Error sending absence rejection email: " . $e->getMessage());
+                    }
+                }
+
+                Notification::make()->title('Baja Médica Denegada')->success()->send();
+            }
         }
+
+        $this->cancelarDenegacion();
+        $this->loadPendientes();
     }
 
     public function aprobarBaja($id): void
@@ -233,55 +292,6 @@ class Aprobaciones extends Page
         }
     }
 
-    public function denegarBaja($id): void
-    {
-        if (!$this->checkPermission()) return;
-
-        $baja = EmpleadoAusencia::find($id);
-        if ($baja) {
-            $comentario = $this->comentariosBajas[$id] ?? null;
-
-            $baja->update([
-                'estado' => 'Rechazada',
-                'comentario_aprobador' => $comentario
-            ]);
-
-            if ($baja->empleado && $baja->empleado->email) {
-                $user = User::where('email', $baja->empleado->email)->first();
-                if ($user) {
-                    Notification::make()
-                        ->title("Solicitud de Baja Médica Rechazada")
-                        ->body("Tu solicitud de baja médica iniciada el " . Carbon::parse($baja->fecha_inicio)->format('d/m/Y') . " ha sido rechazada.")
-                        ->icon('heroicon-o-x-circle')
-                        ->iconColor('danger')
-                        ->sendToDatabase($user);
-                }
-            }
-
-            // Email for the approver (actor)
-            $actor = auth()->user();
-            if ($actor && $actor->email && $baja->empleado) {
-                try {
-                    \Illuminate\Support\Facades\Mail::to($actor->email)->send(new \App\Mail\SolicitudEstadoMail(
-                        $baja->empleado->nombre,
-                        'Bajas médicas',
-                        Carbon::parse($baja->fecha_inicio)->format('d/m/Y'),
-                        $baja->fecha_fin ? Carbon::parse($baja->fecha_fin)->format('d/m/Y') : null,
-                        'Rechazada',
-                        $comentario
-                    ));
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error("Error sending absence rejection confirmation email to actor: " . $e->getMessage());
-                }
-            }
-
-            Notification::make()
-                ->title('Baja Médica Denegada')
-                ->success()
-                ->send();
-            $this->loadPendientes();
-        }
-    }
 
     public function showDocument($path): void
     {

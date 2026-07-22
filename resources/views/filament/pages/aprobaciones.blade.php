@@ -54,10 +54,10 @@
                                         <button type="button" wire:click="aprobarVacacion({{ $vac->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
                                             Aprobar
                                         </button>
-                                        <button type="button" wire:click="denegarVacacion({{ $vac->id }})" style="background-color: #dc2626; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-red-700">
-                                            Denegar
-                                        </button>
-                                    </div>
+                                         <button type="button" wire:click="iniciarDenegacion({{ $vac->id }}, 'vacacion')" style="background-color: #dc2626; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-red-700">
+                                             Denegar
+                                         </button>
+                                     </div>
                                 </td>
                             </tr>
                         @empty
@@ -138,10 +138,10 @@
                                         <button type="button" wire:click="aprobarBaja({{ $baja->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
                                             Aprobar
                                         </button>
-                                        <button type="button" wire:click="denegarBaja({{ $baja->id }})" style="background-color: #dc2626; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-red-700">
-                                            Denegar
-                                        </button>
-                                    </div>
+                                         <button type="button" wire:click="iniciarDenegacion({{ $baja->id }}, 'baja')" style="background-color: #dc2626; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-red-700">
+                                             Denegar
+                                         </button>
+                                     </div>
                                 </td>
                             </tr>
                         @empty
@@ -177,6 +177,44 @@
                 @else
                     <img src="{{ $selectedDocUrl }}" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-md border border-gray-200 dark:border-white/5" />
                 @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Denial Reason Modal -->
+    @if($denyingId)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="cancelarDenegacion">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-lg overflow-hidden transform transition-all">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Denegar Solicitud</h3>
+                <button type="button" wire:click="cancelarDenegacion" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Por favor, introduce el motivo de la denegación de la solicitud. Este motivo se guardará en el registro y se le enviará por correo electrónico al empleado.
+                </p>
+                <div>
+                    <label for="motivoDenegacion" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Motivo de Denegación</label>
+                    <textarea id="motivoDenegacion" wire:model="motivoDenegacion" rows="4" placeholder="Escribe el motivo aquí..." class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-red-500 focus:ring-red-500 shadow-sm py-2 px-3"></textarea>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
+                <button type="button" wire:click="cancelarDenegacion" class="px-4 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    Cancelar
+                </button>
+                <button type="button" wire:click="confirmarDenegacion" style="background-color: #dc2626; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-red-700">
+                    Confirmar Denegación
+                </button>
             </div>
         </div>
     </div>
