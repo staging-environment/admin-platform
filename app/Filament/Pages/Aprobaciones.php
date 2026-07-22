@@ -60,8 +60,29 @@ class Aprobaciones extends Page
         $this->comentariosBajas = [];
     }
 
+    private function checkPermission(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+
+        $user->load('roles', 'permissions');
+        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1 || $user->hasRole('Admin') || $user->can('aprobacion_vacaciones_bajas')) {
+            return true;
+        }
+
+        Notification::make()
+            ->title('Acceso Denegado')
+            ->body('No tienes permisos para realizar esta acción.')
+            ->danger()
+            ->send();
+
+        return false;
+    }
+
     public function aprobarVacacion($id): void
     {
+        if (!$this->checkPermission()) return;
+
         $vac = EmpleadoVacacion::find($id);
         if ($vac) {
             $comentario = $this->comentariosVacaciones[$id] ?? null;
@@ -111,6 +132,8 @@ class Aprobaciones extends Page
 
     public function denegarVacacion($id): void
     {
+        if (!$this->checkPermission()) return;
+
         $vac = EmpleadoVacacion::find($id);
         if ($vac) {
             $comentario = $this->comentariosVacaciones[$id] ?? null;
@@ -159,6 +182,8 @@ class Aprobaciones extends Page
 
     public function aprobarBaja($id): void
     {
+        if (!$this->checkPermission()) return;
+
         $baja = EmpleadoAusencia::find($id);
         if ($baja) {
             $comentario = $this->comentariosBajas[$id] ?? null;
@@ -207,6 +232,8 @@ class Aprobaciones extends Page
 
     public function denegarBaja($id): void
     {
+        if (!$this->checkPermission()) return;
+
         $baja = EmpleadoAusencia::find($id);
         if ($baja) {
             $comentario = $this->comentariosBajas[$id] ?? null;

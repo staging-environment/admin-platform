@@ -1,10 +1,5 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <!-- Banner -->
-        <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl text-white shadow-md">
-            <h2 class="text-2xl font-black">Centro de Aprobaciones</h2>
-            <p class="text-sm opacity-90 mt-1">Gestiona y aprueba de forma centralizada las solicitudes de vacaciones y justificaciones de bajas médicas de la plantilla.</p>
-        </div>
 
         <!-- Vacations Section -->
         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
