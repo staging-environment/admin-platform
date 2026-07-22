@@ -139,9 +139,47 @@
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold bg-white/95 text-slate-800 backdrop-blur-md px-5 py-2.5 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-lg">
                             IR AL PANEL
                         </a>
-                        <a href="{{ route('logout') }}" class="text-xs font-bold bg-red-600/90 text-white backdrop-blur-md px-5 py-2.5 rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg">
-                            CERRAR SESIÓN
-                        </a>
+                        <div x-data="{ open: false }" class="relative" @click.outside="open = false">
+                            <button @click="open = !open" class="text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full hover:bg-white hover:text-slate-800 transition-all duration-300 shadow-lg flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span>{{ explode(' ', auth()->user()->name)[0] }}</span>
+                                <svg class="w-3.5 h-3.5 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-48 bg-slate-900/95 backdrop-blur-lg border border-white/10 rounded-2xl shadow-2xl py-2 z-50"
+                                 style="display: none;">
+                                 
+                                <div class="px-4 py-2 border-b border-white/10">
+                                    <p class="text-[10px] uppercase tracking-wider text-gray-400">Usuario conectado</p>
+                                    <p class="text-xs font-bold text-white truncate">{{ auth()->user()->email }}</p>
+                                </div>
+                                
+                                <a href="{{ url('/profile') }}" class="flex items-center gap-2 px-4 py-2.5 text-xs text-gray-200 hover:bg-white/10 hover:text-white transition-colors">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    Mi Perfil
+                                </a>
+                                
+                                <a href="{{ route('logout') }}" class="flex items-center gap-2 px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors border-t border-white/5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}" class="text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full hover:bg-white hover:text-slate-800 transition-all duration-300 shadow-lg">
                             ACCEDER
