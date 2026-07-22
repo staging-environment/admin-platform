@@ -86,7 +86,7 @@ class FichaEmpleado extends Page
             ->get();
     }
 
-    public function checkIn(): void
+    public function checkIn($latitude = null, $longitude = null): void
     {
         if (!$this->empleado) {
             Notification::make()
@@ -111,6 +111,8 @@ class FichaEmpleado extends Page
             [
                 'hora_entrada' => $this->hora_entrada,
                 'server_checkin_at' => Carbon::now(),
+                'checkin_latitude' => $latitude,
+                'checkin_longitude' => $longitude,
             ]
         );
 
@@ -123,7 +125,7 @@ class FichaEmpleado extends Page
         $this->loadFichajes();
     }
 
-    public function checkOut(): void
+    public function checkOut($latitude = null, $longitude = null): void
     {
         if (!$this->empleado) {
             Notification::make()
@@ -156,6 +158,8 @@ class FichaEmpleado extends Page
         $fichaje->update([
             'hora_salida' => $this->hora_salida,
             'server_checkout_at' => Carbon::now(),
+            'checkout_latitude' => $latitude,
+            'checkout_longitude' => $longitude,
         ]);
 
         Notification::make()
