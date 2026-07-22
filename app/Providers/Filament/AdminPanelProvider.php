@@ -67,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\RedirectToDefaultPanelPage::class,
             ])
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
