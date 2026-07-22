@@ -69,6 +69,9 @@
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
                             'editar_documentacion_empleados' => 'Editar Documentación de Empleados',
+                        ],
+                        'LANDING / PORTAL EMPLEADO' => [
+                            'acceder_ficha_empleado' => 'Acceder a la ficha del empleado',
                         ]
                     ];
 
