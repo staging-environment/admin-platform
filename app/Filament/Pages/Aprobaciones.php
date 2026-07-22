@@ -27,6 +27,9 @@ class Aprobaciones extends Page
     public $comentariosVacaciones = [];
     public $comentariosBajas = [];
 
+    public $selectedDocUrl = null;
+    public $selectedDocType = null;
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -278,5 +281,22 @@ class Aprobaciones extends Page
                 ->send();
             $this->loadPendientes();
         }
+    }
+
+    public function showDocument($path): void
+    {
+        $this->selectedDocUrl = route('admin.recursos_humanos.ver_archivo', ['path' => $path]);
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if ($ext === 'pdf') {
+            $this->selectedDocType = 'pdf';
+        } else {
+            $this->selectedDocType = 'image';
+        }
+    }
+
+    public function closeDocument(): void
+    {
+        $this->selectedDocUrl = null;
+        $this->selectedDocType = null;
     }
 }

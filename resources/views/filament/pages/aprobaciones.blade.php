@@ -120,12 +120,12 @@
                                 </td>
                                 <td class="py-4 px-4">
                                     @if($baja->justificante_path)
-                                        <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $baja->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline">
+                                        <button type="button" wire:click="showDocument('{{ $baja->justificante_path }}')" class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
                                             Ver Documento
-                                        </a>
+                                        </button>
                                     @else
                                         <span class="text-xs text-gray-400 italic">No adjuntado</span>
                                     @endif
@@ -156,4 +156,29 @@
             </div>
         </div>
     </div>
+
+    @if($selectedDocUrl)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="closeDocument">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Justificante Médico</h3>
+                <button type="button" wire:click="closeDocument" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 overflow-y-auto flex-grow flex items-center justify-center bg-gray-50 dark:bg-gray-950/30">
+                @if($selectedDocType === 'pdf')
+                    <iframe src="{{ $selectedDocUrl }}" class="w-full h-[70vh] rounded-2xl border-0 bg-white shadow-inner"></iframe>
+                @else
+                    <img src="{{ $selectedDocUrl }}" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-md border border-gray-200 dark:border-white/5" />
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
 </x-filament-panels::page>
