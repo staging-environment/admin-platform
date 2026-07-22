@@ -89,6 +89,11 @@ class Empleado extends Model
         return $this->hasMany(EmpleadoDocumento::class);
     }
 
+    public function fichajes()
+    {
+        return $this->hasMany(EmpleadoFichaje::class);
+    }
+
     public function cursos()
     {
         return $this->hasMany(EmpleadoCurso::class);

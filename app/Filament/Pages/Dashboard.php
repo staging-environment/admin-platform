@@ -29,6 +29,11 @@ class Dashboard extends \Filament\Pages\Dashboard
     public function mount(): void
     {
         $user = auth()->user();
+        if ($user && $user->hasRole('Empleado') && $user->can('acceder_ficha_empleado') && !$user->hasRole('Admin') && !$user->can('ver_dashboard')) {
+            redirect()->to('/admin/ficha-empleado');
+            return;
+        }
+
         if ($user && !$user->hasRole('Admin') && !$user->can('ver_dashboard') && $user->can('gestion_recursos_humanos')) {
             redirect()->to('/admin/recursos-humanos');
             return;
@@ -75,6 +80,7 @@ class Dashboard extends \Filament\Pages\Dashboard
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
         return $user->hasRole('Admin') 
             || $user->can('ver_dashboard')
-            || $user->can('gestion_recursos_humanos');
+            || $user->can('gestion_recursos_humanos')
+            || ($user->hasRole('Empleado') && $user->can('acceder_ficha_empleado'));
     }
 }

@@ -19,6 +19,12 @@
                         </x-nav-link>
                     @endif
 
+                    @if(auth()->user()?->can('acceder_ficha_empleado'))
+                        <x-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                            Fichajes
+                        </x-nav-link>
+                    @endif
+
                     @if(auth()->user()?->can('gestion_recursos_humanos'))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="w-64">
@@ -185,6 +191,12 @@
             @if(auth()->user()?->can('ver_dashboard'))
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     Inicio
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()?->can('acceder_ficha_empleado'))
+                <x-responsive-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                    Fichajes
                 </x-responsive-nav-link>
             @endif
 
