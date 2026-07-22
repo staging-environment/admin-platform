@@ -149,6 +149,9 @@
                         <a href="{{ route('dashboard') }}" class="text-xs font-bold bg-white/95 text-slate-800 backdrop-blur-md px-5 py-2.5 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-lg">
                             IR AL PANEL
                         </a>
+                        <a href="{{ route('logout') }}" class="text-xs font-bold bg-red-600/90 text-white backdrop-blur-md px-5 py-2.5 rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg">
+                            CERRAR SESIÓN
+                        </a>
                     @else
                         <a href="{{ route('login') }}" class="text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full hover:bg-white hover:text-slate-800 transition-all duration-300 shadow-lg">
                             ACCEDER
