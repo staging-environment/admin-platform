@@ -52,7 +52,9 @@
                         <select id="filterType" wire:model.live="filterType" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3">
                             <option value="fichajes">Fichajes (Entradas/Salidas)</option>
                             <option value="vacaciones">Vacaciones Aprobadas</option>
+                            <option value="vacaciones_pendientes">Vacaciones Pendientes</option>
                             <option value="bajas">Bajas Médicas Aprobadas</option>
+                            <option value="bajas_pendientes">Bajas Médicas Pendientes</option>
                         </select>
                     </div>
 
@@ -141,7 +143,7 @@
                             </tbody>
                         </table>
                     </div>
-                @elseif($filterType === 'vacaciones')
+                @elseif($filterType === 'vacaciones' || $filterType === 'vacaciones_pendientes')
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -151,6 +153,7 @@
                                     <th class="py-3 px-4">Fecha Fin</th>
                                     <th class="py-3 px-4">Días</th>
                                     <th class="py-3 px-4">Tipo</th>
+                                    <th class="py-3 px-4">Estado</th>
                                     <th class="py-3 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -160,19 +163,30 @@
                                         <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
                                             {{ $vac->empleado ? $vac->empleado->nombre . ' ' . $vac->empleado->apellidos : 'N/A' }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium">
+                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($vac->fecha_inicio)->translatedFormat('d/m/Y') }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium">
+                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($vac->fecha_fin)->translatedFormat('d/m/Y') }}
                                         </td>
                                         <td class="py-4 px-4 text-gray-600 dark:text-gray-400 font-bold font-mono text-xs">
                                             {{ $vac->dias_solicitados }}
                                         </td>
                                         <td class="py-4 px-4">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs font-bold">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 text-xs font-bold">
                                                 {{ $vac->tipo }}
                                             </span>
+                                        </td>
+                                        <td class="py-4 px-4">
+                                            @if($vac->estado === 'Aceptada')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
+                                                    Aprobada
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
+                                                    Pendiente
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="py-4 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $vac->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
@@ -185,8 +199,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
-                                            No hay registros de vacaciones aprobadas para el filtro seleccionado.
+                                        <td colspan="7" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                            No hay registros de vacaciones para el filtro seleccionado.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -202,6 +216,7 @@
                                     <th class="py-3 px-4">Fecha Inicio</th>
                                     <th class="py-3 px-4">Fecha Fin Prevista</th>
                                     <th class="py-3 px-4">Justificante</th>
+                                    <th class="py-3 px-4">Estado</th>
                                     <th class="py-3 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -211,10 +226,10 @@
                                         <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
                                             {{ $baja->empleado ? $baja->empleado->nombre . ' ' . $baja->empleado->apellidos : 'N/A' }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium">
+                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($baja->fecha_inicio)->translatedFormat('d/m/Y') }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium">
+                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ $baja->fecha_fin ? \Carbon\Carbon::parse($baja->fecha_fin)->translatedFormat('d/m/Y') : 'No definida' }}
                                         </td>
                                         <td class="py-4 px-4">
@@ -229,6 +244,17 @@
                                                 <span class="text-xs text-gray-400 italic">No adjuntado</span>
                                             @endif
                                         </td>
+                                        <td class="py-4 px-4">
+                                            @if($baja->estado === 'Aceptada')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
+                                                    Aprobada
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
+                                                    Pendiente
+                                                </span>
+                                            @endif
+                                        </td>
                                         <td class="py-4 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $baja->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Ver Ficha / Fichajes
@@ -240,8 +266,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
-                                            No hay registros de bajas médicas aprobadas para el filtro seleccionado.
+                                        <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                            No hay registros de bajas médicas para el filtro seleccionado.
                                         </td>
                                     </tr>
                                 @endforelse

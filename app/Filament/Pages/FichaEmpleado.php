@@ -137,8 +137,9 @@ class FichaEmpleado extends Page
                     ->get();
                 $this->todasLasVacaciones = [];
                 $this->todasLasBajas = [];
-            } elseif ($this->filterType === 'vacaciones') {
-                $query = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', 'Aceptada');
+            } elseif ($this->filterType === 'vacaciones' || $this->filterType === 'vacaciones_pendientes') {
+                $estado = $this->filterType === 'vacaciones' ? 'Aceptada' : 'Pendiente';
+                $query = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', $estado);
 
                 if ($this->filterDate) {
                     $query->where('fecha_inicio', '<=', $this->filterDate)
@@ -158,8 +159,9 @@ class FichaEmpleado extends Page
                     ->get();
                 $this->todosLosFichajes = [];
                 $this->todasLasBajas = [];
-            } elseif ($this->filterType === 'bajas') {
-                $query = \App\Models\EmpleadoAusencia::with('empleado')->where('estado', 'Aceptada');
+            } elseif ($this->filterType === 'bajas' || $this->filterType === 'bajas_pendientes') {
+                $estado = $this->filterType === 'bajas' ? 'Aceptada' : 'Pendiente';
+                $query = \App\Models\EmpleadoAusencia::with('empleado')->where('estado', $estado);
 
                 if ($this->filterDate) {
                     $query->where('fecha_inicio', '<=', $this->filterDate)
