@@ -238,8 +238,8 @@ class EmpleadoResource extends Resource
                                             if ($doc && !empty($doc->file_path)) {
                                                 $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
                                                 $iconsHtml .= '
-                                                    <a href="' . $url . '" target="_blank" title="Ver ' . $label . ' Discapacidad" class="inline-flex items-center justify-center p-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md transition-all">
-                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <a href="' . $url . '" target="_blank" title="Ver ' . $label . ' Discapacidad" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: #0891b2; transition: all 0.2s;" class="hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md">
+                                                        <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                         </svg>
@@ -248,7 +248,7 @@ class EmpleadoResource extends Resource
                                             }
                                         }
                                         
-                                        return '<div class="flex items-center gap-1.5">' . $badge . $iconsHtml . '</div>';
+                                        return '<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconsHtml . '</div>';
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
@@ -266,8 +266,8 @@ class EmpleadoResource extends Resource
                                         if ($doc && !empty($doc->file_path)) {
                                             $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
                                             $iconHtml = '
-                                                <a href="' . $url . '" target="_blank" title="Ver Documento Incapacidad" class="inline-flex items-center justify-center p-1 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md transition-all">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <a href="' . $url . '" target="_blank" title="Ver Documento Incapacidad" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: #0891b2; transition: all 0.2s;" class="hover:bg-cyan-50 dark:hover:bg-cyan-950/20 rounded-md">
+                                                    <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
@@ -275,7 +275,7 @@ class EmpleadoResource extends Resource
                                             ';
                                         }
                                         
-                                        return '<div class="flex items-center gap-1.5">' . $badge . $iconHtml . '</div>';
+                                        return '<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>';
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
