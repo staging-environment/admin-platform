@@ -281,13 +281,6 @@ class EmpleadoResource extends Resource
                                         return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>');
                                     }),
 
-                                \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')
-                                    ->label('Estado Global')
-                                    ->badge()
-                                    ->color(fn ($record) => ($record?->tiene_discapacidad || $record?->tiene_incapacidad) ? 'warning' : 'success')
-                                    ->state(fn ($record) => ($record?->tiene_discapacidad || $record?->tiene_incapacidad) ? 'Registrada' : 'Sin discapacidad ni incapacidad')
-                                    ->columnSpan(2),
-
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
