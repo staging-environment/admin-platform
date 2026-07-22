@@ -514,6 +514,12 @@
                         </span>
                         Historial de Fichajes (Últimos 30 días)
                     </h3>
+                    <button type="button" wire:click="abrirFichajeRetroactivoNuevaFecha" style="background-color: #d97706; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-amber-750 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Fichaje Retroactivo
+                    </button>
                 </div>
 
                 <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-white/5">
@@ -975,10 +981,18 @@
                 <!-- Header -->
                 <div class="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg font-bold">Registrar Fichaje Faltante</h3>
-                        <p class="text-xs text-amber-100 mt-0.5">
-                            Fecha: {{ \Carbon\Carbon::parse($selectedRetroactiveDate)->translatedFormat('l, d \d\e F \d\e Y') }}
-                        </p>
+                        <h3 class="text-lg font-bold">
+                            @if($isCreatingNewRetroactive)
+                                Registrar Fichaje Retroactivo
+                            @else
+                                Registrar Fichaje Faltante
+                            @endif
+                        </h3>
+                        @if(!$isCreatingNewRetroactive)
+                            <p class="text-xs text-amber-100 mt-0.5">
+                                Fecha: {{ \Carbon\Carbon::parse($selectedRetroactiveDate)->translatedFormat('l, d \d\e F \d\e Y') }}
+                            </p>
+                        @endif
                     </div>
                     <button type="button" wire:click="cerrarFichajeRetroactivo" class="text-white hover:text-amber-100 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -990,6 +1004,12 @@
                 <!-- Body -->
                 <div class="p-6 space-y-4">
                     <div class="space-y-4">
+                        @if($isCreatingNewRetroactive)
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Selecciona Fecha <span class="text-red-500">*</span></label>
+                                <input type="date" max="{{ \Carbon\Carbon::today()->format('Y-m-d') }}" wire:model.live="retroactive_fecha" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-semibold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                            </div>
+                        @endif
                         <div>
                             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Entrada <span class="text-red-500">*</span></label>
                             <input type="time" wire:model="retroactive_hora_entrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />

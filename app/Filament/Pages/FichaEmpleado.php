@@ -51,6 +51,8 @@ class FichaEmpleado extends Page
     public $selectedRetroactiveDate = null;
     public $retroactive_hora_entrada = null;
     public $retroactive_hora_salida = null;
+    public $isCreatingNewRetroactive = false;
+    public $retroactive_fecha = null;
 
     // Form fields for vacations
     public $vacacion_fecha_inicio;
@@ -584,7 +586,9 @@ class FichaEmpleado extends Page
 
     public function abrirFichajeRetroactivo($date): void
     {
+        $this->isCreatingNewRetroactive = false;
         $this->selectedRetroactiveDate = $date;
+        $this->retroactive_fecha = $date;
         $existing = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', $date)
             ->first();
@@ -598,11 +602,39 @@ class FichaEmpleado extends Page
         }
     }
 
+    public function abrirFichajeRetroactivoNuevaFecha(): void
+    {
+        $this->isCreatingNewRetroactive = true;
+        $this->selectedRetroactiveDate = Carbon::yesterday()->format('Y-m-d');
+        $this->retroactive_fecha = Carbon::yesterday()->format('Y-m-d');
+        $this->retroactive_hora_entrada = null;
+        $this->retroactive_hora_salida = null;
+    }
+
+    public function updatedRetroactiveFecha($value): void
+    {
+        if ($value) {
+            $existing = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+                ->where('fecha', $value)
+                ->first();
+
+            if ($existing) {
+                $this->retroactive_hora_entrada = $existing->hora_entrada ? Carbon::parse($existing->hora_entrada)->format('H:i') : null;
+                $this->retroactive_hora_salida = $existing->hora_salida ? Carbon::parse($existing->hora_salida)->format('H:i') : null;
+            } else {
+                $this->retroactive_hora_entrada = null;
+                $this->retroactive_hora_salida = null;
+            }
+        }
+    }
+
     public function cerrarFichajeRetroactivo(): void
     {
         $this->selectedRetroactiveDate = null;
+        $this->retroactive_fecha = null;
         $this->retroactive_hora_entrada = null;
         $this->retroactive_hora_salida = null;
+        $this->isCreatingNewRetroactive = false;
     }
 
     public function guardarFichajeRetroactivo(): void
@@ -617,26 +649,29 @@ class FichaEmpleado extends Page
         }
 
         $this->validate([
+            'retroactive_fecha' => 'required|date|before_or_equal:today',
             'retroactive_hora_entrada' => 'required|date_format:H:i',
             'retroactive_hora_salida' => 'nullable|date_format:H:i',
         ]);
 
+        $fecha = $this->retroactive_fecha;
+
         EmpleadoFichaje::updateOrCreate(
             [
                 'empleado_id' => $this->empleado->id,
-                'fecha' => $this->selectedRetroactiveDate,
+                'fecha' => $fecha,
             ],
             [
                 'hora_entrada' => $this->retroactive_hora_entrada,
                 'hora_salida' => $this->retroactive_hora_salida,
-                'server_checkin_at' => Carbon::parse($this->selectedRetroactiveDate . ' ' . $this->retroactive_hora_entrada),
-                'server_checkout_at' => $this->retroactive_hora_salida ? Carbon::parse($this->selectedRetroactiveDate . ' ' . $this->retroactive_hora_salida) : null,
+                'server_checkin_at' => Carbon::parse($fecha . ' ' . $this->retroactive_hora_entrada),
+                'server_checkout_at' => $this->retroactive_hora_salida ? Carbon::parse($fecha . ' ' . $this->retroactive_hora_salida) : null,
             ]
         );
 
         Notification::make()
             ->title('Fichaje Retroactivo Guardado')
-            ->body('Has registrado tu fichaje para el día ' . Carbon::parse($this->selectedRetroactiveDate)->format('d/m/Y') . '.')
+            ->body('Has registrado tu fichaje para el día ' . Carbon::parse($fecha)->format('d/m/Y') . '.')
             ->success()
             ->send();
 
