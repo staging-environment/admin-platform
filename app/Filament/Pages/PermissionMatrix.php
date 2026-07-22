@@ -67,11 +67,14 @@ class PermissionMatrix extends Page
     public function togglePermission($roleId, $permissionId): void
     {
         $role = Role::find($roleId);
+        $permission = Permission::find($permissionId);
 
-        if ($role->hasPermissionTo($permissionId)) {
-            $role->revokePermissionTo($permissionId);
-        } else {
-            $role->givePermissionTo($permissionId);
+        if ($role && $permission) {
+            if ($role->hasPermissionTo($permission)) {
+                $role->revokePermissionTo($permission);
+            } else {
+                $role->givePermissionTo($permission);
+            }
         }
 
         // Limpiar la caché de permisos de Spatie

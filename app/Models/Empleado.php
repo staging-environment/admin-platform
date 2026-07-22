@@ -29,6 +29,13 @@ class Empleado extends Model
 
     protected static function booted()
     {
+        static::saving(function ($empleado) {
+            if (array_key_exists('password', $empleado->attributes)) {
+                $empleado->password = $empleado->attributes['password'];
+                unset($empleado->attributes['password']);
+            }
+        });
+
         static::saved(function ($empleado) {
             $empleado->actualizarAlertas();
 
