@@ -202,12 +202,6 @@ class EmpleadoResource extends Resource
                                             })
                                     )
                                     ->columnSpan(2),
-                                \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
-                                    ->label('Vencimiento de Contrato')
-                                    ->date('d/m/Y')
-                                    ->visible(fn ($record) => $record && $record->tipo_contrato === 'Eventual')
-                                    ->placeholder('N/A')
-                                    ->columnSpan(2),
                             ]),
                     ]),
 
