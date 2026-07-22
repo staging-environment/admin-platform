@@ -222,7 +222,7 @@ class EmpleadoResource extends Resource
                                     ->html()
                                     ->state(function (?\App\Models\Empleado $record) {
                                         if (!$record || !$record->tiene_discapacidad) {
-                                            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
+                                            return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>');
                                         }
                                         
                                         $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
@@ -248,7 +248,7 @@ class EmpleadoResource extends Resource
                                             }
                                         }
                                         
-                                        return '<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconsHtml . '</div>';
+                                        return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconsHtml . '</div>');
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
@@ -256,7 +256,7 @@ class EmpleadoResource extends Resource
                                     ->html()
                                     ->state(function (?\App\Models\Empleado $record) {
                                         if (!$record || !$record->tiene_incapacidad) {
-                                            return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
+                                            return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>');
                                         }
                                         
                                         $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Sí</span>';
@@ -275,7 +275,7 @@ class EmpleadoResource extends Resource
                                             ';
                                         }
                                         
-                                        return '<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>';
+                                        return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>');
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('sin_discapacidad_ni_incapacidad')

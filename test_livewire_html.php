@@ -25,13 +25,13 @@ try {
     echo "=== HTML contains the SVG path or eye icon? ===\n";
     echo str_contains($html, 'ver-archivo') ? "YES\n" : "NO\n";
     
-    // Print a segment of the HTML containing 'Discapacidad / Incapacidad'
-    $pos = strpos($html, 'Discapacidad / Incapacidad');
+    // Search for ¿Tiene Incapacidad? in the HTML
+    $pos = strpos($html, '¿Tiene Incapacidad?');
     if ($pos !== false) {
-        echo "=== HTML excerpt ===\n";
-        echo substr($html, $pos, 4000) . "\n";
+        echo "=== HTML excerpt for ¿Tiene Incapacidad? ===\n";
+        echo substr($html, $pos - 500, 2000) . "\n";
     } else {
-        echo "Could not find 'Discapacidad / Incapacidad' text in HTML.\n";
+        echo "Could not find '¿Tiene Incapacidad?' text in HTML.\n";
     }
 } catch (\Throwable $e) {
     echo "ERROR: " . $e->getMessage() . "\n";
