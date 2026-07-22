@@ -220,7 +220,7 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tiene_discapacidad')
                                     ->label('¿Tiene Discapacidad?')
                                     ->html()
-                                    ->state(function ($state, ?\App\Models\Empleado $record) {
+                                    ->state(function (?\App\Models\Empleado $record) {
                                         if (!$record || !$record->tiene_discapacidad) {
                                             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
                                         }
@@ -254,7 +254,7 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tiene_incapacidad')
                                     ->label('¿Tiene Incapacidad?')
                                     ->html()
-                                    ->state(function ($state, ?\App\Models\Empleado $record) {
+                                    ->state(function (?\App\Models\Empleado $record) {
                                         if (!$record || !$record->tiene_incapacidad) {
                                             return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>';
                                         }
@@ -288,7 +288,7 @@ class EmpleadoResource extends Resource
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')
                                     ->label('Tipo de Discapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_discapacidad)
-                                    ->state(function ($state, ?\App\Models\Empleado $record) {
+                                    ->state(function (?\App\Models\Empleado $record) {
                                         if ($record && !empty($record->tipo_discapacidad)) {
                                             return $record->tipo_discapacidad;
                                         }
