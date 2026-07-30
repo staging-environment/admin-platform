@@ -328,29 +328,18 @@ class EditEmpleado extends EditRecord
                         ->required(fn (Get $get) => $get('motivo_baja') === 'Otros')
                         ->visible(fn (Get $get) => $get('motivo_baja') === 'Otros')
                         ->maxLength(255),
-                    DatePicker::make('fecha_vencimiento_contrato')
-                        ->label('Fecha de finalización del contrato')
-                        ->required(fn (Get $get) => $get('motivo_baja') === 'Finalización de contrato')
-                        ->visible(fn (Get $get) => $get('motivo_baja') === 'Finalización de contrato')
-                        ->default(fn ($record) => $record->fecha_vencimiento_contrato ?? now()),
                     DatePicker::make('fecha_baja')
                         ->label('Fecha de baja')
                         ->default(now())
                         ->required(),
                 ])
                 ->action(function ($record, array $data) {
-                    $updateData = [
+                    $record->update([
                         'estado' => 'Baja',
                         'motivo_baja' => $data['motivo_baja'],
                         'observaciones_baja' => $data['motivo_baja'] === 'Otros' ? $data['observaciones_baja'] : null,
                         'fecha_baja' => $data['fecha_baja'],
-                    ];
-
-                    if ($data['motivo_baja'] === 'Finalización de contrato' && isset($data['fecha_vencimiento_contrato'])) {
-                        $updateData['fecha_vencimiento_contrato'] = $data['fecha_vencimiento_contrato'];
-                    }
-
-                    $record->update($updateData);
+                    ]);
 
                     \Filament\Notifications\Notification::make()
                         ->title('Empleado dado de baja correctamente')

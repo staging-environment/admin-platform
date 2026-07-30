@@ -313,13 +313,7 @@ class EmpleadoResource extends Resource
                                     ->placeholder('No registrado'),
                                 \Filament\Infolists\Components\TextEntry::make('observaciones_baja')
                                     ->label('Observaciones / Detalles')
-                                    ->placeholder('Ninguna')
-                                    ->visible(fn ($record) => $record->motivo_baja === 'Otros'),
-                                \Filament\Infolists\Components\TextEntry::make('fecha_vencimiento_contrato')
-                                    ->label('Fecha finalización de contrato')
-                                    ->date('d/m/Y')
-                                    ->placeholder('No registrada')
-                                    ->visible(fn ($record) => $record->motivo_baja === 'Finalización de contrato'),
+                                    ->placeholder('Ninguna'),
                             ]),
                     ]),
 
