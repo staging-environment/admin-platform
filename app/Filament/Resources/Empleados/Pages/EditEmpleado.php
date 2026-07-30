@@ -60,8 +60,9 @@ class EditEmpleado extends EditRecord
                 ->label('Formación')
                 ->icon('heroicon-o-academic-cap')
                 ->color(function ($record) {
-                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos'])->exists();
+                    $hasCursos = $record->cursos()->exists();
+                    return ($hasDocs || $hasCursos) ? 'warning' : 'danger';
                 })
                 ->modalHeading('Documentos Formación')
                 ->modalSubmitAction(false)
@@ -119,7 +120,7 @@ class EditEmpleado extends EditRecord
                             TextInput::make('porcentaje_discapacidad')
                                 ->label('Porcentaje de Discapacidad')
                                 ->numeric()
-                                ->minValue(0)
+                                ->minValue(fn (Get $get) => (bool) $get('tiene_discapacidad') ? 33 : 0)
                                 ->maxValue(100)
                                 ->suffix('%')
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
@@ -295,6 +296,93 @@ class EditEmpleado extends EditRecord
                     }
                 })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction(),
+            \Filament\Actions\Action::make('darDeBaja')
+                ->label('Baja de empleado')
+                ->icon('heroicon-o-user-minus')
+                ->color('danger')
+                ->visible(fn ($record) => auth()->user()->can('dar_baja_empleado') && ($record->estado !== 'Baja'))
+                ->modalHeading(fn ($record) => "Dar de baja a " . $record->nombre . " " . $record->apellidos)
+                ->modalWidth('md')
+                ->modalSubmitActionLabel('Confirmar Baja')
+                ->form([
+                    Select::make('motivo_baja')
+                        ->label('Motivo de la baja')
+                        ->options([
+                            'Despido procedente' => 'Despido procedente',
+                            'Despido disciplinario' => 'Despido disciplinario',
+                            'Baja voluntaria' => 'Baja voluntaria',
+                            'Finalización de contrato' => 'Finalización de contrato',
+                            'Otros' => 'Otros',
+                        ])
+                        ->required()
+                        ->live(),
+                    TextInput::make('observaciones_baja')
+                        ->label('Observaciones')
+                        ->required(fn (Get $get) => $get('motivo_baja') === 'Otros')
+                        ->visible(fn (Get $get) => $get('motivo_baja') === 'Otros')
+                        ->maxLength(255),
+                    DatePicker::make('fecha_vencimiento_contrato')
+                        ->label('Fecha de finalización del contrato')
+                        ->required(fn (Get $get) => $get('motivo_baja') === 'Finalización de contrato')
+                        ->visible(fn (Get $get) => $get('motivo_baja') === 'Finalización de contrato')
+                        ->default(fn ($record) => $record->fecha_vencimiento_contrato ?? now()),
+                    DatePicker::make('fecha_baja')
+                        ->label('Fecha de baja')
+                        ->default(now())
+                        ->required(),
+                ])
+                ->action(function ($record, array $data) {
+                    $updateData = [
+                        'estado' => 'Baja',
+                        'motivo_baja' => $data['motivo_baja'],
+                        'observaciones_baja' => $data['motivo_baja'] === 'Otros' ? $data['observaciones_baja'] : null,
+                        'fecha_baja' => $data['fecha_baja'],
+                    ];
+
+                    if ($data['motivo_baja'] === 'Finalización de contrato' && isset($data['fecha_vencimiento_contrato'])) {
+                        $updateData['fecha_vencimiento_contrato'] = $data['fecha_vencimiento_contrato'];
+                    }
+
+                    $record->update($updateData);
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('Empleado dado de baja correctamente')
+                        ->success()
+                        ->send();
+
+                    $this->redirect($this->getResource()::getUrl('edit', ['record' => $record]));
+                }),
+            \Filament\Actions\Action::make('darDeAlta')
+                ->label('Dar de alta')
+                ->icon('heroicon-o-user-plus')
+                ->color('success')
+                ->visible(fn ($record) => auth()->user()->can('dar_baja_empleado') && ($record->estado === 'Baja'))
+                ->requiresConfirmation()
+                ->modalHeading(fn ($record) => "Dar de alta a " . $record->nombre . " " . $record->apellidos)
+                ->modalDescription('¿Estás seguro de que deseas dar de alta de nuevo a este empleado?')
+                ->action(function ($record) {
+                    $record->update([
+                        'estado' => 'Alta',
+                        'motivo_baja' => null,
+                        'observaciones_baja' => null,
+                        'fecha_baja' => null,
+                    ]);
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('Empleado dado de alta correctamente')
+                        ->success()
+                        ->send();
+
+                    $this->redirect($this->getResource()::getUrl('edit', ['record' => $record]));
+                }),
+            $this->getCancelFormAction(),
         ];
     }
 }

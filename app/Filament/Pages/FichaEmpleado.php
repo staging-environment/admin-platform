@@ -28,7 +28,8 @@ class FichaEmpleado extends Page
     public $todosLosFichajes = [];
     public $todasLasVacaciones = [];
     public $todasLasBajas = [];
-    public $filterDate = '';
+    public $filterDateFrom = '';
+    public $filterDateTo = '';
     public $filterSearch = '';
     public $filterType = 'fichajes'; // 'fichajes', 'vacaciones', 'bajas'
 
@@ -58,21 +59,29 @@ class FichaEmpleado extends Page
     public $vacacion_fecha_inicio;
     public $vacacion_fecha_fin;
     public $vacacion_tipo = 'Vacaciones';
+    public $permiso_justificante;
+    public $permiso_motivo;
 
     // Form fields for sick leaves
     public $baja_fecha_inicio;
     public $baja_fecha_fin;
     public $baja_justificante;
+    public $alta_fecha_fin;
+    public $alta_justificante;
+    public $activeBajaId;
 
     public static function canAccess(): bool
     {
         $user = auth()->user();
         if (!$user) return false;
         
-        $user->load('roles', 'permissions');
-        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        
-        return $user->hasRole('Admin') || $user->can('acceder_ficha_empleado');
+        return $user->hasRole('Admin') 
+            || $user->hasRole('admin') 
+            || $user->hasRole('Empleado') 
+            || $user->hasRole('empleado') 
+            || $user->can('acceder_portal_fichajes')
+            || $user->email === 'jarodriguezbonilla@gmail.com' 
+            || $user->id === 1;
     }
 
     public function mount(): void
@@ -129,8 +138,11 @@ class FichaEmpleado extends Page
             if ($this->filterType === 'fichajes') {
                 $query = EmpleadoFichaje::with('empleado');
 
-                if ($this->filterDate) {
-                    $query->where('fecha', $this->filterDate);
+                if ($this->filterDateFrom) {
+                    $query->where('fecha', '>=', $this->filterDateFrom);
+                }
+                if ($this->filterDateTo) {
+                    $query->where('fecha', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
@@ -151,9 +163,11 @@ class FichaEmpleado extends Page
                 $estado = $this->filterType === 'vacaciones' ? 'Aceptada' : 'Pendiente';
                 $query = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', $estado);
 
-                if ($this->filterDate) {
-                    $query->where('fecha_inicio', '<=', $this->filterDate)
-                          ->where('fecha_fin', '>=', $this->filterDate);
+                if ($this->filterDateFrom) {
+                    $query->where('fecha_fin', '>=', $this->filterDateFrom);
+                }
+                if ($this->filterDateTo) {
+                    $query->where('fecha_inicio', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
@@ -173,12 +187,14 @@ class FichaEmpleado extends Page
                 $estado = $this->filterType === 'bajas' ? 'Aceptada' : 'Pendiente';
                 $query = \App\Models\EmpleadoAusencia::with('empleado')->where('estado', $estado);
 
-                if ($this->filterDate) {
-                    $query->where('fecha_inicio', '<=', $this->filterDate)
-                          ->where(function($q) {
-                              $q->where('fecha_fin', '>=', $this->filterDate)
-                                ->orWhereNull('fecha_fin');
-                          });
+                if ($this->filterDateFrom) {
+                    $query->where(function($q) {
+                        $q->where('fecha_fin', '>=', $this->filterDateFrom)
+                          ->orWhereNull('fecha_fin');
+                    });
+                }
+                if ($this->filterDateTo) {
+                    $query->where('fecha_inicio', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
@@ -337,9 +353,17 @@ class FichaEmpleado extends Page
             return;
         }
 
+        // Store original values if not set yet (first edit)
+        $originalHoraEntrada = $fichaje->original_hora_entrada ?: $fichaje->hora_entrada;
+        $originalHoraSalida = $fichaje->original_hora_salida ?: $fichaje->hora_salida;
+
         $fichaje->update([
             'hora_entrada' => $this->editingHoraEntrada ?: null,
             'hora_salida' => $this->editingHoraSalida ?: null,
+            'is_edited' => true,
+            'original_hora_entrada' => $originalHoraEntrada,
+            'original_hora_salida' => $originalHoraSalida,
+            'edited_by_email' => auth()->user()->email,
         ]);
 
         Notification::make()
@@ -395,16 +419,36 @@ class FichaEmpleado extends Page
 
     public function solicitarVacacion(): void
     {
-        $this->validate([
+        $rules = [
             'vacacion_fecha_inicio' => 'required|date|after_or_equal:today',
             'vacacion_fecha_fin' => 'required|date|after_or_equal:vacacion_fecha_inicio',
             'vacacion_tipo' => 'required|in:Vacaciones,Permisos',
-        ], [
+        ];
+
+        $messages = [
             'vacacion_fecha_inicio.required' => 'La fecha de inicio es requerida.',
             'vacacion_fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
             'vacacion_fecha_fin.required' => 'La fecha de fin es requerida.',
             'vacacion_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
-        ]);
+        ];
+
+        if ($this->vacacion_tipo === 'Permisos') {
+            $rules['permiso_motivo'] = 'required|string|max:255';
+            $messages['permiso_motivo.required'] = 'Es obligatorio especificar el motivo del permiso retribuido.';
+            $messages['permiso_motivo.max'] = 'El motivo no debe superar los 255 caracteres.';
+
+            $rules['permiso_justificante'] = 'required|file|max:10240';
+            $messages['permiso_justificante.required'] = 'Es obligatorio adjuntar un documento justificante para el permiso retribuido.';
+            $messages['permiso_justificante.file'] = 'El justificante debe ser un archivo válido.';
+            $messages['permiso_justificante.max'] = 'El tamaño máximo del archivo es 10MB.';
+        }
+
+        $this->validate($rules, $messages);
+
+        $justificantePath = null;
+        if ($this->vacacion_tipo === 'Permisos' && $this->permiso_justificante) {
+            $justificantePath = $this->permiso_justificante->store('empleados/justificantes_permisos', 'local');
+        }
 
         $inicio = Carbon::parse($this->vacacion_fecha_inicio);
         $fin = Carbon::parse($this->vacacion_fecha_fin);
@@ -417,14 +461,18 @@ class FichaEmpleado extends Page
             'fecha_fin' => $this->vacacion_fecha_fin,
             'dias_solicitados' => $dias,
             'estado' => 'Pendiente',
+            'justificante_path' => $justificantePath,
+            'comentario_empleado' => $this->vacacion_tipo === 'Permisos' ? $this->permiso_motivo : null,
         ]);
 
         $this->vacacion_fecha_inicio = null;
         $this->vacacion_fecha_fin = null;
         $this->vacacion_tipo = 'Vacaciones';
+        $this->permiso_justificante = null;
+        $this->permiso_motivo = null;
 
         Notification::make()
-            ->title('Solicitud de Vacaciones Enviada')
+            ->title('Solicitud Enviada')
             ->body('Tu solicitud ha sido registrada correctamente en estado Pendiente.')
             ->success()
             ->send();
@@ -455,6 +503,7 @@ class FichaEmpleado extends Page
             'fecha_inicio' => $this->baja_fecha_inicio,
             'fecha_fin' => $this->baja_fecha_fin ?: null,
             'justificante_path' => $path,
+            'estado' => 'Aceptada',
         ]);
 
         $this->baja_fecha_inicio = null;
@@ -462,12 +511,85 @@ class FichaEmpleado extends Page
         $this->baja_justificante = null;
 
         Notification::make()
-            ->title('Solicitud de Baja Médica Registrada')
-            ->body('Tu baja por enfermedad ha sido registrada correctamente.')
+            ->title('Baja Médica Registrada')
+            ->body('Tu baja por enfermedad ha sido registrada correctamente con éxito.')
             ->success()
             ->send();
 
         $this->dispatch('close-modal', id: 'solicitar-baja-modal');
+        $this->loadAusencias();
+    }
+
+    public function abrirRegistrarAlta($bajaId): void
+    {
+        $this->activeBajaId = $bajaId;
+        $this->alta_fecha_fin = Carbon::today()->format('Y-m-d');
+        $this->dispatch('open-modal', id: 'registrar-alta-modal');
+    }
+
+    public function registrarAlta(): void
+    {
+        $this->validate([
+            'alta_fecha_fin' => 'required|date',
+            'alta_justificante' => 'required|file|max:10240',
+        ], [
+            'alta_fecha_fin.required' => 'La fecha de alta es requerida.',
+            'alta_justificante.required' => 'Es obligatorio subir el justificante médico de alta.',
+            'alta_justificante.file' => 'El justificante de alta debe ser un archivo.',
+            'alta_justificante.max' => 'El tamaño máximo del justificante de alta es 10MB.',
+        ]);
+
+        $baja = \App\Models\EmpleadoAusencia::find($this->activeBajaId);
+        if (!$baja || $baja->empleado_id !== $this->empleado->id) {
+            return;
+        }
+
+        if (Carbon::parse($this->alta_fecha_fin)->lt(Carbon::parse($baja->fecha_inicio))) {
+            Notification::make()
+                ->title('Error')
+                ->body('La fecha de alta no puede ser anterior a la fecha de inicio de la baja (' . Carbon::parse($baja->fecha_inicio)->format('d/m/Y') . ').')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $path = $this->alta_justificante->store('empleados/altas', 'local');
+
+        $baja->update([
+            'fecha_fin' => $this->alta_fecha_fin,
+            'justificante_alta_path' => $path,
+        ]);
+
+        try {
+            $admins = \App\Models\User::all()->filter(function($user) {
+                return $user->can('recibir_notificaciones_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com';
+            });
+
+            foreach ($admins as $admin) {
+                \Illuminate\Support\Facades\Mail::to($admin->email)->send(new \App\Mail\NuevaSolicitudAdminMail(
+                    "{$this->empleado->nombre} {$this->empleado->apellidos}",
+                    $this->empleado->email,
+                    'Bajas médicas (Alta)',
+                    Carbon::parse($baja->fecha_inicio)->format('d/m/Y'),
+                    Carbon::parse($this->alta_fecha_fin)->format('d/m/Y'),
+                    'El empleado ha registrado su alta médica.'
+                ));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error sending absence alta email to admins: " . $e->getMessage());
+        }
+
+        $this->activeBajaId = null;
+        $this->alta_fecha_fin = null;
+        $this->alta_justificante = null;
+
+        Notification::make()
+            ->title('Alta Médica Registrada')
+            ->body('Tu fecha y justificante de alta han sido guardados con éxito.')
+            ->success()
+            ->send();
+
+        $this->dispatch('close-modal', id: 'registrar-alta-modal');
         $this->loadAusencias();
     }
 
@@ -666,6 +788,7 @@ class FichaEmpleado extends Page
                 'hora_salida' => $this->retroactive_hora_salida,
                 'server_checkin_at' => Carbon::parse($fecha . ' ' . $this->retroactive_hora_entrada),
                 'server_checkout_at' => $this->retroactive_hora_salida ? Carbon::parse($fecha . ' ' . $this->retroactive_hora_salida) : null,
+                'is_retroactive' => true,
             ]
         );
 

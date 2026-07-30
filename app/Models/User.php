@@ -26,14 +26,14 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // Da acceso si es Admin, Gestor, si tiene el permiso ver_dashboard, o si es el email del creador, o si es Empleado con acceso a la ficha
         return $this->hasRole('Admin') 
             || $this->hasRole('admin') 
             || $this->hasRole('Gestor') 
             || $this->hasRole('gestor') 
+            || $this->hasRole('Empleado')
+            || $this->hasRole('empleado')
             || $this->email === 'jarodriguezbonilla@gmail.com'
-            || $this->can('ver_dashboard')
-            || ($this->hasRole('Empleado') && $this->can('acceder_ficha_empleado'));
+            || $this->can('ver_dashboard');
     }
 
     /**
@@ -77,8 +77,32 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
         });
 
         static::saved(function ($user) {
+            $user->load('roles');
             $empleado = \App\Models\Empleado::withTrashed()->where('email', $user->email)->first();
             
+            if ($user->hasRole('Empleado') || $user->hasRole('empleado')) {
+                if (!$empleado) {
+                    $parts = explode(' ', trim($user->name ?: 'Empleado'));
+                    $nombre = $parts[0];
+                    $apellidos = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : 'Apellidos';
+                    
+                    \App\Models\Empleado::create([
+                        'nombre' => $nombre,
+                        'apellidos' => $apellidos,
+                        'dni' => 'PENDIENTE-' . strtoupper(substr(md5($user->email), 0, 5)),
+                        'fecha_nacimiento' => '1990-01-01',
+                        'direccion' => 'Dirección pendiente',
+                        'localidad' => 'Utrera',
+                        'codigo_postal' => '41710',
+                        'provincia' => 'Sevilla',
+                        'telefono_principal' => $user->telefono ?: '600000000',
+                        'email' => $user->email,
+                    ]);
+                } else if ($empleado->trashed()) {
+                    $empleado->restore();
+                }
+            }
+
             if ($empleado && isset($user->usuario_activo)) {
                 $isActive = filter_var($user->usuario_activo, FILTER_VALIDATE_BOOLEAN);
                 if ($isActive) {

@@ -15,8 +15,7 @@ class EmpleadoVacacion extends Model
                 $empleado = $model->empleado;
                 if ($empleado) {
                     $admins = \App\Models\User::all()->filter(function($user) {
-                        $user->load('roles');
-                        return $user->hasRole('Admin') || $user->hasRole('admin') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+                        return $user->can('recibir_notificaciones_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com';
                     });
 
                     foreach ($admins as $admin) {

@@ -29,7 +29,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     public function mount(): void
     {
         $user = auth()->user();
-        if ($user && $user->hasRole('Empleado') && $user->can('acceder_ficha_empleado') && !$user->hasRole('Admin') && !$user->can('ver_dashboard')) {
+        if ($user && $user->hasRole('Empleado') && $user->can('ver_ficha_empleado') && !$user->hasRole('Admin') && !$user->can('ver_dashboard')) {
             redirect()->to('/admin/ficha-empleado');
             return;
         }

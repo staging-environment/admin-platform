@@ -21,8 +21,7 @@ class TelegramTestSendCommand extends Command
             return;
         }
 
-        $text = "🔔 <b>[PRUEBA] Alerta de cambio de precios de la competencia</b>\n";
-        $text .= "Localidad: <b>Utrera (Prueba de Envío)</b>\n\n";
+        $text = "🔔 <b>[PRUEBA] Cambio de precios Utrera</b>\n\n";
         $text .= "⛽ <b>DIÉSEL:</b>\n";
         $text .= "  1. Gasolinera Competencia A: <b>1.389 €</b>\n";
         $text .= "  2. Gasolinera Competencia B: <b>1.395 €</b>\n";

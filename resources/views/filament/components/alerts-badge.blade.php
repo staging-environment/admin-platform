@@ -4,10 +4,11 @@
         50% { opacity: 0.4; }
     }
 </style>
-<div x-data="{ open: false }" class="inline-block">
+<div x-data="{ open: false }" class="inline-flex items-center gap-2">
     @php
         $count = $record ? $record->alertas()->count() : 0;
         $alertas = $record ? $record->alertas : collect();
+        $isOnBaja = $record ? $record->ausencias()->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->exists() : false;
     @endphp
 
     @if ($count > 0)
@@ -25,6 +26,24 @@
     @else
         <div style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 24px !important; height: 24px !important; border-radius: 9999px !important; background-color: #16a34a !important; color: white !important; font-family: inherit !important; font-size: 12px !important; font-weight: bold !important; line-height: 1 !important; select-none: none !important; flex-shrink: 0 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;">
             ✓
+        </div>
+    @endif
+
+    @if($isOnBaja)
+        <div style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 8px !important; height: 24px !important; border-radius: 9999px !important; background-color: #f43f5e !important; color: white !important; font-family: inherit !important; font-size: 11px !important; font-weight: bold !important; line-height: 1 !important; flex-shrink: 0 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;" title="Actualmente de Baja Médica">
+            <svg style="width: 13px !important; height: 13px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2.5 !important;" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V9a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2zM9 7V5a2 2 0 012-2h2a2 2 0 012-2v2" />
+            </svg>
+            <span style="font-family: inherit !important; font-size: 11px !important; font-weight: 800 !important; line-height: 1 !important;">De Baja Médica</span>
+        </div>
+    @endif
+
+    @if($record && $record->estado === 'Baja')
+        <div style="position: relative !important; z-index: 30 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 8px !important; height: 24px !important; border-radius: 9999px !important; background-color: #374151 !important; color: white !important; font-family: inherit !important; font-size: 11px !important; font-weight: bold !important; line-height: 1 !important; flex-shrink: 0 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;" title="Empleado dado de Baja de la Empresa">
+            <svg style="width: 13px !important; height: 13px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2.5 !important;" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <span style="font-family: inherit !important; font-size: 11px !important; font-weight: 800 !important; line-height: 1 !important;">Dado de Baja</span>
         </div>
     @endif
 

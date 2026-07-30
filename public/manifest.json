@@ -1,0 +1,37 @@
+{
+  "name": "Utrecar",
+  "short_name": "Utrecar",
+  "description": "Plataforma de Administración y Portal de Empleado de Utrecar",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d97706",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/ronda_norte_icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/ronda_norte_icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot_mobile.png",
+      "sizes": "449x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshot_desktop.png",
+      "sizes": "1024x576",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

@@ -45,10 +45,14 @@ class SendMissingCheckinReminders extends Command
 
         $this->info("Target date to verify: {$dateStr} ({$formattedDate})");
 
-        // Load all administrators
+        // Load all administrators/notified users
         $admins = User::all()->filter(function($user) {
             $user->load('roles');
-            return $user->hasRole('Admin') || $user->hasRole('admin') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+            return $user->hasRole('Admin') 
+                || $user->hasRole('admin') 
+                || $user->email === 'jarodriguezbonilla@gmail.com' 
+                || $user->id === 1
+                || $user->can('recibir_notificaciones_recursos_humanos');
         });
 
         // Load all users

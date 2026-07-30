@@ -57,6 +57,7 @@
             animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
     </style>
+    @include('partials.pwa-tags')
 </head>
 <body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen relative overflow-x-hidden" x-data="{ tab: (window.location.pathname === '/' ? ((new URLSearchParams(window.location.search)).get('tab') === 'contacto' ? 'inicio' : ((new URLSearchParams(window.location.search)).get('tab') || 'inicio')) : ''), showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
 

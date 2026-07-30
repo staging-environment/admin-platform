@@ -14,30 +14,29 @@ class RolesTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->sortable(),
-
                 TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('guard_name')
-                    ->label('Guard'),
-
-                TextColumn::make('created_at')
-                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
+            ->actions([
+                \Filament\Actions\DeleteAction::make()
+                    ->before(function (\Filament\Actions\DeleteAction $action, $record) {
+                        $hasUsers = $record->users()->exists();
+                        if ($hasUsers) {
+                            \Filament\Notifications\Notification::make()
+                                ->danger()
+                                ->title('No se puede eliminar el rol')
+                                ->body('Existen usuarios asignados a este rol. Debe cambiar el rol o eliminar a esos usuarios antes de poder borrar el rol.')
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    })
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([]);
     }
 }

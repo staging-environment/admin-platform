@@ -20,7 +20,7 @@ class EmpleadoPolicy
      */
     public function view(User $user, Empleado $empleado): bool
     {
-        return $user->can('gestion_recursos_humanos');
+        return $user->can('gestion_recursos_humanos') || $user->can('ver_ficha_empleado');
     }
 
     /**

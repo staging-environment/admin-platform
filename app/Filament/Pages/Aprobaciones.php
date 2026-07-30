@@ -61,22 +61,12 @@ class Aprobaciones extends Page
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $this->bajasPendientes = EmpleadoAusencia::with('empleado')
-            ->where('estado', 'Pendiente')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $this->bajasPendientes = [];
 
-        $vacs = EmpleadoVacacion::with('empleado')
+        $this->historicoProcesadas = EmpleadoVacacion::with('empleado')
             ->whereIn('estado', ['Aceptada', 'Rechazada'])
-            ->get();
-
-        $bajas = EmpleadoAusencia::with('empleado')
-            ->whereIn('estado', ['Aceptada', 'Rechazada'])
-            ->get();
-
-        $this->historicoProcesadas = $vacs->concat($bajas)
-            ->sortByDesc('updated_at')
-            ->values()
+            ->orderBy('updated_at', 'desc')
+            ->get()
             ->all();
 
         // Clear comment inputs and modal state

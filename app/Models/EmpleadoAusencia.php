@@ -15,8 +15,7 @@ class EmpleadoAusencia extends Model
                 $empleado = $model->empleado;
                 if ($empleado) {
                     $admins = \App\Models\User::all()->filter(function($user) {
-                        $user->load('roles');
-                        return $user->hasRole('Admin') || $user->hasRole('admin') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+                        return $user->can('recibir_notificaciones_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com';
                     });
 
                     foreach ($admins as $admin) {
@@ -53,6 +52,14 @@ class EmpleadoAusencia extends Model
                     \Illuminate\Support\Facades\Log::error("Error sending absence state update email: " . $e->getMessage());
                 }
             }
+        });
+
+        static::saved(function ($model) {
+            $model->empleado?->actualizarAlertas();
+        });
+
+        static::deleted(function ($model) {
+            $model->empleado?->actualizarAlertas();
         });
     }
 

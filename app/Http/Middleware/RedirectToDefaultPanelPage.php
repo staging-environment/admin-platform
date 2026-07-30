@@ -38,7 +38,7 @@ class RedirectToDefaultPanelPage
                 }
 
                 // If already checked in today, normal redirect logic
-                if ($user->hasRole('Empleado') && $user->can('acceder_ficha_empleado')) {
+                if ($user->hasRole('Empleado') || $user->hasRole('empleado') || $user->can('ver_ficha_empleado')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee to /admin/ficha-empleado");
                     return redirect('/admin/ficha-empleado');
                 }

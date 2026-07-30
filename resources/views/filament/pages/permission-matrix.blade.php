@@ -62,19 +62,22 @@
                         ],
                         'Recursos Humanos / Empleados' => [
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
+                            'ver_ficha_empleado' => 'Ver Ficha de Empleado (Detalle)',
+                            'acceder_portal_fichajes' => 'Acceder al listado / portal de Fichajes',
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_eliminar_empleados' => 'Eliminar empleados',
-                            'aprobacion_vacaciones_bajas' => 'Aprobación de vacaciones / Bajas médicas',
+                            'dar_baja_empleado' => 'Dar de baja a un empleado',
+                            'aprobacion_vacaciones_bajas' => 'Aprobación de Vacaciones',
+                            'recibir_notificaciones_recursos_humanos' => 'Recibir notificaciones por correo de Recursos Humanos (bajas, altas, vacaciones y fichajes faltantes)',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
                             'editar_documentacion_empleados' => 'Editar Documentación de Empleados',
                         ],
                         'LANDING / PORTAL EMPLEADO' => [
-                            'acceder_ficha_empleado' => 'Acceder a la ficha del empleado',
                             'solicitar_ver_vacaciones' => 'Solicitar / Ver vacaciones',
-                            'solicitud_baja_enfermedad' => 'Solicitud de baja por enfermedad',
+                            'solicitud_baja_enfermedad' => 'Registrar baja o alta médica',
                         ]
                     ];
 

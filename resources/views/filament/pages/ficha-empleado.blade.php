@@ -30,14 +30,29 @@
                 </div>
 
                 <!-- Filters Section -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                    <!-- Date Filter (First position as requested: "Sobre todo la fecha que aparezca en primer lugar") -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
+                    <!-- Date Filter "Desde" -->
                     <div>
-                        <label for="filterDate" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Filtrar por Fecha</label>
+                        <label for="filterDateFrom" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Desde</label>
                         <div class="relative">
-                            <input type="date" id="filterDate" wire:model.live="filterDate" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3" />
-                            @if($filterDate)
-                                <button type="button" wire:click="$set('filterDate', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <input type="date" id="filterDateFrom" wire:model.live="filterDateFrom" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3" />
+                            @if($filterDateFrom)
+                                <button type="button" wire:click="$set('filterDateFrom', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Date Filter "Hasta" -->
+                    <div>
+                        <label for="filterDateTo" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Hasta</label>
+                        <div class="relative">
+                            <input type="date" id="filterDateTo" wire:model.live="filterDateTo" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3" />
+                            @if($filterDateTo)
+                                <button type="button" wire:click="$set('filterDateTo', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -94,7 +109,21 @@
                                             {{ $fichaje->empleado ? $fichaje->empleado->nombre . ' ' . $fichaje->empleado->apellidos : 'N/A' }}
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 dark:text-gray-300 text-xs">
-                                            {{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F \d\e Y') }}
+                                            <div class="flex flex-col">
+                                                <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F \d\e Y') }}</span>
+                                                <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
+                                                    @if($fichaje->is_retroactive)
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                            Retroactivo
+                                                        </span>
+                                                    @endif
+                                                    @if($fichaje->is_edited)
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" title="Modificado por {{ $fichaje->edited_by_email }}. Entrada original: {{ $fichaje->original_hora_entrada ? \Carbon\Carbon::parse($fichaje->original_hora_entrada)->format('H:i') : '-' }}, Salida original: {{ $fichaje->original_hora_salida ? \Carbon\Carbon::parse($fichaje->original_hora_salida)->format('H:i') : '-' }}">
+                                                            Modificado
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="py-4 px-4 text-gray-600 dark:text-gray-400">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-mono text-xs font-bold">
@@ -332,32 +361,7 @@
                 </div>
             </div>
 
-            @if(count($missingCheckInDays) > 0)
-                <!-- Missing Check-Ins Alert Banner -->
-                <div class="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-3xl flex items-start gap-4 shadow-sm animate-pulse">
-                    <div class="p-3 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-900 dark:text-amber-200">Alerta: Fichaje Faltante detectado</h3>
-                        <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                            No se ha registrado ningún fichaje en los siguientes días laborables. <strong>Haz clic en cualquier día para registrar tu fichaje de forma retroactiva</strong>:
-                        </p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                            @foreach($missingCheckInDays as $day)
-                                <button type="button" wire:click="abrirFichajeRetroactivo('{{ $day['date'] }}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-bold font-mono transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
-                                    <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                                    </svg>
-                                    {{ $day['formatted'] }}
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @endif
+
 
             <!-- Fichaje Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -537,7 +541,21 @@
                             @forelse($recentFichajes as $fichaje)
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
                                     <td class="p-4 text-sm font-bold text-gray-900 dark:text-white">
-                                        {{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F') }}
+                                        <div class="flex flex-col">
+                                            <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F') }}</span>
+                                            <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
+                                                @if($fichaje->is_retroactive)
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                        Retroactivo
+                                                    </span>
+                                                @endif
+                                                @if($fichaje->is_edited)
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" title="Modificado por {{ $fichaje->edited_by_email }}. Entrada original: {{ $fichaje->original_hora_entrada ? \Carbon\Carbon::parse($fichaje->original_hora_entrada)->format('H:i') : '-' }}, Salida original: {{ $fichaje->original_hora_salida ? \Carbon\Carbon::parse($fichaje->original_hora_salida)->format('H:i') : '-' }}">
+                                                        Modificado
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </td>
                                     <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '-' }}
@@ -664,9 +682,24 @@
                                         </span>
                                         Bajas Médicas
                                     </h3>
-                                    <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-baja-modal' })" style="background-color: #e11d48; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                        Solicitar Baja
-                                    </button>
+                                    @php
+                                        $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas médicas' && empty($a->fecha_fin));
+                                    @endphp
+                                    @if($activeBaja)
+                                        <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            Registrar Alta
+                                        </button>
+                                    @else
+                                        <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-baja-modal' })" style="background-color: #e11d48; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                            Registrar Baja
+                                        </button>
+                                    @endif
                                 </div>
 
                                 <div class="py-4 max-h-[250px] overflow-y-auto space-y-3">
@@ -698,8 +731,21 @@
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                         </svg>
-                                                        Ver Justificante
+                                                        Justificante Baja
                                                     </a>
+                                                @endif
+                                                @if($a->justificante_alta_path)
+                                                    <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_alta_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                                        </svg>
+                                                        Justificante Alta
+                                                    </a>
+                                                @endif
+                                                @if(empty($a->fecha_fin))
+                                                    <button type="button" wire:click="abrirRegistrarAlta({{ $a->id }})" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                                        Registrar Alta
+                                                    </button>
                                                 @endif
                                                 <button type="button" wire:click="verDetallesSolicitud({{ $a->id }}, 'baja')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -789,7 +835,7 @@
                 <form wire:submit.prevent="solicitarVacacion" class="space-y-4 py-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Tipo de Solicitud</label>
-                        <select wire:model="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                        <select wire:model.live="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
                             <option value="Vacaciones">Vacaciones</option>
                             <option value="Permisos">Permiso Retribuido</option>
                         </select>
@@ -808,6 +854,20 @@
                         @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
+                    @if($vacacion_tipo === 'Permisos')
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo del Permiso Retribuido</label>
+                        <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquí..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                        @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante del Permiso (PDF, Imagen)</label>
+                        <input type="file" wire:model="permiso_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
+                        @error('permiso_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+                    @endif
+
                     <div class="flex justify-end gap-3 pt-2">
                         <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'solicitar-vacacion-modal' })">
                             Cancelar
@@ -822,7 +882,7 @@
             <!-- solicitar-baja-modal -->
             <x-filament::modal id="solicitar-baja-modal" width="md">
                 <x-slot name="heading">
-                    Solicitud de Baja Médica
+                    Registrar Baja Médica
                 </x-slot>
 
                 <form wire:submit.prevent="solicitarBaja" class="space-y-4 py-4">
@@ -850,6 +910,36 @@
                         </x-filament::button>
                         <x-filament::button color="danger" type="submit">
                             Registrar Baja
+                        </x-filament::button>
+                    </div>
+                </form>
+            </x-filament::modal>
+
+            <!-- registrar-alta-modal -->
+            <x-filament::modal id="registrar-alta-modal" width="md">
+                <x-slot name="heading">
+                    Registrar Alta Médica (Fin de Baja)
+                </x-slot>
+
+                <form wire:submit.prevent="registrarAlta" class="space-y-4 py-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Finalización de la Baja (Alta)</label>
+                        <input type="date" wire:model="alta_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-emerald-500 focus:ring-emerald-500 shadow-sm" />
+                        @error('alta_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante Médico de Alta (PDF, Imagen)</label>
+                        <input type="file" wire:model="alta_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+                        @error('alta_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'registrar-alta-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="success" type="submit">
+                            Registrar Alta
                         </x-filament::button>
                     </div>
                 </form>

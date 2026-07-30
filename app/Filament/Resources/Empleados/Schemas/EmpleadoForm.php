@@ -56,7 +56,41 @@ class EmpleadoForm
                                                      ->label('DNI / NIE')
                                                      ->required()
                                                      ->unique(ignoreRecord: true)
-                                                     ->maxLength(255),
+                                                     ->maxLength(255)
+                                                     ->dehydrateStateUsing(fn ($state) => strtoupper(str_replace([' ', '-'], '', $state)))
+                                                     ->rules([
+                                                         function () {
+                                                             return function (string $attribute, $value, \Closure $fail) {
+                                                                 $clean = strtoupper(str_replace([' ', '-'], '', $value));
+                                                                 
+                                                                 if (empty($clean)) {
+                                                                     return;
+                                                                 }
+
+                                                                 if (preg_match('/^[0-9]{8}[A-Z]$/', $clean)) {
+                                                                     $number = substr($clean, 0, 8);
+                                                                     $letter = substr($clean, -1);
+                                                                 } elseif (preg_match('/^[XYZ][0-9]{7}[A-Z]$/', $clean)) {
+                                                                     $letter = substr($clean, -1);
+                                                                     $start = substr($clean, 0, 1);
+                                                                     $mid = substr($clean, 1, 7);
+                                                                     
+                                                                     $mapping = ['X' => '0', 'Y' => '1', 'Z' => '2'];
+                                                                     $number = $mapping[$start] . $mid;
+                                                                 } else {
+                                                                     $fail('El formato de DNI o NIE introducido no es válido.');
+                                                                     return;
+                                                                 }
+
+                                                                 $letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+                                                                 $calculatedLetter = $letters[intval($number) % 23];
+
+                                                                 if ($letter !== $calculatedLetter) {
+                                                                     $fail('El número de DNI o NIE no coincide con la letra de control correspondiente.');
+                                                                 }
+                                                             };
+                                                         }
+                                                     ]),
                                                  DatePicker::make('fecha_caducidad_dni')
                                                      ->label('Fecha de Caducidad DNI')
                                                      ->visible(false),
@@ -116,6 +150,56 @@ class EmpleadoForm
                                      ->required()
                                      ->unique(ignoreRecord: true)
                                      ->maxLength(255),
+                                 TextInput::make('iban')
+                                     ->label('Código IBAN')
+                                     ->required()
+                                     ->placeholder('ES00 0000 0000 0000 0000 0000')
+                                     ->dehydrateStateUsing(fn ($state) => strtoupper(str_replace(' ', '', $state)))
+                                     ->rules([
+                                         function () {
+                                             return function (string $attribute, $value, \Closure $fail) {
+                                                 $clean = strtoupper(str_replace(' ', '', $value));
+                                                 
+                                                 if (empty($clean)) {
+                                                     return;
+                                                 }
+
+                                                 // 1. Length check: between 15 and 34 characters
+                                                 $len = strlen($clean);
+                                                 if ($len < 15 || $len > 34) {
+                                                     $fail('El IBAN debe tener entre 15 y 34 caracteres.');
+                                                     return;
+                                                 }
+
+                                                 // 2. Validate format: starts with two uppercase letters followed by digits and letters
+                                                 if (!preg_match('/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/', $clean)) {
+                                                     $fail('El formato del IBAN no es válido.');
+                                                     return;
+                                                 }
+
+                                                 // 3. Mod-97 validation
+                                                 $moved = substr($clean, 4) . substr($clean, 0, 4);
+                                                 $numeric = '';
+                                                 foreach (str_split($moved) as $char) {
+                                                     if (ctype_alpha($char)) {
+                                                         $numeric .= ord($char) - ord('A') + 10;
+                                                     } else {
+                                                         $numeric .= $char;
+                                                     }
+                                                 }
+
+                                                 // Compute modulo 97 of a very large number string
+                                                 $remainder = 0;
+                                                 foreach (str_split($numeric, 7) as $chunk) {
+                                                     $remainder = intval($remainder . $chunk) % 97;
+                                                 }
+
+                                                 if ($remainder !== 1) {
+                                                     $fail('El código IBAN introducido no es válido (dígito de control incorrecto).');
+                                                 }
+                                             };
+                                         }
+                                     ]),
                                  TextInput::make('password')
                                      ->label('Contraseña de acceso')
                                      ->password()
@@ -153,7 +237,7 @@ class EmpleadoForm
                                 TextInput::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
                                     ->numeric()
-                                    ->minValue(0)
+                                    ->minValue(fn (Get $get) => (bool) $get('tiene_discapacidad') ? 33 : 0)
                                     ->maxValue(100)
                                     ->suffix('%')
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))

@@ -67,8 +67,9 @@ class ViewEmpleado extends ViewRecord
                 ->label('Formación')
                 ->icon('heroicon-o-academic-cap')
                 ->color(function ($record) {
-                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros'])->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos'])->exists();
+                    $hasCursos = $record->cursos()->exists();
+                    return ($hasDocs || $hasCursos) ? 'warning' : 'danger';
                 })
                 ->modalHeading('Documentos Formación')
                 ->modalSubmitAction(false)
@@ -126,7 +127,7 @@ class ViewEmpleado extends ViewRecord
                             TextInput::make('porcentaje_discapacidad')
                                 ->label('Porcentaje de Discapacidad')
                                 ->numeric()
-                                ->minValue(0)
+                                ->minValue(fn (Get $get) => (bool) $get('tiene_discapacidad') ? 33 : 0)
                                 ->maxValue(100)
                                 ->suffix('%')
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),

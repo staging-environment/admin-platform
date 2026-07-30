@@ -75,6 +75,7 @@ class AdminPanelProvider extends PanelProvider
                     $css = \Illuminate\Support\Facades\Blade::render("
                         @vite(['resources/css/filament-nav.css'])
                         @include('filament.custom-filepond')
+                        @include('partials.pwa-tags')
                     ");
                     if (str_contains(request()->url(), 'recursos-humanos')) {
                         $css .= "

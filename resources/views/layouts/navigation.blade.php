@@ -19,17 +19,11 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->can('acceder_ficha_empleado'))
-                        <x-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
-                            Fichajes
-                        </x-nav-link>
-                    @endif
-
-                    @if(auth()->user()?->can('gestion_recursos_humanos'))
+                    @if(auth()->user()?->canAny(['gestion_recursos_humanos', 'acceder_portal_fichajes']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="w-64">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin/recursos-humanos*') || request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
+                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin/recursos-humanos*') || request()->is('admin/ficha-empleado*') || request()->is('admin/aprobaciones*') || request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
                                         <span>{{ __('Recursos humanos') }}</span>
                                         <svg class="ms-1.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -38,9 +32,17 @@
                                 </x-slot>
  
                                 <x-slot name="content">
+                                     @if(auth()->user()?->can('acceder_portal_fichajes'))
+                                     <x-dropdown-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                                         {{ __('Fichajes') }}
+                                     </x-dropdown-link>
+                                     @endif
+
+                                     @if(auth()->user()?->can('gestion_recursos_humanos'))
                                      <x-dropdown-link href="/admin/recursos-humanos" :active="request()->is('admin/recursos-humanos*')">
                                          {{ __('Empleados') }}
                                      </x-dropdown-link>
+                                     @endif
                                      
                                      @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
                                      <x-dropdown-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
@@ -48,6 +50,7 @@
                                      </x-dropdown-link>
                                      @endif
                                     
+                                     @if(auth()->user()?->can('gestion_recursos_humanos'))
                                     <div x-data="{ openSub: {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'true' : 'false' }} }">
                                         <button @click.stop="openSub = !openSub" class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out text-start text-left">
                                             <span>{{ __('Ofertas de Empleo') }}</span>
@@ -66,6 +69,7 @@
                                             </a>
                                         </div>
                                     </div>
+                                    @endif
                                 </x-slot>
                             </x-dropdown>
                         </div>
@@ -200,27 +204,31 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->can('acceder_ficha_empleado'))
-                <x-responsive-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
-                    Fichajes
-                </x-responsive-nav-link>
-            @endif
-
-            @if(auth()->user()?->can('gestion_recursos_humanos'))
+            @if(auth()->user()?->canAny(['gestion_recursos_humanos', 'acceder_portal_fichajes']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Recursos humanos') }}
                     </div>
                     <div class="mt-2 space-y-1">
+                        @if(auth()->user()?->can('acceder_portal_fichajes'))
+                        <x-responsive-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                            {{ __('Fichajes') }}
+                        </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()?->can('gestion_recursos_humanos'))
                         <x-responsive-nav-link href="/admin/recursos-humanos" :active="request()->is('admin/recursos-humanos*')">
                             {{ __('Empleados') }}
                         </x-responsive-nav-link>
+                        @endif
 
                         @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
                         <x-responsive-nav-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
                             {{ __('Aprobación de Solicitudes') }}
                         </x-responsive-nav-link>
                         @endif
+
+                        @if(auth()->user()?->can('gestion_recursos_humanos'))
                         <div x-data="{ openSub: {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'true' : 'false' }} }">
                             <button @click="openSub = !openSub" class="w-full flex items-center justify-between ps-3 pe-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition duration-150 ease-in-out">
                                 <span>{{ __('Ofertas de Empleo') }}</span>
@@ -237,6 +245,7 @@
                                 </x-responsive-nav-link>
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
             @endif

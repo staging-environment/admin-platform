@@ -206,8 +206,7 @@ class MineturService
     {
         $localityName = self::LOCALITIES[$localityKey]['name'] ?? ucfirst($localityKey);
         
-        $text = "🔔 <b>Cambio de precios de la competencia</b>\n";
-        $text .= "Localidad: <b>{$localityName}</b>\n\n";
+        $text = "🔔 <b>Cambio de precios {$localityName}</b>\n\n";
 
         $previousHistory = Cache::get('minetur_all_prices_history', []);
 

@@ -26,6 +26,7 @@
         }
         [x-cloak] { display: none !important; }
     </style>
+    @include('partials.pwa-tags')
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased relative overflow-x-hidden" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
 

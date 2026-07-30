@@ -18,8 +18,60 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nombre de usuario (Acceso)')
                     ->required()
                     ->maxLength(255),
+
+                TextInput::make('nombre_empleado')
+                    ->label('Nombre (Ficha Empleado)')
+                    ->visible(fn ($record) => $record && \App\Models\Empleado::withTrashed()->where('email', $record->email)->exists())
+                    ->afterStateHydrated(function ($component, $record) {
+                        if ($record) {
+                            $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                            $component->state($empleado?->nombre);
+                        }
+                    })
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                        if ($empleado) {
+                            $empleado->update(['nombre' => $state]);
+                        }
+                    })
+                    ->dehydrated(false),
+
+                TextInput::make('apellidos_empleado')
+                    ->label('Apellidos (Ficha Empleado)')
+                    ->visible(fn ($record) => $record && \App\Models\Empleado::withTrashed()->where('email', $record->email)->exists())
+                    ->afterStateHydrated(function ($component, $record) {
+                        if ($record) {
+                            $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                            $component->state($empleado?->apellidos);
+                        }
+                    })
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                        if ($empleado) {
+                            $empleado->update(['apellidos' => $state]);
+                        }
+                    })
+                    ->dehydrated(false),
+
+                TextInput::make('localidad_empleado')
+                    ->label('Localidad (Ficha Empleado)')
+                    ->visible(fn ($record) => $record && \App\Models\Empleado::withTrashed()->where('email', $record->email)->exists())
+                    ->afterStateHydrated(function ($component, $record) {
+                        if ($record) {
+                            $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                            $component->state($empleado?->localidad);
+                        }
+                    })
+                    ->saveRelationshipsUsing(function ($record, $state) {
+                        $empleado = \App\Models\Empleado::withTrashed()->where('email', $record->email)->first();
+                        if ($empleado) {
+                            $empleado->update(['localidad' => $state]);
+                        }
+                    })
+                    ->dehydrated(false),
 
                 TextInput::make('email')
                     ->email()

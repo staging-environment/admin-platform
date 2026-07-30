@@ -13,6 +13,10 @@ class Empleado extends Model
 
     protected $guarded = [];
 
+    protected $attributes = [
+        'estado' => 'Alta',
+    ];
+
     protected $casts = [
         'tiene_discapacidad' => 'boolean',
         'pertenece_andalucia' => 'boolean',
@@ -24,6 +28,7 @@ class Empleado extends Model
         'fecha_vencimiento_contrato' => 'date',
         'gasolinera_codigo' => 'integer',
         'fecha_caducidad_dni' => 'date',
+        'fecha_baja' => 'date',
     ];
 
 
@@ -223,6 +228,16 @@ class Empleado extends Model
                     'descripcion' => 'La fecha de caducidad del DNI/NIE del empleado (' . $this->fecha_caducidad_dni->format('d/m/Y') . ') ha expirado.',
                 ]);
             }
+        }
+
+        // 6. Alerta: De Baja Médica
+        $isOnBaja = $this->ausencias()->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->exists();
+        if ($isOnBaja) {
+            $this->alertas()->create([
+                'tipo' => 'baja_medica',
+                'titulo' => 'De baja médica',
+                'descripcion' => 'Este empleado se encuentra actualmente en estado de baja médica.',
+            ]);
         }
     }
 }
