@@ -15,6 +15,19 @@ class RedirectToDefaultPanelPage
     {
         $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
+        if ($user) {
+            $isEmpleado = $user->hasRole('Empleado') || $user->hasRole('empleado');
+            if ($isEmpleado && \Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
+                if (!$request->is('profile*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                    \Illuminate\Support\Facades\Log::info("Redirecting employee with default password '1234' to profile page", [
+                        'user_email' => $user->email
+                    ]);
+                    session()->flash('warning', 'Por motivos de seguridad, debes cambiar tu contraseña por defecto (1234) antes de continuar.');
+                    return redirect()->route('profile.edit');
+                }
+            }
+        }
+
         if ($user && ($request->is('admin') || $request->is('admin/'))) {
             $isAdmin = $user->hasRole('Admin') || $user->hasRole('admin') || $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
             
