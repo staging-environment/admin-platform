@@ -8,6 +8,24 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
+            @if (session('status') === 'password-updated')
+                <div class="p-4 sm:p-6 bg-emerald-500/10 border-2 border-emerald-500/40 rounded-xl text-emerald-900 dark:text-emerald-200 flex items-start gap-4 shadow-md transition-all">
+                    <div class="p-2 bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-emerald-800 dark:text-emerald-300">
+                            ¡Contraseña actualizada correctamente!
+                        </h3>
+                        <p class="text-sm mt-1 text-emerald-800/90 dark:text-emerald-200/90 leading-relaxed">
+                            Tu contraseña ha sido cambiada con éxito. Ya puedes acceder y navegar libremente por la plataforma.
+                        </p>
+                    </div>
+                </div>
+            @endif
+
             @if (session('warning') || (auth()->check() && \Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password)))
                 <div class="p-4 sm:p-6 bg-amber-500/10 border-2 border-amber-500/40 rounded-xl text-amber-900 dark:text-amber-200 flex items-start gap-4 shadow-md transition-all">
                     <div class="p-2 bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0">

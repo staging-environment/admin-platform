@@ -39,9 +39,14 @@
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                    x-init="setTimeout(() => show = false, 4000)"
+                    class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"
+                >
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Contraseña actualizada correctamente.
+                </p>
             @endif
         </div>
     </form>
