@@ -18,8 +18,8 @@ class EnsurePasswordIsChanged
 
         if ($user && ($user->hasRole('Empleado') || $user->hasRole('empleado'))) {
             if (Hash::check('1234', $user->password)) {
-                // Permite acceder a las rutas de perfil y cierre de sesión
-                if (!$request->is('profile*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                // Permite acceder a las rutas de perfil, actualización de contraseña y cierre de sesión
+                if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout')) {
                     session()->flash('warning', 'Por motivos de seguridad, debes cambiar tu contraseña por defecto (1234) antes de acceder a la plataforma.');
                     return redirect()->route('profile.edit');
                 }

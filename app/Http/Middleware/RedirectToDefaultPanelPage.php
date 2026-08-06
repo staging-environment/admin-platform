@@ -18,7 +18,7 @@ class RedirectToDefaultPanelPage
         if ($user) {
             $isEmpleado = $user->hasRole('Empleado') || $user->hasRole('empleado');
             if ($isEmpleado && \Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
-                if (!$request->is('profile*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee with default password '1234' to profile page", [
                         'user_email' => $user->email
                     ]);
