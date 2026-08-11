@@ -402,7 +402,7 @@ class EmpleadoResource extends Resource
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('no_tiene_discapacidad')
-                                    ->label('No tiene Discapacidad')
+                                    ->label('No tiene Discapacidad / Incapacidad')
                                     ->html()
                                     ->state(function (?\App\Models\Empleado $record) {
                                         if ($record && $record->no_tiene_discapacidad) {

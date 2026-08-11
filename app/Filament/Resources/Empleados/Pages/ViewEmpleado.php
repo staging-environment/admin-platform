@@ -242,7 +242,7 @@ class ViewEmpleado extends ViewRecord
                         ]),
 
                     Toggle::make('no_tiene_discapacidad')
-                        ->label('No tiene discapacidad')
+                        ->label('No tiene discapacidad / incapacidad')
                         ->live()
                         ->afterStateUpdated(function ($state, Set $set) {
                             if ($state) {
