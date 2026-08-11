@@ -653,7 +653,7 @@ class FichaEmpleado extends Page
 
         try {
             $admins = \App\Models\User::all()->filter(function($user) {
-                return $user->can('aprobacion_vacaciones_bajas') || $user->can('recibir_notificaciones_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com';
+                return $user->can('aprobacion_vacaciones_bajas') || $user->email === 'jarodriguezbonilla@gmail.com';
             });
 
             foreach ($admins as $admin) {
