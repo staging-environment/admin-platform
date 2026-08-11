@@ -16,7 +16,7 @@ class Aprobaciones extends Page
     protected static ?string $navigationLabel = 'Aprobación de Solicitudes';
     protected static ?string $title = 'Aprobación de Vacaciones y Bajas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Recursos humanos';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 4;
 
     protected string $view = 'filament.pages.aprobaciones';

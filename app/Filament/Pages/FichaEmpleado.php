@@ -490,6 +490,23 @@ class FichaEmpleado extends Page
                 $quincenaTexto = "2ª Quincena";
             }
 
+            // Validar que no exista ya una solicitud de vacaciones activa o pendiente para esta misma quincena/mes/año
+            $existingVacation = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+                ->where('tipo', 'Vacaciones')
+                ->whereIn('estado', ['Pendiente', 'Aceptada', 'Aprobada'])
+                ->where('fecha_inicio', $fechaInicioStr)
+                ->where('fecha_fin', $fechaFinStr)
+                ->exists();
+
+            if ($existingVacation) {
+                Notification::make()
+                    ->title('Solicitud Duplicada')
+                    ->body('Ya dispones de una solicitud de vacaciones registrada o pendiente para este mismo período (mes, año y quincena).')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
             $this->vacacion_fecha_inicio = $fechaInicioStr;
             $this->vacacion_fecha_fin = $fechaFinStr;
             $justificantePath = null;

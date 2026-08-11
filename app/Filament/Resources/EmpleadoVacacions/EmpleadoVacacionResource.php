@@ -23,14 +23,20 @@ class EmpleadoVacacionResource extends Resource
     protected static ?string $pluralModelLabel = 'Solicitudes de Vacaciones';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
-    protected static string|\UnitEnum|null $navigationGroup = 'Recursos humanos';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 3;
 
     public static function canAccess(): bool
     {
         $user = auth()->user();
         if (!$user) return false;
-        return $user->hasRole('Admin') || $user->hasRole('admin') || $user->hasRole('Gestor') || $user->hasRole('gestor') || $user->can('gestion_vacaciones_empleados');
+        return $user->hasRole('Admin') 
+            || $user->hasRole('admin') 
+            || $user->hasRole('Gestor') 
+            || $user->hasRole('gestor') 
+            || $user->can('aprobacion_vacaciones_bajas')
+            || $user->can('solicitar_ver_vacaciones')
+            || $user->can('gestion_recursos_humanos');
     }
 
     public static function getNavigationLabel(): string
@@ -42,7 +48,7 @@ class EmpleadoVacacionResource extends Resource
     {
         return $schema
             ->components([
-                // The form is not strictly needed for this view since they only approve/deny from table, but we can leave it empty.
+                // Form configuration
             ]);
     }
 
@@ -73,13 +79,17 @@ class EmpleadoVacacionResource extends Resource
                     
                 TextColumn::make('dias_solicitados')
                     ->label('Días'),
+
+                TextColumn::make('comentario_empleado')
+                    ->label('Detalle')
+                    ->limit(30),
                     
                 TextColumn::make('estado')
-                    ->label('Estado')
+                    ->label('Estado de Validación')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Aceptada' => 'success',
-                        'Rechazada' => 'danger',
+                        'Aceptada', 'Aceptadas', 'Aprobada' => 'success',
+                        'Rechazada', 'Denegada', 'Denegadas' => 'danger',
                         'Pendiente' => 'warning',
                         default => 'gray',
                     })
