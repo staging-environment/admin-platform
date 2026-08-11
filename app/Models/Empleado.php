@@ -19,6 +19,7 @@ class Empleado extends Model
 
     protected $casts = [
         'tiene_discapacidad' => 'boolean',
+        'no_tiene_discapacidad' => 'boolean',
         'pertenece_andalucia' => 'boolean',
         'tipo_discapacidad' => 'array',
         'tiene_incapacidad' => 'boolean',
@@ -237,6 +238,16 @@ class Empleado extends Model
                 'tipo' => 'baja_medica',
                 'titulo' => 'De baja médica',
                 'descripcion' => 'Este empleado se encuentra actualmente en estado de baja médica.',
+            ]);
+        }
+
+        // 7. Alerta: Sin Discapacidad / Incapacidad configurada
+        $hasDiscapacidadConfigured = $this->tiene_discapacidad || $this->tiene_incapacidad || $this->no_tiene_discapacidad;
+        if (!$hasDiscapacidadConfigured) {
+            $this->alertas()->create([
+                'tipo' => 'sin_discapacidad',
+                'titulo' => 'Sin discapacidad / incapacidad configurada',
+                'descripcion' => 'Este empleado no tiene configurada ninguna opción de discapacidad o incapacidad en su ficha.',
             ]);
         }
     }

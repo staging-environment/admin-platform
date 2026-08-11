@@ -221,6 +221,20 @@ class EmpleadoResource extends Resource
                             ->visible(fn ($record) => $record && $record->estado === 'Alta' && $record->ausencias()->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->exists())
                             ->columnSpanFull(),
 
+                        \Filament\Schemas\Components\Html::make('
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px;" class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30 rounded-2xl text-sm text-red-800 dark:text-red-400">
+                                <svg style="width: 24px; height: 24px; flex-shrink: 0;" class="text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <strong class="font-bold">Discapacidad / Incapacidad no configurada:</strong>
+                                    Este empleado no tiene configurada ninguna opción de discapacidad o incapacidad. Por favor, pulse en el botón "Discapacidad / Incapacidad" para configurarla.
+                                </div>
+                            </div>
+                        ')
+                            ->visible(fn ($record) => $record && !$record->tiene_discapacidad && !$record->tiene_incapacidad && !$record->no_tiene_discapacidad)
+                            ->columnSpanFull(),
+
                         \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('gasolinera.Nombre')
@@ -385,6 +399,16 @@ class EmpleadoResource extends Resource
                                         }
                                         
                                         return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>');
+                                    }),
+
+                                \Filament\Infolists\Components\TextEntry::make('no_tiene_discapacidad')
+                                    ->label('No tiene Discapacidad')
+                                    ->html()
+                                    ->state(function (?\App\Models\Empleado $record) {
+                                        if ($record && $record->no_tiene_discapacidad) {
+                                            return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300">Sí</span>');
+                                        }
+                                        return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>');
                                     }),
 
                                 \Filament\Infolists\Components\TextEntry::make('tipo_discapacidad')

@@ -12,6 +12,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class EditEmpleado extends EditRecord
 {
@@ -74,7 +75,8 @@ class EditEmpleado extends EditRecord
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad', 'Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
-                    return ($record->tiene_discapacidad || $record->tiene_incapacidad || $hasDocs) ? 'warning' : 'danger';
+                    $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
+                    return ($hasOption || $hasDocs) ? 'warning' : 'danger';
                 })
                 ->modalHeading('Discapacidad / Incapacidad')
                 ->fillForm(function ($record) {
@@ -97,12 +99,18 @@ class EditEmpleado extends EditRecord
                         'tiene_incapacidad' => $record->tiene_incapacidad,
                         'tipo_incapacidad' => $record->tipo_incapacidad,
                         'incapacidad_file' => $incap?->file_path,
+                        'no_tiene_discapacidad' => $record->no_tiene_discapacidad,
                     ];
                 })
                 ->form([
                     Toggle::make('tiene_discapacidad')
                         ->label('¿Tiene discapacidad?')
-                        ->live(),
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set) {
+                            if ($state) {
+                                $set('no_tiene_discapacidad', false);
+                            }
+                        }),
                     
                     Grid::make(4)
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
@@ -198,7 +206,12 @@ class EditEmpleado extends EditRecord
 
                     Toggle::make('tiene_incapacidad')
                         ->label('¿Tiene incapacidad?')
-                        ->live(),
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set) {
+                            if ($state) {
+                                $set('no_tiene_discapacidad', false);
+                            }
+                        }),
 
                     Grid::make(2)
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
@@ -220,22 +233,37 @@ class EditEmpleado extends EditRecord
                                 ->previewable(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
                         ]),
+
+                    Toggle::make('no_tiene_discapacidad')
+                        ->label('No tiene discapacidad')
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set) {
+                            if ($state) {
+                                $set('tiene_discapacidad', false);
+                                $set('tiene_incapacidad', false);
+                            }
+                        }),
                 ])
                 ->action(function ($record, array $data) {
+                    $noTieneDiscapacidad = (bool) ($data['no_tiene_discapacidad'] ?? false);
+                    $tieneDiscapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_discapacidad'] ?? false);
+                    $tieneIncapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_incapacidad'] ?? false);
+
                     $record->update([
-                        'tiene_discapacidad' => $data['tiene_discapacidad'],
-                        'tipo_discapacidad' => $data['tiene_discapacidad'] ? $data['tipo_discapacidad'] : null,
-                        'porcentaje_discapacidad' => $data['tiene_discapacidad'] ? $data['porcentaje_discapacidad'] : null,
-                        'fecha_reconocimiento' => $data['tiene_discapacidad'] ? $data['fecha_reconocimiento'] : null,
-                        'fecha_resolucion_discapacidad' => $data['tiene_discapacidad'] ? $data['fecha_resolucion_discapacidad'] : null,
-                        'pertenece_andalucia' => $data['tiene_discapacidad'] ? $data['pertenece_andalucia'] : true,
-                        'comunidad_autonoma' => ($data['tiene_discapacidad'] && !$data['pertenece_andalucia']) ? $data['comunidad_autonoma'] : null,
-                        'tiene_incapacidad' => $data['tiene_incapacidad'],
-                        'tipo_incapacidad' => $data['tiene_incapacidad'] ? $data['tipo_incapacidad'] : null,
+                        'tiene_discapacidad' => $tieneDiscapacidad,
+                        'tipo_discapacidad' => $tieneDiscapacidad ? $data['tipo_discapacidad'] : null,
+                        'porcentaje_discapacidad' => $tieneDiscapacidad ? $data['porcentaje_discapacidad'] : null,
+                        'fecha_reconocimiento' => $tieneDiscapacidad ? $data['fecha_reconocimiento'] : null,
+                        'fecha_resolucion_discapacidad' => $tieneDiscapacidad ? $data['fecha_resolucion_discapacidad'] : null,
+                        'pertenece_andalucia' => $tieneDiscapacidad ? $data['pertenece_andalucia'] : true,
+                        'comunidad_autonoma' => ($tieneDiscapacidad && !$data['pertenece_andalucia']) ? $data['comunidad_autonoma'] : null,
+                        'tiene_incapacidad' => $tieneIncapacidad,
+                        'tipo_incapacidad' => $tieneIncapacidad ? $data['tipo_incapacidad'] : null,
+                        'no_tiene_discapacidad' => $noTieneDiscapacidad,
                     ]);
                     
                     // Save documents
-                    if ($data['tiene_discapacidad']) {
+                    if ($tieneDiscapacidad) {
                         if (!empty($data['resolucion_discapacidad'])) {
                             $record->documentos()->updateOrCreate(
                                 ['tipo' => 'Resolución Discapacidad'],
@@ -273,7 +301,7 @@ class EditEmpleado extends EditRecord
                         $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad'])->delete();
                     }
                     
-                    if ($data['tiene_incapacidad']) {
+                    if ($tieneIncapacidad) {
                         if (!empty($data['incapacidad_file'])) {
                             $tipo = 'Incapacidad Física';
                             $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
