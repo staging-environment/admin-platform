@@ -25,6 +25,16 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        // Mantener la sesión abierta tras cambiar la contraseña actualizando el hash en la sesión
+        \Illuminate\Support\Facades\Auth::login($user);
+        if (\class_exists(\Filament\Facades\Filament::class) && \Filament\Facades\Filament::auth()) {
+            try {
+                \Filament\Facades\Filament::auth()->login($user);
+            } catch (\Throwable $e) {
+                // Ignore if guard is identical
+            }
+        }
+
         if (class_exists(\Filament\Notifications\Notification::class)) {
             \Filament\Notifications\Notification::make()
                 ->title('Contraseña actualizada correctamente')
