@@ -860,30 +860,71 @@
                         @error('vacacion_tipo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Inicio</label>
-                        <input type="date" wire:model="vacacion_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                        @error('vacacion_fecha_inicio') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                    </div>
+                    @if($vacacion_tipo === 'Vacaciones')
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Mes</label>
+                                <select wire:model="vacacion_mes" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                                @error('vacacion_mes') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Fin</label>
-                        <input type="date" wire:model="vacacion_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                        @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                    </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Año</label>
+                                <select wire:model="vacacion_ano" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                                    @php $currentYear = (int) \Carbon\Carbon::now()->year; @endphp
+                                    <option value="{{ $currentYear }}">{{ $currentYear }}</option>
+                                    <option value="{{ $currentYear + 1 }}">{{ $currentYear + 1 }}</option>
+                                    <option value="{{ $currentYear + 2 }}">{{ $currentYear + 2 }}</option>
+                                </select>
+                                @error('vacacion_ano') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
 
-                    @if($vacacion_tipo === 'Permisos')
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo del Permiso Retribuido</label>
-                        <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquí..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                        @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                    </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Quincena</label>
+                            <select wire:model="vacacion_quincena" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                                <option value="1">Primera quincena (del 1 al 15)</option>
+                                <option value="2">Segunda quincena (del 16 al fin de mes)</option>
+                            </select>
+                            @error('vacacion_quincena') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    @else
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Inicio</label>
+                            <input type="date" wire:model="vacacion_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                            @error('vacacion_fecha_inicio') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante del Permiso (PDF, Imagen)</label>
-                        <input type="file" wire:model="permiso_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
-                        @error('permiso_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                    </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Fin</label>
+                            <input type="date" wire:model="vacacion_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                            @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo del Permiso Retribuido</label>
+                            <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquí..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                            @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante del Permiso (PDF, Imagen)</label>
+                            <input type="file" wire:model="permiso_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
+                            @error('permiso_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
                     @endif
 
                     <div class="flex justify-end gap-3 pt-2">

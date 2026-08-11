@@ -59,6 +59,9 @@ class FichaEmpleado extends Page
     public $vacacion_fecha_inicio;
     public $vacacion_fecha_fin;
     public $vacacion_tipo = 'Vacaciones';
+    public $vacacion_mes;
+    public $vacacion_ano;
+    public $vacacion_quincena = '1';
     public $permiso_justificante;
     public $permiso_motivo;
 
@@ -122,6 +125,11 @@ class FichaEmpleado extends Page
         // Initialize default input times to current server time
         $this->hora_entrada = Carbon::now()->format('H:i');
         $this->hora_salida = Carbon::now()->format('H:i');
+
+        // Initialize default vacation month, year and fortnight
+        $this->vacacion_mes = (int) Carbon::now()->format('m');
+        $this->vacacion_ano = (int) Carbon::now()->year;
+        $this->vacacion_quincena = '1';
 
         $this->loadFichajes();
         if ($this->empleado) {
@@ -452,35 +460,68 @@ class FichaEmpleado extends Page
 
     public function solicitarVacacion(): void
     {
-        $rules = [
-            'vacacion_fecha_inicio' => 'required|date|after_or_equal:today',
-            'vacacion_fecha_fin' => 'required|date|after_or_equal:vacacion_fecha_inicio',
-            'vacacion_tipo' => 'required|in:Vacaciones,Permisos',
-        ];
+        if ($this->vacacion_tipo === 'Vacaciones') {
+            $rules = [
+                'vacacion_mes' => 'required|integer|between:1,12',
+                'vacacion_ano' => 'required|integer|min:2024',
+                'vacacion_quincena' => 'required|in:1,2',
+                'vacacion_tipo' => 'required|in:Vacaciones,Permisos',
+            ];
 
-        $messages = [
-            'vacacion_fecha_inicio.required' => 'La fecha de inicio es requerida.',
-            'vacacion_fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
-            'vacacion_fecha_fin.required' => 'La fecha de fin es requerida.',
-            'vacacion_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
-        ];
+            $messages = [
+                'vacacion_mes.required' => 'El mes es requerido.',
+                'vacacion_ano.required' => 'El año es requerido.',
+                'vacacion_quincena.required' => 'La quincena es requerida.',
+            ];
 
-        if ($this->vacacion_tipo === 'Permisos') {
-            $rules['permiso_motivo'] = 'required|string|max:255';
-            $messages['permiso_motivo.required'] = 'Es obligatorio especificar el motivo del permiso retribuido.';
-            $messages['permiso_motivo.max'] = 'El motivo no debe superar los 255 caracteres.';
+            $this->validate($rules, $messages);
 
-            $rules['permiso_justificante'] = 'required|file|max:10240';
-            $messages['permiso_justificante.required'] = 'Es obligatorio adjuntar un documento justificante para el permiso retribuido.';
-            $messages['permiso_justificante.file'] = 'El justificante debe ser un archivo válido.';
-            $messages['permiso_justificante.max'] = 'El tamaño máximo del archivo es 10MB.';
-        }
+            $mesFormatted = sprintf('%02d', $this->vacacion_mes);
 
-        $this->validate($rules, $messages);
+            if ($this->vacacion_quincena == '1') {
+                $fechaInicioStr = "{$this->vacacion_ano}-{$mesFormatted}-01";
+                $fechaFinStr = "{$this->vacacion_ano}-{$mesFormatted}-15";
+                $quincenaTexto = "1ª Quincena";
+            } else {
+                $fechaInicioStr = "{$this->vacacion_ano}-{$mesFormatted}-16";
+                $lastDay = Carbon::createFromDate($this->vacacion_ano, (int)$this->vacacion_mes, 1)->endOfMonth()->day;
+                $lastDayFormatted = sprintf('%02d', $lastDay);
+                $fechaFinStr = "{$this->vacacion_ano}-{$mesFormatted}-{$lastDayFormatted}";
+                $quincenaTexto = "2ª Quincena";
+            }
 
-        $justificantePath = null;
-        if ($this->vacacion_tipo === 'Permisos' && $this->permiso_justificante) {
-            $justificantePath = $this->permiso_justificante->store('empleados/justificantes_permisos', 'local');
+            $this->vacacion_fecha_inicio = $fechaInicioStr;
+            $this->vacacion_fecha_fin = $fechaFinStr;
+            $justificantePath = null;
+            $comentario = "Solicitud de Vacaciones ({$quincenaTexto})";
+        } else {
+            $rules = [
+                'vacacion_fecha_inicio' => 'required|date|after_or_equal:today',
+                'vacacion_fecha_fin' => 'required|date|after_or_equal:vacacion_fecha_inicio',
+                'vacacion_tipo' => 'required|in:Vacaciones,Permisos',
+                'permiso_motivo' => 'required|string|max:255',
+                'permiso_justificante' => 'required|file|max:10240',
+            ];
+
+            $messages = [
+                'vacacion_fecha_inicio.required' => 'La fecha de inicio es requerida.',
+                'vacacion_fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+                'vacacion_fecha_fin.required' => 'La fecha de fin es requerida.',
+                'vacacion_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
+                'permiso_motivo.required' => 'Es obligatorio especificar el motivo del permiso retribuido.',
+                'permiso_motivo.max' => 'El motivo no debe superar los 255 caracteres.',
+                'permiso_justificante.required' => 'Es obligatorio adjuntar un documento justificante para el permiso retribuido.',
+                'permiso_justificante.file' => 'El justificante debe ser un archivo válido.',
+                'permiso_justificante.max' => 'El tamaño máximo del archivo es 10MB.',
+            ];
+
+            $this->validate($rules, $messages);
+
+            $justificantePath = null;
+            if ($this->permiso_justificante) {
+                $justificantePath = $this->permiso_justificante->store('empleados/justificantes_permisos', 'local');
+            }
+            $comentario = $this->permiso_motivo;
         }
 
         $inicio = Carbon::parse($this->vacacion_fecha_inicio);
@@ -495,7 +536,7 @@ class FichaEmpleado extends Page
             'dias_solicitados' => $dias,
             'estado' => 'Pendiente',
             'justificante_path' => $justificantePath,
-            'comentario_empleado' => $this->vacacion_tipo === 'Permisos' ? $this->permiso_motivo : null,
+            'comentario_empleado' => $comentario,
         ]);
 
         $this->vacacion_fecha_inicio = null;
