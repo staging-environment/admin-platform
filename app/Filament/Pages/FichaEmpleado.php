@@ -222,8 +222,11 @@ class FichaEmpleado extends Page
             return;
         }
 
+        // Busca la sesión activa de fichaje sin salida para el día de hoy
         $this->fichajeDelDia = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', Carbon::today()->format('Y-m-d'))
+            ->whereNull('hora_salida')
+            ->latest('id')
             ->first();
 
         $this->recentFichajes = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
@@ -258,18 +261,29 @@ class FichaEmpleado extends Page
 
         $today = Carbon::today()->format('Y-m-d');
 
-        EmpleadoFichaje::updateOrCreate(
-            [
-                'empleado_id' => $this->empleado->id,
-                'fecha' => $today,
-            ],
-            [
+        $activeFichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', $today)
+            ->whereNull('hora_salida')
+            ->latest('id')
+            ->first();
+
+        if ($activeFichaje) {
+            $activeFichaje->update([
                 'hora_entrada' => $this->hora_entrada,
                 'server_checkin_at' => Carbon::now(),
                 'checkin_latitude' => $latitude,
                 'checkin_longitude' => $longitude,
-            ]
-        );
+            ]);
+        } else {
+            EmpleadoFichaje::create([
+                'empleado_id' => $this->empleado->id,
+                'fecha' => $today,
+                'hora_entrada' => $this->hora_entrada,
+                'server_checkin_at' => Carbon::now(),
+                'checkin_latitude' => $latitude,
+                'checkin_longitude' => $longitude,
+            ]);
+        }
 
         Notification::make()
             ->title('Check-in Registrado')
@@ -299,7 +313,16 @@ class FichaEmpleado extends Page
 
         $fichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', $today)
+            ->whereNull('hora_salida')
+            ->latest('id')
             ->first();
+
+        if (!$fichaje) {
+            $fichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+                ->where('fecha', $today)
+                ->latest('id')
+                ->first();
+        }
 
         if (!$fichaje) {
             Notification::make()
