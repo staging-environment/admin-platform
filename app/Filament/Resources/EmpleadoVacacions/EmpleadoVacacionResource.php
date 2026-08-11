@@ -70,12 +70,12 @@ class EmpleadoVacacionResource extends Resource
                     
                 TextColumn::make('fecha_inicio')
                     ->label('Inicio')
-                    ->date()
+                    ->date('d/m/Y')
                     ->sortable(),
                     
                 TextColumn::make('fecha_fin')
                     ->label('Fin')
-                    ->date()
+                    ->date('d/m/Y')
                     ->sortable(),
                     
                 TextColumn::make('dias_solicitados')
