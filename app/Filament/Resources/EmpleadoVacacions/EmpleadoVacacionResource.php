@@ -112,7 +112,8 @@ class EmpleadoVacacionResource extends Resource
                         'Vacaciones' => 'Vacaciones',
                         'Permisos' => 'Permiso Retribuido',
                     ]),
-            ])
+            ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
+            ->filtersFormColumns(2)
             ->recordActions([
                 Action::make('aprobar')
                     ->label('Aprobar')
