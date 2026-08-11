@@ -123,7 +123,7 @@ class VacacionesRelationManager extends RelationManager
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()->visible(fn ($record) => $record->estado === 'Pendiente'),
                 \Filament\Actions\Action::make('aprobar')
                     ->label('Aprobar')
                     ->icon('heroicon-o-check-circle')

@@ -687,7 +687,16 @@ class FichaEmpleado extends Page
     public function deleteVacacion($id): void
     {
         $vac = \App\Models\EmpleadoVacacion::find($id);
-        if ($vac && $vac->empleado_id === $this->empleado->id && $vac->estado === 'Pendiente') {
+        if ($vac && $vac->empleado_id === $this->empleado->id) {
+            if ($vac->estado !== 'Pendiente') {
+                Notification::make()
+                    ->title('Acción no permitida')
+                    ->body('No puedes eliminar una solicitud de vacaciones que ya ha sido aprobada o denegada.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
             $vac->delete();
             Notification::make()
                 ->title('Solicitud de Vacaciones Eliminada')
