@@ -34,9 +34,7 @@ class EmpleadoVacacionResource extends Resource
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         $user->unsetRelation('roles')->unsetRelation('permissions');
 
-        return $user->can('aprobacion_vacaciones_bajas')
-            || $user->can('aprobacion_vacaciones')
-            || $user->can('gestion_recursos_humanos');
+        return $user->can('aprobacion_vacaciones_bajas');
     }
 
     public static function getNavigationLabel(): string
