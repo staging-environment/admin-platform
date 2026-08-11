@@ -68,7 +68,7 @@
                             'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_eliminar_empleados' => 'Eliminar empleados',
                             'aprobacion_vacaciones_bajas' => 'Aprobación y Gestión de Vacaciones y Bajas (acceso a panel y avisos por correo)',
-                            'recibir_notificaciones_recursos_humanos' => 'Copia informativa por correo de eventos de RRHH (solo avisos por email, sin acceso a validación)',
+                            'recibir_notificaciones_recursos_humanos' => 'Copia informativa por correo de eventos de RRHH (recibe avisos de nuevas vacaciones, altas/bajas médicas y fichajes faltantes)',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',
