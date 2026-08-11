@@ -34,6 +34,7 @@ class EmpleadoVacacionResource extends Resource
             || $user->hasRole('admin') 
             || $user->hasRole('Gestor') 
             || $user->hasRole('gestor') 
+            || $user->can('aprobacion_vacaciones')
             || $user->can('aprobacion_vacaciones_bajas')
             || $user->can('solicitar_ver_vacaciones')
             || $user->can('gestion_recursos_humanos');
