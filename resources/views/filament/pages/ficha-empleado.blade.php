@@ -659,6 +659,11 @@
                                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                     Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
                                                 </p>
+                                                @if(in_array($v->estado, ['Rechazada', 'Denegada']) && $v->comentario_aprobador)
+                                                    <p class="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium italic">
+                                                        Motivo: {{ $v->comentario_aprobador }}
+                                                    </p>
+                                                @endif
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>

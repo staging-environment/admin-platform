@@ -134,14 +134,27 @@ class EmpleadoVacacionResource extends Resource
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
+                    ->modalHeading('Denegar Solicitud de Vacaciones')
+                    ->modalDescription('¿Estás seguro de que deseas denegar esta solicitud? Puedes indicar opcionalmente el motivo a continuación:')
+                    ->form([
+                        \Filament\Forms\Components\Textarea::make('comentario_aprobador')
+                            ->label('Motivo de la denegación (Opcional)')
+                            ->placeholder('Escribe aquí el motivo o explicación...')
+                            ->rows(3),
+                    ])
                     ->visible(fn ($record) => $record->estado === 'Pendiente')
-                    ->action(function ($record) {
-                        $record->update(['estado' => 'Rechazada']);
+                    ->action(function ($record, array $data) {
+                        $motivo = $data['comentario_aprobador'] ?? null;
+
+                        $record->update([
+                            'estado' => 'Rechazada',
+                            'comentario_aprobador' => $motivo,
+                        ]);
                         
-                        self::notificarEmpleado($record, 'Rechazada');
+                        self::notificarEmpleado($record, 'Rechazada', $motivo);
                         
                         Notification::make()
-                            ->title('Solicitud Rechazada')
+                            ->title('Solicitud Denegada')
                             ->success()
                             ->send();
                     }),
@@ -155,15 +168,18 @@ class EmpleadoVacacionResource extends Resource
         ];
     }
     
-    protected static function notificarEmpleado($record, $estado)
+    protected static function notificarEmpleado($record, $estado, $comentario = null)
     {
         if ($record->empleado && $record->empleado->email) {
             $user = User::where('email', $record->empleado->email)->first();
             if ($user) {
-                $mensaje = "Tu solicitud de {$record->tipo} (del " . \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') . " al " . \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') . ") ha sido {$estado}.";
+                $mensaje = "Tu solicitud de {$record->tipo} (del " . \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') . " al " . \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') . ") ha sido " . ($estado === 'Aceptada' ? 'aprobada' : 'denegada') . ".";
+                if ($comentario) {
+                    $mensaje .= " Motivo: {$comentario}";
+                }
                 
                 Notification::make()
-                    ->title("Solicitud de {$record->tipo} {$estado}")
+                    ->title("Solicitud de {$record->tipo} " . ($estado === 'Aceptada' ? 'Aprobada' : 'Denegada'))
                     ->body($mensaje)
                     ->icon($estado === 'Aceptada' ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->iconColor($estado === 'Aceptada' ? 'success' : 'danger')
