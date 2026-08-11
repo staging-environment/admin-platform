@@ -98,7 +98,19 @@ class EmpleadoVacacionResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                // Optionally filter by status
+                \Filament\Tables\Filters\SelectFilter::make('estado')
+                    ->label('Estado de Validación')
+                    ->options([
+                        'Pendiente' => 'Pendiente',
+                        'Aceptada' => 'Aceptadas (Aprobadas)',
+                        'Rechazada' => 'Denegadas (Rechazadas)',
+                    ]),
+                \Filament\Tables\Filters\SelectFilter::make('tipo')
+                    ->label('Tipo de Solicitud')
+                    ->options([
+                        'Vacaciones' => 'Vacaciones',
+                        'Permisos' => 'Permiso Retribuido',
+                    ]),
             ])
             ->recordActions([
                 Action::make('aprobar')
