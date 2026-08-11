@@ -29,8 +29,9 @@ class SolicitudEstadoMail extends Mailable
 
     public function build()
     {
-        $color = $this->estado === 'Aceptada' ? '#16a34a' : '#dc2626';
-        $estadoTxt = $this->estado === 'Aceptada' ? 'APROBADA' : 'DENEGADA';
+        $isApproved = in_array($this->estado, ['Aceptada', 'Aprobada']);
+        $color = $isApproved ? '#16a34a' : '#dc2626';
+        $estadoTxt = $isApproved ? 'APROBADA' : 'DENEGADA';
 
         return $this->subject("Estado de tu solicitud: {$this->tipo} - {$estadoTxt}")
             ->html("

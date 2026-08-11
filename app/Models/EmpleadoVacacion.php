@@ -35,7 +35,7 @@ class EmpleadoVacacion extends Model
         });
 
         static::updated(function ($model) {
-            if ($model->wasChanged('estado') && in_array($model->estado, ['Aceptada', 'Rechazada'])) {
+            if ($model->wasChanged('estado') && in_array($model->estado, ['Aceptada', 'Aprobada', 'Rechazada', 'Denegada'])) {
                 try {
                     $empleado = $model->empleado;
                     if ($empleado && $empleado->email) {
