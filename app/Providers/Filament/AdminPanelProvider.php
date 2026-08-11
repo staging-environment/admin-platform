@@ -43,11 +43,12 @@ class AdminPanelProvider extends PanelProvider
             // Devolvemos el discoverResources a su estado original sin inventos
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             
-            // Registramos tu recurso de Ofertas de Empleo a mano para saltarnos la limitación de la subcarpeta
+            // Registramos tu recurso de Ofertas de Empleo y Vacaciones a mano
             ->resources([
                 JobOfferResource::class,
                 JobApplicationResource::class,
                 EmpleadoResource::class,
+                \App\Filament\Resources\EmpleadoVacacions\EmpleadoVacacionResource::class,
             ])
             
             ->pages([])

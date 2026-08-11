@@ -81,7 +81,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
+                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
@@ -94,6 +94,15 @@
                                 </x-slot>
 
                                 <x-slot name="content">
+                                    @if(auth()->user()?->canAny(['aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']) || auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Gestor'))
+                                    <x-dropdown-link href="/admin/solicitudes-vacaciones">
+                                        {{ __('Solicitudes de Vacaciones') }}
+                                    </x-dropdown-link>
+                                    <x-dropdown-link href="/admin/aprobaciones">
+                                        {{ __('Aprobación de Solicitudes') }}
+                                    </x-dropdown-link>
+                                    @endif
+
                                     @if(auth()->user()?->can('ver_informes'))
                                     <x-dropdown-link href="/admin/informes">
                                         {{ __('Informes') }}
@@ -256,12 +265,20 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
+            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
                     </div>
                     <div class="mt-2 space-y-1">
+                        @if(auth()->user()?->canAny(['aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']) || auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Gestor'))
+                            <x-responsive-nav-link href="/admin/solicitudes-vacaciones" :active="request()->is('admin/solicitudes-vacaciones*')">
+                                {{ __('Solicitudes de Vacaciones') }}
+                            </x-responsive-nav-link>
+                            <x-responsive-nav-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
+                                {{ __('Aprobación de Solicitudes') }}
+                            </x-responsive-nav-link>
+                        @endif
                         @if(auth()->user()?->can('ver_informes'))
                             <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
                                 {{ __('Informes') }}
