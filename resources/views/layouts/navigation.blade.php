@@ -94,7 +94,7 @@
                                 </x-slot>
 
                                 <x-slot name="content">
-                                    @if(auth()->user()?->canAny(['aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']) || auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Gestor'))
+                                    @if(auth()->user()?->canAny(['aprobacion_vacaciones_bajas', 'aprobacion_vacaciones', 'gestion_recursos_humanos']))
                                     <x-dropdown-link href="/admin/solicitudes-vacaciones">
                                         {{ __('Solicitudes de Vacaciones') }}
                                     </x-dropdown-link>
@@ -268,7 +268,7 @@
                         {{ __('Administración') }}
                     </div>
                     <div class="mt-2 space-y-1">
-                        @if(auth()->user()?->canAny(['aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']) || auth()->user()?->hasRole('Admin') || auth()->user()?->hasRole('Gestor'))
+                        @if(auth()->user()?->canAny(['aprobacion_vacaciones_bajas', 'aprobacion_vacaciones', 'gestion_recursos_humanos']))
                             <x-responsive-nav-link href="/admin/solicitudes-vacaciones" :active="request()->is('admin/solicitudes-vacaciones*')">
                                 {{ __('Solicitudes de Vacaciones') }}
                             </x-responsive-nav-link>

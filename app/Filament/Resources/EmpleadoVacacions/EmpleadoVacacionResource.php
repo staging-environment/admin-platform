@@ -30,13 +30,12 @@ class EmpleadoVacacionResource extends Resource
     {
         $user = auth()->user();
         if (!$user) return false;
-        return $user->hasRole('Admin') 
-            || $user->hasRole('admin') 
-            || $user->hasRole('Gestor') 
-            || $user->hasRole('gestor') 
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        $user->unsetRelation('roles')->unsetRelation('permissions');
+
+        return $user->can('aprobacion_vacaciones_bajas')
             || $user->can('aprobacion_vacaciones')
-            || $user->can('aprobacion_vacaciones_bajas')
-            || $user->can('solicitar_ver_vacaciones')
             || $user->can('gestion_recursos_humanos');
     }
 

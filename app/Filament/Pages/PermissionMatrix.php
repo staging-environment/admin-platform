@@ -70,10 +70,21 @@ class PermissionMatrix extends Page
         $permission = Permission::find($permissionId);
 
         if ($role && $permission) {
-            if ($role->hasPermissionTo($permission)) {
-                $role->revokePermissionTo($permission);
-            } else {
-                $role->givePermissionTo($permission);
+            $isRevoking = $role->hasPermissionTo($permission);
+            
+            $relatedNames = in_array($permission->name, ['aprobacion_vacaciones_bajas', 'aprobacion_vacaciones']) 
+                ? ['aprobacion_vacaciones_bajas', 'aprobacion_vacaciones'] 
+                : [$permission->name];
+
+            foreach ($relatedNames as $pName) {
+                $pObj = Permission::where('name', $pName)->first();
+                if ($pObj) {
+                    if ($isRevoking) {
+                        $role->revokePermissionTo($pObj);
+                    } else {
+                        $role->givePermissionTo($pObj);
+                    }
+                }
             }
         }
 
