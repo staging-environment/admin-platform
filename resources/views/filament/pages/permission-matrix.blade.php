@@ -67,6 +67,7 @@
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_eliminar_empleados' => 'Eliminar empleados',
+                            'dar_baja_empleado' => 'Dar de baja a un empleado',
                             'aprobacion_vacaciones_bajas' => 'Aprobación y Gestión de Vacaciones y Bajas',
                         ],
                         'SUBSECCIONES' => [
@@ -78,12 +79,6 @@
                             'solicitud_baja_enfermedad' => 'Registrar baja o alta médica',
                         ]
                     ];
-
-                    $allGroupedNames = [];
-                    foreach($groups as $gPerms) {
-                        $allGroupedNames = array_merge($allGroupedNames, array_keys($gPerms));
-                    }
-                    $otherPermissions = $permissions->filter(fn($p) => !in_array($p->name, $allGroupedNames));
                 @endphp
 
                 @foreach($groups as $groupName => $groupPermissions)
@@ -118,34 +113,6 @@
                         @endif
                     @endforeach
                 @endforeach
-
-                @if($otherPermissions->count() > 0)
-                    <tr class="bg-gray-100/80 dark:bg-gray-800/40 border-l-4 border-gray-500 dark:border-gray-400">
-                        <td colspan="{{ count($roles) + 1 }}" class="p-4 text-sm font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
-                            <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-gray-500 dark:bg-gray-400"></span>
-                                Otros
-                            </div>
-                        </td>
-                    </tr>
-                    @foreach($otherPermissions as $permission)
-                        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                            <td class="p-4 pl-8 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                {{ $permission->name }}
-                            </td>
-                            @foreach($roles as $role)
-                                <td class="p-4">
-                                    <div class="flex items-center justify-start ml-0.5">
-                                        <x-filament::input.checkbox
-                                            wire:click="togglePermission({{ $role->id }}, {{ $permission->id }})"
-                                            :checked="$this->hasPermission($role->id, $permission->id)"
-                                        />
-                                    </div>
-                                </td>
-                            @endforeach
-                        </tr>
-                    @endforeach
-                @endif
                 </tbody>
             </table>
         </div>
