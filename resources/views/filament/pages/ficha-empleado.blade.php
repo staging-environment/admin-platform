@@ -649,11 +649,11 @@
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $v->tipo }}</span>
                                                     <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
-                                                        {{ $v->estado === 'Aceptada' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
-                                                        {{ $v->estado === 'Rechazada' ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
+                                                        {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
+                                                        {{ in_array($v->estado, ['Rechazada', 'Denegada']) ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
                                                         {{ $v->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
                                                     ">
-                                                        {{ $v->estado }}
+                                                        {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente') }}
                                                     </span>
                                                 </div>
                                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">

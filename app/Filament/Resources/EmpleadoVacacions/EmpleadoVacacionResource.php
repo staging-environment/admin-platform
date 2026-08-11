@@ -101,10 +101,11 @@ class EmpleadoVacacionResource extends Resource
                 \Filament\Tables\Filters\SelectFilter::make('estado')
                     ->label('Estado de Validación')
                     ->options([
-                        'Pendiente' => 'Pendiente',
-                        'Aceptada' => 'Aceptadas (Aprobadas)',
-                        'Rechazada' => 'Denegadas (Rechazadas)',
-                    ]),
+                        'Pendiente' => 'Nuevas (Pendientes)',
+                        'Aceptada' => 'Aprobadas',
+                        'Rechazada' => 'Denegadas',
+                    ])
+                    ->default('Pendiente'),
                 \Filament\Tables\Filters\SelectFilter::make('tipo')
                     ->label('Tipo de Solicitud')
                     ->options([
