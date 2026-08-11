@@ -1,5 +1,23 @@
 <x-filament-panels::page>
     <div class="space-y-6">
+        @if (session('status') === 'password-updated' || session('success'))
+            <div class="p-4 sm:p-6 bg-emerald-500/10 border-2 border-emerald-500/40 rounded-2xl text-emerald-900 dark:text-emerald-200 flex items-start gap-4 shadow-sm">
+                <div class="p-2 bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base text-emerald-800 dark:text-emerald-300">
+                        ¡Contraseña actualizada correctamente!
+                    </h3>
+                    <p class="text-sm mt-1 text-emerald-800/90 dark:text-emerald-200/90 leading-relaxed">
+                        {{ session('success') ?? 'Tu contraseña ha sido cambiada con éxito. Ya puedes navegar libremente por la plataforma.' }}
+                    </p>
+                </div>
+            </div>
+        @endif
+
         @if($isViewingAdminList)
             <!-- Admin Dashboard: List of all employee check-ins / Vacations / Absences -->
             <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">

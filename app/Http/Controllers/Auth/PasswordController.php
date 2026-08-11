@@ -17,13 +17,33 @@ class PasswordController extends Controller
     {
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
+            'password' => ['required', Password::min(8), 'confirmed'],
         ]);
 
-        $request->user()->update([
+        $user = $request->user();
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        if (class_exists(\Filament\Notifications\Notification::class)) {
+            \Filament\Notifications\Notification::make()
+                ->title('Contraseña actualizada correctamente')
+                ->body('Tu contraseña ha sido cambiada con éxito. Ya puedes navegar libremente por la plataforma.')
+                ->success()
+                ->send();
+        }
+
+        session()->flash('status', 'password-updated');
+        session()->flash('success', 'Tu contraseña ha sido cambiada con éxito.');
+
+        if ($user->hasRole('Empleado') || $user->hasRole('empleado') || $user->can('ver_ficha_empleado')) {
+            return redirect('/admin/ficha-empleado');
+        }
+
+        if ($user->can('gestion_recursos_humanos')) {
+            return redirect('/admin/recursos-humanos');
+        }
+
+        return redirect('/admin');
     }
 }
