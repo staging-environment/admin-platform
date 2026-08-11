@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmpleadoFichaje extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'empleado_fichajes';
 
     protected $guarded = [];
@@ -14,6 +17,7 @@ class EmpleadoFichaje extends Model
         'fecha' => 'date:Y-m-d',
         'server_checkin_at' => 'datetime',
         'server_checkout_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function empleado()

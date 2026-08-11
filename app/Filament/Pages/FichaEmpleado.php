@@ -406,8 +406,18 @@ class FichaEmpleado extends Page
         }
 
         $fichaje = EmpleadoFichaje::find($this->deletingFichajeId);
-        if ($fichaje && $fichaje->empleado_id === $this->empleado->id) {
+        $user = auth()->user();
+
+        if ($fichaje) {
             $fechaFormatted = Carbon::parse($fichaje->fecha)->format('d/m/Y');
+
+            // Registrar trazabilidad de auditoría (quién realizó el borrado)
+            $fichaje->update([
+                'deleted_by_email' => $user?->email,
+                'deleted_by_id' => $user?->id,
+            ]);
+
+            // Borrado lógico (Soft Delete)
             $fichaje->delete();
 
             Notification::make()
