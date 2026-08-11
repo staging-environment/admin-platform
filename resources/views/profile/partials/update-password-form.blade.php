@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6" x-data="{ pass: '', confirmPass: '' }">
         @csrf
         @method('put')
 
@@ -21,15 +21,23 @@
 
         <div>
             <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <p class="mt-1 text-xs text-gray-500 font-medium">Mínimo 8 caracteres.</p>
+            <x-text-input id="update_password_password" x-model="pass" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <p class="mt-1 text-xs font-semibold flex items-center gap-1 transition-colors duration-200"
+               :class="pass.length >= 8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'">
+                <span x-text="pass.length >= 8 ? '✓' : '✕'"></span>
+                <span>Mínimo 8 caracteres.</span>
+            </p>
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <p class="mt-1 text-xs text-gray-500 font-medium">Mínimo 8 caracteres.</p>
+            <x-text-input id="update_password_password_confirmation" x-model="confirmPass" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <p class="mt-1 text-xs font-semibold flex items-center gap-1 transition-colors duration-200"
+               :class="(confirmPass.length >= 8 && confirmPass === pass) ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'">
+                <span x-text="(confirmPass.length >= 8 && confirmPass === pass) ? '✓' : '✕'"></span>
+                <span x-text="(confirmPass.length > 0 && confirmPass !== pass) ? 'Las contraseñas deben coincidir (mínimo 8 caracteres).' : 'Mínimo 8 caracteres.'"></span>
+            </p>
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 
