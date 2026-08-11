@@ -4,7 +4,7 @@ namespace App\Filament\Resources\EmpleadoVacacions\Pages;
 
 use App\Filament\Resources\EmpleadoVacacions\EmpleadoVacacionResource;
 use Filament\Resources\Pages\ManageRecords;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ManageEmpleadoVacacions extends ManageRecords
