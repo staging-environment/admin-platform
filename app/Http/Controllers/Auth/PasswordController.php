@@ -21,17 +21,22 @@ class PasswordController extends Controller
         ]);
 
         $user = $request->user();
-        $user->update([
+        $user->forceFill([
             'password' => Hash::make($validated['password']),
-        ]);
+        ])->save();
 
-        // Mantener la sesión abierta tras cambiar la contraseña actualizando el hash en la sesión
-        \Illuminate\Support\Facades\Auth::login($user);
-        if (\class_exists(\Filament\Facades\Filament::class) && \Filament\Facades\Filament::auth()) {
+        // Actualizar el hash de contraseña en la sesión para evitar que AuthenticateSession desloguee al usuario
+        \Illuminate\Support\Facades\Auth::guard('web')->login($user);
+        $request->session()->put('password_hash_web', $user->getAuthPassword());
+        $request->session()->put('password_hash_' . \Illuminate\Support\Facades\Auth::getDefaultDriver(), $user->getAuthPassword());
+
+        if (class_exists(\Filament\Facades\Filament::class) && \Filament\Facades\Filament::auth()) {
             try {
+                $guard = \Filament\Facades\Filament::getAuthGuard() ?: 'web';
                 \Filament\Facades\Filament::auth()->login($user);
+                $request->session()->put('password_hash_' . $guard, $user->getAuthPassword());
             } catch (\Throwable $e) {
-                // Ignore if guard is identical
+                // Ignore
             }
         }
 
