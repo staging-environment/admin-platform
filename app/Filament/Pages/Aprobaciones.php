@@ -97,7 +97,14 @@ class Aprobaciones extends Page
             ->where('estado', 'Pendiente');
 
         if ($this->filter_pendiente_empleado) {
-            $query->where('empleado_id', $this->filter_pendiente_empleado);
+            $search = trim($this->filter_pendiente_empleado);
+            if (is_numeric($search)) {
+                $query->where('empleado_id', $search);
+            } else {
+                $query->whereHas('empleado', function($q) use ($search) {
+                    $q->whereRaw("CONCAT(nombre, ' ', apellidos) LIKE ?", ["%{$search}%"]);
+                });
+            }
         }
         if ($this->filter_pendiente_tipo) {
             $query->where('tipo', $this->filter_pendiente_tipo);
@@ -118,7 +125,14 @@ class Aprobaciones extends Page
             ->whereIn('estado', ['Aceptada', 'Rechazada']);
 
         if ($this->filter_historico_empleado) {
-            $query->where('empleado_id', $this->filter_historico_empleado);
+            $search = trim($this->filter_historico_empleado);
+            if (is_numeric($search)) {
+                $query->where('empleado_id', $search);
+            } else {
+                $query->whereHas('empleado', function($q) use ($search) {
+                    $q->whereRaw("CONCAT(nombre, ' ', apellidos) LIKE ?", ["%{$search}%"]);
+                });
+            }
         }
         if ($this->filter_historico_tipo) {
             $query->where('tipo', $this->filter_historico_tipo);
@@ -139,6 +153,21 @@ class Aprobaciones extends Page
     public function getEmpleadosProperty()
     {
         return \App\Models\Empleado::orderBy('nombre')->get(['id', 'nombre', 'apellidos']);
+    }
+
+    public function getTiposProperty()
+    {
+        $tipos = EmpleadoVacacion::distinct()
+            ->whereNotNull('tipo')
+            ->where('tipo', '!=', '')
+            ->pluck('tipo')
+            ->toArray();
+
+        if (empty($tipos)) {
+            return ['Vacaciones', 'Asuntos Propios', 'Permiso Retribuido'];
+        }
+
+        return $tipos;
     }
 
     public function mount(): void

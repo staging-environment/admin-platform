@@ -21,22 +21,21 @@
             <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
-                    <select wire:model.live="filter_pendiente_empleado" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
-                        <option value="">Todos los empleados</option>
+                    <input type="text" list="dl-pendiente-empleado" wire:model.live.debounce.300ms="filter_pendiente_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
+                    <datalist id="dl-pendiente-empleado">
                         @foreach($this->empleados as $emp)
-                            <option value="{{ $emp->id }}">{{ $emp->nombre }} {{ $emp->apellidos }}</option>
+                            <option value="{{ $emp->nombre }} {{ $emp->apellidos }}"></option>
                         @endforeach
-                    </select>
+                    </datalist>
                 </div>
 
                 <div class="w-40 min-w-[130px]">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo</label>
                     <select wire:model.live="filter_pendiente_tipo" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
                         <option value="">Todos los tipos</option>
-                        <option value="Vacaciones">Vacaciones</option>
-                        <option value="Asuntos Propios">Asuntos Propios</option>
-                        <option value="Sin Sueldo">Sin Sueldo</option>
-                        <option value="Permiso Retribuido">Permiso Retribuido</option>
+                        @foreach($this->tipos as $tipo)
+                            <option value="{{ $tipo }}">{{ $tipo }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -159,22 +158,21 @@
             <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
-                    <select wire:model.live="filter_historico_empleado" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
-                        <option value="">Todos los empleados</option>
+                    <input type="text" list="dl-historico-empleado" wire:model.live.debounce.300ms="filter_historico_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
+                    <datalist id="dl-historico-empleado">
                         @foreach($this->empleados as $emp)
-                            <option value="{{ $emp->id }}">{{ $emp->nombre }} {{ $emp->apellidos }}</option>
+                            <option value="{{ $emp->nombre }} {{ $emp->apellidos }}"></option>
                         @endforeach
-                    </select>
+                    </datalist>
                 </div>
 
                 <div class="w-36 min-w-[120px]">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo</label>
                     <select wire:model.live="filter_historico_tipo" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
                         <option value="">Todos los tipos</option>
-                        <option value="Vacaciones">Vacaciones</option>
-                        <option value="Asuntos Propios">Asuntos Propios</option>
-                        <option value="Sin Sueldo">Sin Sueldo</option>
-                        <option value="Permiso Retribuido">Permiso Retribuido</option>
+                        @foreach($this->tipos as $tipo)
+                            <option value="{{ $tipo }}">{{ $tipo }}</option>
+                        @endforeach
                     </select>
                 </div>
 
