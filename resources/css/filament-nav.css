@@ -497,6 +497,21 @@ button.fi-topbar-trigger {
     margin-bottom: 8px !important;
 }
 
+/* Asteriscos de obligatoriedad siempre en rojo intenso en toda la herramienta */
+.fi-fo-field-wrp-label-required,
+.fi-fo-field-wrp-label sup,
+.fi-fo-field-wrp-label .text-danger-600,
+.fi-fo-field-wrp-label .text-danger-500,
+.fi-fo-field-wrp-label .text-danger-400,
+label sup,
+label .text-danger-600,
+label .text-danger-500,
+label .text-danger-400,
+.required-asterisk {
+    color: #dc2626 !important;
+    font-weight: 700 !important;
+}
+
 
 
 

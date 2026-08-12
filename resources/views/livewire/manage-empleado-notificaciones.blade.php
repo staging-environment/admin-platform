@@ -19,7 +19,7 @@
                 <!-- Tipo de Notificación -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Tipo de Notificación <span class="text-danger-600 dark:text-danger-400">*</span>
+                        Tipo de Notificación <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                         <option value="Modificación sustancial del contrato">Modificación sustancial del contrato</option>
@@ -32,7 +32,7 @@
                 <!-- Fecha de Comunicación -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Fecha de comunicación <span class="text-danger-600 dark:text-danger-400">*</span>
+                        Fecha de comunicación <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <input type="date" wire:model="fecha_comunicacion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                     @error('fecha_comunicacion') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -42,7 +42,7 @@
                 @if ($tipo === 'Modificación sustancial del contrato')
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Fecha de efecto <span class="text-danger-600 dark:text-danger-400">*</span>
+                            Fecha de efecto <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <input type="date" wire:model="fecha_efecto" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                         @error('fecha_efecto') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -53,7 +53,7 @@
                 @if ($tipo === 'Apertura Expediente disciplinario')
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Gravedad <span class="text-danger-600 dark:text-danger-400">*</span>
+                            Gravedad <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <select wire:model="gravedad" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                             <option value="Leve">Leve</option>
@@ -68,7 +68,7 @@
                 @if ($tipo === 'Cierre expediente disciplinario')
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Resolución de cierre <span class="text-danger-600 dark:text-danger-400">*</span>
+                            Resolución de cierre <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <select wire:model.live="resolucion_cierre" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                             <option value="Amonestación">Amonestación</option>
@@ -81,7 +81,7 @@
                     @if ($resolucion_cierre === 'Suspensión de empleo y sueldo')
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Días de suspensión <span class="text-danger-600 dark:text-danger-400">*</span>
+                                Días de suspensión <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                             </label>
                             <input type="number" min="1" wire:model="dias_suspension" placeholder="Ej: 5" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                             @error('dias_suspension') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -92,7 +92,7 @@
                 <!-- Archivo Adjunto Obligatorio -->
                 <div class="md:col-span-2 lg:col-span-3">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Adjuntar Archivo Justificativo (PDF o Imagen) <span class="text-danger-600 dark:text-danger-400">*</span>
+                        Adjuntar Archivo Justificativo (PDF o Imagen) <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <input type="file" wire:model="archivo" accept=".pdf,image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-amber-400">
                     <div wire:loading wire:target="archivo" class="text-xs text-amber-600 mt-1">Cargando archivo...</div>
