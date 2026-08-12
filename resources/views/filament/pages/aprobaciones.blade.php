@@ -57,7 +57,7 @@
                                 </td>
                                 <td class="py-4 px-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <button type="button" wire:click="aprobarVacacion({{ $vac->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
+                                        <button type="button" wire:click="iniciarAprobacion({{ $vac->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
                                             Aprobar
                                         </button>
                                          <button type="button" wire:click="iniciarDenegacion({{ $vac->id }}, 'vacacion')" style="background-color: #dc2626; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-red-700">
@@ -189,6 +189,49 @@
                 @else
                     <img src="{{ $selectedDocUrl }}" class="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-md border border-gray-200 dark:border-white/5" />
                 @endif
+            </div>
+        </div>
+    </div>
+    <!-- Confirm Approval Modal -->
+    @if($approvingVacacion)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="cancelarAprobacion">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-lg overflow-hidden transform transition-all border border-gray-100 dark:border-white/5">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span class="p-1.5 bg-green-500/10 text-green-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </span>
+                    Aprobar Solicitud de Vacaciones
+                </h3>
+                <button type="button" wire:click="cancelarAprobacion" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 space-y-3">
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    ¿Estás seguro de que deseas aprobar las vacaciones de <strong>{{ $approvingVacacion->empleado ? $approvingVacacion->empleado->nombre . ' ' . $approvingVacacion->empleado->apellidos : 'Empleado' }}</strong>?
+                </p>
+                <div class="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-2xl text-xs text-green-900 dark:text-green-300 space-y-1">
+                    <div><strong>Período:</strong> Del {{ \Carbon\Carbon::parse($approvingVacacion->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($approvingVacacion->fecha_fin)->format('d/m/Y') }}</div>
+                    <div><strong>Días solicitados:</strong> {{ $approvingVacacion->dias_solicitados }} días</div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-950/20 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
+                <button type="button" wire:click="cancelarAprobacion" class="px-4 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    Cancelar
+                </button>
+                <button type="button" wire:click="confirmarAprobacion" style="background-color: #16a34a; color: #ffffff;" class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-green-700">
+                    Confirmar Aprobación
+                </button>
             </div>
         </div>
     </div>

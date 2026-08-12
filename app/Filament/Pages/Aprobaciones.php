@@ -35,6 +35,9 @@ class Aprobaciones extends Page
     public $denyingId = null;
     public $motivoDenegacion = '';
 
+    public $approvingId = null;
+    public $approvingVacacion = null;
+
     public $viewingRecord = null;
     public $viewingType = null;
 
@@ -78,6 +81,8 @@ class Aprobaciones extends Page
         $this->denyingType = null;
         $this->denyingId = null;
         $this->motivoDenegacion = '';
+        $this->approvingId = null;
+        $this->approvingVacacion = null;
         $this->viewingRecord = null;
         $this->viewingType = null;
     }
@@ -100,6 +105,28 @@ class Aprobaciones extends Page
             ->send();
 
         return false;
+    }
+
+    public function iniciarAprobacion($id): void
+    {
+        if (!$this->checkPermission()) return;
+        $this->approvingId = $id;
+        $this->approvingVacacion = EmpleadoVacacion::with('empleado')->find($id);
+    }
+
+    public function cancelarAprobacion(): void
+    {
+        $this->approvingId = null;
+        $this->approvingVacacion = null;
+    }
+
+    public function confirmarAprobacion(): void
+    {
+        if ($this->approvingId) {
+            $id = $this->approvingId;
+            $this->cancelarAprobacion();
+            $this->aprobarVacacion($id);
+        }
     }
 
     public function aprobarVacacion($id): void
@@ -136,7 +163,7 @@ class Aprobaciones extends Page
                         Carbon::parse($vac->fecha_inicio)->format('d/m/Y'),
                         Carbon::parse($vac->fecha_fin)->format('d/m/Y'),
                         'Aceptada',
-                        $comentario
+                        null
                     ));
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error("Error sending vacation approval confirmation email to actor: " . $e->getMessage());
