@@ -27,8 +27,10 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     public function canAccessPanel(Panel $panel): bool
     {
         $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($this->email)])->first();
-        if ($empleado && $empleado->estado === 'Baja') {
-            return false;
+        if ($empleado) {
+            if ($empleado->estado === 'Baja' || $empleado->estaSuspendido()) {
+                return false;
+            }
         }
 
         return $this->hasRole('Admin') 

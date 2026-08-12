@@ -19,14 +19,26 @@ class EnsureUserIsNotBaja
         if ($user) {
             $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
 
-            if ($empleado && $empleado->estado === 'Baja') {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+            if ($empleado) {
+                if ($empleado->estado === 'Baja') {
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
 
-                return redirect()->route('filament.admin.auth.login')->withErrors([
-                    'email' => 'Tu usuario se encuentra dado de baja en el sistema. El acceso ha sido bloqueado.',
-                ]);
+                    return redirect()->route('filament.admin.auth.login')->withErrors([
+                        'email' => 'Tu usuario se encuentra dado de baja en el sistema. El acceso ha sido bloqueado.',
+                    ]);
+                }
+
+                if ($empleado->estaSuspendido()) {
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return redirect()->route('filament.admin.auth.login')->withErrors([
+                        'email' => 'Tu cuenta se encuentra en período de suspensión de empleo y sueldo. El acceso está temporalmente bloqueado.',
+                    ]);
+                }
             }
         }
 

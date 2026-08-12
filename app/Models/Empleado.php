@@ -176,6 +176,33 @@ class Empleado extends Model
         }
     }
 
+    public function estaSuspendido(): bool
+    {
+        if ($this->estado === 'Baja') {
+            return false;
+        }
+
+        $suspension = $this->notificaciones()
+            ->where('tipo', 'Cierre expediente disciplinario')
+            ->where('resolucion_cierre', 'Suspensión de empleo y sueldo')
+            ->whereNotNull('fecha_comunicacion')
+            ->where('dias_suspension', '>', 0)
+            ->latest('fecha_comunicacion')
+            ->first();
+
+        if ($suspension) {
+            $fechaInicio = \Carbon\Carbon::parse($suspension->fecha_comunicacion)->startOfDay();
+            $fechaFin = (clone $fechaInicio)->addDays((int) $suspension->dias_suspension)->endOfDay();
+            $now = \Carbon\Carbon::now();
+
+            if ($now->between($fechaInicio, $fechaFin)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function alertas()
     {
         return $this->hasMany(EmpleadoAlerta::class);

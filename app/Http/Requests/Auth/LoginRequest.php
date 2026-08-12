@@ -53,14 +53,26 @@ class LoginRequest extends FormRequest
         $user = Auth::user();
         if ($user) {
             $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
-            if ($empleado && $empleado->estado === 'Baja') {
-                Auth::logout();
-                $this->session()->invalidate();
-                $this->session()->regenerateToken();
+            if ($empleado) {
+                if ($empleado->estado === 'Baja') {
+                    Auth::logout();
+                    $this->session()->invalidate();
+                    $this->session()->regenerateToken();
 
-                throw ValidationException::withMessages([
-                    'email' => 'Tu usuario se encuentra dado de baja en el sistema. El acceso está bloqueado.',
-                ]);
+                    throw ValidationException::withMessages([
+                        'email' => 'Tu usuario se encuentra dado de baja en el sistema. El acceso está bloqueado.',
+                    ]);
+                }
+
+                if ($empleado->estaSuspendido()) {
+                    Auth::logout();
+                    $this->session()->invalidate();
+                    $this->session()->regenerateToken();
+
+                    throw ValidationException::withMessages([
+                        'email' => 'Tu cuenta se encuentra en período de suspensión de empleo y sueldo. El acceso está temporalmente bloqueado.',
+                    ]);
+                }
             }
         }
 

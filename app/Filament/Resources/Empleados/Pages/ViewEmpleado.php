@@ -39,6 +39,19 @@ class ViewEmpleado extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('notificacionesDocuments')
+                ->label('Notificaciones')
+                ->icon('heroicon-o-bell')
+                ->color(function ($record) {
+                    $hasNotifs = $record->notificaciones()->exists();
+                    return $hasNotifs ? 'warning' : 'danger';
+                })
+                ->modalHeading('Notificaciones del Empleado')
+                ->modalWidth('7xl')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalContent(fn ($record) => view('filament.pages.notificaciones-modal', ['record' => $record]))
+                ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('dniDocuments')
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
