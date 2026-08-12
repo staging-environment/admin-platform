@@ -108,11 +108,9 @@ class Aprobaciones extends Page
 
         $vac = EmpleadoVacacion::find($id);
         if ($vac) {
-            $comentario = $this->comentariosVacaciones[$id] ?? null;
-
             $vac->update([
                 'estado' => 'Aceptada',
-                'comentario_aprobador' => $comentario
+                'comentario_aprobador' => null,
             ]);
             
             // Database notification for employee
