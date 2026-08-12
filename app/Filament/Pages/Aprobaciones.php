@@ -8,9 +8,12 @@ use App\Models\EmpleadoAusencia;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
+use Livewire\WithPagination;
 
 class Aprobaciones extends Page
 {
+    use WithPagination;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-check-badge';
 
     protected static ?string $navigationLabel = 'Aprobación de Solicitudes';
@@ -21,9 +24,18 @@ class Aprobaciones extends Page
 
     protected string $view = 'filament.pages.aprobaciones';
 
-    public $vacacionesPendientes = [];
-    public $bajasPendientes = [];
-    public $historicoProcesadas = [];
+    // Filters for Pendientes
+    public $filter_pendiente_empleado = '';
+    public $filter_pendiente_tipo = '';
+    public $filter_pendiente_mes = '';
+    public $filter_pendiente_anio = '';
+
+    // Filters for Histórico
+    public $filter_historico_empleado = '';
+    public $filter_historico_tipo = '';
+    public $filter_historico_estado = '';
+    public $filter_historico_mes = '';
+    public $filter_historico_anio = '';
 
     public $comentariosVacaciones = [];
     public $comentariosBajas = [];
@@ -55,6 +67,80 @@ class Aprobaciones extends Page
             || $user->can('gestion_recursos_humanos');
     }
 
+    public function updatedFilterHistoricoEmpleado() { $this->resetPage('historicoPage'); }
+    public function updatedFilterHistoricoTipo() { $this->resetPage('historicoPage'); }
+    public function updatedFilterHistoricoEstado() { $this->resetPage('historicoPage'); }
+    public function updatedFilterHistoricoMes() { $this->resetPage('historicoPage'); }
+    public function updatedFilterHistoricoAnio() { $this->resetPage('historicoPage'); }
+
+    public function resetPendienteFilters(): void
+    {
+        $this->filter_pendiente_empleado = '';
+        $this->filter_pendiente_tipo = '';
+        $this->filter_pendiente_mes = '';
+        $this->filter_pendiente_anio = '';
+    }
+
+    public function resetHistoricoFilters(): void
+    {
+        $this->filter_historico_empleado = '';
+        $this->filter_historico_tipo = '';
+        $this->filter_historico_estado = '';
+        $this->filter_historico_mes = '';
+        $this->filter_historico_anio = '';
+        $this->resetPage('historicoPage');
+    }
+
+    public function getVacacionesPendientesProperty()
+    {
+        $query = EmpleadoVacacion::with('empleado')
+            ->where('estado', 'Pendiente');
+
+        if ($this->filter_pendiente_empleado) {
+            $query->where('empleado_id', $this->filter_pendiente_empleado);
+        }
+        if ($this->filter_pendiente_tipo) {
+            $query->where('tipo', $this->filter_pendiente_tipo);
+        }
+        if ($this->filter_pendiente_mes) {
+            $query->whereMonth('fecha_inicio', $this->filter_pendiente_mes);
+        }
+        if ($this->filter_pendiente_anio) {
+            $query->whereYear('fecha_inicio', $this->filter_pendiente_anio);
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getHistoricoProcesadasProperty()
+    {
+        $query = EmpleadoVacacion::with('empleado')
+            ->whereIn('estado', ['Aceptada', 'Rechazada']);
+
+        if ($this->filter_historico_empleado) {
+            $query->where('empleado_id', $this->filter_historico_empleado);
+        }
+        if ($this->filter_historico_tipo) {
+            $query->where('tipo', $this->filter_historico_tipo);
+        }
+        if ($this->filter_historico_estado) {
+            $query->where('estado', $this->filter_historico_estado);
+        }
+        if ($this->filter_historico_mes) {
+            $query->whereMonth('fecha_inicio', $this->filter_historico_mes);
+        }
+        if ($this->filter_historico_anio) {
+            $query->whereYear('fecha_inicio', $this->filter_historico_anio);
+        }
+
+        return $query->orderBy('updated_at', 'desc')->paginate(25, ['*'], 'historicoPage');
+    }
+
+    public function getEmpleadosProperty()
+    {
+        return \App\Models\Empleado::orderBy('nombre')->get(['id', 'nombre', 'apellidos']);
+    }
+
     public function mount(): void
     {
         $this->loadPendientes();
@@ -62,19 +148,6 @@ class Aprobaciones extends Page
 
     public function loadPendientes(): void
     {
-        $this->vacacionesPendientes = EmpleadoVacacion::with('empleado')
-            ->where('estado', 'Pendiente')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $this->bajasPendientes = [];
-
-        $this->historicoProcesadas = EmpleadoVacacion::with('empleado')
-            ->whereIn('estado', ['Aceptada', 'Rechazada'])
-            ->orderBy('updated_at', 'desc')
-            ->get()
-            ->all();
-
         // Clear comment inputs and modal state
         $this->comentariosVacaciones = [];
         $this->comentariosBajas = [];

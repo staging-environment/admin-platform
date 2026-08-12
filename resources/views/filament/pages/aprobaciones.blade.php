@@ -13,8 +13,69 @@
                     Solicitudes de Vacaciones Pendientes
                 </h3>
                 <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
-                    {{ count($vacacionesPendientes) }} pendientes
+                    {{ count($this->vacacionesPendientes) }} pendientes
                 </span>
+            </div>
+
+            <!-- Pendientes Filters -->
+            <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
+                    <select wire:model.live="filter_pendiente_empleado" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los empleados</option>
+                        @foreach($this->empleados as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->nombre }} {{ $emp->apellidos }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="w-40 min-w-[130px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo</label>
+                    <select wire:model.live="filter_pendiente_tipo" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los tipos</option>
+                        <option value="Vacaciones">Vacaciones</option>
+                        <option value="Asuntos Propios">Asuntos Propios</option>
+                        <option value="Sin Sueldo">Sin Sueldo</option>
+                        <option value="Permiso Retribuido">Permiso Retribuido</option>
+                    </select>
+                </div>
+
+                <div class="w-36 min-w-[120px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mes</label>
+                    <select wire:model.live="filter_pendiente_mes" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los meses</option>
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+                <div class="w-32 min-w-[100px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Año</label>
+                    <select wire:model.live="filter_pendiente_anio" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+
+                @if($filter_pendiente_empleado || $filter_pendiente_tipo || $filter_pendiente_mes || $filter_pendiente_anio)
+                <div class="self-end">
+                    <button type="button" wire:click="resetPendienteFilters" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-300 transition-all">
+                        Limpiar Filtros
+                    </button>
+                </div>
+                @endif
             </div>
 
             <div class="overflow-x-auto">
@@ -29,7 +90,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
-                        @forelse($vacacionesPendientes as $vac)
+                        @forelse($this->vacacionesPendientes as $vac)
                             <tr>
                                 <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
                                     {{ $vac->empleado ? $vac->empleado->nombre . ' ' . $vac->empleado->apellidos : 'N/A' }}
@@ -78,8 +139,6 @@
             </div>
         </div>
 
-
-
         <!-- Processed Requests History Section -->
         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
             <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
@@ -92,8 +151,78 @@
                     Historial de Solicitudes Procesadas
                 </h3>
                 <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-bold">
-                    {{ count($historicoProcesadas) }} procesadas
+                    {{ $this->historicoProcesadas->total() }} procesadas
                 </span>
+            </div>
+
+            <!-- Histórico Filters -->
+            <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
+                    <select wire:model.live="filter_historico_empleado" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los empleados</option>
+                        @foreach($this->empleados as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->nombre }} {{ $emp->apellidos }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="w-36 min-w-[120px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo</label>
+                    <select wire:model.live="filter_historico_tipo" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los tipos</option>
+                        <option value="Vacaciones">Vacaciones</option>
+                        <option value="Asuntos Propios">Asuntos Propios</option>
+                        <option value="Sin Sueldo">Sin Sueldo</option>
+                        <option value="Permiso Retribuido">Permiso Retribuido</option>
+                    </select>
+                </div>
+
+                <div class="w-36 min-w-[120px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Estado</label>
+                    <select wire:model.live="filter_historico_estado" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los estados</option>
+                        <option value="Aceptada">Aprobada</option>
+                        <option value="Rechazada">Denegada</option>
+                    </select>
+                </div>
+
+                <div class="w-36 min-w-[120px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Mes</label>
+                    <select wire:model.live="filter_historico_mes" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos los meses</option>
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+                <div class="w-32 min-w-[100px]">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Año</label>
+                    <select wire:model.live="filter_historico_anio" class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500">
+                        <option value="">Todos</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+
+                @if($filter_historico_empleado || $filter_historico_tipo || $filter_historico_estado || $filter_historico_mes || $filter_historico_anio)
+                <div class="self-end">
+                    <button type="button" wire:click="resetHistoricoFilters" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-300 transition-all">
+                        Limpiar Filtros
+                    </button>
+                </div>
+                @endif
             </div>
 
             <div class="overflow-x-auto">
@@ -109,7 +238,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
-                        @forelse($historicoProcesadas as $record)
+                        @forelse($this->historicoProcesadas as $record)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
                                 <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
                                     {{ $record->empleado ? $record->empleado->nombre . ' ' . $record->empleado->apellidos : 'N/A' }}
@@ -165,6 +294,11 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination Links -->
+            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
+                {{ $this->historicoProcesadas->links() }}
             </div>
         </div>
     </div>
