@@ -180,28 +180,25 @@ class EditEmpleado extends EditRecord
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             FileUpload::make('resolucion_discapacidad')
-                                ->label('Resolución de Discapacidad (Archivo)')
+                                ->label(new \Illuminate\Support\HtmlString('Resolución de Discapacidad (Archivo) <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
-                                ->label('Dictamen técnico facultativo')
+                                ->label(new \Illuminate\Support\HtmlString('Dictamen técnico facultativo <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
-                                ->label('Certificado de discapacidad')
+                                ->label(new \Illuminate\Support\HtmlString('Certificado de discapacidad <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                ->previewable(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->previewable(false),
                         ]),
 
                     Toggle::make('tiene_incapacidad')
