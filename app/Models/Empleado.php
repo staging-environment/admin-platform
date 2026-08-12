@@ -277,5 +277,25 @@ class Empleado extends Model
                 'descripcion' => 'Este empleado no tiene configurada ninguna opción de discapacidad o incapacidad en su ficha.',
             ]);
         }
+
+        // 8. Alerta: Discapacidad activa con archivos pendientes
+        if ($this->tiene_discapacidad) {
+            $hasRes = $this->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
+            $hasDict = $this->documentos()->where('tipo', 'Dictamen Técnico')->exists();
+            $hasCert = $this->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
+
+            if (!$hasRes || !$hasDict || !$hasCert) {
+                $faltantes = [];
+                if (!$hasRes) $faltantes[] = 'Resolución de discapacidad';
+                if (!$hasDict) $faltantes[] = 'Dictamen técnico facultativo';
+                if (!$hasCert) $faltantes[] = 'Certificado de discapacidad';
+
+                $this->alertas()->create([
+                    'tipo' => 'discapacidad_archivos_pendientes',
+                    'titulo' => 'Documentación de discapacidad incompleta',
+                    'descripcion' => 'Tiene marcada discapacidad pero le falta adjuntar: ' . implode(', ', $faltantes) . '.',
+                ]);
+            }
+        }
     }
 }

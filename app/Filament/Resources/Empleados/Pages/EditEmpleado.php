@@ -201,21 +201,21 @@ class EditEmpleado extends EditRecord
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             FileUpload::make('resolucion_discapacidad')
-                                ->label(new \Illuminate\Support\HtmlString('Resolución de Discapacidad (Archivo) <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                ->label('Resolución de Discapacidad (Archivo)')
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
-                                ->label(new \Illuminate\Support\HtmlString('Dictamen técnico facultativo <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                ->label('Dictamen técnico facultativo')
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
-                                ->label(new \Illuminate\Support\HtmlString('Certificado de discapacidad <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                ->label('Certificado de discapacidad')
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -352,6 +352,8 @@ class EditEmpleado extends EditRecord
                     } else {
                         $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
                     }
+
+                    $record->actualizarAlertas();
                 })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
         ];

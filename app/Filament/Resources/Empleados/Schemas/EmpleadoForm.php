@@ -289,7 +289,7 @@ class EmpleadoForm
                                 Grid::make(3)
                                     ->schema([
                                         FileUpload::make('resolucion_discapacidad')
-                                            ->label(new \Illuminate\Support\HtmlString('Resolución de Discapacidad (Archivo) <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                            ->label('Resolución de Discapacidad (Archivo)')
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -339,6 +339,7 @@ class EmpleadoForm
                                             ->saveRelationshipsUsing(function ($component, $record, $state) {
                                                 if (empty($state)) {
                                                     $record->documentos()->where('tipo', 'Resolución Discapacidad')->delete();
+                                                    $record->actualizarAlertas();
                                                     return;
                                                 }
 
@@ -349,9 +350,10 @@ class EmpleadoForm
                                                         'file_path' => $state,
                                                     ]
                                                 );
+                                                $record->actualizarAlertas();
                                             }),
                                         FileUpload::make('dictamen_tecnico')
-                                            ->label(new \Illuminate\Support\HtmlString('Dictamen técnico facultativo <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                            ->label('Dictamen técnico facultativo')
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -400,6 +402,7 @@ class EmpleadoForm
                                             ->saveRelationshipsUsing(function ($component, $record, $state) {
                                                 if (empty($state)) {
                                                     $record->documentos()->where('tipo', 'Dictamen Técnico')->delete();
+                                                    $record->actualizarAlertas();
                                                     return;
                                                 }
 
@@ -410,9 +413,10 @@ class EmpleadoForm
                                                         'file_path' => $state,
                                                     ]
                                                 );
+                                                $record->actualizarAlertas();
                                             }),
                                         FileUpload::make('certificado_discapacidad')
-                                            ->label(new \Illuminate\Support\HtmlString('Certificado de discapacidad <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>'))
+                                            ->label('Certificado de discapacidad')
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -461,6 +465,7 @@ class EmpleadoForm
                                             ->saveRelationshipsUsing(function ($component, $record, $state) {
                                                 if (empty($state)) {
                                                     $record->documentos()->where('tipo', 'Certificado Discapacidad')->delete();
+                                                    $record->actualizarAlertas();
                                                     return;
                                                 }
 
@@ -471,6 +476,7 @@ class EmpleadoForm
                                                         'file_path' => $state,
                                                     ]
                                                 );
+                                                $record->actualizarAlertas();
                                             }),
                                     ])
                                     ->visible(fn (Get $get, $record) => (bool) ($get('tiene_discapacidad') ?? ($record?->tiene_discapacidad ?? false)))
