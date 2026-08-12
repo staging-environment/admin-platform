@@ -357,14 +357,13 @@ class EditEmpleado extends EditRecord
                         ->default(now())
                         ->required(),
                     FileUpload::make('documento_baja')
-                        ->label(fn (Get $get) => new \Illuminate\Support\HtmlString(
-                            'Documento de baja (Archivo)' . ($get('motivo_baja') !== 'Finalización de contrato' ? ' <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>' : '')
-                        ))
+                        ->label('Documento de baja (Archivo)')
                         ->directory('empleados/bajas')
                         ->disk('local')
                         ->acceptedFileTypes(['application/pdf', 'image/*'])
                         ->previewable(false)
-                        ->required(fn (Get $get) => $get('motivo_baja') !== 'Finalización de contrato'),
+                        ->visible(fn (Get $get) => $get('motivo_baja') && $get('motivo_baja') !== 'Finalización de contrato')
+                        ->required(fn (Get $get) => $get('motivo_baja') && $get('motivo_baja') !== 'Finalización de contrato'),
                 ])
                 ->action(function ($record, array $data) {
                     $docPath = $data['documento_baja'] ?? null;
