@@ -19,7 +19,7 @@
 
             <!-- Pendientes Filters -->
             <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
-                <div class="flex-1 min-w-[200px]">
+                <div class="w-64 max-w-xs">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
                     <input type="text" list="dl-pendiente-empleado" wire:model.live.debounce.300ms="filter_pendiente_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
                     <datalist id="dl-pendiente-empleado">
@@ -156,7 +156,7 @@
 
             <!-- Histórico Filters -->
             <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
-                <div class="flex-1 min-w-[200px]">
+                <div class="w-64 max-w-xs">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
                     <input type="text" list="dl-historico-empleado" wire:model.live.debounce.300ms="filter_historico_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
                     <datalist id="dl-historico-empleado">
