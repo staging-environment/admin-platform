@@ -356,14 +356,34 @@ class EditEmpleado extends EditRecord
                         ->label('Fecha de baja')
                         ->default(now())
                         ->required(),
+                    FileUpload::make('documento_baja')
+                        ->label(fn (Get $get) => new \Illuminate\Support\HtmlString(
+                            'Documento de baja (Archivo)' . ($get('motivo_baja') !== 'Finalización de contrato' ? ' <span class="fi-fo-field-wrp-label-required-mark text-danger-600 dark:text-danger-400">*</span>' : '')
+                        ))
+                        ->directory('empleados/bajas')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->previewable(false)
+                        ->required(fn (Get $get) => $get('motivo_baja') !== 'Finalización de contrato'),
                 ])
                 ->action(function ($record, array $data) {
+                    $docPath = $data['documento_baja'] ?? null;
+
                     $record->update([
                         'estado' => 'Baja',
                         'motivo_baja' => $data['motivo_baja'],
                         'observaciones_baja' => $data['motivo_baja'] === 'Otros' ? $data['observaciones_baja'] : null,
                         'fecha_baja' => $data['fecha_baja'],
+                        'documento_baja_path' => $docPath,
                     ]);
+
+                    if ($docPath) {
+                        $record->documentos()->create([
+                            'tipo' => 'Documento de Baja',
+                            'nombre' => 'Documento de Baja ' . $record->nombre . ' ' . $record->apellidos,
+                            'file_path' => $docPath,
+                        ]);
+                    }
 
                     \Filament\Notifications\Notification::make()
                         ->title('Empleado dado de baja correctamente')
