@@ -21,6 +21,14 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
+    public function mustChangePassword(): bool
+    {
+        if ($this->hasRole('Empleado') || $this->hasRole('empleado')) {
+            return \Illuminate\Support\Facades\Hash::check('1234', $this->password);
+        }
+        return false;
+    }
+
     /**
      * Control de acceso al panel de Filament
      */

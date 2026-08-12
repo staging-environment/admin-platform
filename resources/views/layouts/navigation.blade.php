@@ -12,6 +12,7 @@
                 </div>
 
                 <!-- Navigation Links -->
+                @if(!auth()->user()?->mustChangePassword())
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
                     @if(auth()->user()?->can('ver_dashboard'))
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -30,7 +31,7 @@
                                         </svg>
                                     </button>
                                 </x-slot>
- 
+
                                 <x-slot name="content">
                                      @if(auth()->user()?->can('acceder_portal_fichajes'))
                                      <x-dropdown-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
@@ -81,7 +82,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']))
+                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones_bajas']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
@@ -146,6 +147,7 @@
                         </div>
                     @endif
                 </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->
@@ -203,6 +205,7 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        @if(!auth()->user()?->mustChangePassword())
         <div class="pt-2 pb-3 space-y-1">
             @if(auth()->user()?->can('ver_dashboard'))
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -262,7 +265,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones', 'aprobacion_vacaciones_bajas', 'solicitar_ver_vacaciones', 'gestion_recursos_humanos']))
+            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones_bajas']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
@@ -314,6 +317,8 @@
                     </div>
                 </div>
             @endif
+        </div>
+        @endif
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
