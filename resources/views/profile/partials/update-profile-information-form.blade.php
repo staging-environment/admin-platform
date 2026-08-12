@@ -78,11 +78,6 @@
                     <p class="text-xs text-blue-700 font-medium">
                         El sistema validará tu contacto y asociará tu cuenta automáticamente para enviarte las alertas al instante.
                     </p>
-                </div>
-            @else
-                <div class="mt-4 p-4 bg-gray-50 border-l-4 border-gray-400 rounded-r-md text-sm text-gray-700">
-                    ℹ️ No tienes activo el permiso para recibir alertas de competencia. Si lo necesitas, solicita su activación en la Matriz de Permisos.
-                </div>
             @endcan
         </div>
 
