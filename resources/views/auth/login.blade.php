@@ -4,12 +4,8 @@
             $now = \Carbon\Carbon::now();
             $year = $now->year;
 
-            if ($year === 2026 && $now->between(\Carbon\Carbon::create(2026, 8, 10, 0, 0, 0), \Carbon\Carbon::create(2026, 8, 17, 8, 0, 0))) {
-                return true;
-            }
-
             $sept8 = \Carbon\Carbon::create($year, 9, 8, 0, 0, 0);
-            $startFeria = \Carbon\Carbon::create($year, 9, 4, 0, 0, 0);
+            $startFeria = \Carbon\Carbon::create($year, 9, 4, 20, 0, 0);
             $endFeria = $sept8->copy()->endOfWeek()->addDay()->setTime(8, 0, 0);
 
             return $now->between($startFeria, $endFeria);

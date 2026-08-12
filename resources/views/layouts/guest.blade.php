@@ -3,16 +3,11 @@
         $now = \Carbon\Carbon::now();
         $year = $now->year;
 
-        // 1. Período especial activado esta semana (del 10 al 17 de Agosto a las 08:00 AM)
-        if ($year === 2026 && $now->between(\Carbon\Carbon::create(2026, 8, 10, 0, 0, 0), \Carbon\Carbon::create(2026, 8, 17, 8, 0, 0))) {
-            return true;
-        }
-
-        // 2. Calendario Oficial de la Feria de Consolación de Utrera (Todos los años):
-        // En Utrera la Feria se celebra siempre en torno al 8 de Septiembre (Virgen de Consolación).
-        // Comienza el 4 de Septiembre (Noche del Pescaíto) y finaliza el lunes a las 08:00 AM tras la festividad.
+        // Calendario Oficial de la Feria y Fiestas de Ntra. Sra. de Consolación de Utrera:
+        // Arranca la Noche del Pescaíto (4 de Septiembre a las 20:00) y finaliza tras el día de la Patrona (8 de Septiembre),
+        // volviendo al estado normal el lunes por la mañana a las 08:00 AM.
         $sept8 = \Carbon\Carbon::create($year, 9, 8, 0, 0, 0);
-        $startFeria = \Carbon\Carbon::create($year, 9, 4, 0, 0, 0);
+        $startFeria = \Carbon\Carbon::create($year, 9, 4, 20, 0, 0);
         $endFeria = $sept8->copy()->endOfWeek()->addDay()->setTime(8, 0, 0);
 
         return $now->between($startFeria, $endFeria);
