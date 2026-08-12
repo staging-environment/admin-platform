@@ -31,7 +31,6 @@ class EditEmpleado extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
             \Filament\Actions\Action::make('dniDocuments')
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
