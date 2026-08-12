@@ -1,11 +1,22 @@
 @php
-    $now = \Carbon\Carbon::now();
-    $year = $now->year;
-    // Se activa automáticamente TODOS LOS AÑOS en época de Feria de Utrera (Agosto 10 - Septiembre 10 a las 08:00 AM)
-    $esFeriaUtrera = $now->between(
-        \Carbon\Carbon::create($year, 8, 10, 0, 0, 0),
-        \Carbon\Carbon::create($year, 9, 10, 8, 0, 0)
-    );
+    $esFeriaUtrera = (function() {
+        $now = \Carbon\Carbon::now();
+        $year = $now->year;
+
+        // 1. Período especial activado esta semana (del 10 al 17 de Agosto a las 08:00 AM)
+        if ($year === 2026 && $now->between(\Carbon\Carbon::create(2026, 8, 10, 0, 0, 0), \Carbon\Carbon::create(2026, 8, 17, 8, 0, 0))) {
+            return true;
+        }
+
+        // 2. Calendario Oficial de la Feria de Consolación de Utrera (Todos los años):
+        // En Utrera la Feria se celebra siempre en torno al 8 de Septiembre (Virgen de Consolación).
+        // Comienza el 4 de Septiembre (Noche del Pescaíto) y finaliza el lunes a las 08:00 AM tras la festividad.
+        $sept8 = \Carbon\Carbon::create($year, 9, 8, 0, 0, 0);
+        $startFeria = \Carbon\Carbon::create($year, 9, 4, 0, 0, 0);
+        $endFeria = $sept8->copy()->endOfWeek()->addDay()->setTime(8, 0, 0);
+
+        return $now->between($startFeria, $endFeria);
+    })();
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
