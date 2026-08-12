@@ -63,20 +63,6 @@ class EmpleadoResource extends Resource
                     ))
                     ->columnSpanFull()
                     ->schema([
-                        \Filament\Schemas\Components\Html::make('
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px;" class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30 rounded-2xl text-sm text-red-800 dark:text-red-400">
-                                <svg style="width: 24px; height: 24px; flex-shrink: 0;" class="text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                <div>
-                                    <strong class="font-bold">DNI / NIE no registrado:</strong>
-                                    Este empleado no tiene ningún documento de DNI o NIE asociado en su ficha. Por favor, suba el documento correspondiente para registrar y validar su fecha de caducidad.
-                                </div>
-                            </div>
-                        ')
-                            ->visible(fn ($record) => $record && !$record->documentos()->where('tipo', 'DNI')->exists())
-                            ->columnSpanFull(),
-
                         \Filament\Schemas\Components\Grid::make(4)
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('foto')
