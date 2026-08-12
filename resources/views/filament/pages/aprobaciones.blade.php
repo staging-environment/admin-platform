@@ -10,7 +10,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
                         </svg>
                     </span>
-                    Solicitudes de Vacaciones Pendientes
+                    Solicitudes Pendientes
                 </h3>
                 <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
                     {{ count($this->vacacionesPendientes) }} pendientes

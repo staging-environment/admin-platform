@@ -17,7 +17,7 @@ class Aprobaciones extends Page
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-check-badge';
 
     protected static ?string $navigationLabel = 'Aprobación de Solicitudes';
-    protected static ?string $title = 'Aprobación de Vacaciones y Bajas';
+    protected static ?string $title = 'Aprobación de Solicitudes';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 4;
@@ -157,17 +157,7 @@ class Aprobaciones extends Page
 
     public function getTiposProperty()
     {
-        $tipos = EmpleadoVacacion::distinct()
-            ->whereNotNull('tipo')
-            ->where('tipo', '!=', '')
-            ->pluck('tipo')
-            ->toArray();
-
-        if (empty($tipos)) {
-            return ['Vacaciones', 'Asuntos Propios', 'Permiso Retribuido'];
-        }
-
-        return $tipos;
+        return ['Vacaciones', 'Permiso Retribuido'];
     }
 
     public function mount(): void
