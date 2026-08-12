@@ -1,11 +1,16 @@
 <x-guest-layout>
     @php
-        $esFeriaUtrera = \Carbon\Carbon::now()->isBefore(\Carbon\Carbon::create(2026, 8, 17, 8, 0, 0));
+        $now = \Carbon\Carbon::now();
+        $year = $now->year;
+        $esFeriaUtrera = $now->between(
+            \Carbon\Carbon::create($year, 8, 10, 0, 0, 0),
+            \Carbon\Carbon::create($year, 9, 10, 8, 0, 0)
+        );
     @endphp
 
     @if($esFeriaUtrera)
-        <div class="mb-5 p-3.5 rounded-2xl bg-gradient-to-r from-red-500 via-amber-500 to-rose-500 text-white shadow-md text-center transform hover:scale-[1.01] transition-all overflow-hidden relative">
-            <div class="feria-garland my-1">
+        <div class="mb-5 p-4 rounded-2xl bg-gradient-to-r from-red-700 via-rose-800 to-amber-700 text-white shadow-lg text-center transform hover:scale-[1.01] transition-all relative overflow-hidden border border-amber-400/40">
+            <div class="feria-garland mb-2 pt-1">
                 <div class="farolillo farolillo-red"></div>
                 <div class="farolillo farolillo-yellow"></div>
                 <div class="farolillo farolillo-green"></div>
@@ -14,10 +19,12 @@
                 <div class="farolillo farolillo-yellow"></div>
                 <div class="farolillo farolillo-red"></div>
             </div>
-            <h4 class="font-extrabold text-sm tracking-wide flex items-center justify-center gap-1.5 mt-2.5 drop-shadow-sm">
-                <span>💃</span> ¡Feliz Feria de Consolación de Utrera! <span>🎪</span>
+            <h4 class="font-black text-base text-white tracking-wide flex items-center justify-center gap-2 mt-2 drop-shadow-md">
+                <span class="text-xl">💃</span>
+                <span>¡Feliz Feria de Utrera!</span>
+                <span class="text-xl">🎪</span>
             </h4>
-            <p class="text-[11px] font-medium text-amber-100 mt-0.5 opacity-95">
+            <p class="text-xs font-extrabold text-amber-200 mt-1 drop-shadow-sm">
                 ¡Que paséis unos felices días de fiesta! 🍷✨
             </p>
         </div>

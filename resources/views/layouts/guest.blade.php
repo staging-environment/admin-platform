@@ -1,5 +1,11 @@
 @php
-    $esFeriaUtrera = \Carbon\Carbon::now()->isBefore(\Carbon\Carbon::create(2026, 8, 17, 8, 0, 0));
+    $now = \Carbon\Carbon::now();
+    $year = $now->year;
+    // Se activa automáticamente TODOS LOS AÑOS en época de Feria de Utrera (Agosto 10 - Septiembre 10 a las 08:00 AM)
+    $esFeriaUtrera = $now->between(
+        \Carbon\Carbon::create($year, 8, 10, 0, 0, 0),
+        \Carbon\Carbon::create($year, 9, 10, 8, 0, 0)
+    );
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
