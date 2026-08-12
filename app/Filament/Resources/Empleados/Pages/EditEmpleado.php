@@ -8,6 +8,7 @@ use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
@@ -95,8 +96,16 @@ class EditEmpleado extends EditRecord
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                     $cert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
-                    $incap = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                    $incapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
                     
+                    $incapacidadArchivos = [];
+                    foreach ($incapDocs as $d) {
+                        $incapacidadArchivos[] = [
+                            'file_path' => $d->file_path,
+                            'comentario' => $d->comentario,
+                        ];
+                    }
+
                     return [
                         'tiene_discapacidad' => $record->tiene_discapacidad,
                         'tipo_discapacidad' => $record->tipo_discapacidad,
@@ -110,7 +119,7 @@ class EditEmpleado extends EditRecord
                         'certificado_discapacidad' => $cert?->file_path,
                         'tiene_incapacidad' => $record->tiene_incapacidad,
                         'tipo_incapacidad' => $record->tipo_incapacidad,
-                        'incapacidad_file' => $incap?->file_path,
+                        'incapacidad_archivos' => $incapacidadArchivos,
                         'no_tiene_discapacidad' => $record->no_tiene_discapacidad,
                     ];
                 })
@@ -222,26 +231,36 @@ class EditEmpleado extends EditRecord
                             }
                         }),
 
-                    Grid::make(2)
+                    Select::make('tipo_incapacidad')
+                        ->label('Tipo de Incapacidad')
+                        ->multiple()
+                        ->options([
+                            'Físico' => 'Físico',
+                            'Psíquico' => 'Psíquico',
+                        ])
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->schema([
-                            Select::make('tipo_incapacidad')
-                                ->label('Tipo de Incapacidad')
-                                ->multiple()
-                                ->options([
-                                    'Físico' => 'Físico',
-                                    'Psíquico' => 'Psíquico',
-                                ])
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
 
-                            FileUpload::make('incapacidad_file')
-                                ->label('Adjuntar Documentación de Incapacidad')
+                    Repeater::make('incapacidad_archivos')
+                        ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad (Múltiples archivos) <span class="text-red-600 font-bold">*</span>'))
+                        ->schema([
+                            FileUpload::make('file_path')
+                                ->label('Archivo')
                                 ->directory('empleados/documentos')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
-                        ]),
+                                ->required(),
+                            TextInput::make('comentario')
+                                ->label('Comentario / Descripción')
+                                ->placeholder('Ej: Informe de resolución médica 2026')
+                                ->nullable(),
+                        ])
+                        ->columns(2)
+                        ->addActionLabel('Añadir otro archivo')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->columnSpanFull(),
 
                     Toggle::make('no_tiene_discapacidad')
                         ->label('No tiene discapacidad / incapacidad')
@@ -311,22 +330,24 @@ class EditEmpleado extends EditRecord
                     }
                     
                     if ($tieneIncapacidad) {
-                        if (!empty($data['incapacidad_file'])) {
-                            $tipo = 'Incapacidad Física';
-                            $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
-                            if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
-                                $first = $tipoIncapacidad[0];
-                                $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
-                            }
-                            $record->documentos()->updateOrCreate(
-                                ['tipo' => $tipo],
-                                [
+                        $archivos = $data['incapacidad_archivos'] ?? [];
+                        $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+
+                        foreach ($archivos as $item) {
+                            if (!empty($item['file_path'])) {
+                                $tipo = 'Incapacidad Física';
+                                $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
+                                if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
+                                    $first = $tipoIncapacidad[0];
+                                    $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                                }
+                                $record->documentos()->create([
+                                    'tipo' => $tipo,
                                     'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
-                                    'file_path' => $data['incapacidad_file'],
-                                ]
-                            );
-                        } else {
-                            $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                                    'file_path' => $item['file_path'],
+                                    'comentario' => $item['comentario'] ?? null,
+                                ]);
+                            }
                         }
                     } else {
                         $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();

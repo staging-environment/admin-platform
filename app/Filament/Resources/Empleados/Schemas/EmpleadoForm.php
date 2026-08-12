@@ -492,13 +492,23 @@ class EmpleadoForm
                                     ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                                     ->columnSpanFull(),
 
-                                FileUpload::make('incapacidad_file')
-                                    ->label('Adjuntar Documentación de Incapacidad')
-                                    ->directory('empleados/documentos')
-                                    ->disk('local')
-                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                    ->previewable(false)
-                                    ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                Repeater::make('incapacidad_archivos')
+                                    ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad (Múltiples archivos) <span class="text-red-600 font-bold">*</span>'))
+                                    ->schema([
+                                        FileUpload::make('file_path')
+                                            ->label('Archivo')
+                                            ->directory('empleados/documentos')
+                                            ->disk('local')
+                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                            ->previewable(false)
+                                            ->required(),
+                                        TextInput::make('comentario')
+                                            ->label('Comentario / Descripción')
+                                            ->placeholder('Ej: Informe de resolución médica 2026')
+                                            ->nullable(),
+                                    ])
+                                    ->columns(2)
+                                    ->addActionLabel('Añadir otro archivo')
                                     ->hintAction(
                                         \Filament\Actions\Action::make('ver_incapacidad')
                                             ->label('Ver Incapacidad')
@@ -509,59 +519,73 @@ class EmpleadoForm
                                             ->modalCancelActionLabel('Cerrar')
                                             ->modalWidth('7xl')
                                             ->modalContent(function ($record) {
-                                                $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                                if (!$doc) return null;
-                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
-                                                $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
-                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
-                                                    return new \Illuminate\Support\HtmlString("
-                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
-                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
-                                                        </div>
-                                                    ");
-                                                } elseif ($extension === 'pdf') {
-                                                    return new \Illuminate\Support\HtmlString("
-                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
-                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
-                                                        </div>
-                                                    ");
+                                                $docs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
+                                                if ($docs->isEmpty()) return new \Illuminate\Support\HtmlString("<p class='text-gray-500 p-4 text-center'>No hay documentación de incapacidad adjunta.</p>");
+
+                                                $html = "<div class='space-y-6 p-2'>";
+                                                foreach ($docs as $index => $doc) {
+                                                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                                                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+
+                                                    $html .= "<div class='border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 shadow-sm space-y-3'>";
+                                                    $html .= "<div class='flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100 dark:border-gray-700'>";
+                                                    $html .= "<span class='font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2'><svg class='w-4 h-4 text-amber-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/></svg> Archivo #" . ($index + 1) . "</span>";
+                                                    if ($doc->comentario) {
+                                                        $html .= "<div class='text-xs font-semibold text-gray-700 dark:text-gray-300 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-lg border border-amber-200 dark:border-amber-800'>💬 <strong>Comentario:</strong> " . e($doc->comentario) . "</div>";
+                                                    }
+                                                    $html .= "</div>";
+
+                                                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                        $html .= "<div class='flex justify-center bg-gray-50 dark:bg-gray-900 border rounded-lg p-2 overflow-auto' style='max-height: 50vh;'><img src='{$url}' class='object-contain rounded' style='max-height: 45vh;' /></div>";
+                                                    } elseif ($extension === 'pdf') {
+                                                        $html .= "<iframe src='{$url}' class='w-full border rounded-lg' style='height: 450px;'></iframe>";
+                                                    } else {
+                                                        $html .= "<div class='p-4 text-center'><a href='{$url}' target='_blank' class='text-indigo-600 font-bold underline'>Descargar Archivo (" . strtoupper($extension) . ")</a></div>";
+                                                    }
+                                                    $html .= "</div>";
                                                 }
-                                                return new \Illuminate\Support\HtmlString("
-                                                    <div class='text-center p-4'>
-                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Archivo</a>
-                                                    </div>
-                                                ");
+                                                $html .= "</div>";
+
+                                                return new \Illuminate\Support\HtmlString($html);
                                             })
                                     )
                                     ->afterStateHydrated(function ($component, $record) {
                                         if ($record) {
-                                            $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                                            $component->state($doc ? $doc->file_path : null);
+                                            $docs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
+                                            $state = [];
+                                            foreach ($docs as $d) {
+                                                $state[] = [
+                                                    'file_path' => $d->file_path,
+                                                    'comentario' => $d->comentario,
+                                                ];
+                                            }
+                                            $component->state($state);
                                         }
                                     })
                                     ->dehydrated(false)
                                     ->saveRelationshipsUsing(function ($component, $record, $state, Get $get) {
-                                        if (empty($state)) {
-                                            $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                                        $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                                        if (empty($state) || !is_array($state)) {
                                             return;
                                         }
 
-                                        $tipo = 'Incapacidad Física';
-                                        $tipoIncapacidad = $get('tipo_incapacidad') ?? [];
-                                        if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
-                                            $first = $tipoIncapacidad[0];
-                                            $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                                        foreach ($state as $item) {
+                                            if (!empty($item['file_path'])) {
+                                                $tipo = 'Incapacidad Física';
+                                                $tipoIncapacidad = $get('tipo_incapacidad') ?? [];
+                                                if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
+                                                    $first = $tipoIncapacidad[0];
+                                                    $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                                                }
+
+                                                $record->documentos()->create([
+                                                    'tipo' => $tipo,
+                                                    'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
+                                                    'file_path' => $item['file_path'],
+                                                    'comentario' => $item['comentario'] ?? null,
+                                                ]);
+                                            }
                                         }
-
-                                        $filePath = is_array($state) ? reset($state) : $state;
-
-                                        $record->documentos()->updateOrCreate(
-                                            ['tipo' => $tipo],
-                                            [
-                                                'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
-                                                'file_path' => $filePath,
-                                            ]
-                                        );
                                     })
                                     ->visible(fn (Get $get, $record) => (bool) ($get('tiene_incapacidad') ?? ($record?->tiene_incapacidad ?? false)))
                                     ->columnSpanFull(),

@@ -8,6 +8,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
@@ -103,8 +104,16 @@ class ViewEmpleado extends ViewRecord
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                     $cert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
-                    $incap = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
+                    $incapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
                     
+                    $incapacidadArchivos = [];
+                    foreach ($incapDocs as $d) {
+                        $incapacidadArchivos[] = [
+                            'file_path' => $d->file_path,
+                            'comentario' => $d->comentario,
+                        ];
+                    }
+
                     return [
                         'tiene_discapacidad' => $record->tiene_discapacidad,
                         'tipo_discapacidad' => $record->tipo_discapacidad,
@@ -118,7 +127,7 @@ class ViewEmpleado extends ViewRecord
                         'certificado_discapacidad' => $cert?->file_path,
                         'tiene_incapacidad' => $record->tiene_incapacidad,
                         'tipo_incapacidad' => $record->tipo_incapacidad,
-                        'incapacidad_file' => $incap?->file_path,
+                        'incapacidad_archivos' => $incapacidadArchivos,
                         'no_tiene_discapacidad' => $record->no_tiene_discapacidad,
                     ];
                 })
@@ -142,51 +151,55 @@ class ViewEmpleado extends ViewRecord
                                     'Física' => 'Física',
                                     'Psíquica' => 'Psíquica',
                                     'Sensorial' => 'Sensorial',
+                                    'Intelectual' => 'Intelectual',
                                 ])
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                             
                             TextInput::make('porcentaje_discapacidad')
                                 ->label('Porcentaje de Discapacidad')
                                 ->numeric()
-                                ->minValue(fn (Get $get) => (bool) $get('tiene_discapacidad') ? 33 : 0)
-                                ->maxValue(100)
                                 ->suffix('%')
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_reconocimiento')
                                 ->label('Fecha de reconocimiento')
+                                ->displayFormat('d/m/Y')
+                                ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_resolucion_discapacidad')
                                 ->label('Fecha de resolución')
+                                ->displayFormat('d/m/Y')
+                                ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                         ]),
 
-                    Grid::make(2)
+                    Toggle::make('pertenece_andalucia')
+                        ->label('¿Pertenece a Andalucía?')
+                        ->live()
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+
+                    Grid::make(1)
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
-                            Toggle::make('pertenece_andalucia')
-                                ->label('¿Pertenece a Andalucía?')
-                                ->default(true)
-                                ->live(),
-
                             Select::make('comunidad_autonoma')
                                 ->label('Comunidad Autónoma')
                                 ->options([
+                                    'Andalucía' => 'Andalucía',
                                     'Aragón' => 'Aragón',
-                                    'Principado de Asturias' => 'Principado de Asturias',
-                                    'Illes Balears' => 'Illes Balears',
+                                    'Asturias' => 'Asturias',
+                                    'Baleares' => 'Baleares',
                                     'Canarias' => 'Canarias',
                                     'Cantabria' => 'Cantabria',
-                                    'Castilla y León' => 'Castilla y León',
                                     'Castilla-La Mancha' => 'Castilla-La Mancha',
+                                    'Castilla y León' => 'Castilla y León',
                                     'Cataluña' => 'Cataluña',
-                                    'Comunitat Valenciana' => 'Comunitat Valenciana',
+                                    'Comunidad Valenciana' => 'Comunidad Valenciana',
                                     'Extremadura' => 'Extremadura',
                                     'Galicia' => 'Galicia',
-                                    'Comunidad de Madrid' => 'Comunidad de Madrid',
-                                    'Región de Murcia' => 'Región de Murcia',
-                                    'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
+                                    'Madrid' => 'Madrid',
+                                    'Murcia' => 'Murcia',
+                                    'Navarra' => 'Navarra',
                                     'País Vasco' => 'País Vasco',
                                     'La Rioja' => 'La Rioja',
                                     'Ceuta' => 'Ceuta',
@@ -230,26 +243,36 @@ class ViewEmpleado extends ViewRecord
                             }
                         }),
 
-                    Grid::make(2)
+                    Select::make('tipo_incapacidad')
+                        ->label('Tipo de Incapacidad')
+                        ->multiple()
+                        ->options([
+                            'Físico' => 'Físico',
+                            'Psíquico' => 'Psíquico',
+                        ])
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->schema([
-                            Select::make('tipo_incapacidad')
-                                ->label('Tipo de Incapacidad')
-                                ->multiple()
-                                ->options([
-                                    'Físico' => 'Físico',
-                                    'Psíquico' => 'Psíquico',
-                                ])
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
 
-                            FileUpload::make('incapacidad_file')
-                                ->label('Adjuntar Documentación de Incapacidad')
+                    Repeater::make('incapacidad_archivos')
+                        ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad (Múltiples archivos) <span class="text-red-600 font-bold">*</span>'))
+                        ->schema([
+                            FileUpload::make('file_path')
+                                ->label('Archivo')
                                 ->directory('empleados/documentos')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
-                        ]),
+                                ->required(),
+                            TextInput::make('comentario')
+                                ->label('Comentario / Descripción')
+                                ->placeholder('Ej: Informe de resolución médica 2026')
+                                ->nullable(),
+                        ])
+                        ->columns(2)
+                        ->addActionLabel('Añadir otro archivo')
+                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->columnSpanFull(),
 
                     Toggle::make('no_tiene_discapacidad')
                         ->label('No tiene discapacidad / incapacidad')
@@ -319,22 +342,24 @@ class ViewEmpleado extends ViewRecord
                     }
                     
                     if ($tieneIncapacidad) {
-                        if (!empty($data['incapacidad_file'])) {
-                            $tipo = 'Incapacidad Física';
-                            $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
-                            if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
-                                $first = $tipoIncapacidad[0];
-                                $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
-                            }
-                            $record->documentos()->updateOrCreate(
-                                ['tipo' => $tipo],
-                                [
+                        $archivos = $data['incapacidad_archivos'] ?? [];
+                        $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+
+                        foreach ($archivos as $item) {
+                            if (!empty($item['file_path'])) {
+                                $tipo = 'Incapacidad Física';
+                                $tipoIncapacidad = $data['tipo_incapacidad'] ?? [];
+                                if (is_array($tipoIncapacidad) && count($tipoIncapacidad) > 0) {
+                                    $first = $tipoIncapacidad[0];
+                                    $tipo = $first === 'Psíquico' ? 'Incapacidad Psíquica' : 'Incapacidad Física';
+                                }
+                                $record->documentos()->create([
+                                    'tipo' => $tipo,
                                     'nombre' => 'Documentación Incapacidad ' . $record->nombre . ' ' . $record->apellidos,
-                                    'file_path' => $data['incapacidad_file'],
-                                ]
-                            );
-                        } else {
-                            $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                                    'file_path' => $item['file_path'],
+                                    'comentario' => $item['comentario'] ?? null,
+                                ]);
+                            }
                         }
                     } else {
                         $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
@@ -342,33 +367,39 @@ class ViewEmpleado extends ViewRecord
                 })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('ver_incapacidad')
-                ->modalHeading('Documento de Incapacidad')
+                ->modalHeading('Documentación de Incapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalWidth('7xl')
                 ->modalContent(function ($record) {
-                    $doc = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->first();
-                    if (!$doc) return null;
-                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
-                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
-                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
-                        return new \Illuminate\Support\HtmlString("
-                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
-                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
-                            </div>
-                        ");
-                    } elseif ($extension === 'pdf') {
-                        return new \Illuminate\Support\HtmlString("
-                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
-                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
-                            </div>
-                        ");
+                    $docs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
+                    if ($docs->isEmpty()) return new \Illuminate\Support\HtmlString("<p class='text-gray-500 p-4 text-center'>No hay documentación de incapacidad adjunta.</p>");
+
+                    $html = "<div class='space-y-6 p-2'>";
+                    foreach ($docs as $index => $doc) {
+                        $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                        $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+
+                        $html .= "<div class='border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 shadow-sm space-y-3'>";
+                        $html .= "<div class='flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100 dark:border-gray-700'>";
+                        $html .= "<span class='font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2'><svg class='w-4 h-4 text-amber-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'/></svg> Archivo #" . ($index + 1) . "</span>";
+                        if ($doc->comentario) {
+                            $html .= "<div class='text-xs font-semibold text-gray-700 dark:text-gray-300 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-lg border border-amber-200 dark:border-amber-800'>💬 <strong>Comentario:</strong> " . e($doc->comentario) . "</div>";
+                        }
+                        $html .= "</div>";
+
+                        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                            $html .= "<div class='flex justify-center bg-gray-50 dark:bg-gray-900 border rounded-lg p-2 overflow-auto' style='max-height: 50vh;'><img src='{$url}' class='object-contain rounded' style='max-height: 45vh;' /></div>";
+                        } elseif ($extension === 'pdf') {
+                            $html .= "<iframe src='{$url}' class='w-full border rounded-lg' style='height: 450px;'></iframe>";
+                        } else {
+                            $html .= "<div class='p-4 text-center'><a href='{$url}' target='_blank' class='text-indigo-600 font-bold underline'>Descargar Archivo (" . strtoupper($extension) . ")</a></div>";
+                        }
+                        $html .= "</div>";
                     }
-                    return new \Illuminate\Support\HtmlString("
-                        <div class='text-center p-4'>
-                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Documento</a>
-                        </div>
-                    ");
+                    $html .= "</div>";
+
+                    return new \Illuminate\Support\HtmlString($html);
                 }),
             \Filament\Actions\Action::make('ver_resolucion')
                 ->modalHeading('Resolución de Discapacidad')
