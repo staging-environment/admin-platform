@@ -22,6 +22,8 @@ class FichaEmpleado extends Page
 
     public $empleado;
     public $fichajeDelDia;
+    public $fichajePendienteAnterior = null;
+    public $hora_salida_pendiente = null;
     public $recentFichajes;
 
     public $isViewingAdminList = false;
@@ -230,9 +232,22 @@ class FichaEmpleado extends Page
             return;
         }
 
+        $today = Carbon::today()->format('Y-m-d');
+
+        // Busca si existe algún turno de días anteriores que haya quedado abierto sin registrar salida
+        $this->fichajePendienteAnterior = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', '<', $today)
+            ->whereNull('hora_salida')
+            ->orderBy('fecha', 'desc')
+            ->first();
+
+        if ($this->fichajePendienteAnterior && !$this->hora_salida_pendiente) {
+            $this->hora_salida_pendiente = Carbon::now()->format('H:i');
+        }
+
         // Busca la sesión activa de fichaje sin salida para el día de hoy
         $this->fichajeDelDia = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
-            ->where('fecha', Carbon::today()->format('Y-m-d'))
+            ->where('fecha', $today)
             ->whereNull('hora_salida')
             ->latest('id')
             ->first();
@@ -263,11 +278,33 @@ class FichaEmpleado extends Page
             return;
         }
 
+        $today = Carbon::today()->format('Y-m-d');
+
+        // Impedir nueva entrada si hay un turno de días previos sin registrar salida
+        $unclosedPrevious = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', '<', $today)
+            ->whereNull('hora_salida')
+            ->orderBy('fecha', 'desc')
+            ->first();
+
+        if ($unclosedPrevious) {
+            $fechaTurno = Carbon::parse($unclosedPrevious->fecha)->translatedFormat('l, d \d\e F \d\e Y');
+            $horaEntradaTurno = $unclosedPrevious->hora_entrada ? Carbon::parse($unclosedPrevious->hora_entrada)->format('H:i') : '--:--';
+
+            Notification::make()
+                ->title('Turno anterior sin cerrar')
+                ->body("No puedes registrar una nueva entrada porque tienes un turno pendiente de cierre del {$fechaTurno} (Entrada: {$horaEntradaTurno}). Debes cerrar el turno anterior indicando su hora de salida.")
+                ->danger()
+                ->persistent()
+                ->send();
+
+            $this->loadFichajes();
+            return;
+        }
+
         $this->validate([
             'hora_entrada' => 'required|date_format:H:i',
         ]);
-
-        $today = Carbon::today()->format('Y-m-d');
 
         $activeFichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', $today)
@@ -299,6 +336,60 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->loadFichajes();
+    }
+
+    public function cerrarTurnoAnterior($latitude = null, $longitude = null): void
+    {
+        if (!$this->empleado) {
+            Notification::make()
+                ->title('Error')
+                ->body('Tu usuario no está asociado a ningún registro de empleado.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $this->validate([
+            'hora_salida_pendiente' => 'required|date_format:H:i',
+        ], [
+            'hora_salida_pendiente.required' => 'La hora de salida del turno anterior es obligatoria.',
+            'hora_salida_pendiente.date_format' => 'El formato de hora debe ser HH:MM.',
+        ]);
+
+        $today = Carbon::today()->format('Y-m-d');
+        $fichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', '<', $today)
+            ->whereNull('hora_salida')
+            ->orderBy('fecha', 'desc')
+            ->first();
+
+        if (!$fichaje) {
+            Notification::make()
+                ->title('Aviso')
+                ->body('No se encontró ningún turno anterior pendiente de cierre.')
+                ->warning()
+                ->send();
+            $this->loadFichajes();
+            return;
+        }
+
+        $fechaFormatted = Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F \d\e Y');
+
+        $fichaje->update([
+            'hora_salida' => $this->hora_salida_pendiente,
+            'server_checkout_at' => Carbon::now(),
+            'checkout_latitude' => $latitude,
+            'checkout_longitude' => $longitude,
+        ]);
+
+        Notification::make()
+            ->title('Turno Anterior Cerrado')
+            ->body("Has registrado la salida del {$fechaFormatted} a las {$this->hora_salida_pendiente}. Ahora ya puedes registrar tu entrada de hoy.")
+            ->success()
+            ->send();
+
+        $this->hora_salida_pendiente = null;
         $this->loadFichajes();
     }
 

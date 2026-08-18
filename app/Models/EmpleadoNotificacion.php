@@ -12,6 +12,7 @@ class EmpleadoNotificacion extends Model
         'fecha_comunicacion' => 'date',
         'fecha_efecto' => 'date',
         'fecha_vencimiento' => 'date',
+        'fecha_cierre' => 'date',
         'dias_suspension' => 'integer',
     ];
 

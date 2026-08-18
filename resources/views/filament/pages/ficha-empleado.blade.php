@@ -379,7 +379,72 @@
                 </div>
             </div>
 
+            @if($fichajePendienteAnterior)
+                <!-- Alert Banner: Shift from previous day is unclosed -->
+                <div class="p-6 bg-gradient-to-r from-red-500/10 via-amber-500/10 to-orange-500/10 dark:from-red-950/30 dark:via-amber-950/20 dark:to-orange-950/20 border-2 border-red-500/40 dark:border-red-500/30 rounded-3xl shadow-sm">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-red-500/20 text-red-600 dark:text-red-400 rounded-2xl shrink-0 mt-0.5 animate-pulse">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 font-bold text-xs rounded-full uppercase tracking-wider">
+                                        Atención: Turno Pendiente de Cierre
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">
+                                    Tienes un turno anterior sin cerrar ({{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->translatedFormat('l, d \d\e F \d\e Y') }})
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    Registraste entrada a las <strong class="font-bold text-gray-900 dark:text-white font-mono">{{ \Carbon\Carbon::parse($fichajePendienteAnterior->hora_entrada)->format('H:i') }}</strong> pero no se registró la salida. 
+                                    <span class="text-red-600 dark:text-red-400 font-bold">Debes cerrar el turno anterior indicando la hora de salida para poder realizar una nueva entrada hoy.</span>
+                                </p>
+                            </div>
+                        </div>
 
+                        <!-- Action form to close pending shift -->
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 bg-white dark:bg-gray-900 p-4 rounded-2xl border border-red-200/80 dark:border-red-900/50 shadow-sm shrink-0" x-data="{
+                            loadingCierre: false,
+                            doCerrarTurno() {
+                                this.loadingCierre = true;
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(
+                                        (position) => {
+                                            $wire.cerrarTurnoAnterior(position.coords.latitude, position.coords.longitude)
+                                                .then(() => { this.loadingCierre = false; })
+                                                .catch(() => { this.loadingCierre = false; });
+                                        },
+                                        (error) => {
+                                            console.warn('Geolocation error:', error);
+                                            $wire.cerrarTurnoAnterior(null, null)
+                                                .then(() => { this.loadingCierre = false; })
+                                                .catch(() => { this.loadingCierre = false; });
+                                        },
+                                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                                    );
+                                } else {
+                                    $wire.cerrarTurnoAnterior(null, null)
+                                        .then(() => { this.loadingCierre = false; })
+                                        .catch(() => { this.loadingCierre = false; });
+                                }
+                            }
+                        }">
+                            <div class="space-y-1">
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora de Salida ({{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->format('d/m/Y') }})</label>
+                                <input type="time" wire:model="hora_salida_pendiente" class="w-full sm:w-36 rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-base font-bold focus:border-red-500 focus:ring-red-500 shadow-sm" />
+                            </div>
+                            <button @click="doCerrarTurno" x-bind:disabled="loadingCierre" style="background-color: #dc2626; color: #ffffff;" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-600/20 hover:shadow-red-700/30 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 whitespace-nowrap">
+                                <span x-show="loadingCierre" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                                <span x-show="!loadingCierre">Cerrar Turno Anterior</span>
+                                <span x-show="loadingCierre" style="display: none;">Guardando...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Fichaje Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -399,7 +464,17 @@
                         </div>
 
                         <div class="py-6 flex flex-col items-center justify-center min-h-[160px]">
-                            @if($fichajeDelDia && $fichajeDelDia->hora_entrada)
+                            @if($fichajePendienteAnterior)
+                                <div class="text-center space-y-3 max-w-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-5 rounded-2xl border border-amber-200 dark:border-amber-900/40">
+                                    <svg class="w-10 h-10 mx-auto stroke-current text-amber-500" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white">Entrada Bloqueada</h4>
+                                        <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Debes cerrar primero el turno anterior del <strong>{{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->format('d/m/Y') }}</strong> para poder iniciar tu jornada de hoy.</p>
+                                    </div>
+                                </div>
+                            @elseif($fichajeDelDia && $fichajeDelDia->hora_entrada)
                                 <div class="text-center space-y-2">
                                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 font-bold rounded-full text-sm border border-green-200 dark:border-green-900">
                                         <span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
@@ -474,6 +549,48 @@
                                     </div>
                                     <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</p>
+                                </div>
+                            @elseif($fichajePendienteAnterior)
+                                <div class="w-full max-w-xs space-y-4" x-data="{
+                                    loadingCierre: false,
+                                    doCerrarTurno() {
+                                        this.loadingCierre = true;
+                                        if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition(
+                                                (position) => {
+                                                    $wire.cerrarTurnoAnterior(position.coords.latitude, position.coords.longitude)
+                                                        .then(() => { this.loadingCierre = false; })
+                                                        .catch(() => { this.loadingCierre = false; });
+                                                },
+                                                (error) => {
+                                                    console.warn('Geolocation error:', error);
+                                                    $wire.cerrarTurnoAnterior(null, null)
+                                                        .then(() => { this.loadingCierre = false; })
+                                                        .catch(() => { this.loadingCierre = false; });
+                                                },
+                                                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                                            );
+                                        } else {
+                                            $wire.cerrarTurnoAnterior(null, null)
+                                                .then(() => { this.loadingCierre = false; })
+                                                .catch(() => { this.loadingCierre = false; });
+                                        }
+                                    }
+                                }">
+                                    <div class="text-center pb-1">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 font-bold rounded-full text-xs border border-red-200 dark:border-red-900">
+                                            Turno del {{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->format('d/m/Y') }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora Salida Turno Anterior</label>
+                                        <input type="time" wire:model="hora_salida_pendiente" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-red-500 focus:ring-red-500 shadow-sm" />
+                                    </div>
+                                    <button @click="doCerrarTurno" x-bind:disabled="loadingCierre" style="background-color: #dc2626; color: #ffffff;" class="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-600/10 hover:shadow-red-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                        <span x-show="loadingCierre" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                                        <span x-show="!loadingCierre">Cerrar Turno Anterior</span>
+                                        <span x-show="loadingCierre" style="display: none;">Obteniendo ubicación...</span>
+                                    </button>
                                 </div>
                             @elseif(!$fichajeDelDia || !$fichajeDelDia->hora_entrada)
                                 <div class="text-center space-y-2 max-w-xs text-gray-400">
