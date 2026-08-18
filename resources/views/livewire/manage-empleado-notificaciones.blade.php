@@ -1,21 +1,21 @@
 <div class="space-y-6">
     @if (session()->has('notificacion_success'))
-        <div class="p-4 mb-4 text-sm text-emerald-800 rounded-lg bg-emerald-50 dark:bg-gray-800 dark:text-emerald-400 border border-emerald-200" role="alert">
+        <div class="p-4 mb-4 text-sm rounded-lg border" style="background-color: #ecfdf5 !important; color: #065f46 !important; border-color: #a7f3d0 !important;" role="alert">
             {{ session('notificacion_success') }}
         </div>
     @endif
 
     <!-- Formulario para Cerrar Expediente Disciplinario Seleccionado -->
     @if ($selectedNotificacionIdParaCierre && $selectedNotificacionParaCierre)
-        <div class="p-5 bg-purple-50 dark:bg-purple-950/30 rounded-xl border-2 border-purple-300 dark:border-purple-800 space-y-4 shadow-sm">
-            <div class="flex items-center justify-between border-b border-purple-200 dark:border-purple-800/60 pb-3">
-                <h3 class="text-base font-bold text-purple-900 dark:text-purple-200 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-5 rounded-xl border-2 space-y-4 shadow-sm" style="background-color: #faf5ff !important; border-color: #c084fc !important;">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: #e9d5ff !important;">
+                <h3 class="text-base font-bold flex items-center gap-2" style="color: #581c87 !important;">
+                    <svg class="w-5 h-5" style="color: #7e22ce !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Cierre de Expediente Disciplinario (Apertura: {{ $selectedNotificacionParaCierre->fecha_comunicacion ? $selectedNotificacionParaCierre->fecha_comunicacion->format('d/m/Y') : '-' }} @if($selectedNotificacionParaCierre->gravedad) &bull; Gravedad: {{ $selectedNotificacionParaCierre->gravedad }} @endif)
                 </h3>
-                <button type="button" wire:click="cancelarCierreExpediente" class="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <button type="button" wire:click="cancelarCierreExpediente" class="text-xs font-semibold hover:underline" style="color: #6b7280 !important;">
                     ✕ Cancelar
                 </button>
             </div>
@@ -25,7 +25,7 @@
                     <!-- Fecha de Resolución / Cierre -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Fecha de resolución / cierre <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                            Fecha de resolución / cierre <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <input type="date" wire:model="cierre_fecha_comunicacion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-purple-500 focus:border-purple-500">
                         @error('cierre_fecha_comunicacion') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -34,7 +34,7 @@
                     <!-- Resolución de Cierre -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Resolución de cierre <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                            Resolución de cierre <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <select wire:model.live="cierre_resolucion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-purple-500 focus:border-purple-500">
                             <option value="Amonestación">Amonestación</option>
@@ -48,7 +48,7 @@
                     @if ($cierre_resolucion === 'Suspensión de empleo y sueldo')
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Días de suspensión <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                                Días de suspensión <span class="font-bold" style="color: #dc2626 !important;">*</span>
                             </label>
                             <input type="number" min="1" wire:model="cierre_dias_suspension" placeholder="Ej: 5" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-purple-500 focus:border-purple-500">
                             @error('cierre_dias_suspension') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -58,7 +58,7 @@
                     <!-- Archivo Justificativo de Cierre -->
                     <div class="md:col-span-2 lg:col-span-3">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Adjuntar Archivo Justificativo de Resolución (PDF o Imagen) <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                            Adjuntar Archivo Justificativo de Resolución (PDF o Imagen) <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <input type="file" wire:model="cierre_archivo" accept=".pdf,image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 dark:file:bg-gray-700 dark:file:text-purple-400">
                         <div wire:loading wire:target="cierre_archivo" class="text-xs text-purple-600 mt-1">Cargando archivo...</div>
@@ -70,7 +70,7 @@
                     <button type="button" wire:click="cancelarCierreExpediente" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors">
                         Cancelar
                     </button>
-                    <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+                    <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 text-white text-sm font-bold rounded-lg shadow transition-colors" style="background-color: #7e22ce !important; color: #ffffff !important;">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -95,7 +95,7 @@
                 <!-- Tipo de Notificación -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Tipo de Notificación <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                        Tipo de Notificación <span class="font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                         <option value="Modificación sustancial del contrato">Modificación sustancial del contrato</option>
@@ -107,7 +107,7 @@
                 <!-- Fecha de Comunicación -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Fecha de comunicación <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                        Fecha de comunicación <span class="font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <input type="date" wire:model="fecha_comunicacion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                     @error('fecha_comunicacion') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -117,7 +117,7 @@
                 @if ($tipo === 'Modificación sustancial del contrato')
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Fecha de efecto <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                            Fecha de efecto <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <input type="date" wire:model="fecha_efecto" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                         @error('fecha_efecto') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -128,7 +128,7 @@
                 @if ($tipo === 'Apertura Expediente disciplinario')
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Gravedad <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                            Gravedad <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
                         <select wire:model="gravedad" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
                             <option value="Leve">Leve</option>
@@ -142,7 +142,7 @@
                 <!-- Archivo Adjunto Obligatorio -->
                 <div class="md:col-span-2 lg:col-span-3">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Adjuntar Archivo Justificativo (PDF o Imagen) <span class="text-red-600 dark:text-red-500 font-bold" style="color: #dc2626 !important;">*</span>
+                        Adjuntar Archivo Justificativo (PDF o Imagen) <span class="font-bold" style="color: #dc2626 !important;">*</span>
                     </label>
                     <input type="file" wire:model="archivo" accept=".pdf,image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-amber-400">
                     <div wire:loading wire:target="archivo" class="text-xs text-amber-600 mt-1">Cargando archivo...</div>
@@ -151,7 +151,7 @@
             </div>
 
             <div class="flex justify-end pt-2">
-                <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors">
+                <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style="background-color: #d97706 !important; color: #ffffff !important;">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
@@ -205,19 +205,19 @@
                                 </td>
                                 <td class="py-2.5 px-2 text-center">
                                     @if ($notif->tipo === 'Modificación sustancial del contrato')
-                                        <span class="inline-flex items-center text-[11px] bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded font-medium">
+                                        <span class="inline-flex items-center text-[11px] px-2 py-0.5 rounded font-medium border" style="background-color: #eff6ff !important; color: #1e40af !important; border-color: #bfdbfe !important;">
                                             Efecto: {{ $notif->fecha_efecto ? $notif->fecha_efecto->format('d/m/Y') : '-' }}
                                         </span>
                                     @elseif ($isDisciplinario)
                                         @if ($isOpen)
-                                            <span class="inline-flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full font-bold border" style="background-color: #fef3c7 !important; color: #92400e !important; border-color: #fde68a !important;">
+                                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: #d97706 !important;"></span>
                                                 Abierto @if($notif->gravedad) ({{ $notif->gravedad }}) @endif
                                             </span>
                                         @else
                                             <div class="inline-flex flex-col items-center">
-                                                <span class="inline-flex items-center gap-1 text-[11px] bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 px-2 py-0.5 rounded-full font-bold">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                                <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full font-bold border" style="background-color: #f3e8ff !important; color: #6b21a8 !important; border-color: #e9d5ff !important;">
+                                                    <span class="w-1.5 h-1.5 rounded-full" style="background-color: #9333ea !important;"></span>
                                                     {{ $notif->resolucion_cierre }}
                                                 </span>
                                                 <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
@@ -235,7 +235,7 @@
                                 <td class="py-2.5 px-2 text-center" style="white-space: nowrap;">
                                     <div class="flex flex-col items-center gap-1">
                                         @if ($notif->file_path)
-                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-semibold" title="Documento de Notificación / Apertura">
+                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] hover:underline font-semibold" style="color: #d97706 !important;" title="Documento de Notificación / Apertura">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -245,7 +245,7 @@
                                         @endif
 
                                         @if ($notif->cierre_file_path)
-                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->cierre_file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-purple-600 dark:text-purple-400 hover:underline font-semibold" title="Documento de Resolución de Cierre">
+                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->cierre_file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] hover:underline font-semibold" style="color: #7e22ce !important;" title="Documento de Resolución de Cierre">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
@@ -261,15 +261,15 @@
                                 <td class="py-2.5 px-3 text-center" style="white-space: nowrap;">
                                     <div class="flex items-center justify-center gap-1.5">
                                         @if ($isDisciplinario && $isOpen)
-                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold rounded shadow-sm transition-colors" style="white-space: nowrap;">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2.5 py-1 text-[11px] font-bold rounded shadow-sm hover:opacity-90 transition-opacity" style="background-color: #7e22ce !important; color: #ffffff !important; border: 1px solid #6b21a8 !important; white-space: nowrap;">
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #ffffff !important;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
                                                 Cerrar
                                             </button>
                                         @endif
 
-                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="text-red-600 hover:text-red-800 dark:text-red-400 text-xs font-semibold py-1 px-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" style="white-space: nowrap;">
+                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded hover:opacity-80 transition-opacity" style="color: #dc2626 !important; background-color: #fef2f2 !important; border: 1px solid #fecaca !important; white-space: nowrap;">
                                             Eliminar
                                         </button>
                                     </div>
