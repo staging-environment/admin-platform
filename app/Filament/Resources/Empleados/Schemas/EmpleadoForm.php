@@ -290,6 +290,11 @@ class EmpleadoForm
                                     ->schema([
                                         FileUpload::make('resolucion_discapacidad')
                                             ->label('Resolución de Discapacidad (Archivo)')
+                                            ->markAsRequired()
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                            ->validationMessages([
+                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -354,6 +359,11 @@ class EmpleadoForm
                                             }),
                                         FileUpload::make('dictamen_tecnico')
                                             ->label('Dictamen técnico facultativo')
+                                            ->markAsRequired()
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                            ->validationMessages([
+                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -417,6 +427,11 @@ class EmpleadoForm
                                             }),
                                         FileUpload::make('certificado_discapacidad')
                                             ->label('Certificado de discapacidad')
+                                            ->markAsRequired()
+                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                            ->validationMessages([
+                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])

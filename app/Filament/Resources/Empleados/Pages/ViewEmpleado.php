@@ -214,6 +214,11 @@ class ViewEmpleado extends ViewRecord
                         ->schema([
                             FileUpload::make('resolucion_discapacidad')
                                 ->label('Resolución de Discapacidad (Archivo)')
+                                ->markAsRequired()
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                ->validationMessages([
+                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -221,6 +226,11 @@ class ViewEmpleado extends ViewRecord
 
                             FileUpload::make('dictamen_tecnico')
                                 ->label('Dictamen técnico facultativo')
+                                ->markAsRequired()
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                ->validationMessages([
+                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -228,6 +238,11 @@ class ViewEmpleado extends ViewRecord
 
                             FileUpload::make('certificado_discapacidad')
                                 ->label('Certificado de discapacidad')
+                                ->markAsRequired()
+                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
+                                ->validationMessages([
+                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
+                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -288,6 +303,18 @@ class ViewEmpleado extends ViewRecord
                     $noTieneDiscapacidad = (bool) ($data['no_tiene_discapacidad'] ?? false);
                     $tieneDiscapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_discapacidad'] ?? false);
                     $tieneIncapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_incapacidad'] ?? false);
+
+                    if ($tieneDiscapacidad) {
+                        $hasRes = !empty($data['resolucion_discapacidad']);
+                        $hasDict = !empty($data['dictamen_tecnico']);
+                        $hasCert = !empty($data['certificado_discapacidad']);
+
+                        if (!$hasRes && !$hasDict && !$hasCert) {
+                            throw \Illuminate\Validation\ValidationException::withMessages([
+                                'resolucion_discapacidad' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad (Resolución, Dictamen técnico o Certificado).',
+                            ]);
+                        }
+                    }
 
                     $record->update([
                         'tiene_discapacidad' => $tieneDiscapacidad,
