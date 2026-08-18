@@ -79,87 +79,87 @@
                 </div>
             </form>
         </div>
-    @endif
+    @else
+        <!-- Formulario para Añadir Notificación -->
+        <div class="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Registrar Nueva Notificación
+            </h3>
 
-    <!-- Formulario para Añadir Notificación -->
-    <div class="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Registrar Nueva Notificación
-        </h3>
-
-        <form wire:submit.prevent="guardarNotificacion" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Tipo de Notificación -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Tipo de Notificación <span class="font-bold" style="color: #dc2626 !important;">*</span>
-                    </label>
-                    <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
-                        <option value="Modificación sustancial del contrato">Modificación sustancial del contrato</option>
-                        <option value="Apertura Expediente disciplinario">Apertura Expediente disciplinario</option>
-                    </select>
-                    @error('tipo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Fecha de Comunicación -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Fecha de comunicación <span class="font-bold" style="color: #dc2626 !important;">*</span>
-                    </label>
-                    <input type="date" wire:model="fecha_comunicacion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
-                    @error('fecha_comunicacion') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Condicional 1: Modificación sustancial del contrato -->
-                @if ($tipo === 'Modificación sustancial del contrato')
+            <form wire:submit.prevent="guardarNotificacion" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Tipo de Notificación -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Fecha de efecto <span class="font-bold" style="color: #dc2626 !important;">*</span>
+                            Tipo de Notificación <span class="font-bold" style="color: #dc2626 !important;">*</span>
                         </label>
-                        <input type="date" wire:model="fecha_efecto" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
-                        @error('fecha_efecto') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
-                    </div>
-                @endif
-
-                <!-- Condicional 2: Apertura Expediente disciplinario -->
-                @if ($tipo === 'Apertura Expediente disciplinario')
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Gravedad <span class="font-bold" style="color: #dc2626 !important;">*</span>
-                        </label>
-                        <select wire:model="gravedad" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
-                            <option value="Leve">Leve</option>
-                            <option value="Grave">Grave</option>
-                            <option value="Muy Grave">Muy Grave</option>
+                        <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
+                            <option value="Modificación sustancial del contrato">Modificación sustancial del contrato</option>
+                            <option value="Apertura Expediente disciplinario">Apertura Expediente disciplinario</option>
                         </select>
-                        @error('gravedad') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        @error('tipo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                     </div>
-                @endif
 
-                <!-- Archivo Adjunto Obligatorio -->
-                <div class="md:col-span-2 lg:col-span-3">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Adjuntar Archivo Justificativo (PDF o Imagen) <span class="font-bold" style="color: #dc2626 !important;">*</span>
-                    </label>
-                    <input type="file" wire:model="archivo" accept=".pdf,image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-amber-400">
-                    <div wire:loading wire:target="archivo" class="text-xs text-amber-600 mt-1">Cargando archivo...</div>
-                    @error('archivo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    <!-- Fecha de Comunicación -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Fecha de comunicación <span class="font-bold" style="color: #dc2626 !important;">*</span>
+                        </label>
+                        <input type="date" wire:model="fecha_comunicacion" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
+                        @error('fecha_comunicacion') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Condicional 1: Modificación sustancial del contrato -->
+                    @if ($tipo === 'Modificación sustancial del contrato')
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Fecha de efecto <span class="font-bold" style="color: #dc2626 !important;">*</span>
+                            </label>
+                            <input type="date" wire:model="fecha_efecto" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
+                            @error('fecha_efecto') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+
+                    <!-- Condicional 2: Apertura Expediente disciplinario -->
+                    @if ($tipo === 'Apertura Expediente disciplinario')
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Gravedad <span class="font-bold" style="color: #dc2626 !important;">*</span>
+                            </label>
+                            <select wire:model="gravedad" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-amber-500 focus:border-amber-500">
+                                <option value="Leve">Leve</option>
+                                <option value="Grave">Grave</option>
+                                <option value="Muy Grave">Muy Grave</option>
+                            </select>
+                            @error('gravedad') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+
+                    <!-- Archivo Adjunto Obligatorio -->
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Adjuntar Archivo Justificativo (PDF o Imagen) <span class="font-bold" style="color: #dc2626 !important;">*</span>
+                        </label>
+                        <input type="file" wire:model="archivo" accept=".pdf,image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 dark:file:bg-gray-700 dark:file:text-amber-400">
+                        <div wire:loading wire:target="archivo" class="text-xs text-amber-600 mt-1">Cargando archivo...</div>
+                        @error('archivo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </div>
                 </div>
-            </div>
 
-            <div class="flex justify-end pt-2">
-                <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style="background-color: #d97706 !important; color: #ffffff !important;">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Registrar Notificación
-                </button>
-            </div>
-        </form>
-    </div>
+                <div class="flex justify-end pt-2">
+                    <button type="submit" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-colors" style="background-color: #d97706 !important; color: #ffffff !important;">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Registrar Notificación
+                    </button>
+                </div>
+            </form>
+        </div>
+    @endif
 
     <!-- Lista de Notificaciones Registradas -->
     <div class="space-y-3">
