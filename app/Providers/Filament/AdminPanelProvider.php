@@ -129,40 +129,40 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 \Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
                 function (): string {
-                    $quotes = [
-                        "Y verás que la vida es hermosa, si te paras a ver cómo crecen las cosas.",
-                        "Vivir a la deriva, sentir que cada día es el primero.",
-                        "Dejaré que el viento sople a mi favor, y que me lleve donde quiera, sin buscar explicación.",
-                        "Me colé por la rendija de tu alma y me quedé a vivir allí.",
-                        "No quiero saber si el cielo es azul o gris, solo quiero saber si estás aquí.",
-                        "Me pongo de puntillas y me asomo al tejado a ver pasar las nubes que tú has dibujado.",
-                        "Que no me da la gana pasar media vida buscando tu olor, que no me da la gana vivir en un mundo que no tenga color.",
-                        "A mí me gusta el viento, no sé por qué, pero me limpia la cabeza.",
-                        "Si fuera mi vida una sola canción, la cantaría contigo de principio a fin.",
-                        "Hoy es el día más hermoso de nuestra vida, el mañana no existe y el ayer ya pasó.",
-                        "Y, si cae la lluvia, que nos moje la piel; y, si sopla el viento, que nos lleve con él.",
-                        "Quiero ser tu noche y tu día, tu alegría y tu tristeza, tu sol y tu luna.",
-                        "Busco el camino que lleva al olvido, y me pierdo en tus ojos.",
-                        "No me importan los mapas si el destino eres tú.",
-                        "Y en la frontera del bien y del mal, me quedo contigo a ver qué pasa.",
-                        "Quiero que me hables de ti, del color de tus sueños, de lo que te hace feliz.",
-                        "Buscando mi destino, viviendo en diferido, sin saber dónde voy ni de dónde he venido.",
-                        "Si tú me miras, me lleno de luz; si tú me tocas, me lleno de vida.",
-                        "Y me rebelo contra el tiempo que pasa y nos roba la juventud.",
-                        "Que la vida es muy corta para vivirla con miedo."
+                    $jokes = [
+                        "— ¿Cuánto le pongo, jefe? — Échale 10 euros de gasolina y 50 de fe a ver si llego a fin de mes.",
+                        "— Buenas, ¿me revisa el aceite y la presión de las ruedas? — Señor, esto es un túnel de lavado, salga del coche por favor.",
+                        "— ¿Tiene cambio de 50€? — Sí, claro. — Pues póngame 5€ de diésel y deme los 45€ que tengo que hacer la compra.",
+                        "Regla de oro del gasolinero: el cliente que pide 'llénelo' siempre aparca en el lado contrario al del depósito.",
+                        "— ¿Gasolina 95 o 98? — La que esté más barata, que el coche tiene sed pero yo tengo hipoteca.",
+                        "— Buenas, ¿me pone 2 euros de gasolina? — ¿Qué pasa, que el mechero no le enciende?",
+                        "Ese momento mágico en el que intentas clavar el importe exacto en el surtidor y pasa de 19,99€ a 20,01€... Tragedia nacional.",
+                        "— Oiga, ¿este túnel de lavado encoge los coches? — No, ¿por qué? — Porque entré con un monovolumen y he salido con un Twingo.",
+                        "— ¿Por qué los gasolineros son tan sabios? — Porque manejan los niveles de presión de todo el barrio.",
+                        "— Jefe, ¿me limpia el parabrisas? — Pero si viene usted en moto... — Bueno, pues las gafas, no te pongas tiquismiquis.",
+                        "— ¿Me mira la presión de las ruedas? — Claro... veo que están bajo mucha presión, igual necesitan terapia.",
+                        "— Buenas, ¿el baño está libre? — Sí, pero la llave está atada a una llanta de camión de 40 kilos por seguridad.",
+                        "— ¿Qué hace un pistero cuando se aburre? — Contar cuántos conductores intentan estirar la manguera hasta el otro lado del coche.",
+                        "— Póngame 20 euros de diésel. — ¿Le cobro con tarjeta o con lágrimas?",
+                        "— Oiga, ¿la gasolina sube o baja? — Subir sube siempre, lo que baja es mi paciencia en el turno de noche.",
+                        "— ¿Le miro el agua del limpiaparabrisas? — No gracias, si llueve saco la cabeza por la ventanilla.",
+                        "— Buenas, ¿acepta tarjeta de puntos? — Sí, pero con los puntos que tiene le llega para un ambientador de pino y una servilleta.",
+                        "— ¿Por qué vino en grúa si la gasolinera estaba a 100 metros? — Por confiar en la luz de la reserva hasta el último aliento.",
+                        "— ¿Me pone 10€ de 95? — ¿Para llevar o se la bebe aquí?",
+                        "El superpoder del empleado de gasolinera: adivinar a la primera cuál es 'el coche gris del fondo'."
                     ];
-                    $quoteText = $quotes[array_rand($quotes)];
+                    $jokeText = $jokes[array_rand($jokes)];
                     
                     return \Illuminate\Support\Facades\Blade::render('
                         <div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-center shadow-inner">
                             <p class="text-sm italic font-medium text-amber-800 dark:text-amber-300">
-                                "{{ $quoteText }}"
+                                "{{ $jokeText }}"
                             </p>
                             <span class="block text-[10px] uppercase font-bold text-amber-500 dark:text-amber-400 tracking-widest mt-2">
-                                — Robe (Roberto Iniesta)
+                                — Humor de Gasolinera ⛽
                             </span>
                         </div>
-                    ', ['quoteText' => $quoteText]);
+                    ', ['jokeText' => $jokeText]);
                 }
             )
             ->authMiddleware([
