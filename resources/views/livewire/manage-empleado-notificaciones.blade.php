@@ -172,15 +172,22 @@
                 No hay notificaciones registradas para este empleado.
             </div>
         @else
-            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
-                <table class="w-full text-xs text-left text-gray-600 dark:text-gray-300">
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden w-full">
+                <table class="w-full text-xs text-left text-gray-600 dark:text-gray-300" style="table-layout: fixed; width: 100%; border-collapse: collapse;">
+                    <colgroup>
+                        <col style="width: 28%;">
+                        <col style="width: 16%;">
+                        <col style="width: 22%;">
+                        <col style="width: 16%;">
+                        <col style="width: 18%;">
+                    </colgroup>
                     <thead class="text-[11px] text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
-                            <th class="py-2.5 px-3 w-[26%]">Tipo</th>
-                            <th class="py-2.5 px-2 w-[16%] text-center">F. Comunicación</th>
-                            <th class="py-2.5 px-2 w-[22%] text-center">Estado / Detalles</th>
-                            <th class="py-2.5 px-2 w-[16%] text-center">Documentos</th>
-                            <th class="py-2.5 px-3 w-[20%] text-right">Acciones</th>
+                            <th class="py-2.5 px-3" style="text-align: left;">Tipo</th>
+                            <th class="py-2.5 px-2" style="text-align: center;">F. Comunicación</th>
+                            <th class="py-2.5 px-2" style="text-align: center;">Estado / Detalles</th>
+                            <th class="py-2.5 px-2" style="text-align: center;">Documentos</th>
+                            <th class="py-2.5 px-3" style="text-align: center;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -190,10 +197,10 @@
                                 $isOpen = empty($notif->resolucion_cierre);
                             @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
-                                <td class="py-2.5 px-3 font-semibold text-gray-900 dark:text-white">
+                                <td class="py-2.5 px-3 font-semibold text-gray-900 dark:text-white" style="word-break: break-word;">
                                     {{ $notif->tipo }}
                                 </td>
-                                <td class="py-2.5 px-2 text-center whitespace-nowrap text-gray-700 dark:text-gray-300">
+                                <td class="py-2.5 px-2 text-center text-gray-700 dark:text-gray-300" style="white-space: nowrap;">
                                     {{ $notif->fecha_comunicacion ? $notif->fecha_comunicacion->format('d/m/Y') : '-' }}
                                 </td>
                                 <td class="py-2.5 px-2 text-center">
@@ -225,7 +232,7 @@
                                         @endif
                                     @endif
                                 </td>
-                                <td class="py-2.5 px-2 text-center whitespace-nowrap">
+                                <td class="py-2.5 px-2 text-center" style="white-space: nowrap;">
                                     <div class="flex flex-col items-center gap-1">
                                         @if ($notif->file_path)
                                             <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-semibold" title="Documento de Notificación / Apertura">
@@ -251,10 +258,10 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="py-2.5 px-3 text-right whitespace-nowrap">
-                                    <div class="inline-flex items-center justify-end gap-1.5">
+                                <td class="py-2.5 px-3 text-center" style="white-space: nowrap;">
+                                    <div class="flex items-center justify-center gap-1.5">
                                         @if ($isDisciplinario && $isOpen)
-                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-semibold rounded shadow-sm transition-colors whitespace-nowrap">
+                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold rounded shadow-sm transition-colors" style="white-space: nowrap;">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
@@ -262,7 +269,7 @@
                                             </button>
                                         @endif
 
-                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold py-1 px-1">
+                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="text-red-600 hover:text-red-800 dark:text-red-400 text-xs font-semibold py-1 px-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" style="white-space: nowrap;">
                                             Eliminar
                                         </button>
                                     </div>
