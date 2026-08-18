@@ -13,7 +13,7 @@
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Cierre de Expediente Disciplinario (Apertura: {{ $selectedNotificacionParaCierre->fecha_comunicacion ? $selectedNotificacionParaCierre->fecha_comunicacion->format('d/m/Y') : '-' }} &bull; Gravedad: {{ $selectedNotificacionParaCierre->gravedad }})
+                    Cierre de Expediente Disciplinario (Apertura: {{ $selectedNotificacionParaCierre->fecha_comunicacion ? $selectedNotificacionParaCierre->fecha_comunicacion->format('d/m/Y') : '-' }} @if($selectedNotificacionParaCierre->gravedad) &bull; Gravedad: {{ $selectedNotificacionParaCierre->gravedad }} @endif)
                 </h3>
                 <button type="button" wire:click="cancelarCierreExpediente" class="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                     ✕ Cancelar
@@ -172,75 +172,74 @@
                 No hay notificaciones registradas para este empleado.
             </div>
         @else
-            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
+            <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+                <table class="w-full text-xs text-left text-gray-600 dark:text-gray-300">
+                    <thead class="text-[11px] text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
-                            <th class="px-4 py-3">Tipo / Notificación</th>
-                            <th class="px-4 py-3">F. Comunicación</th>
-                            <th class="px-4 py-3">Estado / Detalles</th>
-                            <th class="px-4 py-3 text-center">Documentos</th>
-                            <th class="px-4 py-3 text-right">Acciones</th>
+                            <th class="py-2.5 px-3 w-[26%]">Tipo</th>
+                            <th class="py-2.5 px-2 w-[16%] text-center">F. Comunicación</th>
+                            <th class="py-2.5 px-2 w-[22%] text-center">Estado / Detalles</th>
+                            <th class="py-2.5 px-2 w-[16%] text-center">Documentos</th>
+                            <th class="py-2.5 px-3 w-[20%] text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach ($notificaciones as $notif)
+                            @php
+                                $isDisciplinario = str_contains($notif->tipo, 'disciplinario') || str_contains($notif->tipo, 'Expediente');
+                                $isOpen = empty($notif->resolucion_cierre);
+                            @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
-                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                <td class="py-2.5 px-3 font-semibold text-gray-900 dark:text-white">
                                     {{ $notif->tipo }}
                                 </td>
-                                <td class="px-4 py-3">
+                                <td class="py-2.5 px-2 text-center whitespace-nowrap text-gray-700 dark:text-gray-300">
                                     {{ $notif->fecha_comunicacion ? $notif->fecha_comunicacion->format('d/m/Y') : '-' }}
                                 </td>
-                                <td class="px-4 py-3">
+                                <td class="py-2.5 px-2 text-center">
                                     @if ($notif->tipo === 'Modificación sustancial del contrato')
-                                        <span class="inline-flex items-center text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded font-medium">
+                                        <span class="inline-flex items-center text-[11px] bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 px-2 py-0.5 rounded font-medium">
                                             Efecto: {{ $notif->fecha_efecto ? $notif->fecha_efecto->format('d/m/Y') : '-' }}
                                         </span>
-                                    @elseif ($notif->tipo === 'Apertura Expediente disciplinario' || $notif->tipo === 'Cierre expediente disciplinario')
-                                        @if (!$notif->resolucion_cierre)
-                                            <div class="space-y-1">
-                                                <span class="inline-flex items-center gap-1.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2.5 py-0.5 rounded-full font-bold">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                                    Abierto ({{ $notif->gravedad }})
-                                                </span>
-                                            </div>
+                                    @elseif ($isDisciplinario)
+                                        @if ($isOpen)
+                                            <span class="inline-flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                Abierto @if($notif->gravedad) ({{ $notif->gravedad }}) @endif
+                                            </span>
                                         @else
-                                            <div class="space-y-1">
-                                                <span class="inline-flex items-center gap-1.5 text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 px-2.5 py-0.5 rounded-full font-bold">
+                                            <div class="inline-flex flex-col items-center">
+                                                <span class="inline-flex items-center gap-1 text-[11px] bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 px-2 py-0.5 rounded-full font-bold">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                                    Cerrado: {{ $notif->resolucion_cierre }}
+                                                    {{ $notif->resolucion_cierre }}
                                                 </span>
-                                                <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                                                <div class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
                                                     @if ($notif->fecha_cierre)
-                                                        <span>F. Cierre: {{ $notif->fecha_cierre->format('d/m/Y') }}</span>
+                                                        <span>{{ $notif->fecha_cierre->format('d/m/Y') }}</span>
                                                     @endif
                                                     @if ($notif->resolucion_cierre === 'Suspensión de empleo y sueldo' && $notif->dias_suspension)
-                                                        <span class="font-semibold">&bull; {{ $notif->dias_suspension }} días de suspensión</span>
-                                                    @endif
-                                                    @if ($notif->gravedad)
-                                                        <span class="block text-gray-400">Gravedad apertura: {{ $notif->gravedad }}</span>
+                                                        <span> &bull; {{ $notif->dias_suspension }}d</span>
                                                     @endif
                                                 </div>
                                             </div>
                                         @endif
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-center">
+                                <td class="py-2.5 px-2 text-center whitespace-nowrap">
                                     <div class="flex flex-col items-center gap-1">
                                         @if ($notif->file_path)
-                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 hover:underline font-semibold" title="Documento de Notificación / Apertura">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 hover:underline font-semibold" title="Documento de Notificación / Apertura">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                 </svg>
-                                                {{ ($notif->tipo === 'Apertura Expediente disciplinario' && $notif->cierre_file_path) ? 'Doc. Apertura' : 'Ver Archivo' }}
+                                                {{ ($isDisciplinario && $notif->cierre_file_path) ? 'Doc. Apertura' : 'Ver Archivo' }}
                                             </a>
                                         @endif
 
                                         @if ($notif->cierre_file_path)
-                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->cierre_file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:underline font-semibold" title="Documento de Resolución de Cierre">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $notif->cierre_file_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-purple-600 dark:text-purple-400 hover:underline font-semibold" title="Documento de Resolución de Cierre">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
                                                 Doc. Cierre
@@ -248,22 +247,22 @@
                                         @endif
 
                                         @if (!$notif->file_path && !$notif->cierre_file_path)
-                                            <span class="text-xs text-gray-400">-</span>
+                                            <span class="text-[11px] text-gray-400">-</span>
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="inline-flex items-center gap-2">
-                                        @if (($notif->tipo === 'Apertura Expediente disciplinario') && !$notif->resolucion_cierre)
-                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
-                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                                    <div class="inline-flex items-center justify-end gap-1.5">
+                                        @if ($isDisciplinario && $isOpen)
+                                            <button type="button" wire:click="iniciarCierreExpediente({{ $notif->id }})" class="inline-flex items-center px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-semibold rounded shadow-sm transition-colors whitespace-nowrap">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
-                                                Cerrar Expediente
+                                                Cerrar
                                             </button>
                                         @endif
 
-                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold">
+                                        <button type="button" wire:click="eliminarNotificacion({{ $notif->id }})" wire:confirm="¿Seguro que deseas eliminar esta notificación?" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold py-1 px-1">
                                             Eliminar
                                         </button>
                                     </div>
