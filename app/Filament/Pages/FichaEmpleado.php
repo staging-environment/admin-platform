@@ -234,21 +234,26 @@ class FichaEmpleado extends Page
 
         $today = Carbon::today()->format('Y-m-d');
 
-        // Busca si existe algún turno de días anteriores que haya quedado abierto sin registrar salida
-        $this->fichajePendienteAnterior = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+        // Busca el último turno previo del empleado (antes de hoy).
+        // Si el último turno previo no tiene hora_salida registrada, es que quedó abierto y debe cerrarse.
+        $ultimoPrevio = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', '<', $today)
-            ->whereNull('hora_salida')
             ->orderBy('fecha', 'desc')
+            ->orderBy('id', 'desc')
             ->first();
 
-        if ($this->fichajePendienteAnterior && !$this->hora_salida_pendiente) {
-            $this->hora_salida_pendiente = Carbon::now()->format('H:i');
+        if ($ultimoPrevio && empty($ultimoPrevio->hora_salida)) {
+            $this->fichajePendienteAnterior = $ultimoPrevio;
+            if (!$this->hora_salida_pendiente) {
+                $this->hora_salida_pendiente = Carbon::now()->format('H:i');
+            }
+        } else {
+            $this->fichajePendienteAnterior = null;
         }
 
-        // Busca la sesión activa de fichaje sin salida para el día de hoy
+        // Busca el fichaje más reciente del día de hoy
         $this->fichajeDelDia = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', $today)
-            ->whereNull('hora_salida')
             ->latest('id')
             ->first();
 
@@ -280,16 +285,16 @@ class FichaEmpleado extends Page
 
         $today = Carbon::today()->format('Y-m-d');
 
-        // Impedir nueva entrada si hay un turno de días previos sin registrar salida
-        $unclosedPrevious = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+        // Impedir nueva entrada si el último turno de días previos quedó sin registrar salida
+        $ultimoPrevio = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', '<', $today)
-            ->whereNull('hora_salida')
             ->orderBy('fecha', 'desc')
+            ->orderBy('id', 'desc')
             ->first();
 
-        if ($unclosedPrevious) {
-            $fechaTurno = Carbon::parse($unclosedPrevious->fecha)->translatedFormat('l, d \d\e F \d\e Y');
-            $horaEntradaTurno = $unclosedPrevious->hora_entrada ? Carbon::parse($unclosedPrevious->hora_entrada)->format('H:i') : '--:--';
+        if ($ultimoPrevio && empty($ultimoPrevio->hora_salida)) {
+            $fechaTurno = Carbon::parse($ultimoPrevio->fecha)->translatedFormat('l, d \d\e F \d\e Y');
+            $horaEntradaTurno = $ultimoPrevio->hora_entrada ? Carbon::parse($ultimoPrevio->hora_entrada)->format('H:i') : '--:--';
 
             Notification::make()
                 ->title('Turno anterior sin cerrar')
@@ -360,11 +365,11 @@ class FichaEmpleado extends Page
         $today = Carbon::today()->format('Y-m-d');
         $fichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', '<', $today)
-            ->whereNull('hora_salida')
             ->orderBy('fecha', 'desc')
+            ->orderBy('id', 'desc')
             ->first();
 
-        if (!$fichaje) {
+        if (!$fichaje || !empty($fichaje->hora_salida)) {
             Notification::make()
                 ->title('Aviso')
                 ->body('No se encontró ningún turno anterior pendiente de cierre.')

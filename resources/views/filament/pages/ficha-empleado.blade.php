@@ -481,7 +481,7 @@
                                         Entrada Registrada
                                     </div>
                                     <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkin_at ? $fichajeDelDia->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_entrada)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @else
                                  <div class="w-full max-w-xs space-y-4" x-data="{
@@ -548,7 +548,7 @@
                                         Salida Registrada
                                     </div>
                                     <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at ? $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @elseif($fichajePendienteAnterior)
                                 <div class="w-full max-w-xs space-y-4" x-data="{
