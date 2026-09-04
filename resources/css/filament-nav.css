@@ -296,14 +296,15 @@ button.fi-topbar-trigger {
 }
 
 /* Columna de acciones fija sin solapar */
-.fi-resource-recursos-humanos tr.fi-ta-row > td.fi-ta-actions-cell,
-.fi-resource-recursos-humanos th.fi-ta-actions-header-cell {
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 65px !important;
-    padding-left: 2px !important;
+.fi-resource-recursos-humanos th.fi-ta-actions-header-cell,
+.fi-resource-recursos-humanos td.fi-ta-actions-cell,
+.fi-resource-recursos-humanos tr.fi-ta-row > td:last-child {
+    width: 65px !important;
+    min-width: 65px !important;
+    max-width: 75px !important;
+    padding-left: 4px !important;
     padding-right: 8px !important;
-    text-align: right !important;
+    text-align: center !important;
 }
 
 /* Botones de acción mini */
@@ -313,7 +314,7 @@ button.fi-topbar-trigger {
     display: inline-flex !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
 }
 .fi-resource-recursos-humanos .fi-ta-actions button,
 .fi-resource-recursos-humanos .fi-ta-actions a {
