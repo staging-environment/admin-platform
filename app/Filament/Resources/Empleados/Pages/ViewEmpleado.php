@@ -165,6 +165,7 @@ class ViewEmpleado extends ViewRecord
                     return [];
                 })
                 ->modalHeading('Discapacidad / Incapacidad')
+                ->modalWidth('4xl')
                 ->fillForm(function ($record) {
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
@@ -206,7 +207,7 @@ class ViewEmpleado extends ViewRecord
                             }
                         }),
                     
-                    Grid::make(4)
+                    Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             Select::make('tipo_discapacidad')
@@ -227,58 +228,59 @@ class ViewEmpleado extends ViewRecord
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_reconocimiento')
-                                ->label('Fecha de reconocimiento')
+                                ->label('Fecha reconocimiento')
                                 ->displayFormat('d/m/Y')
                                 ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_resolucion_discapacidad')
-                                ->label('Fecha de resolución')
+                                ->label('Fecha resolución')
                                 ->displayFormat('d/m/Y')
                                 ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                         ]),
 
-                    Toggle::make('pertenece_andalucia')
-                        ->label('¿Pertenece a Andalucía?')
-                        ->live()
-                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad')),
-
-                    Grid::make(1)
+                    Grid::make(['default' => 1, 'sm' => 12])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
+                            Toggle::make('pertenece_andalucia')
+                                ->label('¿Pertenece a Andalucía?')
+                                ->default(true)
+                                ->live()
+                                ->columnSpan(['default' => 12, 'sm' => fn (Get $get) => ! $get('pertenece_andalucia') ? 5 : 12]),
+
                             Select::make('comunidad_autonoma')
                                 ->label('Comunidad Autónoma')
                                 ->options([
-                                    'Andalucía' => 'Andalucía',
                                     'Aragón' => 'Aragón',
-                                    'Asturias' => 'Asturias',
-                                    'Baleares' => 'Baleares',
+                                    'Principado de Asturias' => 'Principado de Asturias',
+                                    'Illes Balears' => 'Illes Balears',
                                     'Canarias' => 'Canarias',
                                     'Cantabria' => 'Cantabria',
-                                    'Castilla-La Mancha' => 'Castilla-La Mancha',
                                     'Castilla y León' => 'Castilla y León',
+                                    'Castilla-La Mancha' => 'Castilla-La Mancha',
                                     'Cataluña' => 'Cataluña',
-                                    'Comunidad Valenciana' => 'Comunidad Valenciana',
+                                    'Comunitat Valenciana' => 'Comunitat Valenciana',
                                     'Extremadura' => 'Extremadura',
                                     'Galicia' => 'Galicia',
-                                    'Madrid' => 'Madrid',
-                                    'Murcia' => 'Murcia',
-                                    'Navarra' => 'Navarra',
+                                    'Comunidad de Madrid' => 'Comunidad de Madrid',
+                                    'Región de Murcia' => 'Región de Murcia',
+                                    'Comunidad Foral de Navarra' => 'Comunidad Foral de Navarra',
                                     'País Vasco' => 'País Vasco',
                                     'La Rioja' => 'La Rioja',
                                     'Ceuta' => 'Ceuta',
                                     'Melilla' => 'Melilla',
                                 ])
                                 ->visible(fn (Get $get) => ! $get('pertenece_andalucia'))
-                                ->required(fn (Get $get) => ! $get('pertenece_andalucia')),
+                                ->required(fn (Get $get) => ! $get('pertenece_andalucia'))
+                                ->columnSpan(['default' => 12, 'sm' => 7]),
                         ]),
 
-                    Grid::make(3)
+                    Grid::make(['default' => 1, 'sm' => 3])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             FileUpload::make('resolucion_discapacidad')
-                                ->label('Resolución de Discapacidad (Archivo)')
+                                ->label('Resolución Discapacidad')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([
@@ -290,7 +292,7 @@ class ViewEmpleado extends ViewRecord
                                 ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
-                                ->label('Dictamen técnico facultativo')
+                                ->label('Dictamen Técnico')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([
@@ -302,7 +304,7 @@ class ViewEmpleado extends ViewRecord
                                 ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
-                                ->label('Certificado de discapacidad')
+                                ->label('Certificado Discapacidad')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([

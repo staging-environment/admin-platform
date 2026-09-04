@@ -553,6 +553,33 @@ label .text-danger-400,
     border-color: #334155 !important;
 }
 
+/* Compactar formularios dentro de ventanas modales en pantallas pequeñas y medianas */
+.fi-modal-content {
+    padding: 1rem 1.25rem !important;
+}
+
+.fi-modal-content .fi-fo-field-wrp {
+    margin-bottom: 0.25rem !important;
+}
+
+.fi-modal-content .fi-fo-field-wrp-label {
+    margin-bottom: 0.15rem !important;
+    font-size: 0.8125rem !important;
+}
+
+.fi-modal-content .fi-grid {
+    gap: 0.75rem !important;
+}
+
+.fi-modal-content .fi-fo-file-upload {
+    padding: 0.5rem !important;
+}
+
+.fi-modal-window {
+    max-height: 92vh !important;
+}
+
+
 
 
 

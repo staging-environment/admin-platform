@@ -157,6 +157,7 @@ class EditEmpleado extends EditRecord
                     return [];
                 })
                 ->modalHeading('Discapacidad / Incapacidad')
+                ->modalWidth('4xl')
                 ->fillForm(function ($record) {
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
@@ -198,7 +199,7 @@ class EditEmpleado extends EditRecord
                             }
                         }),
                     
-                    Grid::make(4)
+                    Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             Select::make('tipo_discapacidad')
@@ -208,6 +209,7 @@ class EditEmpleado extends EditRecord
                                     'Física' => 'Física',
                                     'Psíquica' => 'Psíquica',
                                     'Sensorial' => 'Sensorial',
+                                    'Intelectual' => 'Intelectual',
                                 ])
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                             
@@ -220,21 +222,26 @@ class EditEmpleado extends EditRecord
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_reconocimiento')
-                                ->label('Fecha de reconocimiento')
+                                ->label('Fecha reconocimiento')
+                                ->displayFormat('d/m/Y')
+                                ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
 
                             DatePicker::make('fecha_resolucion_discapacidad')
-                                ->label('Fecha de resolución')
+                                ->label('Fecha resolución')
+                                ->displayFormat('d/m/Y')
+                                ->native(false)
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
                         ]),
 
-                    Grid::make(2)
+                    Grid::make(['default' => 1, 'sm' => 12])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             Toggle::make('pertenece_andalucia')
                                 ->label('¿Pertenece a Andalucía?')
                                 ->default(true)
-                                ->live(),
+                                ->live()
+                                ->columnSpan(['default' => 12, 'sm' => fn (Get $get) => ! $get('pertenece_andalucia') ? 5 : 12]),
 
                             Select::make('comunidad_autonoma')
                                 ->label('Comunidad Autónoma')
@@ -259,14 +266,15 @@ class EditEmpleado extends EditRecord
                                     'Melilla' => 'Melilla',
                                 ])
                                 ->visible(fn (Get $get) => ! $get('pertenece_andalucia'))
-                                ->required(fn (Get $get) => ! $get('pertenece_andalucia')),
+                                ->required(fn (Get $get) => ! $get('pertenece_andalucia'))
+                                ->columnSpan(['default' => 12, 'sm' => 7]),
                         ]),
 
-                    Grid::make(3)
+                    Grid::make(['default' => 1, 'sm' => 3])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
                         ->schema([
                             FileUpload::make('resolucion_discapacidad')
-                                ->label('Resolución de Discapacidad (Archivo)')
+                                ->label('Resolución Discapacidad')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([
@@ -278,7 +286,7 @@ class EditEmpleado extends EditRecord
                                 ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
-                                ->label('Dictamen técnico facultativo')
+                                ->label('Dictamen Técnico')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([
@@ -290,7 +298,7 @@ class EditEmpleado extends EditRecord
                                 ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
-                                ->label('Certificado de discapacidad')
+                                ->label('Certificado Discapacidad')
                                 ->markAsRequired()
                                 ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
                                 ->validationMessages([
