@@ -555,7 +555,7 @@ label .text-danger-400,
 
 /* Asegurar que las ventanas modales contengan siempre su cabecera, contenido scrolleable y pie de botones dentro de la ventana */
 .fi-modal-window {
-    max-height: calc(100vh - 2.5rem) !important;
+    max-height: calc(100vh - 3rem) !important;
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
@@ -568,7 +568,8 @@ label .text-danger-400,
 .fi-modal-content {
     overflow-y: auto !important;
     flex: 1 1 auto !important;
-    max-height: calc(100vh - 11rem) !important;
+    min-height: 0 !important;
+    max-height: none !important;
     padding: 0.85rem 1.25rem !important;
 }
 
