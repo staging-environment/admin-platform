@@ -192,7 +192,7 @@ class EditEmpleado extends EditRecord
                     ];
                 })
                 ->form([
-                    Grid::make(['default' => 1, 'sm' => 12])
+                    Grid::make(['default' => 1, 'sm' => 3])
                         ->schema([
                             Toggle::make('no_tiene_discapacidad')
                                 ->label('No tiene discapacidad / incapacidad')
@@ -202,12 +202,8 @@ class EditEmpleado extends EditRecord
                                         $set('tiene_discapacidad', false);
                                         $set('tiene_incapacidad', false);
                                     }
-                                })
-                                ->columnSpan(['default' => 12, 'sm' => 12]),
-                        ]),
+                                }),
 
-                    Grid::make(['default' => 1, 'sm' => 12])
-                        ->schema([
                             Toggle::make('tiene_discapacidad')
                                 ->label('¿Tiene discapacidad?')
                                 ->live()
@@ -215,8 +211,16 @@ class EditEmpleado extends EditRecord
                                     if ($state) {
                                         $set('no_tiene_discapacidad', false);
                                     }
-                                })
-                                ->columnSpan(['default' => 12, 'sm' => 12]),
+                                }),
+
+                            Toggle::make('tiene_incapacidad')
+                                ->label('¿Tiene incapacidad?')
+                                ->live()
+                                ->afterStateUpdated(function ($state, Set $set) {
+                                    if ($state) {
+                                        $set('no_tiene_discapacidad', false);
+                                    }
+                                }),
                         ]),
                     
                     Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
@@ -330,29 +334,16 @@ class EditEmpleado extends EditRecord
                                 ->previewable(false),
                         ]),
 
-                    Grid::make(['default' => 1, 'sm' => 12])
-                        ->schema([
-                            Toggle::make('tiene_incapacidad')
-                                ->label('¿Tiene incapacidad?')
-                                ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $set('no_tiene_discapacidad', false);
-                                    }
-                                })
-                                ->columnSpan(['default' => 12, 'sm' => fn (Get $get) => (bool) $get('tiene_incapacidad') ? 4 : 12]),
-
-                            Select::make('tipo_incapacidad')
-                                ->label('Tipo de Incapacidad')
-                                ->multiple()
-                                ->options([
-                                    'Físico' => 'Físico',
-                                    'Psíquico' => 'Psíquico',
-                                ])
-                                ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                                ->columnSpan(['default' => 12, 'sm' => 8]),
-                        ]),
+                    Select::make('tipo_incapacidad')
+                        ->label('Tipo de Incapacidad')
+                        ->multiple()
+                        ->options([
+                            'Físico' => 'Físico',
+                            'Psíquico' => 'Psíquico',
+                        ])
+                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                        ->columnSpanFull(),
 
                     Repeater::make('incapacidad_archivos')
                         ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad <span class="text-red-600 font-bold">*</span>'))
@@ -363,13 +354,15 @@ class EditEmpleado extends EditRecord
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false)
-                                ->required(),
+                                ->required()
+                                ->columnSpan(['default' => 12, 'sm' => 5]),
                             TextInput::make('comentario')
                                 ->label('Comentario / Descripción')
                                 ->placeholder('Ej: Informe de resolución médica')
-                                ->nullable(),
+                                ->nullable()
+                                ->columnSpan(['default' => 12, 'sm' => 7]),
                         ])
-                        ->columns(2)
+                        ->columns(['default' => 1, 'sm' => 12])
                         ->compact()
                         ->reorderable(false)
                         ->addActionLabel('Añadir otro archivo')
