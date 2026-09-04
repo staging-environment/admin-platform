@@ -553,9 +553,37 @@ label .text-danger-400,
     border-color: #334155 !important;
 }
 
-/* Compactar formularios dentro de ventanas modales en pantallas pequeñas y medianas */
+/* Asegurar que las ventanas modales contengan siempre su cabecera, contenido scrolleable y pie de botones dentro de la ventana */
+.fi-modal-window {
+    max-height: calc(100vh - 2.5rem) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.fi-modal-header {
+    flex-shrink: 0 !important;
+}
+
 .fi-modal-content {
-    padding: 0.75rem 1rem !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    max-height: calc(100vh - 11rem) !important;
+    padding: 0.85rem 1.25rem !important;
+}
+
+.fi-modal-footer,
+.fi-modal-actions {
+    flex-shrink: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 0.65rem 1.25rem !important;
+    background-color: #f8fafc !important;
+}
+
+.dark .fi-modal-footer,
+.dark .fi-modal-actions {
+    border-top: 1px solid #334155 !important;
+    background-color: #0f172a !important;
 }
 
 .fi-modal-content .fi-fo-field-wrp {
@@ -608,9 +636,6 @@ label .text-danger-400,
     margin-bottom: 0.1rem !important;
 }
 
-.fi-modal-window {
-    max-height: 94vh !important;
-}
 
 
 
