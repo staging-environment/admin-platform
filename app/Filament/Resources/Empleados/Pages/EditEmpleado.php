@@ -285,6 +285,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
@@ -297,6 +299,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
@@ -309,6 +313,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
                         ]),
 
@@ -344,6 +350,8 @@ class EditEmpleado extends EditRecord
                                 ->directory('empleados/documentos')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false)
                                 ->required(),
                             TextInput::make('comentario')

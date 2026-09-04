@@ -291,6 +291,8 @@ class ViewEmpleado extends ViewRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
 
                             FileUpload::make('dictamen_tecnico')
@@ -303,6 +305,8 @@ class ViewEmpleado extends ViewRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
 
                             FileUpload::make('certificado_discapacidad')
@@ -315,6 +319,8 @@ class ViewEmpleado extends ViewRecord
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false),
                         ]),
 
@@ -350,6 +356,8 @@ class ViewEmpleado extends ViewRecord
                                 ->directory('empleados/documentos')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                ->openable()
+                                ->downloadable()
                                 ->previewable(false)
                                 ->required(),
                             TextInput::make('comentario')
