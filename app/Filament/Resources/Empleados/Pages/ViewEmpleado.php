@@ -529,6 +529,7 @@ class ViewEmpleado extends ViewRecord
                 })
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('ver_incapacidad')
+                ->extraAttributes(['style' => 'display: none !important;'])
                 ->modalHeading('Documentación de Incapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -564,6 +565,7 @@ class ViewEmpleado extends ViewRecord
                     return new \Illuminate\Support\HtmlString($html);
                 }),
             \Filament\Actions\Action::make('ver_resolucion')
+                ->extraAttributes(['style' => 'display: none !important;'])
                 ->modalHeading('Resolución de Discapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -593,6 +595,7 @@ class ViewEmpleado extends ViewRecord
                     ");
                 }),
             \Filament\Actions\Action::make('ver_dictamen')
+                ->extraAttributes(['style' => 'display: none !important;'])
                 ->modalHeading('Dictamen Técnico Facultativo')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -622,6 +625,7 @@ class ViewEmpleado extends ViewRecord
                     ");
                 }),
             \Filament\Actions\Action::make('ver_certificado')
+                ->extraAttributes(['style' => 'display: none !important;'])
                 ->modalHeading('Certificado de Discapacidad')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -651,6 +655,7 @@ class ViewEmpleado extends ViewRecord
                     ");
                 }),
             \Filament\Actions\Action::make('ver_autorizacion_consulta')
+                ->extraAttributes(['style' => 'display: none !important;'])
                 ->modalHeading('Autorización de Consulta')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
