@@ -44,6 +44,7 @@ class ViewEmpleado extends ViewRecord
                 ->label('Notificaciones')
                 ->icon('heroicon-o-bell')
                 ->color(function ($record) {
+                    if (!$record) return 'gray';
                     $hasNotifs = $record->notificaciones()->exists();
                     return $hasNotifs ? 'warning' : 'gray';
                 })
@@ -57,9 +58,11 @@ class ViewEmpleado extends ViewRecord
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
                 ->color(function ($record) {
+                    if (!$record) return 'gray';
                     $hasDocs = $record->documentos()->where('tipo', 'DNI')->exists();
                     $isExpired = $record->fecha_caducidad_dni && $record->fecha_caducidad_dni->isPast();
-                    if (!$hasDocs || $isExpired) {
+                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_dni', 'dni_caducado'])->exists();
+                    if (!$hasDocs || $isExpired || $hasAlert) {
                         return 'danger';
                     }
                     return 'success';
@@ -73,12 +76,15 @@ class ViewEmpleado extends ViewRecord
                 ->label('Contratos')
                 ->icon('heroicon-o-document-text')
                 ->color(function ($record) {
+                    if (!$record) return 'gray';
                     $hasDocs = $record->documentos()->where('tipo', 'Contratos')->exists();
                     if (!$hasDocs) {
                         return 'danger';
                     }
                     $latest = $record->documentos()->where('tipo', 'Contratos')->latest('id')->first();
-                    if ($latest && $latest->tipo_contrato === 'Eventual' && $latest->fecha_vencimiento_contrato && $latest->fecha_vencimiento_contrato->isPast()) {
+                    $isExpired = $latest && $latest->tipo_contrato === 'Eventual' && $latest->fecha_vencimiento_contrato && $latest->fecha_vencimiento_contrato->isPast();
+                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_contrato', 'contrato_vencido'])->exists();
+                    if ($isExpired || $hasAlert) {
                         return 'danger';
                     }
                     return 'success';
@@ -93,6 +99,7 @@ class ViewEmpleado extends ViewRecord
                 ->label('Formación')
                 ->icon('heroicon-o-academic-cap')
                 ->color(function ($record) {
+                    if (!$record) return 'gray';
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos'])->exists();
                     $hasCursos = $record->cursos()->exists();
                     return ($hasDocs || $hasCursos) ? 'success' : 'gray';
@@ -106,8 +113,11 @@ class ViewEmpleado extends ViewRecord
                 ->label('Discapacidad / Incapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
+                    if (!$record) return 'gray';
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    if (!$hasOption) {
+                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+
+                    if (!$hasOption || $hasAlert) {
                         return 'danger';
                     }
 

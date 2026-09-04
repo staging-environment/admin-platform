@@ -512,6 +512,48 @@ label .text-danger-400,
     font-weight: 700 !important;
 }
 
+/* Botones de acción en cabecera con color neutro (fondo gris clarito) */
+.fi-header .fi-btn.fi-color-gray,
+.fi-header .fi-color-gray,
+.fi-header-actions .fi-btn.fi-color-gray,
+.fi-header-actions .fi-color-gray,
+.fi-page-header-actions .fi-btn.fi-color-gray,
+.fi-page-header-actions .fi-color-gray,
+.fi-ac .fi-btn.fi-color-gray,
+.fi-ac .fi-color-gray {
+    background-color: #f1f5f9 !important; /* Gris clarito slate-100 */
+    color: #334155 !important; /* slate-700 */
+    border: 1px solid #cbd5e1 !important; /* slate-300 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-header .fi-btn.fi-color-gray:hover,
+.fi-header .fi-color-gray:hover,
+.fi-header-actions .fi-btn.fi-color-gray:hover,
+.fi-header-actions .fi-color-gray:hover,
+.fi-page-header-actions .fi-btn.fi-color-gray:hover,
+.fi-page-header-actions .fi-color-gray:hover,
+.fi-ac .fi-btn.fi-color-gray:hover,
+.fi-ac .fi-color-gray:hover {
+    background-color: #e2e8f0 !important; /* slate-200 */
+    color: #0f172a !important; /* slate-900 */
+    border-color: #94a3b8 !important;
+}
+
+.dark .fi-header .fi-btn.fi-color-gray,
+.dark .fi-header .fi-color-gray,
+.dark .fi-header-actions .fi-btn.fi-color-gray,
+.dark .fi-header-actions .fi-color-gray,
+.dark .fi-page-header-actions .fi-btn.fi-color-gray,
+.dark .fi-page-header-actions .fi-color-gray,
+.dark .fi-ac .fi-btn.fi-color-gray,
+.dark .fi-ac .fi-color-gray {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+
 
 
 
