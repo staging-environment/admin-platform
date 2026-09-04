@@ -131,25 +131,40 @@ class ViewEmpleado extends ViewRecord
                 ->color(function ($record) {
                     if (!$record) return 'gray';
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+                    $hasAlert = $record->alertas()->whereIn('tipo', [
+                        'sin_discapacidad',
+                        'discapacidad_archivos_pendientes',
+                        'incapacidad_archivos_pendientes',
+                        'falta_autorizacion_consulta',
+                    ])->exists();
 
                     if (!$hasOption || $hasAlert) {
                         return 'danger';
                     }
 
-                    if ($record->tiene_discapacidad) {
-                        $hasRes = $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
-                        $hasDict = $record->documentos()->where('tipo', 'Dictamen Técnico')->exists();
-                        $hasCert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
-                        if (!$hasRes && !$hasDict && !$hasCert) {
+                    if ($record->tiene_discapacidad || $record->tiene_incapacidad) {
+                        $hasAuth = $record->documentos()->where('tipo', 'Autorización de Consulta')->exists();
+                        if (!$hasAuth) {
                             return 'danger';
                         }
-                        return 'success';
-                    }
 
-                    if ($record->tiene_incapacidad) {
-                        $hasIncapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
-                        return $hasIncapDocs ? 'success' : 'danger';
+                        if ($record->tiene_discapacidad) {
+                            $hasRes = $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
+                            $hasDict = $record->documentos()->where('tipo', 'Dictamen Técnico')->exists();
+                            $hasCert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
+                            if (!$hasRes && !$hasDict && !$hasCert) {
+                                return 'danger';
+                            }
+                        }
+
+                        if ($record->tiene_incapacidad) {
+                            $hasIncapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+                            if (!$hasIncapDocs) {
+                                return 'danger';
+                            }
+                        }
+
+                        return 'success';
                     }
 
                     return 'gray';
@@ -157,7 +172,12 @@ class ViewEmpleado extends ViewRecord
                 ->extraAttributes(function ($record) {
                     if (!$record) return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+                    $hasAlert = $record->alertas()->whereIn('tipo', [
+                        'sin_discapacidad',
+                        'discapacidad_archivos_pendientes',
+                        'incapacidad_archivos_pendientes',
+                        'falta_autorizacion_consulta',
+                    ])->exists();
 
                     if ($hasOption && !$hasAlert && !$record->tiene_discapacidad && !$record->tiene_incapacidad) {
                         return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
@@ -172,6 +192,7 @@ class ViewEmpleado extends ViewRecord
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                     $cert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                    $aut = $record->documentos()->where('tipo', 'Autorización de Consulta')->first();
                     $incapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
                     
                     $incapacidadArchivos = [];
@@ -196,6 +217,7 @@ class ViewEmpleado extends ViewRecord
                         'tiene_incapacidad' => $record->tiene_incapacidad,
                         'tipo_incapacidad' => $record->tipo_incapacidad,
                         'incapacidad_archivos' => $incapacidadArchivos,
+                        'autorizacion_consulta' => $aut?->file_path,
                         'no_tiene_discapacidad' => $record->no_tiene_discapacidad,
                     ];
                 })
@@ -373,6 +395,17 @@ class ViewEmpleado extends ViewRecord
                         ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->columnSpanFull(),
 
+                    FileUpload::make('autorizacion_consulta')
+                        ->label('Autorización de Consulta')
+                        ->directory('empleados/autorizaciones')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->openable()
+                        ->downloadable()
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') || (bool) $get('tiene_incapacidad'))
+                        ->columnSpanFull(),
+
                     Toggle::make('no_tiene_discapacidad')
                         ->label('No tiene discapacidad / incapacidad')
                         ->live()
@@ -474,6 +507,22 @@ class ViewEmpleado extends ViewRecord
                         }
                     } else {
                         $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                    }
+
+                    if ($tieneDiscapacidad || $tieneIncapacidad) {
+                        if (!empty($data['autorizacion_consulta'])) {
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => 'Autorización de Consulta'],
+                                [
+                                    'nombre' => 'Autorización de Consulta ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['autorizacion_consulta'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->where('tipo', 'Autorización de Consulta')->delete();
+                        }
+                    } else {
+                        $record->documentos()->where('tipo', 'Autorización de Consulta')->delete();
                     }
 
                     $record->actualizarAlertas();
@@ -598,6 +647,35 @@ class ViewEmpleado extends ViewRecord
                     return new \Illuminate\Support\HtmlString("
                         <div class='text-center p-4'>
                             <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Certificado</a>
+                        </div>
+                    ");
+                }),
+            \Filament\Actions\Action::make('ver_autorizacion_consulta')
+                ->modalHeading('Autorización de Consulta')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('7xl')
+                ->modalContent(function ($record) {
+                    $doc = $record->documentos()->where('tipo', 'Autorización de Consulta')->first();
+                    if (!$doc) return null;
+                    $url = route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]);
+                    $extension = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION));
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                            </div>
+                        ");
+                    } elseif ($extension === 'pdf') {
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                            </div>
+                        ");
+                    }
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='text-center p-4'>
+                            <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Autorización</a>
                         </div>
                     ");
                 }),

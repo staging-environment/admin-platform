@@ -284,16 +284,35 @@ class Empleado extends Model
             $hasDict = $this->documentos()->where('tipo', 'Dictamen Técnico')->exists();
             $hasCert = $this->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
 
-            if (!$hasRes || !$hasDict || !$hasCert) {
-                $faltantes = [];
-                if (!$hasRes) $faltantes[] = 'Resolución de discapacidad';
-                if (!$hasDict) $faltantes[] = 'Dictamen técnico facultativo';
-                if (!$hasCert) $faltantes[] = 'Certificado de discapacidad';
-
+            if (!$hasRes && !$hasDict && !$hasCert) {
                 $this->alertas()->create([
                     'tipo' => 'discapacidad_archivos_pendientes',
                     'titulo' => 'Documentación de discapacidad incompleta',
-                    'descripcion' => 'Tiene marcada discapacidad pero le falta adjuntar: ' . implode(', ', $faltantes) . '.',
+                    'descripcion' => 'Tiene marcada discapacidad pero debe adjuntar al menos uno de los archivos requeridos (Resolución, Dictamen o Certificado).',
+                ]);
+            }
+        }
+
+        // 9. Alerta: Incapacidad activa sin documentación
+        if ($this->tiene_incapacidad) {
+            $hasIncap = $this->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+            if (!$hasIncap) {
+                $this->alertas()->create([
+                    'tipo' => 'incapacidad_archivos_pendientes',
+                    'titulo' => 'Documentación de incapacidad incompleta',
+                    'descripcion' => 'Tiene marcada incapacidad pero no tiene adjunta la documentación médica correspondiente.',
+                ]);
+            }
+        }
+
+        // 10. Alerta: Falta Autorización de Consulta (cuando tiene discapacidad o incapacidad)
+        if ($this->tiene_discapacidad || $this->tiene_incapacidad) {
+            $hasAuth = $this->documentos()->where('tipo', 'Autorización de Consulta')->exists();
+            if (!$hasAuth) {
+                $this->alertas()->create([
+                    'tipo' => 'falta_autorizacion_consulta',
+                    'titulo' => 'Falta Autorización de Consulta',
+                    'descripcion' => 'El empleado tiene marcada discapacidad o incapacidad pero falta adjuntar la Autorización de Consulta.',
                 ]);
             }
         }

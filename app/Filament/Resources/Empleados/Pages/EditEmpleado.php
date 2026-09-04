@@ -123,25 +123,40 @@ class EditEmpleado extends EditRecord
                 ->color(function ($record) {
                     if (!$record) return 'gray';
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+                    $hasAlert = $record->alertas()->whereIn('tipo', [
+                        'sin_discapacidad',
+                        'discapacidad_archivos_pendientes',
+                        'incapacidad_archivos_pendientes',
+                        'falta_autorizacion_consulta',
+                    ])->exists();
 
                     if (!$hasOption || $hasAlert) {
                         return 'danger';
                     }
 
-                    if ($record->tiene_discapacidad) {
-                        $hasRes = $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
-                        $hasDict = $record->documentos()->where('tipo', 'Dictamen Técnico')->exists();
-                        $hasCert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
-                        if (!$hasRes && !$hasDict && !$hasCert) {
+                    if ($record->tiene_discapacidad || $record->tiene_incapacidad) {
+                        $hasAuth = $record->documentos()->where('tipo', 'Autorización de Consulta')->exists();
+                        if (!$hasAuth) {
                             return 'danger';
                         }
-                        return 'success';
-                    }
 
-                    if ($record->tiene_incapacidad) {
-                        $hasIncapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
-                        return $hasIncapDocs ? 'success' : 'danger';
+                        if ($record->tiene_discapacidad) {
+                            $hasRes = $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
+                            $hasDict = $record->documentos()->where('tipo', 'Dictamen Técnico')->exists();
+                            $hasCert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
+                            if (!$hasRes && !$hasDict && !$hasCert) {
+                                return 'danger';
+                            }
+                        }
+
+                        if ($record->tiene_incapacidad) {
+                            $hasIncapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+                            if (!$hasIncapDocs) {
+                                return 'danger';
+                            }
+                        }
+
+                        return 'success';
                     }
 
                     return 'gray';
@@ -149,7 +164,12 @@ class EditEmpleado extends EditRecord
                 ->extraAttributes(function ($record) {
                     if (!$record) return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+                    $hasAlert = $record->alertas()->whereIn('tipo', [
+                        'sin_discapacidad',
+                        'discapacidad_archivos_pendientes',
+                        'incapacidad_archivos_pendientes',
+                        'falta_autorizacion_consulta',
+                    ])->exists();
 
                     if ($hasOption && !$hasAlert && !$record->tiene_discapacidad && !$record->tiene_incapacidad) {
                         return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
@@ -164,6 +184,7 @@ class EditEmpleado extends EditRecord
                     $res = $record->documentos()->where('tipo', 'Resolución Discapacidad')->first();
                     $dict = $record->documentos()->where('tipo', 'Dictamen Técnico')->first();
                     $cert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->first();
+                    $aut = $record->documentos()->where('tipo', 'Autorización de Consulta')->first();
                     $incapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->get();
                     
                     $incapacidadArchivos = [];
@@ -188,6 +209,7 @@ class EditEmpleado extends EditRecord
                         'tiene_incapacidad' => $record->tiene_incapacidad,
                         'tipo_incapacidad' => $record->tipo_incapacidad,
                         'incapacidad_archivos' => $incapacidadArchivos,
+                        'autorizacion_consulta' => $aut?->file_path,
                         'no_tiene_discapacidad' => $record->no_tiene_discapacidad,
                     ];
                 })
@@ -367,6 +389,17 @@ class EditEmpleado extends EditRecord
                         ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->columnSpanFull(),
 
+                    FileUpload::make('autorizacion_consulta')
+                        ->label('Autorización de Consulta')
+                        ->directory('empleados/autorizaciones')
+                        ->disk('local')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->openable()
+                        ->downloadable()
+                        ->previewable(false)
+                        ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') || (bool) $get('tiene_incapacidad'))
+                        ->columnSpanFull(),
+
                     Toggle::make('no_tiene_discapacidad')
                         ->label('No tiene discapacidad / incapacidad')
                         ->live()
@@ -468,6 +501,22 @@ class EditEmpleado extends EditRecord
                         }
                     } else {
                         $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->delete();
+                    }
+
+                    if ($tieneDiscapacidad || $tieneIncapacidad) {
+                        if (!empty($data['autorizacion_consulta'])) {
+                            $record->documentos()->updateOrCreate(
+                                ['tipo' => 'Autorización de Consulta'],
+                                [
+                                    'nombre' => 'Autorización de Consulta ' . $record->nombre . ' ' . $record->apellidos,
+                                    'file_path' => $data['autorizacion_consulta'],
+                                ]
+                            );
+                        } else {
+                            $record->documentos()->where('tipo', 'Autorización de Consulta')->delete();
+                        }
+                    } else {
+                        $record->documentos()->where('tipo', 'Autorización de Consulta')->delete();
                     }
 
                     $record->actualizarAlertas();

@@ -427,6 +427,28 @@ class EmpleadoResource extends Resource
                                     ->label('Tipo de Incapacidad')
                                     ->visible(fn ($record) => $record && $record->tiene_incapacidad)
                                     ->placeholder('Ninguna'),
+
+                                \Filament\Infolists\Components\TextEntry::make('autorizacion_consulta')
+                                    ->label('Autorización de Consulta')
+                                    ->visible(fn ($record) => $record && ($record->tiene_discapacidad || $record->tiene_incapacidad))
+                                    ->html()
+                                    ->state(function (?\App\Models\Empleado $record) {
+                                        if (!$record) return '-';
+                                        $doc = $record->documentos()->where('tipo', 'Autorización de Consulta')->first();
+                                        if ($doc) {
+                                            $badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300">Adjunta</span>';
+                                            $iconHtml = '
+                                                <a href="#" x-on:click.prevent="$wire.mountAction(\'ver_autorizacion_consulta\')" title="Ver Autorización de Consulta" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: #d97706; transition: all 0.2s;" class="hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-md">
+                                                    <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </a>
+                                            ';
+                                            return new \Illuminate\Support\HtmlString('<div style="display: flex; align-items: center; gap: 6px;">' . $badge . $iconHtml . '</div>');
+                                        }
+                                        return new \Illuminate\Support\HtmlString('<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300">Pendiente</span>');
+                                    }),
                             ]),
                     ]),
 
