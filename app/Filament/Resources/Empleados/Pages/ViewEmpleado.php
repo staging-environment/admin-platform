@@ -200,36 +200,14 @@ class ViewEmpleado extends ViewRecord
                     ];
                 })
                 ->form([
-                    Grid::make(['default' => 1, 'sm' => 3])
-                        ->schema([
-                            Toggle::make('no_tiene_discapacidad')
-                                ->label('No tiene discapacidad / incapacidad')
-                                ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $set('tiene_discapacidad', false);
-                                        $set('tiene_incapacidad', false);
-                                    }
-                                }),
-
-                            Toggle::make('tiene_discapacidad')
-                                ->label('¿Tiene discapacidad?')
-                                ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $set('no_tiene_discapacidad', false);
-                                    }
-                                }),
-
-                            Toggle::make('tiene_incapacidad')
-                                ->label('¿Tiene incapacidad?')
-                                ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $set('no_tiene_discapacidad', false);
-                                    }
-                                }),
-                        ]),
+                    Toggle::make('tiene_discapacidad')
+                        ->label('¿Tiene discapacidad?')
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set) {
+                            if ($state) {
+                                $set('no_tiene_discapacidad', false);
+                            }
+                        }),
                     
                     Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
                         ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
@@ -340,16 +318,29 @@ class ViewEmpleado extends ViewRecord
                                 ->previewable(false),
                         ]),
 
-                    Select::make('tipo_incapacidad')
-                        ->label('Tipo de Incapacidad')
-                        ->multiple()
-                        ->options([
-                            'Físico' => 'Físico',
-                            'Psíquico' => 'Psíquico',
-                        ])
-                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->columnSpanFull(),
+                    Grid::make(['default' => 1, 'sm' => 12])
+                        ->schema([
+                            Toggle::make('tiene_incapacidad')
+                                ->label('¿Tiene incapacidad?')
+                                ->live()
+                                ->afterStateUpdated(function ($state, Set $set) {
+                                    if ($state) {
+                                        $set('no_tiene_discapacidad', false);
+                                    }
+                                })
+                                ->columnSpan(['default' => 12, 'sm' => fn (Get $get) => (bool) $get('tiene_incapacidad') ? 4 : 12]),
+
+                            Select::make('tipo_incapacidad')
+                                ->label('Tipo de Incapacidad')
+                                ->multiple()
+                                ->options([
+                                    'Físico' => 'Físico',
+                                    'Psíquico' => 'Psíquico',
+                                ])
+                                ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                ->columnSpan(['default' => 12, 'sm' => 8]),
+                        ]),
 
                     Repeater::make('incapacidad_archivos')
                         ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad <span class="text-red-600 font-bold">*</span>'))
@@ -375,6 +366,16 @@ class ViewEmpleado extends ViewRecord
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->columnSpanFull(),
+
+                    Toggle::make('no_tiene_discapacidad')
+                        ->label('No tiene discapacidad / incapacidad')
+                        ->live()
+                        ->afterStateUpdated(function ($state, Set $set) {
+                            if ($state) {
+                                $set('tiene_discapacidad', false);
+                                $set('tiene_incapacidad', false);
+                            }
+                        }),
                 ])
                 ->action(function ($record, array $data) {
                     $noTieneDiscapacidad = (bool) ($data['no_tiene_discapacidad'] ?? false);
