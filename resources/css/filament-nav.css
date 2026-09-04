@@ -594,12 +594,30 @@ label .text-danger-400,
 
 .fi-modal-content .fi-fo-field-wrp-label {
     margin-bottom: 0.05rem !important;
-    font-size: 0.6875rem !important;
+    font-size: 0.625rem !important;
+    line-height: 1.1 !important;
 }
 
-.fi-modal-content .fi-fo-field-wrp-label label {
-    font-size: 0.6875rem !important;
+.fi-modal-content .fi-fo-field-wrp-label label,
+.fi-modal-content .fi-fo-field-wrp-label span,
+.fi-modal-content .fi-fo-field-wrp-label-content {
+    font-size: 0.625rem !important;
     font-weight: 600 !important;
+    line-height: 1.1 !important;
+}
+
+.fi-modal-content .fi-fo-repeater-item .fi-fo-field-wrp-label label,
+.fi-modal-content .fi-fo-repeater-item .fi-fo-field-wrp-label span {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.025em !important;
+    color: #475569 !important;
+}
+
+.dark .fi-modal-content .fi-fo-repeater-item .fi-fo-field-wrp-label label,
+.dark .fi-modal-content .fi-fo-repeater-item .fi-fo-field-wrp-label span {
+    color: #94a3b8 !important;
 }
 
 .fi-modal-content input,
