@@ -45,7 +45,7 @@ class ViewEmpleado extends ViewRecord
                 ->icon('heroicon-o-bell')
                 ->color(function ($record) {
                     $hasNotifs = $record->notificaciones()->exists();
-                    return $hasNotifs ? 'warning' : 'danger';
+                    return $hasNotifs ? 'warning' : 'gray';
                 })
                 ->modalHeading('Notificaciones del Empleado')
                 ->modalWidth('7xl')
@@ -58,7 +58,11 @@ class ViewEmpleado extends ViewRecord
                 ->icon('heroicon-o-identification')
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->where('tipo', 'DNI')->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    $isExpired = $record->fecha_caducidad_dni && $record->fecha_caducidad_dni->isPast();
+                    if (!$hasDocs || $isExpired) {
+                        return 'danger';
+                    }
+                    return 'success';
                 })
                 ->modalHeading("DNI's asociados al empleado")
                 ->modalSubmitAction(false)
@@ -70,7 +74,14 @@ class ViewEmpleado extends ViewRecord
                 ->icon('heroicon-o-document-text')
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->where('tipo', 'Contratos')->exists();
-                    return $hasDocs ? 'warning' : 'danger';
+                    if (!$hasDocs) {
+                        return 'danger';
+                    }
+                    $latest = $record->documentos()->where('tipo', 'Contratos')->latest('id')->first();
+                    if ($latest && $latest->tipo_contrato === 'Eventual' && $latest->fecha_vencimiento_contrato && $latest->fecha_vencimiento_contrato->isPast()) {
+                        return 'danger';
+                    }
+                    return 'success';
                 })
                 ->modalHeading('Documentos Contratos')
                 ->modalWidth('7xl')
@@ -84,7 +95,7 @@ class ViewEmpleado extends ViewRecord
                 ->color(function ($record) {
                     $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos'])->exists();
                     $hasCursos = $record->cursos()->exists();
-                    return ($hasDocs || $hasCursos) ? 'warning' : 'danger';
+                    return ($hasDocs || $hasCursos) ? 'success' : 'gray';
                 })
                 ->modalHeading('Documentos Formación')
                 ->modalSubmitAction(false)
@@ -95,9 +106,27 @@ class ViewEmpleado extends ViewRecord
                 ->label('Discapacidad / Incapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
-                    $hasDocs = $record->documentos()->whereIn('tipo', ['Resolución Discapacidad', 'Dictamen Técnico', 'Certificado Discapacidad', 'Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
-                    return ($hasOption || $hasDocs) ? 'warning' : 'danger';
+                    if (!$hasOption) {
+                        return 'danger';
+                    }
+
+                    if ($record->tiene_discapacidad) {
+                        $hasRes = $record->documentos()->where('tipo', 'Resolución Discapacidad')->exists();
+                        $hasDict = $record->documentos()->where('tipo', 'Dictamen Técnico')->exists();
+                        $hasCert = $record->documentos()->where('tipo', 'Certificado Discapacidad')->exists();
+                        if (!$hasRes && !$hasDict && !$hasCert) {
+                            return 'danger';
+                        }
+                        return 'success';
+                    }
+
+                    if ($record->tiene_incapacidad) {
+                        $hasIncapDocs = $record->documentos()->whereIn('tipo', ['Incapacidad Física', 'Incapacidad Psíquica', 'Incapacidad'])->exists();
+                        return $hasIncapDocs ? 'success' : 'danger';
+                    }
+
+                    return 'gray';
                 })
                 ->modalHeading('Discapacidad / Incapacidad')
                 ->fillForm(function ($record) {
