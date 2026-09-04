@@ -40,6 +40,13 @@ class EditEmpleado extends EditRecord
                     $hasNotifs = $record->notificaciones()->exists();
                     return $hasNotifs ? 'warning' : 'gray';
                 })
+                ->extraAttributes(function ($record) {
+                    $hasNotifs = $record?->notificaciones()->exists();
+                    if (!$hasNotifs) {
+                        return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
+                    }
+                    return [];
+                })
                 ->modalHeading('Notificaciones del Empleado')
                 ->modalWidth('7xl')
                 ->modalSubmitAction(false)
@@ -96,6 +103,15 @@ class EditEmpleado extends EditRecord
                     $hasCursos = $record->cursos()->exists();
                     return ($hasDocs || $hasCursos) ? 'success' : 'gray';
                 })
+                ->extraAttributes(function ($record) {
+                    if (!$record) return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
+                    $hasDocs = $record->documentos()->whereIn('tipo', ['Certificados', 'Titulaciones', 'Carnets', 'Otros', 'Prevención de riesgos laborales', 'Manipulación de alimentos'])->exists();
+                    $hasCursos = $record->cursos()->exists();
+                    if (!$hasDocs && !$hasCursos) {
+                        return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
+                    }
+                    return [];
+                })
                 ->modalHeading('Documentos Formación')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
@@ -129,6 +145,16 @@ class EditEmpleado extends EditRecord
                     }
 
                     return 'gray';
+                })
+                ->extraAttributes(function ($record) {
+                    if (!$record) return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
+                    $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
+                    $hasAlert = $record->alertas()->whereIn('tipo', ['sin_discapacidad', 'discapacidad_archivos_pendientes'])->exists();
+
+                    if ($hasOption && !$hasAlert && !$record->tiene_discapacidad && !$record->tiene_incapacidad) {
+                        return ['style' => 'background-color: #e2e8f0 !important; color: #334155 !important; border: 1px solid #cbd5e1 !important;'];
+                    }
+                    return [];
                 })
                 ->modalHeading('Discapacidad / Incapacidad')
                 ->fillForm(function ($record) {
