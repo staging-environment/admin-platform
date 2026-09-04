@@ -247,13 +247,13 @@ button.fi-topbar-trigger {
 }
 
 
-/* Filas compactas con fuentes ampliadas */
+/* Filas compactas con fuentes equilibradas */
 .fi-resource-recursos-humanos .fi-ta-cell,
 .fi-resource-recursos-humanos tr.fi-ta-row > td.fi-ta-cell {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
     height: 32px !important;
 }
 
@@ -274,12 +274,12 @@ button.fi-topbar-trigger {
 }
 
 .fi-resource-recursos-humanos .fi-ta-row td * {
-    font-size: 0.85rem !important; /* Fuente ampliada */
+    font-size: 0.8125rem !important;
 }
 
-/* Tamaño de la columna del nombre */
+/* Tamaño de la columna del nombre/apellidos */
 .fi-resource-recursos-humanos .fi-ta-row td .fi-ta-text-item {
-    font-size: 0.875rem !important; /* Nombre ligeramente más grande */
+    font-size: 0.8125rem !important;
     font-weight: 600 !important;
 }
 
@@ -287,9 +287,9 @@ button.fi-topbar-trigger {
 .fi-resource-recursos-humanos .fi-ta-header th {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    font-size: 0.8rem !important; /* Cabecera ampliada */
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    font-size: 0.75rem !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
@@ -297,12 +297,17 @@ button.fi-topbar-trigger {
 
 /* Botones de acción mini */
 .fi-resource-recursos-humanos .fi-ta-actions {
-    gap: 0.1rem !important;
+    gap: 0.15rem !important;
     padding: 0 !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
 }
 .fi-resource-recursos-humanos .fi-ta-actions button,
 .fi-resource-recursos-humanos .fi-ta-actions a {
     padding: 1px !important;
+    flex-shrink: 0 !important;
 }
 .fi-resource-recursos-humanos .fi-ta-actions svg {
     width: 14px !important;
