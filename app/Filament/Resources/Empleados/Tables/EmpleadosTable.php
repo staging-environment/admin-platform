@@ -26,6 +26,7 @@ class EmpleadosTable
                     ->alignStart()
                     ->disabledClick()
                     ->extraAttributes([
+                        'style' => 'width: 20%; min-width: 170px;',
                         'onclick' => 'event.stopPropagation()',
                     ])
                     ->searchable()
@@ -35,6 +36,7 @@ class EmpleadosTable
                     ->label('Nombre')
                     ->formatStateUsing(fn ($state) => mb_strtoupper(trim($state ?? '')))
                     ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->extraAttributes(['style' => 'width: 15%; min-width: 130px;'])
                     ->searchable()
                     ->sortable(),
 
@@ -42,18 +44,21 @@ class EmpleadosTable
                     ->label('Teléfono')
                     ->size('xs')
                     ->color('gray')
+                    ->extraAttributes(['style' => 'width: 11%; min-width: 95px; white-space: nowrap;'])
                     ->default('—'),
 
                  TextColumn::make('gasolinera.Nombre')
                     ->label('Ubicación de trabajo')
                     ->size('xs')
                     ->color('gray')
+                    ->extraAttributes(['style' => 'width: 20%; min-width: 150px;'])
                     ->default('—'),
 
                 TextColumn::make('puesto')
                     ->label('Puesto')
                     ->size('xs')
                     ->color('gray')
+                    ->extraAttributes(['style' => 'width: 26%; min-width: 180px;'])
                     ->default('—'),
             ])
             ->striped()

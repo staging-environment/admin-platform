@@ -295,9 +295,20 @@ button.fi-topbar-trigger {
     letter-spacing: 0.05em !important;
 }
 
+/* Columna de acciones fija sin solapar */
+.fi-resource-recursos-humanos tr.fi-ta-row > td.fi-ta-actions-cell,
+.fi-resource-recursos-humanos th.fi-ta-actions-header-cell {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 65px !important;
+    padding-left: 2px !important;
+    padding-right: 8px !important;
+    text-align: right !important;
+}
+
 /* Botones de acción mini */
 .fi-resource-recursos-humanos .fi-ta-actions {
-    gap: 0.15rem !important;
+    gap: 0.25rem !important;
     padding: 0 !important;
     display: inline-flex !important;
     flex-wrap: nowrap !important;
@@ -306,7 +317,7 @@ button.fi-topbar-trigger {
 }
 .fi-resource-recursos-humanos .fi-ta-actions button,
 .fi-resource-recursos-humanos .fi-ta-actions a {
-    padding: 1px !important;
+    padding: 2px !important;
     flex-shrink: 0 !important;
 }
 .fi-resource-recursos-humanos .fi-ta-actions svg {
