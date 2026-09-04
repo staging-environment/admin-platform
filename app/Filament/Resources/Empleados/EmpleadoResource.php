@@ -238,7 +238,52 @@ class EmpleadoResource extends Resource
                                         'Alta' => 'success',
                                         'Baja' => 'danger',
                                         default => 'gray',
-                                    }),
+                                    })
+                                    ->extraAttributes(['style' => 'width: fit-content;'])
+                                    ->suffixAction(
+                                        \Filament\Actions\Action::make('ver_baja')
+                                            ->icon('heroicon-m-eye')
+                                            ->color('warning')
+                                            ->iconButton()
+                                            ->visible(function ($record) {
+                                                if (!$record || $record->estado !== 'Baja') {
+                                                    return false;
+                                                }
+                                                return !empty($record->documento_baja_path) || $record->documentos()->where('tipo', 'Documento de Baja')->exists();
+                                            })
+                                            ->modalHeading(fn ($record) => 'Documento de Baja - ' . ($record ? ($record->nombre . ' ' . $record->apellidos) : ''))
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelActionLabel('Cerrar')
+                                            ->modalWidth('7xl')
+                                            ->modalContent(function ($record) {
+                                                $filePath = $record->documento_baja_path;
+                                                if (!$filePath) {
+                                                    $doc = $record->documentos()->where('tipo', 'Documento de Baja')->latest('id')->first();
+                                                    $filePath = $doc?->file_path;
+                                                }
+                                                if (!$filePath) return null;
+                                                $url = route('admin.recursos_humanos.ver_archivo', ['path' => $filePath]);
+                                                $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                                                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='flex justify-center p-2 bg-gray-50 border rounded-lg overflow-auto' style='max-height: 75vh; min-height: 450px;'>
+                                                            <img src='{$url}' class='object-contain rounded shadow-sm' style='max-height: 70vh;' />
+                                                        </div>
+                                                    ");
+                                                } elseif ($extension === 'pdf') {
+                                                    return new \Illuminate\Support\HtmlString("
+                                                        <div class='w-full border rounded-lg overflow-hidden' style='height: 75vh; min-height: 600px;'>
+                                                            <iframe src='{$url}' class='w-full h-full border-none'></iframe>
+                                                        </div>
+                                                    ");
+                                                }
+                                                return new \Illuminate\Support\HtmlString("
+                                                    <div class='text-center p-4'>
+                                                        <a href='" . route('admin.recursos_humanos.descargar_archivo', ['path' => $filePath]) . "' class='underline text-amber-600 font-bold' target='_blank'>Descargar Documento de Baja</a>
+                                                    </div>
+                                                ");
+                                            })
+                                    ),
                             ]),
                     ]),
 
