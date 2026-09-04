@@ -163,15 +163,22 @@ class Empleado extends Model
     {
         $latest = $this->documentos()
             ->where('tipo', 'Contratos')
-            ->latest('id')
+            ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+            ->orderBy('id', 'desc')
             ->first();
 
         if ($latest) {
+            $isEventual = in_array(strtolower(trim($latest->tipo_contrato ?? '')), ['eventual', 'temporal']);
             $this->update([
                 'tipo_contrato' => $latest->tipo_contrato,
-                'fecha_vencimiento_contrato' => ($latest->tipo_contrato === 'Eventual') ? $latest->fecha_vencimiento_contrato : null,
+                'fecha_vencimiento_contrato' => $isEventual ? $latest->fecha_vencimiento_contrato : null,
                 'gasolinera_codigo' => $latest->gasolinera_codigo ?: $this->gasolinera_codigo,
                 'puesto' => $latest->puesto ?: $this->puesto,
+            ]);
+        } else {
+            $this->update([
+                'tipo_contrato' => null,
+                'fecha_vencimiento_contrato' => null,
             ]);
         }
     }
@@ -213,8 +220,23 @@ class Empleado extends Model
         // 1. Limpiar alertas anteriores
         $this->alertas()->delete();
 
+        // Si el empleado está dado de baja en la empresa, no debe tener alertas operativas activas
+        if ($this->estado === 'Baja') {
+            return;
+        }
+
+        // Obtener el contrato más relevante (ordenado por fecha de inicio más reciente o último ID)
+        $latestContract = $this->documentos()
+            ->where('tipo', 'Contratos')
+            ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $tipoContrato = $latestContract?->tipo_contrato ?: $this->tipo_contrato;
+        $fechaVencimiento = $latestContract?->fecha_vencimiento_contrato ?: $this->fecha_vencimiento_contrato;
+        $hasContract = ($latestContract !== null) || !empty($tipoContrato);
+
         // 2. Alerta: Sin Contrato
-        $hasContract = $this->documentos()->where('tipo', 'Contratos')->exists();
         if (!$hasContract) {
             $this->alertas()->create([
                 'tipo' => 'sin_contrato',
@@ -223,17 +245,13 @@ class Empleado extends Model
             ]);
         } else {
             // 3. Alerta: Contrato Eventual Expirado
-            $latestContract = $this->documentos()
-                ->where('tipo', 'Contratos')
-                ->latest('id')
-                ->first();
-
-            if ($latestContract && $latestContract->tipo_contrato === 'Eventual') {
-                if ($latestContract->fecha_vencimiento_contrato && $latestContract->fecha_vencimiento_contrato->isPast()) {
+            $isEventual = in_array(strtolower(trim($tipoContrato ?? '')), ['eventual', 'temporal']);
+            if ($isEventual) {
+                if ($fechaVencimiento && $fechaVencimiento->endOfDay()->isPast()) {
                     $this->alertas()->create([
                         'tipo' => 'contrato_vencido',
                         'titulo' => 'Contrato eventual vencido',
-                        'descripcion' => 'La fecha de vencimiento del último contrato temporal (' . $latestContract->fecha_vencimiento_contrato->format('d/m/Y') . ') ya ha pasado.',
+                        'descripcion' => 'La fecha de finalización del contrato temporal (' . $fechaVencimiento->format('d/m/Y') . ') ya ha pasado.',
                     ]);
                 }
             }
@@ -249,7 +267,7 @@ class Empleado extends Model
             ]);
         } else {
             // 5. Alerta: DNI Caducado
-            if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->isPast()) {
+            if ($this->fecha_caducidad_dni && $this->fecha_caducidad_dni->endOfDay()->isPast()) {
                 $this->alertas()->create([
                     'tipo' => 'dni_caducado',
                     'titulo' => 'DNI / NIE caducado',

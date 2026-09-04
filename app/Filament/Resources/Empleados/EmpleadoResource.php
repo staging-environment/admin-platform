@@ -190,9 +190,42 @@ class EmpleadoResource extends Resource
                                  \Filament\Infolists\Components\TextEntry::make('tipo_contrato')
                                       ->label('Tipo de Contrato')
                                       ->state(function ($record) {
-                                          $latest = $record?->documentos()->where('tipo', 'Contratos')->latest('id')->first();
+                                          $latest = $record?->documentos()
+                                              ->where('tipo', 'Contratos')
+                                              ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+                                              ->orderBy('id', 'desc')
+                                              ->first();
                                           $val = ($latest && $latest->tipo_contrato) ? $latest->tipo_contrato : ($record?->tipo_contrato);
-                                          return $val === 'Indefinido' ? 'Fijo' : $val;
+                                          $venc = ($latest && $latest->fecha_vencimiento_contrato) ? $latest->fecha_vencimiento_contrato : ($record?->fecha_vencimiento_contrato);
+
+                                          if ($val === 'Indefinido') {
+                                              return 'Fijo';
+                                          }
+                                          if (in_array(strtolower(trim($val ?? '')), ['eventual', 'temporal'])) {
+                                              if ($venc) {
+                                                  $isExpired = $venc->endOfDay()->isPast();
+                                                  $formatted = $venc->format('d/m/Y');
+                                                  return $isExpired 
+                                                      ? "Eventual (Vencido: {$formatted})" 
+                                                      : "Eventual (Fin: {$formatted})";
+                                              }
+                                              return 'Eventual';
+                                          }
+                                          return $val;
+                                      })
+                                      ->color(function ($record) {
+                                          if ($record?->estado === 'Baja') return null;
+                                          $latest = $record?->documentos()
+                                              ->where('tipo', 'Contratos')
+                                              ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+                                              ->orderBy('id', 'desc')
+                                              ->first();
+                                          $val = ($latest && $latest->tipo_contrato) ? $latest->tipo_contrato : ($record?->tipo_contrato);
+                                          $venc = ($latest && $latest->fecha_vencimiento_contrato) ? $latest->fecha_vencimiento_contrato : ($record?->fecha_vencimiento_contrato);
+                                          if (in_array(strtolower(trim($val ?? '')), ['eventual', 'temporal']) && $venc && $venc->endOfDay()->isPast()) {
+                                              return 'danger';
+                                          }
+                                          return null;
                                       })
                                       ->placeholder('Sin contrato registrado')
                                       ->extraAttributes(['style' => 'width: fit-content;'])

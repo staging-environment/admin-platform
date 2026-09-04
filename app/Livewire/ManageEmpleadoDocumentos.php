@@ -406,6 +406,7 @@ class ManageEmpleadoDocumentos extends Component
             ]);
         }
 
+        $this->empleado->refresh();
         $this->empleado->actualizarAlertas();
         $this->editingDocumentId = null;
         $this->edit_file = null;

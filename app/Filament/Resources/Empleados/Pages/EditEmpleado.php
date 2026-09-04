@@ -19,6 +19,14 @@ class EditEmpleado extends EditRecord
 {
     protected static string $resource = EmpleadoResource::class;
 
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+        $this->record->actualizarAlertas();
+    }
+
+
+
     public function content(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         return $schema
@@ -57,9 +65,9 @@ class EditEmpleado extends EditRecord
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
                 ->color(function ($record) {
-                    if (!$record) return 'gray';
+                    if (!$record || $record->estado === 'Baja') return 'gray';
                     $hasDocs = $record->documentos()->where('tipo', 'DNI')->exists();
-                    $isExpired = $record->fecha_caducidad_dni && $record->fecha_caducidad_dni->isPast();
+                    $isExpired = $record->fecha_caducidad_dni && $record->fecha_caducidad_dni->endOfDay()->isPast();
                     $hasAlert = $record->alertas()->whereIn('tipo', ['sin_dni', 'dni_caducado'])->exists();
                     if (!$hasDocs || $isExpired || $hasAlert) {
                         return 'danger';
@@ -75,13 +83,27 @@ class EditEmpleado extends EditRecord
                 ->label('Contratos')
                 ->icon('heroicon-o-document-text')
                 ->color(function ($record) {
-                    if (!$record) return 'gray';
+                    if (!$record || $record->estado === 'Baja') return 'gray';
                     $hasDocs = $record->documentos()->where('tipo', 'Contratos')->exists();
-                    if (!$hasDocs) {
+                    $tipo = $record->tipo_contrato;
+                    $venc = $record->fecha_vencimiento_contrato;
+
+                    $latest = $record->documentos()
+                        ->where('tipo', 'Contratos')
+                        ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    if ($latest) {
+                        $tipo = $latest->tipo_contrato ?: $tipo;
+                        $venc = $latest->fecha_vencimiento_contrato ?: $venc;
+                    }
+
+                    if (!$hasDocs && empty($tipo)) {
                         return 'danger';
                     }
-                    $latest = $record->documentos()->where('tipo', 'Contratos')->latest('id')->first();
-                    $isExpired = $latest && $latest->tipo_contrato === 'Eventual' && $latest->fecha_vencimiento_contrato && $latest->fecha_vencimiento_contrato->isPast();
+
+                    $isEventual = in_array(strtolower(trim($tipo ?? '')), ['eventual', 'temporal']);
+                    $isExpired = $isEventual && $venc && $venc->endOfDay()->isPast();
                     $hasAlert = $record->alertas()->whereIn('tipo', ['sin_contrato', 'contrato_vencido'])->exists();
                     if ($isExpired || $hasAlert) {
                         return 'danger';
@@ -121,7 +143,7 @@ class EditEmpleado extends EditRecord
                 ->label('Discapacidad / Incapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
-                    if (!$record) return 'gray';
+                    if (!$record || $record->estado === 'Baja') return 'gray';
                     $hasOption = $record->tiene_discapacidad || $record->tiene_incapacidad || $record->no_tiene_discapacidad;
                     $hasAlert = $record->alertas()->whereIn('tipo', [
                         'sin_discapacidad',

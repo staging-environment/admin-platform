@@ -29,3 +29,8 @@ Schedule::command('fichajes:send-missing-reminders')->dailyAt('21:00');
 
 
 
+
+// ── Alertas de Empleados (Comprobación diaria de vencimientos) ───────────────
+Schedule::call(function () {
+    \App\Models\Empleado::all()->each->actualizarAlertas();
+})->dailyAt('00:05');
