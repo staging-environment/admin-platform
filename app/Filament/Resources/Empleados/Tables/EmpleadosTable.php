@@ -20,19 +20,41 @@ class EmpleadosTable
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([10, 20, 50, 100])
             ->columns([
-                \Filament\Tables\Columns\ViewColumn::make('apellidos')
-                    ->label('Nombre')
-                    ->view('filament.tables.columns.nombre-con-alerta')
-                    ->alignStart()
+                \Filament\Tables\Columns\ViewColumn::make('alerta')
+                    ->label(' ')
+                    ->view('filament.tables.columns.solo-alerta')
+                    ->alignCenter()
                     ->disabledClick()
                     ->extraAttributes([
+                        'style' => 'width: 48px; max-width: 48px; text-align: center; padding-right: 0 !important;',
                         'onclick' => 'event.stopPropagation()',
-                    ])
+                    ]),
+
+                TextColumn::make('apellidos')
+                    ->label('Nombre')
+                    ->formatStateUsing(function ($record) {
+                        if (!$record) return '';
+                        $nombre = trim($record->nombre);
+                        $apellidos = trim($record->apellidos ?? '');
+
+                        if (empty($apellidos)) {
+                            return mb_strtoupper($nombre);
+                        }
+                        $parts = preg_split('/\s+/', $apellidos);
+                        $primerApellido = array_shift($parts);
+                        $segundoApellido = count($parts) > 0 ? implode(' ', $parts) : '';
+
+                        if ($segundoApellido !== '') {
+                            return mb_strtoupper($primerApellido) . ' ' . mb_strtoupper($segundoApellido) . ', ' . mb_strtoupper($nombre);
+                        }
+                        return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
+                    })
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
                     ->searchable(query: fn ($query, $search) => $query->where(function ($q) use ($search) {
                         $q->where('nombre', 'like', "%{$search}%")
                           ->orWhere('apellidos', 'like', "%{$search}%");
                     }))
-                    ->sortable(['nombre', 'apellidos']),
+                    ->sortable(['apellidos', 'nombre']),
 
                 TextColumn::make('telefono_principal')
                     ->label('Teléfono')
