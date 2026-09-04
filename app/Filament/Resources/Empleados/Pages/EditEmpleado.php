@@ -420,16 +420,29 @@ class EditEmpleado extends EditRecord
                         ->default(now())
                         ->required(),
                     FileUpload::make('documento_baja')
-                        ->label('Documento de baja (Archivo)')
+                        ->label(fn (Get $get) => $get('motivo_baja') === 'Baja voluntaria' ? 'Finiquito' : 'Documento de baja (Archivo)')
                         ->directory('empleados/bajas')
                         ->disk('local')
                         ->acceptedFileTypes(['application/pdf', 'image/*'])
                         ->previewable(false)
-                        ->visible(fn (Get $get) => $get('motivo_baja') && $get('motivo_baja') !== 'Finalización de contrato')
-                        ->required(fn (Get $get) => $get('motivo_baja') && $get('motivo_baja') !== 'Finalización de contrato'),
+                        ->required()
+                        ->rules(['required'])
+                        ->validationMessages([
+                            'required' => 'Es obligatorio adjuntar el archivo para tramitar la baja.',
+                        ]),
                 ])
                 ->action(function ($record, array $data) {
                     $docPath = $data['documento_baja'] ?? null;
+
+                    if (empty($docPath)) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error al tramitar la baja')
+                            ->body('Es obligatorio adjuntar el archivo (Finiquito / Documento de baja).')
+                            ->danger()
+                            ->send();
+                        $this->halt();
+                        return;
+                    }
 
                     $record->update([
                         'estado' => 'Baja',
@@ -439,13 +452,13 @@ class EditEmpleado extends EditRecord
                         'documento_baja_path' => $docPath,
                     ]);
 
-                    if ($docPath) {
-                        $record->documentos()->create([
-                            'tipo' => 'Documento de Baja',
-                            'nombre' => 'Documento de Baja ' . $record->nombre . ' ' . $record->apellidos,
-                            'file_path' => $docPath,
-                        ]);
-                    }
+                    $docNombre = ($data['motivo_baja'] === 'Baja voluntaria' ? 'Finiquito ' : 'Documento de Baja ') . $record->nombre . ' ' . $record->apellidos;
+
+                    $record->documentos()->create([
+                        'tipo' => 'Documento de Baja',
+                        'nombre' => $docNombre,
+                        'file_path' => $docPath,
+                    ]);
 
                     \Filament\Notifications\Notification::make()
                         ->title('Empleado dado de baja correctamente')
