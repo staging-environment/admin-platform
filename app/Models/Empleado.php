@@ -220,8 +220,18 @@ class Empleado extends Model
         // 1. Limpiar alertas anteriores
         $this->alertas()->delete();
 
-        // Si el empleado está dado de baja en la empresa, no debe tener alertas operativas activas
+        // Si el empleado está dado de baja en la empresa:
+        // No debe tener alertas operativas de personal en alta,
+        // pero DEBE alertar si le falta el documento oficial de baja o finiquito.
         if ($this->estado === 'Baja') {
+            $hasDocBaja = !empty($this->documento_baja_path) || $this->documentos()->where('tipo', 'Documento de Baja')->exists();
+            if (!$hasDocBaja) {
+                $this->alertas()->create([
+                    'tipo' => 'falta_documento_baja',
+                    'titulo' => 'Falta documento de baja',
+                    'descripcion' => 'El empleado está dado de baja en la empresa pero no tiene adjuntado el documento oficial de baja o finiquito.',
+                ]);
+            }
             return;
         }
 

@@ -68,6 +68,7 @@ class DocumentosRelationManager extends RelationManager
                         'Certificado Discapacidad' => 'Certificado Discapacidad',
                         'Incapacidad Física' => 'Incapacidad Física',
                         'Incapacidad Psíquica' => 'Incapacidad Psíquica',
+                        'Documento de Baja' => 'Documento de Baja / Finiquito',
                         'Otros' => 'Otros documentos (Formación)',
                     ])
                     ->required(),
