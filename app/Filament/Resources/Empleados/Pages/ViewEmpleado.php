@@ -316,27 +316,32 @@ class ViewEmpleado extends ViewRecord
                                 ->previewable(false),
                         ]),
 
-                    Toggle::make('tiene_incapacidad')
-                        ->label('¿Tiene incapacidad?')
-                        ->live()
-                        ->afterStateUpdated(function ($state, Set $set) {
-                            if ($state) {
-                                $set('no_tiene_discapacidad', false);
-                            }
-                        }),
+                    Grid::make(['default' => 1, 'sm' => 12])
+                        ->schema([
+                            Toggle::make('tiene_incapacidad')
+                                ->label('¿Tiene incapacidad?')
+                                ->live()
+                                ->afterStateUpdated(function ($state, Set $set) {
+                                    if ($state) {
+                                        $set('no_tiene_discapacidad', false);
+                                    }
+                                })
+                                ->columnSpan(['default' => 12, 'sm' => fn (Get $get) => (bool) $get('tiene_incapacidad') ? 4 : 12]),
 
-                    Select::make('tipo_incapacidad')
-                        ->label('Tipo de Incapacidad')
-                        ->multiple()
-                        ->options([
-                            'Físico' => 'Físico',
-                            'Psíquico' => 'Psíquico',
-                        ])
-                        ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad')),
+                            Select::make('tipo_incapacidad')
+                                ->label('Tipo de Incapacidad')
+                                ->multiple()
+                                ->options([
+                                    'Físico' => 'Físico',
+                                    'Psíquico' => 'Psíquico',
+                                ])
+                                ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                ->columnSpan(['default' => 12, 'sm' => 8]),
+                        ]),
 
                     Repeater::make('incapacidad_archivos')
-                        ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad (Múltiples archivos) <span class="text-red-600 font-bold">*</span>'))
+                        ->label(new \Illuminate\Support\HtmlString('Adjuntar Documentación de Incapacidad <span class="text-red-600 font-bold">*</span>'))
                         ->schema([
                             FileUpload::make('file_path')
                                 ->label('Archivo')
@@ -347,10 +352,12 @@ class ViewEmpleado extends ViewRecord
                                 ->required(),
                             TextInput::make('comentario')
                                 ->label('Comentario / Descripción')
-                                ->placeholder('Ej: Informe de resolución médica 2026')
+                                ->placeholder('Ej: Informe de resolución médica')
                                 ->nullable(),
                         ])
                         ->columns(2)
+                        ->compact()
+                        ->reorderable(false)
                         ->addActionLabel('Añadir otro archivo')
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))

@@ -555,29 +555,63 @@ label .text-danger-400,
 
 /* Compactar formularios dentro de ventanas modales en pantallas pequeñas y medianas */
 .fi-modal-content {
-    padding: 1rem 1.25rem !important;
+    padding: 0.75rem 1rem !important;
 }
 
 .fi-modal-content .fi-fo-field-wrp {
-    margin-bottom: 0.25rem !important;
+    margin-bottom: 0.2rem !important;
 }
 
 .fi-modal-content .fi-fo-field-wrp-label {
-    margin-bottom: 0.15rem !important;
+    margin-bottom: 0.1rem !important;
     font-size: 0.8125rem !important;
 }
 
 .fi-modal-content .fi-grid {
-    gap: 0.75rem !important;
+    gap: 0.5rem !important;
 }
 
-.fi-modal-content .fi-fo-file-upload {
-    padding: 0.5rem !important;
+/* Compactar Repeater en modal */
+.fi-modal-content .fi-fo-repeater-item {
+    padding: 0.4rem 0.6rem !important;
+    margin-bottom: 0.35rem !important;
+    border-radius: 0.5rem !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.fi-modal-content .fi-fo-repeater-item-header {
+    padding: 0.2rem 0.4rem !important;
+    margin-bottom: 0.2rem !important;
+}
+
+.fi-modal-content .fi-fo-repeater-item-content {
+    gap: 0.4rem !important;
+}
+
+/* Compactar FileUploads / FilePond en modal */
+.fi-modal-content .filepond--root {
+    margin-bottom: 0 !important;
+}
+
+.fi-modal-content .filepond--drop-label {
+    min-height: 2.25rem !important;
+    height: 2.25rem !important;
+}
+
+.fi-modal-content .filepond--drop-label label {
+    font-size: 0.75rem !important;
+    padding: 0.25rem !important;
+}
+
+.fi-modal-content .filepond--item {
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
 }
 
 .fi-modal-window {
-    max-height: 92vh !important;
+    max-height: 94vh !important;
 }
+
 
 
 
