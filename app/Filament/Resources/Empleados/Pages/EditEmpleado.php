@@ -345,15 +345,13 @@ class EditEmpleado extends EditRecord
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
                                 ->previewable(false)
-                                ->required()
-                                ->columnSpan(['default' => 12, 'sm' => 5]),
+                                ->required(),
                             TextInput::make('comentario')
                                 ->label('Comentario / Descripción')
                                 ->placeholder('Ej: Informe de resolución médica')
-                                ->nullable()
-                                ->columnSpan(['default' => 12, 'sm' => 7]),
+                                ->nullable(),
                         ])
-                        ->columns(['default' => 1, 'sm' => 12])
+                        ->columns(2)
                         ->compact()
                         ->reorderable(false)
                         ->addActionLabel('Añadir otro archivo')
