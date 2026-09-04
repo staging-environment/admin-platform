@@ -232,7 +232,7 @@ class EmpleadoForm
                                         'Sensorial' => 'Sensorial',
                                     ])
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                    ->nullable(),
                                 
                                 TextInput::make('porcentaje_discapacidad')
                                     ->label('Porcentaje de Discapacidad')
@@ -241,19 +241,19 @@ class EmpleadoForm
                                     ->maxValue(100)
                                     ->suffix('%')
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                    ->nullable(),
 
                                 DatePicker::make('fecha_reconocimiento')
                                     ->label('Fecha de reconocimiento')
                                     ->beforeOrEqual('fecha_resolucion_discapacidad')
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                    ->nullable(),
 
                                 DatePicker::make('fecha_resolucion_discapacidad')
                                     ->label('Fecha de resolución')
                                     ->afterOrEqual('fecha_reconocimiento')
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                    ->nullable(),
 
                                 Toggle::make('pertenece_andalucia')
                                     ->label('¿Pertenece a Andalucía?')
@@ -284,17 +284,13 @@ class EmpleadoForm
                                         'Melilla' => 'Melilla',
                                     ])
                                     ->visible(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && ! $get('pertenece_andalucia')),
+                                    ->nullable(),
 
                                 Grid::make(3)
                                     ->schema([
                                         FileUpload::make('resolucion_discapacidad')
                                             ->label('Resolución de Discapacidad (Archivo)')
                                             ->markAsRequired()
-                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                            ->validationMessages([
-                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -360,10 +356,6 @@ class EmpleadoForm
                                         FileUpload::make('dictamen_tecnico')
                                             ->label('Dictamen técnico facultativo')
                                             ->markAsRequired()
-                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                            ->validationMessages([
-                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -428,10 +420,6 @@ class EmpleadoForm
                                         FileUpload::make('certificado_discapacidad')
                                             ->label('Certificado de discapacidad')
                                             ->markAsRequired()
-                                            ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                            ->validationMessages([
-                                                'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                            ])
                                             ->directory('empleados/resoluciones')
                                             ->disk('local')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -510,7 +498,7 @@ class EmpleadoForm
                                         'Psíquico' => 'Psíquico',
                                     ])
                                     ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                                    ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                    ->nullable()
                                     ->columnSpanFull(),
 
                                 Repeater::make('incapacidad_archivos')

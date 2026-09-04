@@ -340,7 +340,7 @@ class EditEmpleado extends EditRecord
                                     'Sensorial' => 'Sensorial',
                                     'Intelectual' => 'Intelectual',
                                 ])
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->nullable(),
                             
                             TextInput::make('porcentaje_discapacidad')
                                 ->label('Porcentaje de Discapacidad')
@@ -348,19 +348,19 @@ class EditEmpleado extends EditRecord
                                 ->minValue(fn (Get $get) => (bool) $get('tiene_discapacidad') ? 33 : 0)
                                 ->maxValue(100)
                                 ->suffix('%')
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->nullable(),
 
                             DatePicker::make('fecha_reconocimiento')
                                 ->label('Fecha reconocimiento')
                                 ->displayFormat('d/m/Y')
                                 ->native(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->nullable(),
 
                             DatePicker::make('fecha_resolucion_discapacidad')
                                 ->label('Fecha resolución')
                                 ->displayFormat('d/m/Y')
                                 ->native(false)
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad')),
+                                ->nullable(),
                         ]),
 
                     Grid::make(['default' => 1, 'sm' => 12])
@@ -395,7 +395,7 @@ class EditEmpleado extends EditRecord
                                     'Melilla' => 'Melilla',
                                 ])
                                 ->visible(fn (Get $get) => ! $get('pertenece_andalucia'))
-                                ->required(fn (Get $get) => ! $get('pertenece_andalucia'))
+                                ->nullable()
                                 ->columnSpan(['default' => 12, 'sm' => 7]),
                         ]),
 
@@ -405,10 +405,6 @@ class EditEmpleado extends EditRecord
                             FileUpload::make('resolucion_discapacidad')
                                 ->label('Resolución Discapacidad')
                                 ->markAsRequired()
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                ->validationMessages([
-                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -419,10 +415,6 @@ class EditEmpleado extends EditRecord
                             FileUpload::make('dictamen_tecnico')
                                 ->label('Dictamen Técnico')
                                 ->markAsRequired()
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                ->validationMessages([
-                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -433,10 +425,6 @@ class EditEmpleado extends EditRecord
                             FileUpload::make('certificado_discapacidad')
                                 ->label('Certificado Discapacidad')
                                 ->markAsRequired()
-                                ->required(fn (Get $get) => (bool) $get('tiene_discapacidad') && empty($get('resolucion_discapacidad')) && empty($get('dictamen_tecnico')) && empty($get('certificado_discapacidad')))
-                                ->validationMessages([
-                                    'required' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad.',
-                                ])
                                 ->directory('empleados/resoluciones')
                                 ->disk('local')
                                 ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -465,7 +453,7 @@ class EditEmpleado extends EditRecord
                                     'Psíquico' => 'Psíquico',
                                 ])
                                 ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                                ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
+                                ->nullable()
                                 ->columnSpan(['default' => 12, 'sm' => 8]),
                         ]),
 
@@ -491,7 +479,6 @@ class EditEmpleado extends EditRecord
                         ->reorderable(false)
                         ->addActionLabel('Añadir otro archivo')
                         ->visible(fn (Get $get) => (bool) $get('tiene_incapacidad'))
-                        ->required(fn (Get $get) => (bool) $get('tiene_incapacidad'))
                         ->columnSpanFull(),
 
                     FileUpload::make('autorizacion_consulta')
@@ -519,18 +506,6 @@ class EditEmpleado extends EditRecord
                     $noTieneDiscapacidad = (bool) ($data['no_tiene_discapacidad'] ?? false);
                     $tieneDiscapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_discapacidad'] ?? false);
                     $tieneIncapacidad = $noTieneDiscapacidad ? false : (bool) ($data['tiene_incapacidad'] ?? false);
-
-                    if ($tieneDiscapacidad) {
-                        $hasRes = !empty($data['resolucion_discapacidad']);
-                        $hasDict = !empty($data['dictamen_tecnico']);
-                        $hasCert = !empty($data['certificado_discapacidad']);
-
-                        if (!$hasRes && !$hasDict && !$hasCert) {
-                            throw \Illuminate\Validation\ValidationException::withMessages([
-                                'resolucion_discapacidad' => 'Debe adjuntar al menos uno de los tres archivos de discapacidad (Resolución, Dictamen técnico o Certificado).',
-                            ]);
-                        }
-                    }
 
                     $record->update([
                         'tiene_discapacidad' => $tieneDiscapacidad,
