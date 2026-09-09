@@ -93,7 +93,7 @@
 
                     <!-- Search Filter (Third position) -->
                     <div>
-                        <label for="filterSearch" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Buscar Empleado (Nombre, Apellidos o Email)</label>
+                        <label for="filterSearch" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Buscar Empleado</label>
                         <div class="relative">
                             <input type="text" id="filterSearch" wire:model.live.debounce.300ms="filterSearch" placeholder="Ej. José, Bonilla, empleado@utrecar.com..." class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3 pr-10" />
                             @if($filterSearch)
