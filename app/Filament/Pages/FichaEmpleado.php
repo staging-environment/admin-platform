@@ -35,8 +35,8 @@ class FichaEmpleado extends Page
     public $filterDateTo = '';
     public $filterSearch = '';
     public $filterType = 'fichajes'; // 'fichajes', 'vacaciones', 'bajas'
-    public $sortField = 'apellidos';
-    public $sortDirection = 'asc';
+    public $sortField = 'fecha';
+    public $sortDirection = 'desc';
 
     public $hora_entrada;
     public $hora_salida;
