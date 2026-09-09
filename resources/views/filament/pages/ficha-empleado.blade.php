@@ -157,7 +157,7 @@
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 dark:text-gray-300 text-xs">
                                             <div class="flex flex-col">
-                                                <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F \d\e Y') }}</span>
+                                                <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') }}</span>
                                                 <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
                                                     @if($fichaje->is_retroactive)
                                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
@@ -796,7 +796,7 @@
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
                                     <td class="p-4 text-sm font-bold text-gray-900 dark:text-white">
                                         <div class="flex flex-col">
-                                            <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->translatedFormat('l, d \d\e F') }}</span>
+                                            <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') }}</span>
                                             <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
                                                 @if($fichaje->is_retroactive)
                                                     <span class="inline-flex items-center px-1.5 py-0.5 rounded font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
