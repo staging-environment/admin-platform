@@ -238,7 +238,7 @@
                                         </td>
                                         <td class="py-4 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $fichaje->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Ver Ficha / Fichajes
+                                                Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                                 </svg>
@@ -331,7 +331,7 @@
                                         </td>
                                         <td class="py-4 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $vac->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Ver Ficha / Fichajes
+                                                Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                                 </svg>
@@ -427,7 +427,7 @@
                                         </td>
                                         <td class="py-4 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $baja->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Ver Ficha / Fichajes
+                                                Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                                 </svg>
