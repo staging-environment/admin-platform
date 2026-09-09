@@ -79,7 +79,7 @@ class VacacionesRelationManager extends RelationManager
                     ])
                     ->default('Pendiente')
                     ->required()
-                    ->disabled(fn () => !auth()->user()->hasRole('Admin') && !auth()->user()->hasRole('Gestor') && !auth()->user()->hasRole('admin') && !auth()->user()->hasRole('gestor'))
+                    ->disabled(fn () => !auth()->user()->can('aprobacion_vacaciones_bajas') && !auth()->user()->can('gestion_recursos_humanos') && auth()->user()->id !== 1 && auth()->user()->email !== 'jarodriguezbonilla@gmail.com')
                     ->dehydrated(true),
                 TextInput::make('dias_disponibles')
                     ->label('Días Disponibles Restantes (Opcional)')

@@ -34,7 +34,7 @@ class ManageHome extends Page implements HasForms, HasTable
         $user = auth()->user();
         if (!$user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('gestion_portada');
+        return $user->can('gestion_portada');
     }
     protected static ?string $navigationLabel = 'Configuración de Portada';
     protected static ?string $title = 'Configuración de Portada';

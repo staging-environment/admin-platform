@@ -131,7 +131,7 @@
             <nav class="flex gap-3 items-center">
                 @if (Route::has('login'))
                     @auth
-@if(optional(auth()->user())->email === 'jarodriguezbonilla@gmail.com' || optional(auth()->user())->id === 1 || optional(auth()->user())->hasRole('Admin') || optional(auth()->user())->can('gestion_portada'))
+@if(optional(auth()->user())->email === 'jarodriguezbonilla@gmail.com' || optional(auth()->user())->id === 1 || optional(auth()->user())->can('gestion_portada'))
                             <a href="{{ url('/admin/manage-home') }}" class="text-xs font-bold bg-white/10 text-white backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-full hover:bg-white hover:text-slate-800 transition-all duration-300 shadow-lg flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 EDITAR PORTADA

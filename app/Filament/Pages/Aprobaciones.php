@@ -58,13 +58,10 @@ class Aprobaciones extends Page
         $user = auth()->user();
         if (!$user) return false;
 
-        return $user->hasRole('Admin')
-            || $user->hasRole('admin')
-            || $user->hasRole('Gestor')
-            || $user->hasRole('gestor')
-            || $user->can('aprobacion_vacaciones')
-            || $user->can('aprobacion_vacaciones_bajas')
-            || $user->can('gestion_recursos_humanos');
+        return $user->can('aprobacion_vacaciones_bajas')
+            || $user->can('gestion_recursos_humanos')
+            || $user->email === 'jarodriguezbonilla@gmail.com'
+            || $user->id === 1;
     }
 
     public function updatedFilterHistoricoEmpleado() { $this->resetPage('historicoPage'); }
@@ -186,7 +183,7 @@ class Aprobaciones extends Page
         if (!$user) return false;
 
         $user->load('roles', 'permissions');
-        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1 || $user->hasRole('Admin') || $user->can('aprobacion_vacaciones_bajas')) {
+        if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1 || $user->can('aprobacion_vacaciones_bajas') || $user->can('gestion_recursos_humanos')) {
             return true;
         }
 

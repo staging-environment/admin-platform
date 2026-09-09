@@ -41,7 +41,7 @@ class FileExplorer extends Page
         $user = auth()->user();
         if (!$user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('utilizar_explorador');
+        return $user->can('utilizar_explorador');
     }
 
     public function mount(): void

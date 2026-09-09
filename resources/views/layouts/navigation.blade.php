@@ -45,7 +45,7 @@
                                      </x-dropdown-link>
                                      @endif
                                      
-                                     @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
+                                     @if(auth()->user()?->can('aprobacion_vacaciones_bajas'))
                                      <x-dropdown-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
                                          {{ __('Aprobación de Solicitudes') }}
                                      </x-dropdown-link>
@@ -225,7 +225,7 @@
                         </x-responsive-nav-link>
                         @endif
 
-                        @if(auth()->user()?->can('aprobacion_vacaciones_bajas') || auth()->user()?->hasRole('Admin'))
+                        @if(auth()->user()?->can('aprobacion_vacaciones_bajas'))
                         <x-responsive-nav-link href="/admin/aprobaciones" :active="request()->is('admin/aprobaciones*')">
                             {{ __('Aprobación de Solicitudes') }}
                         </x-responsive-nav-link>

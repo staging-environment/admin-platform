@@ -81,11 +81,9 @@ class FichaEmpleado extends Page
         $user = auth()->user();
         if (!$user) return false;
         
-        return $user->hasRole('Admin') 
-            || $user->hasRole('admin') 
-            || $user->hasRole('Empleado') 
-            || $user->hasRole('empleado') 
-            || $user->can('acceder_portal_fichajes')
+        return $user->can('acceder_portal_fichajes') 
+            || $user->can('ver_ficha_empleado')
+            || $user->can('gestion_recursos_humanos')
             || $user->email === 'jarodriguezbonilla@gmail.com' 
             || $user->id === 1;
     }
@@ -93,7 +91,7 @@ class FichaEmpleado extends Page
     public function mount(): void
     {
         $user = auth()->user();
-        $isAdmin = $user->hasRole('Admin') || $user->hasRole('Gestor') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+        $isAdmin = $user->can('ver_ficha_empleado') || $user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
         $this->isAdmin = $isAdmin;
 
         $empleadoId = request()->query('empleado_id');
@@ -111,7 +109,7 @@ class FichaEmpleado extends Page
         }
 
         // Auto-create mock employee for admin users who also have the Empleado role (or are testing)
-        if (!$this->empleado && !$this->isViewingAdminList && ($user->hasRole('Admin') || $user->hasRole('admin'))) {
+        if (!$this->empleado && !$this->isViewingAdminList && ($user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)) {
             $this->empleado = Empleado::create([
                 'nombre' => $user->name ?: 'jarodriguezbonilla',
                 'apellidos' => '(Admin)',
@@ -830,7 +828,7 @@ class FichaEmpleado extends Page
         }
         
         // Security check: ensure the employee has access to this request or is authorized
-        if ($sol && ($sol->empleado_id === $this->empleado->id || auth()->user()->hasRole('Admin') || auth()->user()->can('aprobacion_vacaciones_bajas'))) {
+        if ($sol && ($sol->empleado_id === $this->empleado->id || auth()->user()->can('aprobacion_vacaciones_bajas') || auth()->user()->can('gestion_recursos_humanos') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com')) {
             $this->selectedSolicitud = $sol;
         } else {
             $this->selectedSolicitud = null;

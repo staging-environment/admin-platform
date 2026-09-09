@@ -51,7 +51,7 @@ class PasswordController extends Controller
         session()->flash('status', 'password-updated');
         session()->flash('success', 'Tu contraseña ha sido cambiada con éxito.');
 
-        if ($user->hasRole('Empleado') || $user->hasRole('empleado') || $user->can('ver_ficha_empleado')) {
+        if ($user->can('acceder_portal_fichajes') || $user->can('ver_ficha_empleado')) {
             return redirect('/admin/ficha-empleado');
         }
 

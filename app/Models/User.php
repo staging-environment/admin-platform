@@ -23,10 +23,7 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
 
     public function mustChangePassword(): bool
     {
-        if ($this->hasRole('Empleado') || $this->hasRole('empleado')) {
-            return \Illuminate\Support\Facades\Hash::check('1234', $this->password);
-        }
-        return false;
+        return \Illuminate\Support\Facades\Hash::check('1234', $this->password);
     }
 
     /**
@@ -41,14 +38,12 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
             }
         }
 
-        return $this->hasRole('Admin') 
-            || $this->hasRole('admin') 
-            || $this->hasRole('Gestor') 
-            || $this->hasRole('gestor') 
-            || $this->hasRole('Empleado')
-            || $this->hasRole('empleado')
+        return $this->can('acceder_portal_fichajes')
+            || $this->can('ver_dashboard')
+            || $this->can('gestion_recursos_humanos')
+            || $this->permissions()->exists()
             || $this->email === 'jarodriguezbonilla@gmail.com'
-            || $this->can('ver_dashboard');
+            || $this->id === 1;
     }
 
     /**
@@ -95,7 +90,7 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
             $user->load('roles');
             $empleado = \App\Models\Empleado::withTrashed()->where('email', $user->email)->first();
             
-            if ($user->hasRole('Empleado') || $user->hasRole('empleado')) {
+            if ($user->can('acceder_portal_fichajes') || $user->hasRole('Empleado')) {
                 if (!$empleado) {
                     $parts = explode(' ', trim($user->name ?: 'Empleado'));
                     $nombre = $parts[0];

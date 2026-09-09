@@ -278,7 +278,7 @@
 
             @php
                 $pendingVacations = [];
-                if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Gestor') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestor')) {
+                if (auth()->user()->can('aprobacion_vacaciones_bajas') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com') {
                     $pendingVacations = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', 'Pendiente')->orderBy('created_at', 'desc')->get();
                 }
             @endphp

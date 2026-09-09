@@ -13,7 +13,6 @@ class InformesExportController extends Controller
         $user = auth()->user();
         if (!$user) abort(403);
         $canAccess = ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)
-                     || $user->hasRole('Admin')
                      || $user->can('ver_informes');
         if (!$canAccess) abort(403, 'No tienes permiso para exportar informes.');
 

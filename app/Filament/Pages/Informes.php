@@ -97,7 +97,7 @@ class Informes extends Page implements HasForms
         $user = auth()->user();
         if (!$user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('ver_informes');
+        return $user->can('ver_informes');
     }
 
     public function mount(): void

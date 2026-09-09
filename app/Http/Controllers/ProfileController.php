@@ -47,7 +47,7 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-        if ($user->hasRole('Empleado') || $user->hasRole('empleado')) {
+        if (!$user->can('gestion_eliminar_usuarios') && $user->id !== 1 && $user->email !== 'jarodriguezbonilla@gmail.com') {
             abort(403, 'Acción no permitida.');
         }
 

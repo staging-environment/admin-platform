@@ -47,19 +47,19 @@ class SendMissingCheckinReminders extends Command
 
         // Load all administrators/notified users
         $admins = User::all()->filter(function($user) {
-            $user->load('roles');
-            return $user->hasRole('Admin') 
-                || $user->hasRole('admin') 
-                || $user->can('aprobacion_vacaciones_bajas');
+            return $user->can('aprobacion_vacaciones_bajas') 
+                || $user->can('gestion_recursos_humanos')
+                || $user->id === 1 
+                || $user->email === 'jarodriguezbonilla@gmail.com';
         });
 
         // Load all users
         $users = User::all()->filter(function($user) {
-            $user->load('roles');
-            // Must have Empleado role, but NOT Admin role
-            $hasEmpleado = $user->hasRole('Empleado') || $user->hasRole('empleado');
-            $isAdmin = $user->hasRole('Admin') || $user->hasRole('admin') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
-            return $hasEmpleado && !$isAdmin;
+            $isWorker = $user->can('acceder_portal_fichajes') 
+                && !$user->can('gestion_recursos_humanos') 
+                && $user->id !== 1 
+                && $user->email !== 'jarodriguezbonilla@gmail.com';
+            return $isWorker;
         });
 
         $this->info("Found " . $users->count() . " active employees to analyze.");

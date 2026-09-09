@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            @if(!auth()->user()->hasRole('Empleado') && !auth()->user()->hasRole('empleado'))
+            @if(auth()->user()->can('gestion_eliminar_usuarios') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com')
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')

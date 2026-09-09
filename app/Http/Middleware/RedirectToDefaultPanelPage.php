@@ -16,8 +16,7 @@ class RedirectToDefaultPanelPage
         $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
         if ($user) {
-            $isEmpleado = $user->hasRole('Empleado') || $user->hasRole('empleado');
-            if ($isEmpleado && \Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
+            if (\Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
                 if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee with default password '1234' to profile page", [
                         'user_email' => $user->email
@@ -29,7 +28,7 @@ class RedirectToDefaultPanelPage
         }
 
         if ($user && ($request->is('admin') || $request->is('admin/'))) {
-            $isAdmin = $user->hasRole('Admin') || $user->hasRole('admin') || $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+            $isAdmin = $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
             
             if (!$isAdmin) {
                 // Check if they already checked in today
@@ -51,7 +50,7 @@ class RedirectToDefaultPanelPage
                 }
 
                 // If already checked in today, normal redirect logic
-                if ($user->hasRole('Empleado') || $user->hasRole('empleado') || $user->can('ver_ficha_empleado')) {
+                if ($user->can('acceder_portal_fichajes') || $user->can('ver_ficha_empleado')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee to /admin/ficha-empleado");
                     return redirect('/admin/ficha-empleado');
                 }

@@ -38,7 +38,7 @@ class ContactoMensajeResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('ver_dashboard'); // Any admin/gestor can see it, adjust if needed
+        return $user->can('ver_dashboard'); // Any admin/gestor can see it, adjust if needed
     }
 
     public static function form(Schema $schema): Schema

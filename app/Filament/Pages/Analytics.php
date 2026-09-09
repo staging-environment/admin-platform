@@ -28,7 +28,7 @@ class Analytics extends Page
         
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
         
-        return $user->hasRole('Admin') || $user->can('ver_analiticas');
+        return $user->can('ver_analiticas');
     }
 
     protected function getHeaderWidgets(): array

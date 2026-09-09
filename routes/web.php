@@ -309,7 +309,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Vista previa de tablas (SII, Virtusgesnet, etc.)
     Route::get('/admin/db-preview/{connection}/{table}', function (Request $request, $connection, $table) {
-        if (!auth()->user()->hasRole('Admin')) {
+        if (!auth()->user()->can('gestion_roles') && auth()->user()->id !== 1 && auth()->user()->email !== 'jarodriguezbonilla@gmail.com') {
             abort(403);
         }
 

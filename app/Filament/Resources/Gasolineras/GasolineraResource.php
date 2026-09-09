@@ -37,7 +37,7 @@ class GasolineraResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         if ($user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1) return true;
-        return $user->hasRole('Admin') || $user->can('gestion_gasolineras');
+        return $user->can('gestion_gasolineras');
     }
 
     public static function form(Schema $schema): Schema
