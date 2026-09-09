@@ -112,8 +112,31 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Empleado</th>
-                                    <th class="py-3 px-4">Fecha</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Apellidos</span>
+                                            @if($sortField === 'apellidos')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Nombre</span>
+                                            @if($sortField === 'nombre')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4">Ubicación de trabajo</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Fecha</span>
+                                            @if($sortField === 'fecha')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
                                     <th class="py-3 px-4">Hora Entrada</th>
                                     <th class="py-3 px-4">Hora Salida</th>
                                     <th class="py-3 px-4">Tiempo Total</th>
@@ -123,8 +146,14 @@
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todosLosFichajes as $fichaje)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
-                                            {{ $fichaje->empleado ? $fichaje->empleado->nombre . ' ' . $fichaje->empleado->apellidos : 'N/A' }}
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->apellidos ?? '') : 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->nombre ?? '') : '—' }}
+                                        </td>
+                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                            {{ $fichaje->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 dark:text-gray-300 text-xs">
                                             <div class="flex flex-col">
@@ -218,7 +247,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                        <td colspan="8" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
                                             No hay registros de fichajes en el sistema.
                                         </td>
                                     </tr>
@@ -231,8 +260,31 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Empleado</th>
-                                    <th class="py-3 px-4">Fecha Inicio</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Apellidos</span>
+                                            @if($sortField === 'apellidos')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Nombre</span>
+                                            @if($sortField === 'nombre')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4">Ubicación de trabajo</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Fecha Inicio</span>
+                                            @if($sortField === 'fecha')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
                                     <th class="py-3 px-4">Fecha Fin</th>
                                     <th class="py-3 px-4">Días</th>
                                     <th class="py-3 px-4">Tipo</th>
@@ -243,8 +295,14 @@
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todasLasVacaciones as $vac)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
-                                            {{ $vac->empleado ? $vac->empleado->nombre . ' ' . $vac->empleado->apellidos : 'N/A' }}
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $vac->empleado ? mb_strtoupper($vac->empleado->apellidos ?? '') : 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $vac->empleado ? mb_strtoupper($vac->empleado->nombre ?? '') : '—' }}
+                                        </td>
+                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                            {{ $vac->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($vac->fecha_inicio)->translatedFormat('d/m/Y') }}
@@ -282,7 +340,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                        <td colspan="9" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
                                             No hay registros de vacaciones para el filtro seleccionado.
                                         </td>
                                     </tr>
@@ -295,8 +353,31 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Empleado</th>
-                                    <th class="py-3 px-4">Fecha Inicio</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Apellidos</span>
+                                            @if($sortField === 'apellidos')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Nombre</span>
+                                            @if($sortField === 'nombre')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-4">Ubicación de trabajo</th>
+                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                        <div class="flex items-center gap-1">
+                                            <span>Fecha Inicio</span>
+                                            @if($sortField === 'fecha')
+                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </div>
+                                    </th>
                                     <th class="py-3 px-4">Fecha Fin Prevista</th>
                                     <th class="py-3 px-4">Justificante</th>
                                     <th class="py-3 px-4">Estado</th>
@@ -306,8 +387,14 @@
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todasLasBajas as $baja)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
-                                            {{ $baja->empleado ? $baja->empleado->nombre . ' ' . $baja->empleado->apellidos : 'N/A' }}
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $baja->empleado ? mb_strtoupper($baja->empleado->apellidos ?? '') : 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                            {{ $baja->empleado ? mb_strtoupper($baja->empleado->nombre ?? '') : '—' }}
+                                        </td>
+                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                            {{ $baja->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
                                         <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($baja->fecha_inicio)->translatedFormat('d/m/Y') }}
@@ -349,7 +436,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                                        <td colspan="8" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
                                             No hay registros de bajas médicas para el filtro seleccionado.
                                         </td>
                                     </tr>

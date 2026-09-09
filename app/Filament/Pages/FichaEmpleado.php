@@ -35,6 +35,8 @@ class FichaEmpleado extends Page
     public $filterDateTo = '';
     public $filterSearch = '';
     public $filterType = 'fichajes'; // 'fichajes', 'vacaciones', 'bajas'
+    public $sortField = 'apellidos';
+    public $sortDirection = 'asc';
 
     public $hora_entrada;
     public $hora_salida;
@@ -86,6 +88,16 @@ class FichaEmpleado extends Page
             || $user->can('gestion_recursos_humanos')
             || $user->email === 'jarodriguezbonilla@gmail.com' 
             || $user->id === 1;
+    }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = ($field === 'fecha') ? 'desc' : 'asc';
+        }
     }
 
     public function mount(): void
@@ -146,78 +158,121 @@ class FichaEmpleado extends Page
             $search = $this->filterSearch ? '%' . $this->filterSearch . '%' : null;
 
             if ($this->filterType === 'fichajes') {
-                $query = EmpleadoFichaje::with('empleado');
+                $query = EmpleadoFichaje::with(['empleado.gasolinera'])
+                    ->leftJoin('empleados', 'empleado_fichajes.empleado_id', '=', 'empleados.id')
+                    ->select('empleado_fichajes.*');
 
                 if ($this->filterDateFrom) {
-                    $query->where('fecha', '>=', $this->filterDateFrom);
+                    $query->where('empleado_fichajes.fecha', '>=', $this->filterDateFrom);
                 }
                 if ($this->filterDateTo) {
-                    $query->where('fecha', '<=', $this->filterDateTo);
+                    $query->where('empleado_fichajes.fecha', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
-                    $query->whereHas('empleado', function($q) use ($search) {
-                        $q->where('nombre', 'like', $search)
-                          ->orWhere('apellidos', 'like', $search)
-                          ->orWhere('email', 'like', $search);
+                    $query->where(function($q) use ($search) {
+                        $q->where('empleados.nombre', 'like', $search)
+                          ->orWhere('empleados.apellidos', 'like', $search)
+                          ->orWhere('empleados.email', 'like', $search);
                     });
                 }
 
-                $this->todosLosFichajes = $query
-                    ->orderBy('fecha', 'desc')
-                    ->orderBy('hora_entrada', 'desc')
-                    ->get();
+                if ($this->sortField === 'nombre') {
+                    $query->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleado_fichajes.fecha', 'desc')
+                          ->orderBy('empleado_fichajes.hora_entrada', 'desc');
+                } elseif ($this->sortField === 'fecha') {
+                    $query->orderBy('empleado_fichajes.fecha', $this->sortDirection)
+                          ->orderBy('empleado_fichajes.hora_entrada', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', 'asc');
+                } else {
+                    $query->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleado_fichajes.fecha', 'desc')
+                          ->orderBy('empleado_fichajes.hora_entrada', 'desc');
+                }
+
+                $this->todosLosFichajes = $query->get();
                 $this->todasLasVacaciones = [];
                 $this->todasLasBajas = [];
             } elseif ($this->filterType === 'vacaciones' || $this->filterType === 'vacaciones_pendientes') {
                 $estado = $this->filterType === 'vacaciones' ? 'Aceptada' : 'Pendiente';
-                $query = \App\Models\EmpleadoVacacion::with('empleado')->where('estado', $estado);
+                $query = \App\Models\EmpleadoVacacion::with(['empleado.gasolinera'])
+                    ->leftJoin('empleados', 'empleado_vacaciones.empleado_id', '=', 'empleados.id')
+                    ->select('empleado_vacaciones.*')
+                    ->where('empleado_vacaciones.estado', $estado);
 
                 if ($this->filterDateFrom) {
-                    $query->where('fecha_fin', '>=', $this->filterDateFrom);
+                    $query->where('empleado_vacaciones.fecha_fin', '>=', $this->filterDateFrom);
                 }
                 if ($this->filterDateTo) {
-                    $query->where('fecha_inicio', '<=', $this->filterDateTo);
+                    $query->where('empleado_vacaciones.fecha_inicio', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
-                    $query->whereHas('empleado', function($q) use ($search) {
-                        $q->where('nombre', 'like', $search)
-                          ->orWhere('apellidos', 'like', $search)
-                          ->orWhere('email', 'like', $search);
+                    $query->where(function($q) use ($search) {
+                        $q->where('empleados.nombre', 'like', $search)
+                          ->orWhere('empleados.apellidos', 'like', $search)
+                          ->orWhere('empleados.email', 'like', $search);
                     });
                 }
 
-                $this->todasLasVacaciones = $query
-                    ->orderBy('fecha_inicio', 'desc')
-                    ->get();
+                if ($this->sortField === 'nombre') {
+                    $query->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleado_vacaciones.fecha_inicio', 'desc');
+                } elseif ($this->sortField === 'fecha') {
+                    $query->orderBy('empleado_vacaciones.fecha_inicio', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', 'asc');
+                } else {
+                    $query->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleado_vacaciones.fecha_inicio', 'desc');
+                }
+
+                $this->todasLasVacaciones = $query->get();
                 $this->todosLosFichajes = [];
                 $this->todasLasBajas = [];
             } elseif ($this->filterType === 'bajas' || $this->filterType === 'bajas_pendientes') {
                 $estado = $this->filterType === 'bajas' ? 'Aceptada' : 'Pendiente';
-                $query = \App\Models\EmpleadoAusencia::with('empleado')->where('estado', $estado);
+                $query = \App\Models\EmpleadoAusencia::with(['empleado.gasolinera'])
+                    ->leftJoin('empleados', 'empleado_ausencias.empleado_id', '=', 'empleados.id')
+                    ->select('empleado_ausencias.*')
+                    ->where('empleado_ausencias.estado', $estado);
 
                 if ($this->filterDateFrom) {
                     $query->where(function($q) {
-                        $q->where('fecha_fin', '>=', $this->filterDateFrom)
-                          ->orWhereNull('fecha_fin');
+                        $q->where('empleado_ausencias.fecha_fin', '>=', $this->filterDateFrom)
+                          ->orWhereNull('empleado_ausencias.fecha_fin');
                     });
                 }
                 if ($this->filterDateTo) {
-                    $query->where('fecha_inicio', '<=', $this->filterDateTo);
+                    $query->where('empleado_ausencias.fecha_inicio', '<=', $this->filterDateTo);
                 }
 
                 if ($search) {
-                    $query->whereHas('empleado', function($q) use ($search) {
-                        $q->where('nombre', 'like', $search)
-                          ->orWhere('apellidos', 'like', $search)
-                          ->orWhere('email', 'like', $search);
+                    $query->where(function($q) use ($search) {
+                        $q->where('empleados.nombre', 'like', $search)
+                          ->orWhere('empleados.apellidos', 'like', $search)
+                          ->orWhere('empleados.email', 'like', $search);
                     });
                 }
 
-                $this->todasLasBajas = $query
-                    ->orderBy('fecha_inicio', 'desc')
-                    ->get();
+                if ($this->sortField === 'nombre') {
+                    $query->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleado_ausencias.fecha_inicio', 'desc');
+                } elseif ($this->sortField === 'fecha') {
+                    $query->orderBy('empleado_ausencias.fecha_inicio', $this->sortDirection)
+                          ->orderBy('empleados.apellidos', 'asc');
+                } else {
+                    $query->orderBy('empleados.apellidos', $this->sortDirection)
+                          ->orderBy('empleados.nombre', $this->sortDirection)
+                          ->orderBy('empleado_ausencias.fecha_inicio', 'desc');
+                }
+
+                $this->todasLasBajas = $query->get();
                 $this->todosLosFichajes = [];
                 $this->todasLasVacaciones = [];
             }
