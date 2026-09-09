@@ -27,6 +27,7 @@ class FichaEmpleado extends Page
     public $recentFichajes;
 
     public $isViewingAdminList = false;
+    public bool $isAdmin = false;
     public $todosLosFichajes = [];
     public $todasLasVacaciones = [];
     public $todasLasBajas = [];
@@ -93,6 +94,7 @@ class FichaEmpleado extends Page
     {
         $user = auth()->user();
         $isAdmin = $user->hasRole('Admin') || $user->hasRole('Gestor') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+        $this->isAdmin = $isAdmin;
 
         $empleadoId = request()->query('empleado_id');
 
