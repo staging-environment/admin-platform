@@ -28,27 +28,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                         </span>
-                        @if($filterType === 'fichajes')
-                            Control General de Fichajes de Empleados
-                        @elseif($filterType === 'vacaciones')
-                            Control General de Vacaciones de Empleados
-                        @else
-                            Control General de Bajas Médicas de Empleados
-                        @endif
+                        Control General de Fichajes de Empleados
                     </h3>
                     <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
-                        @if($filterType === 'fichajes')
-                            {{ count($todosLosFichajes) }} registros totales
-                        @elseif($filterType === 'vacaciones')
-                            {{ count($todasLasVacaciones) }} registros totales
-                        @else
-                            {{ count($todasLasBajas) }} registros totales
-                        @endif
+                        {{ count($todosLosFichajes) }} registros totales
                     </span>
                 </div>
 
                 <!-- Filters Section -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
                     <!-- Date Filter "Desde" -->
                     <div>
                         <label for="filterDateFrom" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Desde</label>
@@ -79,19 +67,7 @@
                         </div>
                     </div>
 
-                    <!-- Record Type Filter (Second position) -->
-                    <div>
-                        <label for="filterType" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ver tipo de registro</label>
-                        <select id="filterType" wire:model.live="filterType" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3">
-                            <option value="fichajes">Fichajes (Entradas/Salidas)</option>
-                            <option value="vacaciones">Vacaciones Aprobadas</option>
-                            <option value="vacaciones_pendientes">Vacaciones Pendientes</option>
-                            <option value="bajas">Bajas Médicas Aprobadas</option>
-                            <option value="bajas_pendientes">Bajas Médicas Pendientes</option>
-                        </select>
-                    </div>
-
-                    <!-- Search Filter (Third position) -->
+                    <!-- Search Filter -->
                     <div>
                         <label for="filterSearch" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Buscar Empleado</label>
                         <div class="relative">
@@ -107,8 +83,7 @@
                     </div>
                 </div>
 
-                @if($filterType === 'fichajes')
-                    <div class="overflow-x-auto">
+                <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
@@ -251,196 +226,6 @@
                             </tbody>
                         </table>
                     </div>
-                @elseif($filterType === 'vacaciones' || $filterType === 'vacaciones_pendientes')
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Apellidos</span>
-                                            @if($sortField === 'apellidos')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Nombre</span>
-                                            @if($sortField === 'nombre')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4">Ubicación de trabajo</th>
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Fecha Inicio</span>
-                                            @if($sortField === 'fecha')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4">Fecha Fin</th>
-                                    <th class="py-2 px-4">Días</th>
-                                    <th class="py-2 px-4">Tipo</th>
-                                    <th class="py-2 px-4">Estado</th>
-                                    <th class="py-2 px-4 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
-                                @forelse($todasLasVacaciones as $vac)
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
-                                            {{ $vac->empleado ? mb_strtoupper($vac->empleado->apellidos ?? '') : 'N/A' }}
-                                        </td>
-                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
-                                            {{ $vac->empleado ? mb_strtoupper($vac->empleado->nombre ?? '') : '—' }}
-                                        </td>
-                                        <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
-                                            {{ $vac->empleado?->gasolinera?->Nombre ?? '—' }}
-                                        </td>
-                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
-                                            {{ \Carbon\Carbon::parse($vac->fecha_inicio)->translatedFormat('d/m/Y') }}
-                                        </td>
-                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
-                                            {{ \Carbon\Carbon::parse($vac->fecha_fin)->translatedFormat('d/m/Y') }}
-                                        </td>
-                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400 font-bold font-mono text-xs">
-                                            {{ $vac->dias_solicitados }}
-                                        </td>
-                                        <td class="py-2 px-4">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 text-xs font-bold">
-                                                {{ $vac->tipo }}
-                                            </span>
-                                        </td>
-                                        <td class="py-2 px-4">
-                                            @if($vac->estado === 'Aceptada')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
-                                                    Aprobada
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
-                                                    Pendiente
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="py-2 px-4 text-right">
-                                            <a href="/admin/ficha-empleado?empleado_id={{ $vac->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Fichajes
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="9" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
-                                            No hay registros de vacaciones para el filtro seleccionado.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Apellidos</span>
-                                            @if($sortField === 'apellidos')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Nombre</span>
-                                            @if($sortField === 'nombre')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4">Ubicación de trabajo</th>
-                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
-                                        <div class="flex items-center gap-1">
-                                            <span>Fecha Inicio</span>
-                                            @if($sortField === 'fecha')
-                                                <span class="text-amber-600 font-bold">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
-                                            @endif
-                                        </div>
-                                    </th>
-                                    <th class="py-2 px-4">Fecha Fin Prevista</th>
-                                    <th class="py-2 px-4">Justificante</th>
-                                    <th class="py-2 px-4">Estado</th>
-                                    <th class="py-2 px-4 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
-                                @forelse($todasLasBajas as $baja)
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
-                                            {{ $baja->empleado ? mb_strtoupper($baja->empleado->apellidos ?? '') : 'N/A' }}
-                                        </td>
-                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
-                                            {{ $baja->empleado ? mb_strtoupper($baja->empleado->nombre ?? '') : '—' }}
-                                        </td>
-                                        <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
-                                            {{ $baja->empleado?->gasolinera?->Nombre ?? '—' }}
-                                        </td>
-                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
-                                            {{ \Carbon\Carbon::parse($baja->fecha_inicio)->translatedFormat('d/m/Y') }}
-                                        </td>
-                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
-                                            {{ $baja->fecha_fin ? \Carbon\Carbon::parse($baja->fecha_fin)->translatedFormat('d/m/Y') : 'No definida' }}
-                                        </td>
-                                        <td class="py-2 px-4">
-                                            @if($baja->justificante_path)
-                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $baja->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline font-bold">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                                    </svg>
-                                                    Ver Justificante
-                                                </a>
-                                            @else
-                                                <span class="text-xs text-gray-400 italic">No adjuntado</span>
-                                            @endif
-                                        </td>
-                                        <td class="py-2 px-4">
-                                            @if($baja->estado === 'Aceptada')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
-                                                    Aprobada
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs font-bold animate-pulse">
-                                                    Pendiente
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="py-2 px-4 text-right">
-                                            <a href="/admin/ficha-empleado?empleado_id={{ $baja->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Fichajes
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
-                                            No hay registros de bajas médicas para el filtro seleccionado.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
             </div>
         @elseif(!$empleado)
             <div class="p-6 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-2xl flex items-start gap-4">
