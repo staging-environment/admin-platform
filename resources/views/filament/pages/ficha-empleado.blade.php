@@ -112,7 +112,7 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
                                         <div class="flex items-center gap-1">
                                             <span>Apellidos</span>
                                             @if($sortField === 'apellidos')
@@ -120,7 +120,7 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
                                         <div class="flex items-center gap-1">
                                             <span>Nombre</span>
                                             @if($sortField === 'nombre')
@@ -128,8 +128,8 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Ubicación de trabajo</th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                    <th class="py-2 px-4">Ubicación de trabajo</th>
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
                                         <div class="flex items-center gap-1">
                                             <span>Fecha</span>
                                             @if($sortField === 'fecha')
@@ -137,25 +137,25 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Hora Entrada</th>
-                                    <th class="py-3 px-4">Hora Salida</th>
-                                    <th class="py-3 px-4">Tiempo Total</th>
-                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                    <th class="py-2 px-4">Hora Entrada</th>
+                                    <th class="py-2 px-4">Hora Salida</th>
+                                    <th class="py-2 px-4">Tiempo Total</th>
+                                    <th class="py-2 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todosLosFichajes as $fichaje)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->apellidos ?? '') : 'N/A' }}
                                         </td>
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->nombre ?? '') : '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                        <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
                                             {{ $fichaje->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 text-xs">
+                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 text-xs">
                                             <div class="flex flex-col">
                                                 <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') }}</span>
                                                 <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
@@ -172,7 +172,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-4 px-4 text-gray-600 dark:text-gray-400">
+                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
                                             <div class="flex flex-col gap-1">
                                                 <div class="flex items-center gap-1.5">
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-mono text-xs font-bold w-fit">
@@ -193,7 +193,7 @@
                                                 @endif
                                             </div>
                                         </td>
-                                        <td class="py-4 px-4 text-gray-600 dark:text-gray-400">
+                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
                                             @if($fichaje->hora_salida)
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1.5">
@@ -220,7 +220,7 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="py-4 px-4 font-bold text-gray-700 dark:text-gray-300 text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-700 dark:text-gray-300 text-xs">
                                             @php
                                                 if ($fichaje->hora_salida) {
                                                     $t1 = \Carbon\Carbon::parse($fichaje->hora_entrada);
@@ -232,7 +232,7 @@
                                                 }
                                             @endphp
                                         </td>
-                                        <td class="py-4 px-4 text-right">
+                                        <td class="py-2 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $fichaje->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +256,7 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
                                         <div class="flex items-center gap-1">
                                             <span>Apellidos</span>
                                             @if($sortField === 'apellidos')
@@ -264,7 +264,7 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
                                         <div class="flex items-center gap-1">
                                             <span>Nombre</span>
                                             @if($sortField === 'nombre')
@@ -272,8 +272,8 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Ubicación de trabajo</th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                    <th class="py-2 px-4">Ubicación de trabajo</th>
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
                                         <div class="flex items-center gap-1">
                                             <span>Fecha Inicio</span>
                                             @if($sortField === 'fecha')
@@ -281,40 +281,40 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Fecha Fin</th>
-                                    <th class="py-3 px-4">Días</th>
-                                    <th class="py-3 px-4">Tipo</th>
-                                    <th class="py-3 px-4">Estado</th>
-                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                    <th class="py-2 px-4">Fecha Fin</th>
+                                    <th class="py-2 px-4">Días</th>
+                                    <th class="py-2 px-4">Tipo</th>
+                                    <th class="py-2 px-4">Estado</th>
+                                    <th class="py-2 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todasLasVacaciones as $vac)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $vac->empleado ? mb_strtoupper($vac->empleado->apellidos ?? '') : 'N/A' }}
                                         </td>
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $vac->empleado ? mb_strtoupper($vac->empleado->nombre ?? '') : '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                        <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
                                             {{ $vac->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
+                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($vac->fecha_inicio)->translatedFormat('d/m/Y') }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
+                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($vac->fecha_fin)->translatedFormat('d/m/Y') }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-600 dark:text-gray-400 font-bold font-mono text-xs">
+                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400 font-bold font-mono text-xs">
                                             {{ $vac->dias_solicitados }}
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 px-4">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 text-xs font-bold">
                                                 {{ $vac->tipo }}
                                             </span>
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 px-4">
                                             @if($vac->estado === 'Aceptada')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
                                                     Aprobada
@@ -325,7 +325,7 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="py-4 px-4 text-right">
+                                        <td class="py-2 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $vac->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,7 +349,7 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('apellidos')">
                                         <div class="flex items-center gap-1">
                                             <span>Apellidos</span>
                                             @if($sortField === 'apellidos')
@@ -357,7 +357,7 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('nombre')">
                                         <div class="flex items-center gap-1">
                                             <span>Nombre</span>
                                             @if($sortField === 'nombre')
@@ -365,8 +365,8 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Ubicación de trabajo</th>
-                                    <th class="py-3 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
+                                    <th class="py-2 px-4">Ubicación de trabajo</th>
+                                    <th class="py-2 px-4 cursor-pointer select-none hover:text-amber-600 transition-colors" wire:click="sortBy('fecha')">
                                         <div class="flex items-center gap-1">
                                             <span>Fecha Inicio</span>
                                             @if($sortField === 'fecha')
@@ -374,31 +374,31 @@
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-3 px-4">Fecha Fin Prevista</th>
-                                    <th class="py-3 px-4">Justificante</th>
-                                    <th class="py-3 px-4">Estado</th>
-                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                    <th class="py-2 px-4">Fecha Fin Prevista</th>
+                                    <th class="py-2 px-4">Justificante</th>
+                                    <th class="py-2 px-4">Estado</th>
+                                    <th class="py-2 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
                                 @forelse($todasLasBajas as $baja)
                                     <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $baja->empleado ? mb_strtoupper($baja->empleado->apellidos ?? '') : 'N/A' }}
                                         </td>
-                                        <td class="py-4 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
+                                        <td class="py-2 px-4 font-bold text-gray-900 dark:text-white uppercase text-xs">
                                             {{ $baja->empleado ? mb_strtoupper($baja->empleado->nombre ?? '') : '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
+                                        <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
                                             {{ $baja->empleado?->gasolinera?->Nombre ?? '—' }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
+                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ \Carbon\Carbon::parse($baja->fecha_inicio)->translatedFormat('d/m/Y') }}
                                         </td>
-                                        <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
+                                        <td class="py-2 px-4 text-gray-700 dark:text-gray-300 font-medium text-xs">
                                             {{ $baja->fecha_fin ? \Carbon\Carbon::parse($baja->fecha_fin)->translatedFormat('d/m/Y') : 'No definida' }}
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 px-4">
                                             @if($baja->justificante_path)
                                                 <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $baja->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline font-bold">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,7 +410,7 @@
                                                 <span class="text-xs text-gray-400 italic">No adjuntado</span>
                                             @endif
                                         </td>
-                                        <td class="py-4 px-4">
+                                        <td class="py-2 px-4">
                                             @if($baja->estado === 'Aceptada')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
                                                     Aprobada
@@ -421,7 +421,7 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="py-4 px-4 text-right">
+                                        <td class="py-2 px-4 text-right">
                                             <a href="/admin/ficha-empleado?empleado_id={{ $baja->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Fichajes
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -784,17 +784,17 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Entrada</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Salida</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Horas Trabajadas</th>
-                                <th class="p-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase text-right">Acciones</th>
+                                <th class="py-2 px-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Fecha</th>
+                                <th class="py-2 px-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Entrada</th>
+                                <th class="py-2 px-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Hora Salida</th>
+                                <th class="py-2 px-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Horas Trabajadas</th>
+                                <th class="py-2 px-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-white/5">
                             @forelse($recentFichajes as $fichaje)
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                    <td class="p-4 text-sm font-bold text-gray-900 dark:text-white">
+                                    <td class="py-2 px-4 text-sm font-bold text-gray-900 dark:text-white">
                                         <div class="flex flex-col">
                                             <span>{{ \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') }}</span>
                                             <div class="flex flex-wrap gap-1 mt-1 font-normal text-[10px]">
@@ -811,7 +811,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
+                                    <td class="py-2 px-4 text-sm text-gray-700 dark:text-gray-300">
                                         <div class="flex flex-col gap-1">
                                             <div class="flex items-center gap-2">
                                                 <span class="font-bold text-gray-900 dark:text-white text-base">
@@ -832,7 +832,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
+                                    <td class="py-2 px-4 text-sm text-gray-700 dark:text-gray-300">
                                         @if($fichaje->hora_salida)
                                             <div class="flex flex-col gap-1">
                                                 <div class="flex items-center gap-2">
@@ -859,7 +859,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="p-4 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                                    <td class="py-2 px-4 text-sm font-semibold text-amber-600 dark:text-amber-400">
                                         @if($fichaje->hora_entrada && $fichaje->hora_salida)
                                             @php
                                                 $in = \Carbon\Carbon::parse($fichaje->hora_entrada);
@@ -873,7 +873,7 @@
                                             -
                                         @endif
                                     </td>
-                                    <td class="p-4 text-sm text-right space-x-2">
+                                    <td class="py-2 px-4 text-sm text-right space-x-2">
                                         <button wire:click="editFichaje({{ $fichaje->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
