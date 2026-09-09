@@ -22,6 +22,8 @@ class EmpleadoVacacionResource extends Resource
     protected static ?string $modelLabel = 'Solicitud de Vacación/Permiso';
     protected static ?string $pluralModelLabel = 'Solicitudes de Vacaciones';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 3;

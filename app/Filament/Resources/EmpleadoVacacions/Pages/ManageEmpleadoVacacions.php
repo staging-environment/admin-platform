@@ -9,6 +9,11 @@ class ManageEmpleadoVacacions extends ManageRecords
 {
     protected static string $resource = EmpleadoVacacionResource::class;
 
+    public function mount(): void
+    {
+        redirect()->to('/admin/aprobaciones');
+    }
+
     protected function getHeaderActions(): array
     {
         return [];

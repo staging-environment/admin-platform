@@ -82,7 +82,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones_bajas']))
+                    @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                         <div class="inline-flex items-center">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
@@ -95,12 +95,6 @@
                                 </x-slot>
 
                                 <x-slot name="content">
-                                    @if(auth()->user()?->can('aprobacion_vacaciones_bajas'))
-                                    <x-dropdown-link href="/admin/solicitudes-vacaciones">
-                                        {{ __('Solicitudes de Vacaciones') }}
-                                    </x-dropdown-link>
-                                    @endif
-
                                     @if(auth()->user()?->can('ver_informes'))
                                     <x-dropdown-link href="/admin/informes">
                                         {{ __('Informes') }}
@@ -265,17 +259,12 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada', 'aprobacion_vacaciones_bajas']))
+            @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Administración') }}
                     </div>
                     <div class="mt-2 space-y-1">
-                        @if(auth()->user()?->can('aprobacion_vacaciones_bajas'))
-                            <x-responsive-nav-link href="/admin/solicitudes-vacaciones" :active="request()->is('admin/solicitudes-vacaciones*')">
-                                {{ __('Solicitudes de Vacaciones') }}
-                            </x-responsive-nav-link>
-                        @endif
                         @if(auth()->user()?->can('ver_informes'))
                             <x-responsive-nav-link href="/admin/informes" :active="request()->is('admin/informes*')">
                                 {{ __('Informes') }}
