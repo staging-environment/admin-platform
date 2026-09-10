@@ -40,3 +40,83 @@ Schedule::call(function () {
 // Se ejecuta el 1 de Agosto de cada año a las 04:00 (y reintento el 20 de Agosto).
 Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 1, '04:00');
 Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 20, '04:00');
+
+// ?? Comando de Prueba / Simulaci?n de Alertas de Competencia ??????????????????
+Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', function () {
+    $service = app(\App\Services\MineturService::class);
+    if ($this->option('clear')) {
+        $service->clearPriceAlerts();
+        $this->info('Alertas de competencia limpiadas.');
+        return;
+    }
+
+    $service->recordPriceAlert([
+        'id'                     => uniqid('price_alert_', true),
+        'locality_key'           => 'utrera',
+        'locality_name'          => 'Utrera',
+        'fuel_type'              => 'diesel',
+        'fuel_label'             => 'DI?SEL',
+        'stations'               => [
+            [
+                'rank'       => 1,
+                'name'       => 'E.S. VISTALEGRE',
+                'address'    => 'CALLE ECIJA-JEREZ, 11',
+                'price'      => 1.629,
+                'old_price'  => 1.619,
+                'diff'       => 0.010,
+                'diff_text'  => '+0.010',
+                'direction'  => 'sube',
+                'is_changed' => true,
+            ],
+            [
+                'rank'       => 2,
+                'name'       => 'FAMILY ENERGY',
+                'address'    => 'CARRETERA C.CIAL ALMAZARA PLAZA',
+                'price'      => 1.615,
+                'old_price'  => 1.625,
+                'diff'       => -0.010,
+                'diff_text'  => '-0.010',
+                'direction'  => 'baja',
+                'is_changed' => true,
+            ],
+            [
+                'rank'       => 3,
+                'name'       => 'BALLENOIL',
+                'address'    => 'PLAZA DE LA TRIANILLA, S/N',
+                'price'      => 1.619,
+                'old_price'  => 1.619,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+            [
+                'rank'       => 4,
+                'name'       => 'PLENERGY',
+                'address'    => 'CALLE ALMAZARA, 2',
+                'price'      => 1.619,
+                'old_price'  => 1.619,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+            [
+                'rank'       => 5,
+                'name'       => 'PLENERGY',
+                'address'    => 'CALLE MIRLO, 1',
+                'price'      => 1.619,
+                'old_price'  => 1.619,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+        ],
+        'changed_stations_count' => 2,
+        'created_at'             => now()->timestamp,
+        'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
+    ]);
+
+    $this->info('Alerta de prueba registrada con ?xito. V?lida durante 2 horas.');
+})->purpose('Simular o limpiar una alerta de cambio de precio de la competencia');
