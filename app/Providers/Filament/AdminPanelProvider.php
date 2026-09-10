@@ -78,6 +78,59 @@ class AdminPanelProvider extends PanelProvider
                         @include('filament.custom-filepond')
                         @include('partials.pwa-tags')
                     ");
+
+                    // Estilos globales de tipografía compacta y márgenes reducidos para todas las secciones
+                    $css .= "
+                    <style>
+                        /* Títulos principales de página reducidos en todas las secciones */
+                        .fi-header-heading,
+                        h1.fi-header-heading,
+                        .fi-page-header .fi-header-heading,
+                        .fi-header h1 {
+                            font-size: 1.35rem !important; /* ~21px */
+                            line-height: 1.25 !important;
+                            font-weight: 700 !important;
+                            letter-spacing: -0.015em !important;
+                        }
+
+                        /* Reducción de márgenes en la cabecera de página */
+                        .fi-header {
+                            margin-bottom: 0.65rem !important;
+                            padding-bottom: 0px !important;
+                            gap: 0.35rem !important;
+                        }
+                        .fi-page-header-main-ctn {
+                            padding-top: 0.25rem !important;
+                            padding-bottom: 0.25rem !important;
+                        }
+
+                        /* Títulos secundarios reducidos en todas las secciones */
+                        .fi-section-header-heading,
+                        .fi-sc-section-header-heading,
+                        .fi-ta-header-heading,
+                        .fi-ta-header-title,
+                        .fi-header-subheading,
+                        .fi-section-header-title,
+                        .fi-section h3,
+                        .fi-section h2,
+                        .fi-ta-content h3 {
+                            font-size: 0.95rem !important; /* ~15px */
+                            line-height: 1.3 !important;
+                            font-weight: 700 !important;
+                        }
+
+                        /* Reducción de márgenes entre bloques y secciones */
+                        .fi-page-content,
+                        .fi-page-content > div,
+                        .fi-page > div.space-y-6 {
+                            gap: 0.875rem !important;
+                        }
+                        .fi-section {
+                            margin-bottom: 0.875rem !important;
+                        }
+                    </style>
+                    ";
+
                     if (str_contains(request()->url(), 'recursos-humanos')) {
                         $css .= "
                         <style>

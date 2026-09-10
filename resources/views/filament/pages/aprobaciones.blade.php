@@ -1,20 +1,20 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
+    <div class="space-y-3.5">
 
         <!-- Top Bar: Calendario vacaciones -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:px-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-2xl shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:px-4 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-2xl shadow-xs">
             <div class="flex items-center gap-3">
                 <span class="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </span>
                 <div>
-                    <h4 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Calendario General de Vacaciones</h4>
+                    <h4 class="text-xs sm:text-[13px] font-bold text-gray-900 dark:text-white">Calendario General de Vacaciones</h4>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Consulta anual y mensual de todas las solicitudes aprobadas, pendientes y denegadas.</p>
                 </div>
             </div>
-            <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer">
+            <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
@@ -23,23 +23,23 @@
         </div>
 
         <!-- Vacations Section -->
-        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span class="p-2 bg-sky-500/10 text-sky-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
+        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between pb-2.5 border-b border-gray-50 dark:border-white/5 mb-3">
+                <h3 class="text-sm sm:text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span class="p-1.5 bg-sky-500/10 text-sky-600 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </span>
                     Solicitudes Pendientes
                 </h3>
-                <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
+                <span class="px-2.5 py-0.5 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
                     {{ count($this->vacacionesPendientes) }} pendientes
                 </span>
             </div>
 
             <!-- Pendientes Filters -->
-            <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
+            <div class="mb-3 p-2.5 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-xl flex flex-wrap items-center gap-2.5">
                 <div class="w-64 max-w-xs">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
                     <input type="text" list="dl-pendiente-empleado" wire:model.live.debounce.300ms="filter_pendiente_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
@@ -160,23 +160,23 @@
         </div>
 
         <!-- Processed Requests History Section -->
-        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
-            <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span class="p-2 bg-indigo-500/10 text-indigo-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between pb-2.5 border-b border-gray-50 dark:border-white/5 mb-3">
+                <h3 class="text-sm sm:text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span class="p-1.5 bg-indigo-500/10 text-indigo-600 rounded-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                         </svg>
                     </span>
                     Historial de Solicitudes Procesadas
                 </h3>
-                <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-bold">
+                <span class="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-bold">
                     {{ $this->historicoProcesadas->total() }} procesadas
                 </span>
             </div>
 
             <!-- Histórico Filters -->
-            <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-2xl flex flex-wrap items-center gap-3">
+            <div class="mb-3 p-2.5 bg-gray-50 dark:bg-gray-950/40 border border-gray-100 dark:border-white/5 rounded-xl flex flex-wrap items-center gap-2.5">
                 <div class="w-64 max-w-xs">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Empleado</label>
                     <input type="text" list="dl-historico-empleado" wire:model.live.debounce.300ms="filter_historico_empleado" placeholder="Escribe para buscar empleado..." class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 focus:ring-indigo-500" />
