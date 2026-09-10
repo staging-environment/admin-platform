@@ -28,7 +28,7 @@
         </x-slot>
 
         <!-- Segmented control for business area -->
-        <div class="mb-3">
+        <div class="mb-2">
             <div class="grid grid-cols-3 gap-1 p-1 bg-gray-100 dark:bg-gray-800/80 rounded-lg text-xs font-medium">
                 <button
                     type="button"
@@ -52,6 +52,17 @@
                     Tienda
                 </button>
             </div>
+        </div>
+
+        <!-- Explanatory note -->
+        <div class="flex items-start gap-1.5 mb-3 px-1 py-1.5 rounded-md bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 text-[11px] leading-snug text-gray-500 dark:text-gray-400">
+            <x-filament::icon
+                icon="heroicon-m-information-circle"
+                class="h-4 w-4 shrink-0 text-primary-500 mt-0.5"
+            />
+            <p>
+                <strong>Margen bruto:</strong> Ventas de TPV menos facturas de compra ({{ $tipoNegocio === 'combustible' ? 'gasolina y diésel' : ($tipoNegocio === 'tienda' ? 'tienda y lavado' : 'total estación') }}). Sin descontar costes operativos (luz, nóminas, etc.).
+            </p>
         </div>
 
         <div
