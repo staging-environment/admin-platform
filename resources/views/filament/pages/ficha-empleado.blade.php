@@ -900,7 +900,7 @@
                         <x-filament::button color="gray" x-on:click="$dispatch('close-modal', { id: 'edit-fichaje-modal' })">
                             Cancelar
                         </x-filament::button>
-                        <x-filament::button color="warning" wire:click="updateFichaje">
+                        <x-filament::button color="success" wire:click="updateFichaje" style="background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;">
                             Guardar Cambios
                         </x-filament::button>
                     </div>

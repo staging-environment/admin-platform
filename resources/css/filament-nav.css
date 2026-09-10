@@ -941,3 +941,39 @@ label .text-danger-400,
     background-color: #15803d !important;
     border-color: #15803d !important;
 }
+
+/* ==========================================================================
+   COLOR VERDE CORPORATIVO GLOBAL PARA GUARDAR CAMBIOS Y FORMULARIO SUBMIT
+   ========================================================================== */
+.fi-form-actions button[type="submit"],
+.fi-form-actions .fi-btn-color-primary,
+.fi-form-actions .fi-btn-color-success,
+form[wire\:submit] button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger),
+form button[type="submit"].fi-btn-color-primary,
+.fi-modal-footer-actions button[type="submit"].fi-btn-color-primary,
+.fi-modal-footer-actions button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger) {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    border-color: #16a34a !important;
+}
+
+.fi-form-actions button[type="submit"]:hover,
+.fi-form-actions .fi-btn-color-primary:hover,
+.fi-form-actions .fi-btn-color-success:hover,
+form[wire\:submit] button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger):hover,
+form button[type="submit"].fi-btn-color-primary:hover,
+.fi-modal-footer-actions button[type="submit"].fi-btn-color-primary:hover,
+.fi-modal-footer-actions button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger):hover {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+.fi-form-actions button[type="submit"] span,
+.fi-form-actions .fi-btn-color-primary span,
+.fi-form-actions .fi-btn-color-success span,
+form[wire\:submit] button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger) span,
+form button[type="submit"].fi-btn-color-primary span,
+.fi-modal-footer-actions button[type="submit"].fi-btn-color-primary span,
+.fi-modal-footer-actions button[type="submit"]:not(.fi-btn-color-gray):not(.fi-btn-color-danger) span {
+    color: #ffffff !important;
+}

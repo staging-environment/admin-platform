@@ -3,7 +3,7 @@
         {{ $this->form }}
 
         <div class="flex flex-wrap gap-3 justify-end">
-            <x-filament::button type="submit">
+            <x-filament::button type="submit" color="success" style="background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;">
                 Guardar Cambios
             </x-filament::button>
         </div>

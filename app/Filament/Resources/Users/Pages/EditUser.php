@@ -16,4 +16,13 @@ class EditUser extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getSaveFormAction(): \Filament\Actions\Action
+    {
+        return parent::getSaveFormAction()
+            ->color('success')
+            ->extraAttributes([
+                'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+            ]);
+    }
 }
