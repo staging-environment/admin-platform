@@ -30,9 +30,21 @@
                         </span>
                         Control General de Fichajes de Empleados
                     </h3>
-                    <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold">
-                        {{ count($todosLosFichajes) }} registros totales
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <button type="button" wire:click="exportPdf" wire:loading.attr="disabled" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 cursor-pointer" title="Exportar todos los resultados coincidentes a PDF">
+                            <svg wire:loading.remove wire:target="exportPdf" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <svg wire:loading wire:target="exportPdf" class="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            <span>Exportar PDF</span>
+                        </button>
+                        <span class="px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold whitespace-nowrap">
+                            {{ $todosLosFichajes instanceof \Illuminate\Pagination\LengthAwarePaginator ? $todosLosFichajes->total() : count($todosLosFichajes) }} registros totales
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Filters Section -->
@@ -226,6 +238,12 @@
                             </tbody>
                         </table>
                     </div>
+
+                    @if($todosLosFichajes instanceof \Illuminate\Pagination\LengthAwarePaginator && $todosLosFichajes->hasPages())
+                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5">
+                            {{ $todosLosFichajes->links() }}
+                        </div>
+                    @endif
             </div>
         @elseif(!$empleado)
             <div class="p-6 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-2xl flex items-start gap-4">
