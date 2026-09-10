@@ -14,13 +14,28 @@
         }
         $countDisplay = $totalChanged > 0 ? $totalChanged : $totalAlerts;
         $isGlobalBadge = $isGlobal ?? empty($localityName);
+
+        // Detectar si la alerta es de Diesel, Gasolina o ambos
+        $fuels = collect($alerts)->pluck('fuel_type')->filter()->unique()->values()->all();
+        $hasDiesel = in_array('diesel', $fuels);
+        $hasGas = in_array('gas95', $fuels);
+
+        if ($hasDiesel && $hasGas) {
+            $fuelTag = 'Di&eacute;sel y Gasolina';
+        } elseif ($hasDiesel) {
+            $fuelTag = 'Di&eacute;sel';
+        } elseif ($hasGas) {
+            $fuelTag = 'Gasolina 95';
+        } else {
+            $fuelTag = '';
+        }
     @endphp
 
     @if ($totalAlerts > 0)
         <!-- Boton pulsante de alerta -->
         <button type="button" 
                 @click.stop="open = true" 
-                style="position: relative !important; z-index: 10 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; {{ $isGlobalBadge ? 'padding: 0 9px !important; height: 20px !important;' : 'margin-left: 6px !important; padding: 0 7px !important; height: 18px !important;' }} border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: all 0.2s !important; box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4) !important; flex-shrink: 0 !important; outline: none !important; animation: alert-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
+                style="position: relative !important; z-index: 10 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; {{ $isGlobalBadge ? 'padding: 0 10px !important; height: 21px !important;' : 'margin-left: 6px !important; padding: 0 7px !important; height: 18px !important;' }} border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: all 0.2s !important; box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4) !important; flex-shrink: 0 !important; outline: none !important; animation: alert-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'"
                 title="Cambios de precio detectados por MITECO en las ultimas 2 horas">
@@ -29,9 +44,9 @@
             </svg>
             <span style="font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; line-height: 1 !important; white-space: nowrap !important; letter-spacing: 0.02em !important;">
                 @if ($isGlobalBadge)
-                    MITECO: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio detectado' : 'cambios detectados' }}
+                    MITECO {!! $fuelTag ? "({$fuelTag})" : '' !!}: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio detectado' : 'cambios detectados' }}
                 @else
-                    MITECO: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio' : 'cambios' }}
+                    MITECO {!! $fuelTag ? "({$fuelTag})" : '' !!}: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio' : 'cambios' }}
                 @endif
             </span>
         </button>
@@ -109,8 +124,9 @@
                                             </svg>
                                             {{ $alert['locality_name'] ?? $localityName ?? 'Localidad' }}
                                         </div>
-                                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded {{ $isDiesel ? 'bg-gray-900 text-white' : 'bg-green-600 text-white' }}">
-                                            {!! $isDiesel ? 'DI&Eacute;SEL' : 'GASOLINA 95' !!}
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded {{ $isDiesel ? 'bg-gray-900 text-white' : 'bg-green-600 text-white' }}">
+                                            <span class="w-1.5 h-1.5 rounded-full {{ $isDiesel ? 'bg-amber-400' : 'bg-white' }}"></span>
+                                            Cambio en {!! $isDiesel ? 'DI&Eacute;SEL' : 'GASOLINA 95' !!}
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 tabular-nums">
