@@ -55,7 +55,7 @@ class Aprobaciones extends Page
 
     // Calendario Modal
     public bool $showCalendarioModal = false;
-    public string $calendarioVista = 'mensual'; // 'mensual' | 'anual'
+    public string $calendarioVista = 'anual'; // 'anual' por defecto
     public int $calendarioAnio = 2026;
     public int $calendarioMes = 9;
     public string $calendarioEmpleado = '';
@@ -469,6 +469,7 @@ class Aprobaciones extends Page
         if (empty($this->calendarioMes)) {
             $this->calendarioMes = (int) date('n');
         }
+        $this->calendarioVista = 'anual';
         $this->showCalendarioModal = true;
     }
 
