@@ -170,7 +170,7 @@
                                                             </p>
                                                         @endif
                                                         <span style="font-size: 9px !important; font-weight: 700 !important; color: {{ $isDiesel ? '#4b5563' : '#15803d' }} !important; text-transform: uppercase !important;">
-                                                            {{ $isDiesel ? 'Di&eacute;sel' : 'Gasolina 95' }}
+                                                            {!! $isDiesel ? 'Di&eacute;sel' : 'Gasolina 95' !!}
                                                         </span>
                                                     </div>
                                                 </div>
