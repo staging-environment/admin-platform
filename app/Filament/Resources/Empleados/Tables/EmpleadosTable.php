@@ -79,7 +79,7 @@ class EmpleadosTable
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
-                            $data['value'],
+                            $data['value'] ?? null,
                             function (\Illuminate\Database\Eloquent\Builder $query, $centro) {
                                 $map = [
                                     'Sevilla' => 2,
@@ -110,7 +110,7 @@ class EmpleadosTable
                     ->default('Alta')
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
-                            $data['value'],
+                            $data['value'] ?? null,
                             function (\Illuminate\Database\Eloquent\Builder $query, $value) {
                                 if ($value === 'Alta') {
                                     return $query->where('estado', 'Alta');
@@ -140,7 +140,7 @@ class EmpleadosTable
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
-                            $data['query'],
+                            $data['query'] ?? null,
                             fn (\Illuminate\Database\Eloquent\Builder $query, $search) => $query->where(function ($q) use ($search) {
                                 $q->where('nombre', 'like', "%{$search}%")
                                   ->orWhere('apellidos', 'like', "%{$search}%")
