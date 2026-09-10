@@ -1093,15 +1093,20 @@ table thead th {
 
 
                         /* Botones de acción compactos en cabecera para mantener altura homogénea con las migas de pan */
+                        .fi-header-actions-ctn,
                         .fi-header-actions,
-                        .fi-page-header-actions {
+                        .fi-page-header-actions,
+                        .fi-header .fi-ac {
                             display: flex !important;
                             align-items: center !important;
                             gap: 0.35rem !important;
                         }
 
+                        .fi-header .fi-btn,
+                        .fi-header-actions-ctn .fi-btn,
                         .fi-header-actions .fi-btn,
-                        .fi-page-header-actions .fi-btn {
+                        .fi-page-header-actions .fi-btn,
+                        .fi-header .fi-ac-action {
                             padding-top: 0.25rem !important;
                             padding-bottom: 0.25rem !important;
                             padding-block: 0.25rem !important;
@@ -1113,15 +1118,21 @@ table thead th {
                             border-radius: 0.5rem !important;
                         }
 
+                        .fi-header .fi-btn .fi-btn-label,
+                        .fi-header-actions-ctn .fi-btn .fi-btn-label,
                         .fi-header-actions .fi-btn .fi-btn-label,
-                        .fi-page-header-actions .fi-btn .fi-btn-label {
+                        .fi-page-header-actions .fi-btn .fi-btn-label,
+                        .fi-header .fi-ac-action .fi-btn-label {
                             font-size: 0.75rem !important;
                             font-weight: 600 !important;
                         }
 
-                        .fi-header-actions .fi-btn .fi-btn-icon,
+                        .fi-header .fi-btn .fi-btn-icon,
+                        .fi-header .fi-btn svg,
+                        .fi-header-actions-ctn .fi-btn svg,
                         .fi-header-actions .fi-btn svg,
-                        .fi-page-header-actions .fi-btn svg {
+                        .fi-page-header-actions .fi-btn svg,
+                        .fi-header .fi-ac-action svg {
                             width: 0.85rem !important;
                             height: 0.85rem !important;
                         }

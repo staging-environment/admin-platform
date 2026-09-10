@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Empleados\Pages;
 
 use App\Filament\Resources\Empleados\EmpleadoResource;
+use Filament\Support\Enums\Size;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\Toggle;
@@ -44,6 +45,7 @@ class EditEmpleado extends EditRecord
     {
         return [
                         \Filament\Actions\Action::make('documentoBaja')
+                ->size(Size::ExtraSmall)
                 ->label(function ($record) {
                     if (!$record) return 'Documento de Baja';
                     $hasDoc = !empty($record->documento_baja_path) || $record->documentos()->where('tipo', 'Documento de Baja')->exists();
@@ -127,6 +129,7 @@ class EditEmpleado extends EditRecord
                     ");
                 }),
             \Filament\Actions\Action::make('notificacionesDocuments')
+                ->size(Size::ExtraSmall)
                 ->label('Notificaciones')
                 ->icon('heroicon-o-bell')
                 ->color(function ($record) {
@@ -148,6 +151,7 @@ class EditEmpleado extends EditRecord
                 ->modalContent(fn ($record) => view('filament.pages.notificaciones-modal', ['record' => $record]))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('dniDocuments')
+                ->size(Size::ExtraSmall)
                 ->label('DNI')
                 ->icon('heroicon-o-identification')
                 ->color(function ($record) {
@@ -166,6 +170,7 @@ class EditEmpleado extends EditRecord
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'dni']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('contratosDocuments')
+                ->size(Size::ExtraSmall)
                 ->label('Contratos')
                 ->icon('heroicon-o-document-text')
                 ->color(function ($record) {
@@ -203,6 +208,7 @@ class EditEmpleado extends EditRecord
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'contratos']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('formacionDocuments')
+                ->size(Size::ExtraSmall)
                 ->label('Formación')
                 ->icon('heroicon-o-academic-cap')
                 ->color(function ($record) {
@@ -226,6 +232,7 @@ class EditEmpleado extends EditRecord
                 ->modalContent(fn ($record) => view('filament.pages.documentos-modal', ['record' => $record, 'family' => 'formacion']))
                 ->visible(fn () => auth()->user()->can('ver_documentacion_empleados')),
             \Filament\Actions\Action::make('discapacidadIncapacidad')
+                ->size(Size::ExtraSmall)
                 ->label('Discapacidad / Incapacidad')
                 ->icon('heroicon-o-heart')
                 ->color(function ($record) {
