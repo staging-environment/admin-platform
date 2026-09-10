@@ -542,7 +542,7 @@
     <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95vw] max-w-6xl h-[88vh] max-h-[850px] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
+        <div style="width: min(820px, 94vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
             
             <!-- Modal Header & Navigation Bar -->
             <div class="shrink-0 px-4 sm:px-6 py-3 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
@@ -575,7 +575,7 @@
                 <!-- Right: Search, Legend & Close -->
                 <div class="flex items-center gap-3">
                     <!-- Employee Search Filter -->
-                    <div class="relative w-36 sm:w-48">
+                    <div class="relative w-36 sm:w-44">
                         <input
                             type="text"
                             list="dl-cal-empleados"
@@ -641,7 +641,7 @@
                             $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-50');
                         @endphp
 
-                        <div style="min-height: 80px; max-height: 105px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
+                        <div style="min-height: 95px; max-height: 125px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
                             <!-- Day Number Header -->
                             <div class="flex items-center justify-between mb-1 leading-none">
                                 <div></div>
@@ -652,7 +652,7 @@
 
                             <!-- Day Requests (Pills) -->
                             @if(!empty($d['solicitudes']))
-                                <div class="space-y-1 overflow-y-auto max-h-[60px] sm:max-h-[75px] pr-0.5">
+                                <div class="space-y-1 overflow-y-auto max-h-[75px] sm:max-h-[92px] pr-0.5">
                                     @foreach($d['solicitudes'] as $sol)
                                         @php
                                             $st = $sol['estado'];
@@ -673,8 +673,8 @@
                                         @endphp
 
                                         <div class="relative group/tip" title="{{ $tooltipText }}">
-                                            <!-- Píldora visible -->
-                                            <div style="{{ $pillStyle }}" class="px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9px] font-bold flex items-center justify-between gap-1 leading-none shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all">
+                                            <!-- Píldora visible con iniciales pequeñas y discretas -->
+                                            <div style="{{ $pillStyle }}" class="px-1.5 py-0.5 rounded text-[7.5px] sm:text-[8px] font-bold flex items-center justify-between gap-1 leading-none shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all">
                                                 <span class="truncate font-black tracking-wider">{{ $sol['iniciales'] }}</span>
                                                 <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $dotColor }};"></span>
                                             </div>
