@@ -394,23 +394,34 @@
         {{-- ═══════════════════════════════════════════════════════════════ --}}
 
         <section>
-            <div class="flex items-center gap-2 mb-2 flex-wrap">
-                <div class="w-1 h-4 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
-                <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(consulta cada 15 min)</span></h2>
+            <div class="flex items-center justify-between gap-3 mb-2 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <div class="w-1 h-4 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
+                    <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(consulta cada 15 min)</span></h2>
 
-                @if(!empty($competitorAlerts))
-                    <div class="ml-2">
-                        @include('filament.components.competitor-alert-badge', [
-                            'alerts' => $competitorAlerts,
-                            'localityName' => null,
-                            'isGlobal' => true,
-                        ])
-                    </div>
-                @endif
+                    @if(!empty($competitorAlerts))
+                        <div class="ml-2">
+                            @include('filament.components.competitor-alert-badge', [
+                                'alerts' => $competitorAlerts,
+                                'localityName' => null,
+                                'isGlobal' => true,
+                            ])
+                        </div>
+                    @endif
+                </div>
 
-                <span class="ml-auto text-xs" style="color:#6b7280">
-                    Datos oficiales · Ministerio para la Transición Ecológica (MITECO)
-                </span>
+                <div class="ml-auto flex items-center gap-2 flex-wrap text-right">
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                        Datos oficiales &middot; Ministerio para la Transici&oacute;n Ecol&oacute;gica (MITECO)
+                    </span>
+                    <span class="text-gray-300 dark:text-gray-600 hidden md:inline">&bull;</span>
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 inline-flex items-center gap-1 font-medium bg-gray-100/80 dark:bg-gray-800/80 px-2 py-0.5 rounded-md border border-gray-200/60 dark:border-gray-700/60" title="Las alertas caducan a las 2 horas de su deteccion si no se registran nuevos cambios">
+                        <svg class="w-2.5 h-2.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Alertas activas 2h si no hay nuevos cambios
+                    </span>
+                </div>
             </div>
 
             <div id="competitors-container">
