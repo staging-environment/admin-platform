@@ -169,14 +169,29 @@
     </style>
 </head>
 <body>
+    @php
+        $logoPath = public_path('ronda_norte_logo.png');
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+    @endphp
     <!-- Encabezado corporativo -->
     <table class="header-table">
         <tr>
-            <td style="vertical-align: middle;">
-                <div class="header-subtitle">Utrecar - Active Network</div>
-                <div class="header-title">Control General de Fichajes de Empleados</div>
+            <td style="vertical-align: middle; width: 68%;">
+                <table style="border-collapse: collapse; margin: 0; padding: 0;">
+                    <tr>
+                        @if($logoBase64)
+                            <td style="vertical-align: middle; padding-right: 12px; width: 42px;">
+                                <img src="{{ $logoBase64 }}" alt="Utrecar" style="height: 38px; width: auto; display: block;" />
+                            </td>
+                        @endif
+                        <td style="vertical-align: middle;">
+                            <div class="header-subtitle">UTRECAR - ACTIVE NETWORK</div>
+                            <div class="header-title">Control General de Fichajes de Empleados</div>
+                        </td>
+                    </tr>
+                </table>
             </td>
-            <td class="header-meta" style="vertical-align: middle;">
+            <td class="header-meta" style="vertical-align: middle; width: 32%;">
                 <strong>Fecha de Emisión:</strong> {{ $generatedAt }}<br>
                 <strong>Total Registros:</strong> {{ count($fichajes) }}<br>
                 <strong>Usuario Emisor:</strong> {{ auth()->user()->name ?? 'Administrador' }}
