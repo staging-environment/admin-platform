@@ -110,6 +110,34 @@ class BeneficiosChart extends ChartWidget
         }
     }
 
+    protected function getOptions(): \Filament\Support\RawJs
+    {
+        return \Filament\Support\RawJs::make(<<<JS
+            {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => {
+                                if (value === 0) return '0 €';
+                                return (value / 1000) + 'k €';
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let val = context.raw || 0;
+                                return 'Beneficio: ' + new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
+                            },
+                        },
+                    },
+                },
+            }
+        JS);
+    }
+
     protected function getType(): string
     {
         return 'bar';
