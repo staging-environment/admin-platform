@@ -7,8 +7,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class EditJobApplication extends EditRecord
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = JobApplicationResource::class;
 
     public function mount(int | string $record): void

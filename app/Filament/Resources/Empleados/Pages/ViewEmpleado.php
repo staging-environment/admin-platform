@@ -15,8 +15,11 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class ViewEmpleado extends ViewRecord
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = EmpleadoResource::class;
 
     public function mount(int | string $record): void

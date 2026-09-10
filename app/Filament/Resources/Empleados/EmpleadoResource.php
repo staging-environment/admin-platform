@@ -41,6 +41,11 @@ class EmpleadoResource extends Resource
             });
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Recursos humanos';
+    }
+
     public static function getNavigationLabel(): string
     {
         return 'Recursos humanos';

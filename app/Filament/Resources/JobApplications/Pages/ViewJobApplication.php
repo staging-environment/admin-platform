@@ -6,8 +6,11 @@ use App\Filament\Resources\JobApplications\JobApplicationResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class ViewJobApplication extends ViewRecord
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = JobApplicationResource::class;
 
     public function mount(int | string $record): void

@@ -6,8 +6,11 @@ use App\Filament\Resources\Gasolineras\GasolineraResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class EditGasolinera extends EditRecord
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = GasolineraResource::class;
 
     protected function getHeaderActions(): array

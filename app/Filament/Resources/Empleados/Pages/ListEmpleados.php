@@ -9,8 +9,11 @@ use Filament\Resources\Pages\ListRecords;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class ListEmpleados extends ListRecords
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = EmpleadoResource::class;
 
     protected function getHeaderActions(): array

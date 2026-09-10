@@ -45,8 +45,8 @@ class ManageHome extends Page implements HasForms, HasTable
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => 'Administración',
-            static::getNavigationLabel(),
+            'Administración',
+            'Configuración de Portada',
         ];
     }
 

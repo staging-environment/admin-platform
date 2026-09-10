@@ -35,8 +35,8 @@ class PermissionMatrix extends Page
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => 'Administración',
-            static::getNavigationLabel(),
+            'Administración',
+            'Matriz de Permisos',
         ];
     }
 

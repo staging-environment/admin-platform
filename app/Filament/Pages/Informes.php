@@ -86,9 +86,19 @@ class Informes extends Page implements HasForms
 
     public function getBreadcrumbs(): array
     {
+        $title = $this->getTitle();
+        if ($title === 'Informes') {
+            return [
+                'Administración',
+                'Informes',
+                'Listado',
+            ];
+        }
+
         return [
-            '#' => 'Administración',
-            $this->getTitle(),
+            'Administración',
+            '/admin/informes' => 'Informes',
+            $title,
         ];
     }
 

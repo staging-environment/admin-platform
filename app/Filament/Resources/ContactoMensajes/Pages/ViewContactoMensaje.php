@@ -6,8 +6,11 @@ use App\Filament\Resources\ContactoMensajes\ContactoMensajeResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class ViewContactoMensaje extends ViewRecord
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = ContactoMensajeResource::class;
 
     public function mount(int | string $record): void

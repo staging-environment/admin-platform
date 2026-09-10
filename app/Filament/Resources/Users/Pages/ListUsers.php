@@ -7,8 +7,11 @@ use Filament\Resources\Pages\ListRecords;
 // Cambiamos esta línea para que apunte a la carpeta Users
 use App\Filament\Resources\Users\UserResource;
 
+use App\Filament\Traits\HasMenuBreadcrumbs;
 class ListUsers extends ListRecords
 {
+    use HasMenuBreadcrumbs;
+
     protected static string $resource = UserResource::class;
 
     protected function getHeaderActions(): array

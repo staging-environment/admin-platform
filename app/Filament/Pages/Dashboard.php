@@ -16,6 +16,13 @@ class Dashboard extends \Filament\Pages\Dashboard
 
     public function getHeading(): string { return ''; }
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            'Inicio',
+        ];
+    }
+
     /** Datos de mercados internacionales (Yahoo Finance) */
     public array $gasoilData = [];
     public array $rbobData   = [];
