@@ -30,7 +30,6 @@ class FichaEmpleado extends Page
 
     public $isViewingAdminList = false;
     public bool $isAdmin = false;
-    public $todosLosFichajes = [];
     public $todasLasVacaciones = [];
     public $todasLasBajas = [];
     public $filterDateFrom = '';
@@ -265,14 +264,16 @@ class FichaEmpleado extends Page
     public function render(): \Illuminate\Contracts\View\View
     {
         $this->loadFichajes();
+        return parent::render();
+    }
 
-        $todosLosFichajes = $this->isViewingAdminList
-            ? $this->getTodosLosFichajesQuery()->paginate(50)
-            : collect();
-
-        return view($this->getView(), array_merge($this->getViewData(), [
-            'todosLosFichajes' => $todosLosFichajes,
-        ]));
+    protected function getViewData(): array
+    {
+        return [
+            'todosLosFichajes' => $this->isViewingAdminList
+                ? $this->getTodosLosFichajesQuery()->paginate(50)
+                : collect(),
+        ];
     }
 
     public function exportPdf()
