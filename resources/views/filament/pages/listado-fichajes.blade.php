@@ -140,12 +140,16 @@
                                                 </div>
                                             </div>
                                         </td>
-﻿                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
+                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
                                             @php
-                                                $realCheckin = $fichaje->server_checkin_at
-                                                    ? $fichaje->server_checkin_at->timezone("Europe/Madrid")->format("d/m/Y H:i:s")
-                                                    : ($fichaje->fecha && $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->fecha . " " . $fichaje->hora_entrada)->format("d/m/Y H:i:s") : null);
-                                                $tooltipEntrada = $realCheckin ? "Real: " . $realCheckin : null;
+                                                if ($fichaje->server_checkin_at) {
+                                                    $realCheckin = $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s');
+                                                } else {
+                                                    $fStr = $fichaje->fecha ? \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') : '';
+                                                    $hStr = $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '';
+                                                    $realCheckin = trim($fStr . ' ' . $hStr);
+                                                }
+                                                $tooltipEntrada = $realCheckin ? 'Real: ' . $realCheckin : null;
                                             @endphp
                                             <div class="flex items-center gap-1.5">
                                                 <span 
@@ -155,7 +159,7 @@
                                                         title="{{ $tooltipEntrada }}"
                                                     @endif
                                                 >
-                                                    {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format("H:i") : "-" }}
+                                                    {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '-' }}
                                                 </span>
                                                 @if($fichaje->checkin_latitude && $fichaje->checkin_longitude)
                                                     <a href="https://www.google.com/maps?q={{ $fichaje->checkin_latitude }},{{ $fichaje->checkin_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkin_latitude }}, {{ $fichaje->checkin_longitude }})">
@@ -168,10 +172,14 @@
                                         <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
                                             @if($fichaje->hora_salida)
                                                 @php
-                                                    $realCheckout = $fichaje->server_checkout_at
-                                                        ? $fichaje->server_checkout_at->timezone("Europe/Madrid")->format("d/m/Y H:i:s")
-                                                        : ($fichaje->fecha && $fichaje->hora_salida ? \Carbon\Carbon::parse($fichaje->fecha . " " . $fichaje->hora_salida)->format("d/m/Y H:i:s") : null);
-                                                    $tooltipSalida = $realCheckout ? "Real: " . $realCheckout : null;
+                                                    if ($fichaje->server_checkout_at) {
+                                                        $realCheckout = $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s');
+                                                    } else {
+                                                        $fStr = $fichaje->fecha ? \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') : '';
+                                                        $hStr = $fichaje->hora_salida ? \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') : '';
+                                                        $realCheckout = trim($fStr . ' ' . $hStr);
+                                                    }
+                                                    $tooltipSalida = $realCheckout ? 'Real: ' . $realCheckout : null;
                                                 @endphp
                                                 <div class="flex items-center gap-1.5">
                                                     <span 
@@ -181,7 +189,7 @@
                                                             title="{{ $tooltipSalida }}"
                                                         @endif
                                                     >
-                                                        {{ \Carbon\Carbon::parse($fichaje->hora_salida)->format("H:i") }}
+                                                        {{ \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') }}
                                                     </span>
                                                     @if($fichaje->checkout_latitude && $fichaje->checkout_longitude)
                                                         <a href="https://www.google.com/maps?q={{ $fichaje->checkout_latitude }},{{ $fichaje->checkout_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkout_latitude }}, {{ $fichaje->checkout_longitude }})">
