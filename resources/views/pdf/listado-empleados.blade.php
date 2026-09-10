@@ -120,17 +120,6 @@
             border: 1px solid #fecdd3;
             display: inline-block;
         }
-        .badge-alerta {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            font-size: 6.5pt;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 2px;
-            border: 1px solid #fca5a5;
-        }
         .footer {
             position: fixed;
             bottom: -10mm;
@@ -236,7 +225,7 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 11%;">Situación</th>
+                <th style="width: 11%;">Estado</th>
                 <th style="width: 21%;">Apellidos</th>
                 <th style="width: 16%;">Nombre</th>
                 <th style="width: 11%;">DNI</th>
@@ -249,7 +238,6 @@
             @forelse($empleados as $emp)
                 @php
                     $isOnBajaMedica = $emp->ausencias ? $emp->ausencias->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->count() > 0 : false;
-                    $alertasCount = $emp->alertas ? $emp->alertas->count() : 0;
                 @endphp
                 <tr>
                     <td>
@@ -259,10 +247,6 @@
                             <span class="badge-baja-medica">Baja médica</span>
                         @else
                             <span class="badge-alta">Alta</span>
-                        @endif
-
-                        @if($alertasCount > 0)
-                            <br><span class="badge-alerta">{{ $alertasCount }} {{ $alertasCount === 1 ? 'alerta' : 'alertas' }}</span>
                         @endif
                     </td>
                     <td style="font-weight: bold; text-transform: uppercase;">

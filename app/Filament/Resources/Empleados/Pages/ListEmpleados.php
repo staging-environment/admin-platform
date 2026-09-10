@@ -43,7 +43,7 @@ class ListEmpleados extends ListRecords
         }
 
         $query = $this->getFilteredSortedTableQuery();
-        $empleados = $query->with(['gasolinera', 'ausencias', 'alertas'])->get();
+        $empleados = $query->with(['gasolinera', 'ausencias'])->get();
 
         $filters = $this->tableFilters ?? [];
         $centroTrabajo = $filters['centro_trabajo']['value'] ?? null;
