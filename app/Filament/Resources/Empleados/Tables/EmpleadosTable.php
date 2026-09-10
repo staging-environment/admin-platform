@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Empleados\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use STS\FilamentImpersonate\Actions\Impersonate;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -195,6 +196,11 @@ class EmpleadosTable
                     ])
             )
             ->actions([
+                Impersonate::make()
+                    ->impersonateRecord(fn ($record) => $record->user)
+                    ->iconButton()
+                    ->tooltip('Suplantar usuario')
+                    ->visible(fn ($record) => $record->user !== null && auth()->user()?->canImpersonate()),
                 EditAction::make()->iconButton(),
                 \Filament\Actions\DeleteAction::make()->iconButton(),
             ])

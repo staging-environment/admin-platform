@@ -29,6 +29,25 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
     /**
      * Control de acceso al panel de Filament
      */
+
+    /**
+     * Determina si el usuario puede suplantar / enmascararse como otro usuario.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->can('suplantar_usuarios')
+            || $this->email === 'jarodriguezbonilla@gmail.com'
+            || $this->id === 1;
+    }
+
+    /**
+     * Determina si este usuario puede ser suplantado.
+     */
+    public function canBeImpersonated(): bool
+    {
+        return $this->id !== auth()->id();
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($this->email)])->first();

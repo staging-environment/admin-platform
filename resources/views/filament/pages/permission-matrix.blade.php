@@ -47,6 +47,7 @@
                             'ver_dashboard' => 'Ver Comparador de Precios',
                             'gestion_usuarios' => 'Gestión de Usuarios',
                             'gestion_eliminar_usuarios' => 'Eliminar usuarios',
+                            'suplantar_usuarios' => 'Suplantar / Enmascarar Usuarios (Impersonate)',
                             'gestion_roles' => 'Gestión de Roles y Matriz de Permisos',
                             'utilizar_explorador' => 'Utilizar Explorador de Archivos',
                             'ver_informes' => 'Ver Informes y Estadísticas',

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use STS\FilamentImpersonate\Actions\Impersonate;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 
@@ -144,6 +145,9 @@ class UsersTable
                     ]),
             )
             ->actions([
+                Impersonate::make()
+                    ->iconButton()
+                    ->tooltip('Suplantar usuario'),
                 EditAction::make()
                     ->iconButton()
                     ->tooltip('Editar'),
