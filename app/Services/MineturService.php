@@ -222,6 +222,9 @@ class MineturService
         $text .= "<b>Precios actuales (Top Competidores):</b>\n";
         $text .= "{$fuelEmoji} <b>{$fuelLabel}:</b>\n";
 
+        $stationsData = [];
+        $changedStationsCount = 0;
+
         foreach (array_slice($newPrices, 0, 5) as $idx => $s) {
             $num = $idx + 1;
             
@@ -231,6 +234,10 @@ class MineturService
             $priceText = "<b>" . number_format($s['price'], 3) . " €</b>";
             $highlight = "";
             $stationName = $s['name'];
+            $isChanged = false;
+            $diff = 0;
+            $diffText = "";
+            $direction = null;
 
             if ($oldPrice !== null && abs($oldPrice - $s['price']) > 0.0001) {
                 $diff = $s['price'] - $oldPrice;
@@ -238,10 +245,38 @@ class MineturService
                 $direction = $diff > 0 ? "sube" : "baja";
                 $highlight = " ⚠️ <b>({$direction})</b> <i>(antes " . number_format($oldPrice, 3) . " € | {$diffText} €)</i>";
                 $stationName = "<b>{$stationName}</b>";
+                $isChanged = true;
+                $changedStationsCount++;
             }
+
+            $stationsData[] = [
+                'rank'        => $num,
+                'id'          => $s['id'],
+                'name'        => $s['name'],
+                'address'     => $s['address'] ?? '',
+                'price'       => (float) $s['price'],
+                'old_price'   => $oldPrice !== null ? (float) $oldPrice : null,
+                'diff'        => (float) $diff,
+                'diff_text'   => $diffText,
+                'direction'   => $direction,
+                'is_changed'  => $isChanged,
+            ];
 
             $text .= "  {$num}. {$stationName}: {$priceText}{$highlight}\n";
         }
+
+        // Registrar evento de alerta en cache para la interfaz web (duracion 2 horas)
+        $this->recordPriceAlert([
+            'id'                     => uniqid('price_alert_', true),
+            'locality_key'           => $localityKey,
+            'locality_name'          => $localityName,
+            'fuel_type'              => $fuelType,
+            'fuel_label'             => $fuelLabel,
+            'stations'               => $stationsData,
+            'changed_stations_count' => $changedStationsCount,
+            'created_at'             => now()->timestamp,
+            'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
+        ]);
 
         // Find users with the required permission and active Telegram linked
         $usersToAlert = \App\Models\User::permission('recibir_notificaciones_competencia')
@@ -252,6 +287,55 @@ class MineturService
         foreach ($usersToAlert as $user) {
             $telegramService->sendMessage($user->telegram_chat_id, $text);
         }
+    }
+
+    /**
+     * Record a competitor price change alert in cache (valid for 2 hours).
+     */
+    public function recordPriceAlert(array $alertItem): void
+    {
+        $alerts = Cache::get('competitor_price_change_alerts', []);
+        $now = now()->timestamp;
+        
+        // Mantener solo alertas de las ultimas 2 horas (7200 segundos)
+        $alerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 7200);
+
+        // Si ya hay una alerta reciente de la misma localidad y combustible en los ultimos 10 min, la reemplazamos
+        $alerts = array_filter($alerts, function ($a) use ($alertItem, $now) {
+            return !($a['locality_key'] === $alertItem['locality_key'] 
+                     && $a['fuel_type'] === $alertItem['fuel_type'] 
+                     && ($now - ($a['created_at'] ?? 0)) <= 600);
+        });
+
+        array_unshift($alerts, $alertItem);
+        $alerts = array_slice($alerts, 0, 20);
+
+        Cache::put('competitor_price_change_alerts', array_values($alerts), now()->addHours(2));
+    }
+
+    /**
+     * Get all active competitor price alerts from the last 2 hours.
+     */
+    public function getRecentPriceAlerts(): array
+    {
+        $alerts = Cache::get('competitor_price_change_alerts', []);
+        $now = now()->timestamp;
+
+        $validAlerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 7200);
+
+        if (count($validAlerts) !== count($alerts)) {
+            Cache::put('competitor_price_change_alerts', array_values($validAlerts), now()->addHours(2));
+        }
+
+        return array_values($validAlerts);
+    }
+
+    /**
+     * Clear all price alerts from cache.
+     */
+    public function clearPriceAlerts(): void
+    {
+        Cache::forget('competitor_price_change_alerts');
     }
 
     /**

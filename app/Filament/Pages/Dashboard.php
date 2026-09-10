@@ -33,6 +33,9 @@ class Dashboard extends \Filament\Pages\Dashboard
     /** Estado del bot MITECO */
     public ?array $mitecoLastUpdate = null;
 
+    /** Alertas de cambios de precio de competencia (ultimas 2 horas) */
+    public array $competitorAlerts = [];
+
     public function mount(): void
     {
         $user = auth()->user();
@@ -71,6 +74,7 @@ class Dashboard extends \Filament\Pages\Dashboard
         $this->rbobData    = $fuelService->getRBOB();
         $this->localityData = $mineturService->getAllLocalitiesData();
         $this->mitecoLastUpdate = Cache::get('miteco_last_update_status');
+        $this->competitorAlerts = $mineturService->getRecentPriceAlerts();
     }
 
     /** Refresca sólo los datos de competencia local (llamado por wire:poll cada 5 min). */
@@ -78,6 +82,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     {
         $mineturService     = app(MineturService::class);
         $this->localityData = $mineturService->getAllLocalitiesData();
+        $this->competitorAlerts = $mineturService->getRecentPriceAlerts();
     }
 
     public static function canAccess(): bool
