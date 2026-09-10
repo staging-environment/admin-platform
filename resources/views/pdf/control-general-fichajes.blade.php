@@ -208,13 +208,21 @@
                         {{ $filterSearch ? $filterSearch : 'Todos los empleados' }}
                     </span>
                 </td>
-                <td style="width: 20%;">
+                @php
+                    $criterioOrden = match($sortField) {
+                        'fecha' => ($sortDirection === 'desc') ? 'Fecha (más recientes primero)' : 'Fecha (más antiguos primero)',
+                        'apellidos' => ($sortDirection === 'asc') ? 'Apellidos (de la A a la Z)' : 'Apellidos (de la Z a la A)',
+                        'nombre' => ($sortDirection === 'asc') ? 'Nombre (de la A a la Z)' : 'Nombre (de la Z a la A)',
+                        default => ucfirst($sortField) . ' (' . ($sortDirection === 'asc' ? 'Ascendente' : 'Descendente') . ')'
+                    };
+                @endphp
+                <td style="width: 28%;">
                     <span class="filter-label">Criterio de Orden:</span><br>
                     <span class="filter-value">
-                        {{ ucfirst($sortField) }} ({{ strtoupper($sortDirection) }})
+                        {{ $criterioOrden }}
                     </span>
                 </td>
-                <td style="width: 20%; text-align: right;">
+                <td style="width: 17%; text-align: right;">
                     <span class="filter-label">Total Exportado:</span><br>
                     <span class="filter-value" style="color: #d97706; font-size: 9pt;">
                         {{ count($fichajes) }} fichajes
