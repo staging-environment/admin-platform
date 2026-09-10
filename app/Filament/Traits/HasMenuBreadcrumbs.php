@@ -33,8 +33,8 @@ trait HasMenuBreadcrumbs
             ];
         }
 
-        // 2. Caso especial: JobApplications (Inscritos a Ofertas)
-        // Jerarqu?a directa: Recursos humanos > Inscritos a Ofertas > Listado
+        // 2. Caso especial: JobApplications (Ofertas de Empleo)
+        // Jerarqu?a directa: Recursos humanos > Ofertas de Empleo > Listado
         if ($resource === JobApplicationResource::class) {
             $action = $this->getBreadcrumb();
             $isIndex = in_array(strtolower($action), ['listado', 'list', 'inscripciones', '']);
@@ -42,14 +42,14 @@ trait HasMenuBreadcrumbs
             if ($isIndex) {
                 return [
                     'Recursos humanos',
-                    'Inscritos a Ofertas',
+                    'Ofertas de Empleo',
                     'Listado',
                 ];
             }
 
             return [
                 'Recursos humanos',
-                $resource::getUrl('index') => 'Inscritos a Ofertas',
+                $resource::getUrl('index') => 'Ofertas de Empleo',
                 $action,
             ];
         }
