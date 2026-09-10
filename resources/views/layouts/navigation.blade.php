@@ -13,20 +13,47 @@
 
                 <!-- Navigation Links -->
                 @if(!auth()->user()?->mustChangePassword())
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
+                @php
+                    $isInicioActive = request()->is('admin') 
+                        || request()->is('dashboard') 
+                        || request()->is('admin/dashboard') 
+                        || request()->routeIs('filament.admin.pages.dashboard') 
+                        || request()->routeIs('dashboard');
+
+                    $isRrHhActive = request()->is('admin/recursos-humanos*') 
+                        || request()->is('admin/ficha-empleado*') 
+                        || request()->is('admin/aprobaciones*') 
+                        || request()->is('admin/solicitudes-vacaciones*') 
+                        || request()->is('admin/job-offers*') 
+                        || request()->is('admin/job-applications*')
+                        || request()->is('admin/candidaturas*');
+
+                    $isFileExplorerActive = request()->is('admin/file-explorer*');
+
+                    $isAdminActive = request()->is('admin/informes*') 
+                        || request()->is('admin/analytics*') 
+                        || request()->is('admin/gasolineras*') 
+                        || request()->is('admin/users*') 
+                        || request()->is('admin/manage-home*') 
+                        || request()->is('admin/permission-matrix*') 
+                        || request()->is('admin/roles*')
+                        || request()->is('admin/permissions*')
+                        || request()->is('admin/contacto-mensajes*');
+                @endphp
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:h-full">
                     @if(auth()->user()?->can('ver_dashboard'))
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            Inicio
+                        <x-nav-link :href="route('dashboard')" :active="$isInicioActive">
+                            {{ __('Inicio') }}
                         </x-nav-link>
                     @endif
 
                     @if(auth()->user()?->canAny(['gestion_recursos_humanos', 'acceder_portal_fichajes']))
-                        <div class="inline-flex items-center">
+                        <div class="inline-flex items-center h-full">
                             <x-dropdown align="left" width="w-64">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin/recursos-humanos*') || request()->is('admin/ficha-empleado*') || request()->is('admin/aprobaciones*') || request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
+                                    <button type="button" class="h-16 inline-flex items-center px-1 pt-1 border-b-2 {{ $isRrHhActive ? 'border-indigo-500 text-indigo-600 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium' }} text-sm leading-5 focus:outline-none transition duration-150 ease-in-out">
                                         <span>{{ __('Recursos humanos') }}</span>
-                                        <svg class="ms-1.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <svg class="ms-1.5 h-4 w-4 fill-current {{ $isRrHhActive ? 'text-indigo-600' : 'text-gray-400' }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </button>
@@ -53,20 +80,30 @@
                                     
                                      @if(auth()->user()?->can('gestion_recursos_humanos'))
                                     <div x-data="{ openSub: {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'true' : 'false' }} }">
-                                        <button @click.stop="openSub = !openSub" class="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out text-start text-left">
+                                        <button @click.stop="openSub = !openSub" class="w-full flex items-center justify-between px-4 py-2 text-sm {{ (request()->is('admin/job-offers*') || request()->is('admin/job-applications*')) ? 'text-indigo-600 font-bold bg-indigo-50/70' : 'text-gray-700 hover:bg-gray-100' }} focus:outline-none transition duration-150 ease-in-out text-start text-left">
                                             <span>{{ __('Ofertas de Empleo') }}</span>
                                             <svg class="h-4 w-4 transform transition-transform duration-200" :class="{ 'rotate-90': openSub }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
                                         <div x-show="openSub" style="display: none; border-left: 4px solid #6366f1 !important; background-color: #f9fafb !important; margin: 4px 0; padding: 4px 0;">
-                                            <a href="/admin/job-offers" class="flex items-center w-full pr-4 py-2 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-offers*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}" style="padding-left: 2rem !important;">
-                                                <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                {{ __('Ver Ofertas') }}
+                                            <a href="/admin/job-offers" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ request()->is('admin/job-offers*') ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
+                                                <span class="flex items-center">
+                                                    <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
+                                                    {{ __('Ver Ofertas') }}
+                                                </span>
+                                                @if(request()->is('admin/job-offers*'))
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                                                @endif
                                             </a>
-                                            <a href="/admin/job-applications" class="flex items-center w-full pr-4 py-2 text-xs font-semibold text-gray-600 hover:text-indigo-600 hover:bg-gray-100 transition duration-150 ease-in-out {{ request()->is('admin/job-applications*') ? 'text-indigo-600 font-extrabold bg-indigo-50/50' : '' }}" style="padding-left: 2rem !important;">
-                                                <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                {{ __('Inscritos a Ofertas') }}
+                                            <a href="/admin/job-applications" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ request()->is('admin/job-applications*') ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
+                                                <span class="flex items-center">
+                                                    <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
+                                                    {{ __('Inscritos a Ofertas') }}
+                                                </span>
+                                                @if(request()->is('admin/job-applications*'))
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                                                @endif
                                             </a>
                                         </div>
                                     </div>
@@ -77,18 +114,18 @@
                     @endif
 
                     @if(auth()->user()?->can('utilizar_explorador'))
-                        <x-nav-link href="/admin/file-explorer" :active="request()->is('admin/file-explorer*')">
+                        <x-nav-link href="/admin/file-explorer" :active="$isFileExplorerActive">
                             {{ __('Explorador de Archivos') }}
                         </x-nav-link>
                     @endif
 
                     @if(auth()->user()?->canAny(['ver_informes', 'ver_analiticas', 'gestion_gasolineras', 'gestion_usuarios', 'gestion_roles', 'gestion_portada']))
-                        <div class="inline-flex items-center">
+                        <div class="inline-flex items-center h-full">
                             <x-dropdown align="left" width="60">
                                 <x-slot name="trigger">
-                                    <button class="inline-flex items-center px-1 py-2 border border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out {{ (request()->is('admin*') && !request()->is('admin/file-explorer*') && !request()->is('admin/job-offers*') && !request()->is('admin/job-applications*')) ? 'text-gray-900 font-bold border-indigo-400' : '' }}">
+                                    <button type="button" class="h-16 inline-flex items-center px-1 pt-1 border-b-2 {{ $isAdminActive ? 'border-indigo-500 text-indigo-600 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium' }} text-sm leading-5 focus:outline-none transition duration-150 ease-in-out">
                                         <span>{{ __('Administración') }}</span>
-                                        <svg class="ms-1.5 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <svg class="ms-1.5 h-4 w-4 fill-current {{ $isAdminActive ? 'text-indigo-600' : 'text-gray-400' }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </button>
@@ -96,43 +133,43 @@
 
                                 <x-slot name="content">
                                     @if(auth()->user()?->can('ver_informes'))
-                                    <x-dropdown-link href="/admin/informes">
+                                    <x-dropdown-link href="/admin/informes" :active="request()->is('admin/informes*')">
                                         {{ __('Informes') }}
                                     </x-dropdown-link>
                                     @endif
 
                                     @if(auth()->user()?->can('ver_analiticas'))
-                                    <x-dropdown-link href="/admin/analytics">
+                                    <x-dropdown-link href="/admin/analytics" :active="request()->is('admin/analytics*')">
                                         {{ __('Analítica') }}
                                     </x-dropdown-link>
                                     @endif
                                     
                                     @if(auth()->user()?->can('gestion_gasolineras'))
-                                    <x-dropdown-link href="/admin/gasolineras">
+                                    <x-dropdown-link href="/admin/gasolineras" :active="request()->is('admin/gasolineras*')">
                                         {{ __('Gasolineras') }}
                                     </x-dropdown-link>
                                     @endif
 
                                     @if(auth()->user()?->can('gestion_usuarios'))
-                                    <x-dropdown-link href="/admin/users">
+                                    <x-dropdown-link href="/admin/users" :active="request()->is('admin/users*')">
                                         {{ __('Usuarios') }}
                                     </x-dropdown-link>
                                     @endif
 
                                     @if(auth()->user()?->can('gestion_portada'))
-                                    <x-dropdown-link href="/admin/manage-home">
+                                    <x-dropdown-link href="/admin/manage-home" :active="request()->is('admin/manage-home*')">
                                         {{ __('Configuración de Portada') }}
                                     </x-dropdown-link>
                                     @endif
 
                                     @if(auth()->user()?->can('gestion_roles'))
-                                    <x-dropdown-link href="/admin/permission-matrix">
+                                    <x-dropdown-link href="/admin/permission-matrix" :active="request()->is('admin/permission-matrix*')">
                                         {{ __('Matriz de Permisos') }}
                                     </x-dropdown-link>
                                     @endif
 
                                     @if(auth()->user()?->can('gestion_roles'))
-                                    <x-dropdown-link href="/admin/roles">
+                                    <x-dropdown-link href="/admin/roles" :active="request()->is('admin/roles*')">
                                         {{ __('Roles') }}
                                     </x-dropdown-link>
                                     @endif
@@ -202,8 +239,8 @@
         @if(!auth()->user()?->mustChangePassword())
         <div class="pt-2 pb-3 space-y-1">
             @if(auth()->user()?->can('ver_dashboard'))
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    Inicio
+                <x-responsive-nav-link :href="route('dashboard')" :active="$isInicioActive">
+                    {{ __('Inicio') }}
                 </x-responsive-nav-link>
             @endif
 
