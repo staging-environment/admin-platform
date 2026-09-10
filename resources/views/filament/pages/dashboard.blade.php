@@ -398,19 +398,16 @@
                 <div class="w-1 h-4 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
                 <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(consulta cada 15 min)</span></h2>
 
-                @if(!empty($competitorAlerts))
-                    <div class="ml-2">
-                        @include('filament.components.competitor-alert-badge', ['alerts' => $competitorAlerts])
-                    </div>
-                @endif
-
                 <span class="ml-auto text-xs" style="color:#6b7280">
                     Datos oficiales · Ministerio para la Transición Ecológica (MITECO)
                 </span>
             </div>
 
             <div id="competitors-container">
-                @include('filament.pages.competitors-list', ['localityData' => $localityData])
+                @include('filament.pages.competitors-list', [
+                    'localityData' => $localityData,
+                    'competitorAlerts' => $competitorAlerts,
+                ])
             </div>
         </section>
 

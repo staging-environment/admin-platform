@@ -50,12 +50,13 @@ Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', fu
         return;
     }
 
+    // Alerta 1: Utrera (Diesel) - 2 estaciones cambiadas
     $service->recordPriceAlert([
         'id'                     => uniqid('price_alert_', true),
         'locality_key'           => 'utrera',
         'locality_name'          => 'Utrera',
         'fuel_type'              => 'diesel',
-        'fuel_label'             => 'DI?SEL',
+        'fuel_label'             => 'DIESEL',
         'stations'               => [
             [
                 'rank'       => 1,
@@ -118,5 +119,74 @@ Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', fu
         'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
     ]);
 
-    $this->info('Alerta de prueba registrada con ?xito. V?lida durante 2 horas.');
-})->purpose('Simular o limpiar una alerta de cambio de precio de la competencia');
+    // Alerta 2: Sevilla (Gasolina 95) - 1 estacion cambiada
+    $service->recordPriceAlert([
+        'id'                     => uniqid('price_alert_', true),
+        'locality_key'           => 'sevilla',
+        'locality_name'          => 'Sevilla',
+        'fuel_type'              => 'gas95',
+        'fuel_label'             => 'GASOLINA 95',
+        'stations'               => [
+            [
+                'rank'       => 1,
+                'name'       => 'PETROPRIX SEVILLA',
+                'address'    => 'AVENIDA DE LA RAZA, 14',
+                'price'      => 1.589,
+                'old_price'  => 1.599,
+                'diff'       => -0.010,
+                'diff_text'  => '-0.010',
+                'direction'  => 'baja',
+                'is_changed' => true,
+            ],
+            [
+                'rank'       => 2,
+                'name'       => 'BALLENOIL SEVILLA',
+                'address'    => 'CALLE PINO CENTRAL, 4',
+                'price'      => 1.595,
+                'old_price'  => 1.595,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+            [
+                'rank'       => 3,
+                'name'       => 'PLENOIL SEVILLA',
+                'address'    => 'CARRETERA CARMONA, 10',
+                'price'      => 1.599,
+                'old_price'  => 1.599,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+            [
+                'rank'       => 4,
+                'name'       => 'REPSOL SEVILLA ESTE',
+                'address'    => 'AVENIDA DE LAS CIENCIAS',
+                'price'      => 1.639,
+                'old_price'  => 1.639,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+            [
+                'rank'       => 5,
+                'name'       => 'CEPSA SEVILLA',
+                'address'    => 'AVENIDA DE LA PAZ, 30',
+                'price'      => 1.649,
+                'old_price'  => 1.649,
+                'diff'       => 0,
+                'diff_text'  => '',
+                'direction'  => null,
+                'is_changed' => false,
+            ],
+        ],
+        'changed_stations_count' => 1,
+        'created_at'             => now()->timestamp,
+        'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
+    ]);
+
+    $this->info('Alertas de prueba registradas con exito (Utrera y Sevilla). Validas durante 2 horas.');
+})->purpose('Simular o limpiar alertas de cambio de precio de la competencia');

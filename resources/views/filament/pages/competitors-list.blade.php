@@ -9,7 +9,10 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
     @foreach($localities as $key => $localityName)
-        @php $ldata = $localityData[$key] ?? ['diesel' => [], 'gas95' => [], 'updated_at' => null]; @endphp
+        @php 
+            $ldata = $localityData[$key] ?? ['diesel' => [], 'gas95' => [], 'updated_at' => null]; 
+            $locAlerts = collect($competitorAlerts ?? [])->where('locality_key', $key)->values()->all();
+        @endphp
 
         <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden" style="border:1px solid rgba(0,0,0,0.07)">
 
@@ -23,6 +26,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xs font-bold text-white leading-tight">{{ $localityName }}</h3>
+
+                    @if(!empty($locAlerts))
+                        @include('filament.components.competitor-alert-badge', ['alerts' => $locAlerts, 'localityName' => $localityName])
+                    @endif
                 </div>
                 <span id="updated-time-{{ $key }}" class="text-[9px] font-medium tabular-nums" style="color:#9ca3af;">
                     @if(isset($ldata['checked_at']))
