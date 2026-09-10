@@ -1,14 +1,6 @@
 <x-guest-layout>
     @php
-        $esFeriaUtrera = (function() {
-            $now = \Carbon\Carbon::now();
-            $year = $now->year;
-
-            $startFeria = \Carbon\Carbon::create($year, 9, 4, 20, 0, 0);
-            $endFeria = \Carbon\Carbon::create($year, 9, 8, 23, 59, 59);
-
-            return $now->between($startFeria, $endFeria);
-        })();
+        $esFeriaUtrera = \App\Models\HomeConfig::isFeriaUtreraActiva();
     @endphp
 
     @if($esFeriaUtrera)

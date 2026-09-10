@@ -34,3 +34,9 @@ Schedule::command('fichajes:send-missing-reminders')->dailyAt('21:00');
 Schedule::call(function () {
     \App\Models\Empleado::all()->each->actualizarAlertas();
 })->dailyAt('00:05');
+
+// ── Sincronización Anual Feria de Utrera (Portal Web Oficial / BD) ─────────────
+// Consulta por internet las fechas oficiales de la Feria y actualiza la BD.
+// Se ejecuta el 1 de Agosto de cada año a las 04:00 (y reintento el 20 de Agosto).
+Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 1, '04:00');
+Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 20, '04:00');
