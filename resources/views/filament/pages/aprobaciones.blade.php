@@ -542,7 +542,7 @@
     <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
-        <div style="width: min(960px, 95vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
+        <div style="width: min(1300px, 96vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
             
             <!-- Modal Header & Navigation Bar -->
             <div class="shrink-0 px-4 sm:px-6 py-3 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
@@ -575,7 +575,7 @@
                 <!-- Right: Search, Legend & Close -->
                 <div class="flex items-center gap-3">
                     <!-- Employee Search Filter -->
-                    <div class="relative w-36 sm:w-44">
+                    <div class="relative w-36 sm:w-52">
                         <input
                             type="text"
                             list="dl-cal-empleados"
