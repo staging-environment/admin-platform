@@ -28,9 +28,15 @@ button.fi-topbar-trigger {
 
 /* Eliminar el padding vertical excesivo (py-8 = 2rem) del contenedor de cabecera de página */
 .fi-page-header-main-ctn {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-    gap: 0.25rem !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-block-start: 0px !important;
+    padding-block-end: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    gap: 0px !important;
+    row-gap: 0px !important;
 }
 
 @media (min-width: 640px) {
@@ -342,8 +348,14 @@ button.fi-topbar-trigger {
 
 /* Cabecera (breadcrumbs + Crear empleado) compacta */
 .fi-resource-recursos-humanos .fi-header {
-    margin-bottom: 0.25rem !important;
-    gap: 0.15rem !important;
+    margin-top: 0.85rem !important;
+    margin-bottom: 0.65rem !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-block-start: 0px !important;
+    padding-block-end: 0px !important;
+    gap: 0.5rem !important;
 }
 
 /* Formulario de filtros compacto */
@@ -1002,7 +1014,14 @@ h1.fi-header-heading,
 
 .fi-page-header-main-ctn {
     padding-top: 0px !important;
-    padding-bottom: 0.15rem !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-block-start: 0px !important;
+    padding-block-end: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    gap: 0px !important;
+    row-gap: 0px !important;
 }
 
 /* 3. Títulos secundarios reducidos en todas las secciones */
@@ -1079,7 +1098,13 @@ body.fi-body .fi-header {
     margin-bottom: 0.65rem !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    gap: 0.25rem !important;
+    padding-block: 0px !important;
+    padding-block-start: 0px !important;
+    padding-block-end: 0px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
 }
 
 /* Contenedor de las migas de pan (pill moderno flotante) */

@@ -79,10 +79,10 @@ class AdminPanelProvider extends PanelProvider
                         @include('partials.pwa-tags')
                     ");
 
-                    // Estilos globales de tipografía compacta y márgenes reducidos para todas las secciones
+                    // Estilos globales de tipografía compacta, márgenes y migas de pan para todas las secciones
                     $css .= "
                     <style>
-                        /* Ocultar el título principal de página en todas las secciones */
+                        /* 1. Ocultar el título principal de página en todas las secciones */
                         .fi-header-heading,
                         h1.fi-header-heading,
                         .fi-page-header .fi-header-heading,
@@ -90,20 +90,68 @@ class AdminPanelProvider extends PanelProvider
                             display: none !important;
                         }
 
-                        /* Margen equilibrado en la cabecera de página */
+                        /* 2. Unificación total del margen superior y espaciado de layout en todas las secciones */
+                        body.fi-body .fi-layout,
+                        body.fi-body .fi-main-ctn,
+                        body.fi-body main.fi-main,
+                        body.fi-body .fi-content,
+                        body.fi-body .fi-page {
+                            padding-top: 0px !important;
+                            margin-top: 0px !important;
+                        }
+
+                        body.fi-body .fi-layout {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 0px !important;
+                            min-height: 0px !important;
+                        }
+
+                        body.fi-body .fi-main-ctn {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 0px !important;
+                            margin: 0px !important;
+                            padding: 0px !important;
+                            flex-grow: 1 !important;
+                        }
+
+                        body.fi-body .fi-page-header-main-ctn {
+                            padding-top: 0px !important;
+                            padding-bottom: 0px !important;
+                            padding-block: 0px !important;
+                            padding-block-start: 0px !important;
+                            padding-block-end: 0px !important;
+                            margin-top: 0px !important;
+                            margin-bottom: 0px !important;
+                            gap: 0px !important;
+                            row-gap: 0px !important;
+                        }
+
+                        /* 3. Margen unificado y equilibrado de la cabecera / migas de pan en todas las secciones */
+                        body.fi-body .fi-header,
                         .fi-header {
                             margin-top: 0.85rem !important;
                             margin-bottom: 0.65rem !important;
                             padding-top: 0px !important;
                             padding-bottom: 0px !important;
-                            gap: 0.25rem !important;
-                        }
-                        .fi-page-header-main-ctn {
-                            padding-top: 0.15rem !important;
-                            padding-bottom: 0.15rem !important;
+                            padding-block: 0px !important;
+                            padding-block-start: 0px !important;
+                            padding-block-end: 0px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: space-between !important;
+                            gap: 0.5rem !important;
                         }
 
-                        /* Títulos secundarios reducidos en todas las secciones */
+                        body.fi-body .fi-page-dashboard .fi-header,
+                        body.fi-body .fi-dashboard-page .fi-header {
+                            display: flex !important;
+                            margin-top: 0.85rem !important;
+                            margin-bottom: 0.65rem !important;
+                        }
+
+                        /* 4. Títulos secundarios reducidos en todas las secciones */
                         .fi-section-header-heading,
                         .fi-sc-section-header-heading,
                         .fi-ta-header-heading,
@@ -118,7 +166,7 @@ class AdminPanelProvider extends PanelProvider
                             font-weight: 700 !important;
                         }
 
-                        /* Reducción de márgenes entre bloques y secciones */
+                        /* 5. Reducción de márgenes entre bloques y secciones */
                         .fi-page-content,
                         .fi-page-content > div,
                         .fi-page > div.space-y-6 {
@@ -128,7 +176,7 @@ class AdminPanelProvider extends PanelProvider
                             margin-bottom: 0.875rem !important;
                         }
 
-                        /* 5. Tablas y listados compactos en todas las secciones */
+                        /* 6. Tablas y listados compactos en todas las secciones */
                         .fi-ta-table td,
                         .fi-ta-table th,
                         table tbody td,
@@ -139,7 +187,6 @@ class AdminPanelProvider extends PanelProvider
                             padding-right: 0.85rem !important;
                         }
 
-                        /* Títulos y textos principales en filas de listados (ej. nombre de empleado) */
                         .fi-ta-table td .fi-ta-text-item-label,
                         .fi-ta-table td .fi-ta-text-item,
                         table tbody td:first-child,
@@ -150,13 +197,11 @@ class AdminPanelProvider extends PanelProvider
                             font-weight: 600 !important;
                         }
 
-                        /* Tipografía general más compacta en el contenido de las tablas */
                         .fi-ta-table tbody tr,
                         table tbody tr {
                             font-size: 0.775rem !important; /* ~12.4px */
                         }
 
-                        /* Encabezados de tablas reducidos */
                         .fi-ta-table thead th,
                         table thead th {
                             padding-top: 0.45rem !important;
@@ -164,156 +209,147 @@ class AdminPanelProvider extends PanelProvider
                             font-size: 0.675rem !important; /* ~10.8px */
                             letter-spacing: 0.05em !important;
                         }
+
+                        /* 7. Migas de pan profesionales y elegantes (Pills) unificadas para todas las secciones */
+                        body.fi-body .fi-breadcrumbs,
+                        .fi-breadcrumbs {
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            margin: 0px !important;
+                            padding: 0px !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-list,
+                        .fi-breadcrumbs-list {
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            flex-wrap: wrap !important;
+                            gap: 0.35rem !important;
+                            padding: 0.28rem 0.75rem !important;
+                            background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%) !important;
+                            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+                            border-radius: 9999px !important;
+                            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+                            backdrop-filter: blur(8px) !important;
+                        }
+
+                        .dark body.fi-body .fi-breadcrumbs-list,
+                        .dark .fi-breadcrumbs-list {
+                            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%) !important;
+                            border-color: rgba(255, 255, 255, 0.08) !important;
+                            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25) !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item,
+                        .fi-breadcrumbs-item {
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            gap: 0.35rem !important;
+                            font-size: 0.75rem !important;
+                            line-height: 1.25 !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item-separator,
+                        .fi-breadcrumbs-item-separator {
+                            width: 0.85rem !important;
+                            height: 0.85rem !important;
+                            color: #818cf8 !important;
+                            opacity: 0.85 !important;
+                        }
+
+                        .dark body.fi-body .fi-breadcrumbs-item-separator,
+                        .dark .fi-breadcrumbs-item-separator {
+                            color: #6366f1 !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label,
+                        .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
+                            color: #4f46e5 !important;
+                            font-weight: 700 !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label::before,
+                        .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label::before {
+                            content: '' !important;
+                            display: inline-block !important;
+                            width: 6px !important;
+                            height: 6px !important;
+                            border-radius: 50% !important;
+                            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                            box-shadow: 0 0 6px rgba(99, 102, 241, 0.5) !important;
+                            margin-right: 6px !important;
+                        }
+
+                        .dark body.fi-body .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label,
+                        .dark .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
+                            color: #a5b4fc !important;
+                        }
+
+                        body.fi-body a.fi-breadcrumbs-item-label,
+                        a.fi-breadcrumbs-item-label {
+                            color: #475569 !important;
+                            font-weight: 600 !important;
+                            text-decoration: none !important;
+                            padding: 0.15rem 0.45rem !important;
+                            border-radius: 0.375rem !important;
+                            transition: all 0.15s ease-in-out !important;
+                        }
+
+                        body.fi-body a.fi-breadcrumbs-item-label:hover,
+                        a.fi-breadcrumbs-item-label:hover {
+                            color: #4338ca !important;
+                            background-color: rgba(99, 102, 241, 0.1) !important;
+                        }
+
+                        .dark body.fi-body a.fi-breadcrumbs-item-label,
+                        .dark a.fi-breadcrumbs-item-label {
+                            color: #94a3b8 !important;
+                        }
+
+                        .dark body.fi-body a.fi-breadcrumbs-item-label:hover,
+                        .dark a.fi-breadcrumbs-item-label:hover {
+                            color: #e0e7ff !important;
+                            background-color: rgba(99, 102, 241, 0.25) !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label,
+                        .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
+                            color: #3730a3 !important;
+                            font-weight: 700 !important;
+                            background-color: #e0e7ff !important;
+                            padding: 0.15rem 0.55rem !important;
+                            border-radius: 9999px !important;
+                            border: 1px solid rgba(199, 210, 254, 0.8) !important;
+                        }
+
+                        .dark body.fi-body .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label,
+                        .dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
+                            color: #e0e7ff !important;
+                            background-color: rgba(79, 70, 229, 0.25) !important;
+                            border-color: rgba(99, 102, 241, 0.4) !important;
+                        }
+
+                        body.fi-body .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label,
+                        .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
+                            color: #4338ca !important;
+                            background-color: #e0e7ff !important;
+                            border: 1px solid rgba(199, 210, 254, 0.8) !important;
+                            padding: 0.18rem 0.65rem !important;
+                            border-radius: 9999px !important;
+                            font-weight: 700 !important;
+                        }
+
+                        .dark body.fi-body .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label,
+                        .dark .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
+                            color: #e0e7ff !important;
+                            background-color: rgba(79, 70, 229, 0.25) !important;
+                            border-color: rgba(99, 102, 241, 0.4) !important;
+                        }
                     </style>
                     ";
 
-                    if (str_contains(request()->url(), 'recursos-humanos')) {
-                        $css .= "
-                        <style>
-                            .fi-main-ctn,
-                            .fi-layout,
-                            main,
-                            .fi-content {
-                                padding-top: 0px !important;
-                                margin-top: 0px !important;
-                            }
-                            .fi-layout {
-                                display: flex !important;
-                                flex-direction: column !important;
-                                grid-template-rows: 1fr !important;
-                                gap: 0 !important;
-                                min-height: 0 !important;
-                            }
-                            .fi-main-ctn {
-                                display: flex !important;
-                                flex-direction: column !important;
-                                gap: 0 !important;
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                flex-grow: 1 !important;
-                            }
-                            .fi-main {
-                                padding-top: 0px !important;
-                                margin-top: 0px !important;
-                            }
-                            .fi-header {
-                                margin-top: 0.85rem !important;
-                                padding-top: 0px !important;
-                                margin-bottom: 0.65rem !important;
-                                gap: 0.15rem !important;
-                            }
-                            .fi-page-dashboard .fi-header,
-                            .fi-dashboard-page .fi-header {
-                                display: block !important;
-                                margin-top: 0.85rem !important;
-                                margin-bottom: 0.65rem !important;
-                            }
-                            .fi-breadcrumbs {
-                                display: inline-flex !important;
-                                align-items: center !important;
-                                margin-top: 0px !important;
-                                margin-bottom: 0px !important;
-                            }
-                            .fi-breadcrumbs-list {
-                                display: inline-flex !important;
-                                align-items: center !important;
-                                flex-wrap: wrap !important;
-                                gap: 0.35rem !important;
-                                padding: 0.28rem 0.75rem !important;
-                                background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%) !important;
-                                border: 1px solid rgba(226, 232, 240, 0.95) !important;
-                                border-radius: 9999px !important;
-                                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
-                                backdrop-filter: blur(8px) !important;
-                            }
-                            .dark .fi-breadcrumbs-list {
-                                background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%) !important;
-                                border-color: rgba(255, 255, 255, 0.08) !important;
-                                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25) !important;
-                            }
-                            .fi-breadcrumbs-item {
-                                display: inline-flex !important;
-                                align-items: center !important;
-                                gap: 0.35rem !important;
-                                font-size: 0.75rem !important;
-                                line-height: 1.25 !important;
-                            }
-                            .fi-breadcrumbs-item-separator {
-                                width: 0.85rem !important;
-                                height: 0.85rem !important;
-                                color: #818cf8 !important;
-                                opacity: 0.85 !important;
-                            }
-                            .dark .fi-breadcrumbs-item-separator {
-                                color: #6366f1 !important;
-                            }
-                            .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
-                                color: #4f46e5 !important;
-                                font-weight: 700 !important;
-                                display: inline-flex !important;
-                                align-items: center !important;
-                            }
-                            .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label::before {
-                                content: '' !important;
-                                display: inline-block !important;
-                                width: 6px !important;
-                                height: 6px !important;
-                                border-radius: 50% !important;
-                                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-                                box-shadow: 0 0 6px rgba(99, 102, 241, 0.5) !important;
-                                margin-right: 6px !important;
-                            }
-                            .dark .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
-                                color: #a5b4fc !important;
-                            }
-                            a.fi-breadcrumbs-item-label {
-                                color: #475569 !important;
-                                font-weight: 600 !important;
-                                text-decoration: none !important;
-                                padding: 0.15rem 0.45rem !important;
-                                border-radius: 0.375rem !important;
-                                transition: all 0.15s ease-in-out !important;
-                            }
-                            a.fi-breadcrumbs-item-label:hover {
-                                color: #4338ca !important;
-                                background-color: rgba(99, 102, 241, 0.1) !important;
-                            }
-                            .dark a.fi-breadcrumbs-item-label {
-                                color: #94a3b8 !important;
-                            }
-                            .dark a.fi-breadcrumbs-item-label:hover {
-                                color: #e0e7ff !important;
-                                background-color: rgba(99, 102, 241, 0.25) !important;
-                            }
-                            .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
-                                color: #3730a3 !important;
-                                font-weight: 700 !important;
-                                background-color: #e0e7ff !important;
-                                padding: 0.15rem 0.55rem !important;
-                                border-radius: 9999px !important;
-                                border: 1px solid rgba(199, 210, 254, 0.8) !important;
-                            }
-                            .dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
-                                color: #e0e7ff !important;
-                                background-color: rgba(79, 70, 229, 0.25) !important;
-                                border-color: rgba(99, 102, 241, 0.4) !important;
-                            }
-                            .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
-                                color: #4338ca !important;
-                                background-color: #e0e7ff !important;
-                                border: 1px solid rgba(199, 210, 254, 0.8) !important;
-                                padding: 0.18rem 0.65rem !important;
-                                border-radius: 9999px !important;
-                                font-weight: 700 !important;
-                            }
-                            .dark .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
-                                color: #e0e7ff !important;
-                                background-color: rgba(79, 70, 229, 0.25) !important;
-                                border-color: rgba(99, 102, 241, 0.4) !important;
-                            }
-                        </style>
-                        ";
-                    }
                     return $css;
                 }
             )
