@@ -5,44 +5,6 @@
     {{-- ESTILOS INLINE DEL DASHBOARD                                       --}}
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     <style>
-        /* ------------------------------------------------------------------- */
-        /* FONDO: TEXTURA DE ASFALTO / CARRETERA & MICRO-PATRON DE REPOSTAJE   */
-        /* (Reversible: retirar o comentar este bloque para restaurar)         */
-        /* ------------------------------------------------------------------- */
-        body.fi-body,
-        body.fi-body .fi-layout,
-        body.fi-body .fi-main-ctn,
-        body.fi-body main.fi-main,
-        body.fi-body .fi-page {
-            background-color: #0b0f19 !important;
-            background-image: 
-                /* 1. Iluminacion de marquesina de repostaje: Ambar Diesel a la izquierda */
-                radial-gradient(ellipse 55% 45% at 0% 15%, rgba(245, 158, 11, 0.16) 0%, transparent 60%),
-                /* 2. Iluminacion de marquesina de repostaje: Verde Gasolina a la derecha */
-                radial-gradient(ellipse 55% 45% at 100% 15%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
-                /* 3. Reflejo profundo de hidrocarburos / noche */
-                radial-gradient(ellipse 70% 50% at 50% 95%, rgba(30, 58, 138, 0.22) 0%, transparent 65%),
-                /* 4. Micro-patron geometrico de repostaje (Puntos de telemetria y balizas) */
-                radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-                /* 5. Trama tecnica de calzada y asfalto (Lineas sutiles de bahia de repostaje a 45deg) */
-                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 24px),
-                /* 6. Base gradiente de asfalto y carretera nocturna */
-                linear-gradient(180deg, #111827 0%, #0c121e 50%, #070a12 100%) !important;
-            background-size: 
-                100% 100%,
-                100% 100%,
-                100% 100%,
-                28px 28px,
-                36px 36px,
-                100% 100% !important;
-            background-attachment: fixed !important;
-        }
-
-        /* Elevacion tecnica de tarjetas sobre el asfalto */
-        #competitors-container > div > div {
-            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
-        }
-
         /* ── Tarjeta Gasoil (Negro) ─────────────────────────────── */
         .market-card-black {
             background: linear-gradient(145deg, #06080f 0%, #0d1117 40%, #111827 100%);
