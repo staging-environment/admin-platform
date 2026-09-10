@@ -90,14 +90,16 @@ class AdminPanelProvider extends PanelProvider
                             display: none !important;
                         }
 
-                        /* Reducción de márgenes en la cabecera de página */
+                        /* Margen equilibrado en la cabecera de página */
                         .fi-header {
-                            margin-bottom: 0.25rem !important;
+                            margin-top: 0.85rem !important;
+                            margin-bottom: 0.65rem !important;
+                            padding-top: 0px !important;
                             padding-bottom: 0px !important;
                             gap: 0.25rem !important;
                         }
                         .fi-page-header-main-ctn {
-                            padding-top: 0px !important;
+                            padding-top: 0.15rem !important;
                             padding-bottom: 0.15rem !important;
                         }
 
@@ -195,13 +197,119 @@ class AdminPanelProvider extends PanelProvider
                                 margin-top: 0px !important;
                             }
                             .fi-header {
-                                margin-top: 0px !important;
+                                margin-top: 0.85rem !important;
                                 padding-top: 0px !important;
-                                margin-bottom: 0.25rem !important;
+                                margin-bottom: 0.65rem !important;
                                 gap: 0.15rem !important;
                             }
+                            .fi-page-dashboard .fi-header,
+                            .fi-dashboard-page .fi-header {
+                                display: block !important;
+                                margin-top: 0.85rem !important;
+                                margin-bottom: 0.65rem !important;
+                            }
                             .fi-breadcrumbs {
+                                display: inline-flex !important;
+                                align-items: center !important;
+                                margin-top: 0px !important;
                                 margin-bottom: 0px !important;
+                            }
+                            .fi-breadcrumbs-list {
+                                display: inline-flex !important;
+                                align-items: center !important;
+                                flex-wrap: wrap !important;
+                                gap: 0.35rem !important;
+                                padding: 0.28rem 0.75rem !important;
+                                background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%) !important;
+                                border: 1px solid rgba(226, 232, 240, 0.95) !important;
+                                border-radius: 9999px !important;
+                                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+                                backdrop-filter: blur(8px) !important;
+                            }
+                            .dark .fi-breadcrumbs-list {
+                                background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%) !important;
+                                border-color: rgba(255, 255, 255, 0.08) !important;
+                                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25) !important;
+                            }
+                            .fi-breadcrumbs-item {
+                                display: inline-flex !important;
+                                align-items: center !important;
+                                gap: 0.35rem !important;
+                                font-size: 0.75rem !important;
+                                line-height: 1.25 !important;
+                            }
+                            .fi-breadcrumbs-item-separator {
+                                width: 0.85rem !important;
+                                height: 0.85rem !important;
+                                color: #818cf8 !important;
+                                opacity: 0.85 !important;
+                            }
+                            .dark .fi-breadcrumbs-item-separator {
+                                color: #6366f1 !important;
+                            }
+                            .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
+                                color: #4f46e5 !important;
+                                font-weight: 700 !important;
+                                display: inline-flex !important;
+                                align-items: center !important;
+                            }
+                            .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label::before {
+                                content: '' !important;
+                                display: inline-block !important;
+                                width: 6px !important;
+                                height: 6px !important;
+                                border-radius: 50% !important;
+                                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+                                box-shadow: 0 0 6px rgba(99, 102, 241, 0.5) !important;
+                                margin-right: 6px !important;
+                            }
+                            .dark .fi-breadcrumbs-item:first-child .fi-breadcrumbs-item-label {
+                                color: #a5b4fc !important;
+                            }
+                            a.fi-breadcrumbs-item-label {
+                                color: #475569 !important;
+                                font-weight: 600 !important;
+                                text-decoration: none !important;
+                                padding: 0.15rem 0.45rem !important;
+                                border-radius: 0.375rem !important;
+                                transition: all 0.15s ease-in-out !important;
+                            }
+                            a.fi-breadcrumbs-item-label:hover {
+                                color: #4338ca !important;
+                                background-color: rgba(99, 102, 241, 0.1) !important;
+                            }
+                            .dark a.fi-breadcrumbs-item-label {
+                                color: #94a3b8 !important;
+                            }
+                            .dark a.fi-breadcrumbs-item-label:hover {
+                                color: #e0e7ff !important;
+                                background-color: rgba(99, 102, 241, 0.25) !important;
+                            }
+                            .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
+                                color: #3730a3 !important;
+                                font-weight: 700 !important;
+                                background-color: #e0e7ff !important;
+                                padding: 0.15rem 0.55rem !important;
+                                border-radius: 9999px !important;
+                                border: 1px solid rgba(199, 210, 254, 0.8) !important;
+                            }
+                            .dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label {
+                                color: #e0e7ff !important;
+                                background-color: rgba(79, 70, 229, 0.25) !important;
+                                border-color: rgba(99, 102, 241, 0.4) !important;
+                            }
+                            .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
+                                color: #4338ca !important;
+                                background-color: #e0e7ff !important;
+                                border: 1px solid rgba(199, 210, 254, 0.8) !important;
+                                padding: 0.18rem 0.65rem !important;
+                                border-radius: 9999px !important;
+                                font-weight: 700 !important;
+                            }
+                            .dark .fi-breadcrumbs-item:first-child:last-child .fi-breadcrumbs-item-label {
+                                color: #e0e7ff !important;
+                                background-color: rgba(79, 70, 229, 0.25) !important;
+                                border-color: rgba(99, 102, 241, 0.4) !important;
                             }
                         </style>
                         ";
