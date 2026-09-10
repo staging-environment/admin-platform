@@ -152,6 +152,13 @@ class EmpleadosTable
                     }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->filtersFormColumns(3)
+            ->filtersApplyAction(
+                fn (\Filament\Tables\Actions\Action $action) => $action
+                    ->color('success')
+                    ->extraAttributes([
+                        'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                    ])
+            )
             ->actions([
                 EditAction::make()->iconButton(),
                 \Filament\Actions\DeleteAction::make()->iconButton(),

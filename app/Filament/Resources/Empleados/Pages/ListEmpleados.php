@@ -21,7 +21,11 @@ class ListEmpleados extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('danger')
                 ->action(fn () => $this->exportPdf()),
-            CreateAction::make(),
+            CreateAction::make()
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                ]),
         ];
     }
 

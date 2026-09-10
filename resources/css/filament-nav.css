@@ -382,7 +382,23 @@ button.fi-topbar-trigger {
     min-width: 150px !important;
 }
 
-/* Ajustar el botón de aplicar filtros para que se sitúe al lado */
+/* Botón Crear Empleado en Recursos Humanos */
+.fi-resource-recursos-humanos .fi-header-actions a[href*="create"],
+.fi-resource-recursos-humanos .fi-header-actions .fi-btn-color-primary,
+.fi-resource-recursos-humanos .fi-header-actions .fi-btn-color-success {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    border-color: #16a34a !important;
+}
+
+.fi-resource-recursos-humanos .fi-header-actions a[href*="create"]:hover,
+.fi-resource-recursos-humanos .fi-header-actions .fi-btn-color-primary:hover,
+.fi-resource-recursos-humanos .fi-header-actions .fi-btn-color-success:hover {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+/* Ajustar el botón de aplicar filtros para que se sitúe al lado con fondo verde */
 .fi-resource-recursos-humanos .fi-ta-filters-actions-ctn {
     display: flex !important;
     align-items: flex-end !important;
@@ -395,6 +411,19 @@ button.fi-topbar-trigger {
     white-space: nowrap !important;
     padding: 2px 10px !important;
     font-size: 0.75rem !important;
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    border-color: #16a34a !important;
+}
+
+.fi-resource-recursos-humanos .fi-ta-filters-actions-ctn button:hover {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+.fi-resource-recursos-humanos .fi-header-actions a[href*="create"] span,
+.fi-resource-recursos-humanos .fi-ta-filters-actions-ctn button span {
+    color: #ffffff !important;
 }
 
 /* Ocultar el header de filtros redundante (contiene la palabra filtros y Resetear) o reacomodarlo */
