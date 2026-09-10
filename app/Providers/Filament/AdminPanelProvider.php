@@ -201,14 +201,98 @@ class AdminPanelProvider extends PanelProvider
                             font-weight: 700 !important;
                         }
 
-                        /* 5. Reducción de márgenes entre bloques y secciones */
+                        /* 5. Compactación global de tarjetas (cards), esquemas y secciones en todas las páginas */
+                        .fi-sc.fi-sc-has-gap,
+                        .fi-sc-flex,
+                        .fi-sc-form,
+                        .fi-sc-grid,
+                        .fi-grid,
+                        .fi-page-content-ctn,
                         .fi-page-content,
+                        .fi-page-main,
+                        form.fi-form,
+                        .fi-form,
                         .fi-page-content > div,
-                        .fi-page > div.space-y-6 {
-                            gap: 0.875rem !important;
+                        .fi-page > div.space-y-6,
+                        .ficha-empleado-container,
+                        .fi-sc-section-ctn {
+                            gap: 0.35rem !important;
+                            row-gap: 0.35rem !important;
                         }
-                        .fi-section {
-                            margin-bottom: 0.875rem !important;
+
+                        .fi-section-content .fi-sc.fi-sc-has-gap,
+                        .fi-section-content.fi-sc.fi-sc-has-gap {
+                            gap: 0.6rem !important;
+                            row-gap: 0.4rem !important;
+                        }
+
+                        .fi-section,
+                        .fi-sc-section {
+                            margin-top: 0px !important;
+                            margin-bottom: 0.35rem !important;
+                        }
+
+                        .fi-section:not(.fi-section-not-contained):not(.fi-aside) > .fi-section-header,
+                        .fi-section:not(.fi-section-not-contained).fi-compact:not(.fi-aside) > .fi-section-header,
+                        .fi-section > .fi-section-header,
+                        .fi-section-header {
+                            padding-top: 0.35rem !important;
+                            padding-bottom: 0.35rem !important;
+                            padding-block: 0.35rem !important;
+                            padding-inline: 0.85rem !important;
+                            min-height: 0px !important;
+                        }
+
+                        .fi-section:not(.fi-section-not-contained):not(.fi-divided) > .fi-section-content-ctn > .fi-section-content,
+                        .fi-section:not(.fi-section-not-contained).fi-compact:not(.fi-divided) > .fi-section-content-ctn > .fi-section-content,
+                        .fi-section .fi-section-content-ctn > .fi-section-content,
+                        .fi-section .fi-section-content,
+                        .fi-sc-section .fi-section-content,
+                        .fi-section-content {
+                            padding-top: 0.35rem !important;
+                            padding-bottom: 0.45rem !important;
+                            padding-block: 0.4rem !important;
+                            padding-inline: 0.85rem !important;
+                        }
+
+                        .fi-section:not(.fi-section-not-contained) > .fi-section-content-ctn > .fi-section-footer,
+                        .fi-section .fi-section-footer {
+                            padding-top: 0.3rem !important;
+                            padding-bottom: 0.3rem !important;
+                            padding-block: 0.3rem !important;
+                            padding-inline: 0.85rem !important;
+                        }
+
+                        .fi-section hr,
+                        .fi-sc-section hr {
+                            margin-top: 0.3rem !important;
+                            margin-bottom: 0.3rem !important;
+                            margin-block: 0.3rem !important;
+                        }
+
+                        .fi-in-entry-wrp,
+                        .fi-fo-field-wrp {
+                            margin-bottom: 0px !important;
+                            padding-top: 0px !important;
+                            padding-bottom: 0px !important;
+                        }
+
+                        .fi-in-entry-wrp-label,
+                        .fi-fo-field-wrp-label {
+                            margin-bottom: 0.1rem !important;
+                        }
+
+                        .fi-in-entry-wrp-label dt,
+                        .fi-fo-field-wrp-label label,
+                        .fi-in-entry-wrp-label span {
+                            font-size: 0.725rem !important;
+                            line-height: 1.2 !important;
+                        }
+
+                        .fi-in-text-item,
+                        .fi-in-affixes-ctn {
+                            font-size: 0.8rem !important;
+                            line-height: 1.25 !important;
                         }
 
                         /* 6. Tablas y listados compactos en todas las secciones */

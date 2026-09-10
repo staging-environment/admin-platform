@@ -1039,36 +1039,10 @@ h1.fi-header-heading,
     font-weight: 700 !important;
 }
 
-/* 4. Compactación global de secciones (cards) y reducción drástica de márgenes en todas las secciones */
-.fi-section .fi-section-content-ctn > .fi-section-content,
-.fi-section:not(.fi-section-not-contained):not(.fi-divided) > .fi-section-content-ctn > .fi-section-content,
-.fi-section .fi-section-content,
-.fi-sc-section .fi-section-content {
-    padding-top: 0.5rem !important;      /* 8px */
-    padding-bottom: 0.5rem !important;   /* 8px */
-    padding-inline: 0.85rem !important;  /* ~13.6px */
-}
-
-.fi-section > .fi-section-header,
-.fi-section:not(.fi-section-not-contained):not(.fi-aside) > .fi-section-header,
-.fi-section-header {
-    padding-top: 0.4rem !important;      /* ~6.4px */
-    padding-bottom: 0.4rem !important;   /* ~6.4px */
-    padding-inline: 0.85rem !important;  /* ~13.6px */
-}
-
-.fi-section .fi-section-footer,
-.fi-section > .fi-section-content-ctn > .fi-section-footer {
-    padding-top: 0.35rem !important;
-    padding-bottom: 0.35rem !important;
-    padding-inline: 0.85rem !important;
-}
-
-.fi-section,
-.fi-sc-section {
-    margin-bottom: 0.45rem !important;   /* Separación compacta entre tarjetas */
-}
-
+/* 4. Compactación global de tarjetas (cards), esquemas y secciones en todas las páginas */
+.fi-sc.fi-sc-has-gap,
+.fi-sc-flex,
+.fi-sc-form,
 .fi-sc-grid,
 .fi-grid,
 .fi-page-content-ctn,
@@ -1080,19 +1054,65 @@ form.fi-form,
 .fi-page > div.space-y-6,
 .ficha-empleado-container,
 .fi-sc-section-ctn {
-    row-gap: 0.45rem !important;         /* 7px de separación vertical entre secciones */
-    gap: 0.45rem !important;
+    gap: 0.35rem !important;
+    row-gap: 0.35rem !important;
+}
+
+.fi-section-content .fi-sc.fi-sc-has-gap,
+.fi-section-content.fi-sc.fi-sc-has-gap {
+    gap: 0.6rem !important;
+    row-gap: 0.4rem !important;
+}
+
+.fi-section,
+.fi-sc-section {
+    margin-top: 0px !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.fi-section:not(.fi-section-not-contained):not(.fi-aside) > .fi-section-header,
+.fi-section:not(.fi-section-not-contained).fi-compact:not(.fi-aside) > .fi-section-header,
+.fi-section > .fi-section-header,
+.fi-section-header {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+    padding-block: 0.35rem !important;
+    padding-inline: 0.85rem !important;
+    min-height: 0px !important;
+}
+
+.fi-section:not(.fi-section-not-contained):not(.fi-divided) > .fi-section-content-ctn > .fi-section-content,
+.fi-section:not(.fi-section-not-contained).fi-compact:not(.fi-divided) > .fi-section-content-ctn > .fi-section-content,
+.fi-section .fi-section-content-ctn > .fi-section-content,
+.fi-section .fi-section-content,
+.fi-sc-section .fi-section-content,
+.fi-section-content {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.45rem !important;
+    padding-block: 0.4rem !important;
+    padding-inline: 0.85rem !important;
+}
+
+.fi-section:not(.fi-section-not-contained) > .fi-section-content-ctn > .fi-section-footer,
+.fi-section .fi-section-footer {
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+    padding-block: 0.3rem !important;
+    padding-inline: 0.85rem !important;
 }
 
 .fi-section hr,
 .fi-sc-section hr {
-    margin-top: 0.45rem !important;
-    margin-bottom: 0.45rem !important;
+    margin-top: 0.3rem !important;
+    margin-bottom: 0.3rem !important;
+    margin-block: 0.3rem !important;
 }
 
 .fi-in-entry-wrp,
 .fi-fo-field-wrp {
-    margin-bottom: 0.15rem !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
 }
 
 .fi-in-entry-wrp-label,
@@ -1101,10 +1121,16 @@ form.fi-form,
 }
 
 .fi-in-entry-wrp-label dt,
-.fi-fo-field-wrp-label label {
+.fi-fo-field-wrp-label label,
+.fi-in-entry-wrp-label span {
     font-size: 0.725rem !important;
     line-height: 1.2 !important;
-    margin-bottom: 0.1rem !important;
+}
+
+.fi-in-text-item,
+.fi-in-affixes-ctn {
+    font-size: 0.8rem !important;
+    line-height: 1.25 !important;
 }
 
 /* 5. Tablas y listados compactos en todas las secciones */
