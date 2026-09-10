@@ -542,7 +542,7 @@
     <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
-        <div style="width: min(820px, 94vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
+        <div style="width: min(960px, 95vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
             
             <!-- Modal Header & Navigation Bar -->
             <div class="shrink-0 px-4 sm:px-6 py-3 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
@@ -673,10 +673,10 @@
                                         @endphp
 
                                         <div class="relative group/tip" title="{{ $tooltipText }}">
-                                            <!-- Píldora visible con iniciales pequeñas y discretas -->
-                                            <div style="{{ $pillStyle }}" class="px-1.5 py-0.5 rounded text-[7.5px] sm:text-[8px] font-bold flex items-center justify-between gap-1 leading-none shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all">
-                                                <span class="truncate font-black tracking-wider">{{ $sol['iniciales'] }}</span>
-                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $dotColor }};"></span>
+                                            <!-- Píldora visible con iniciales compactas y discretas (inline style seguro) -->
+                                            <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1; padding: 2px 4px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 transition-all">
+                                                <span class="truncate" style="font-size: 8px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['iniciales'] }}</span>
+                                                <span style="width: 4px; height: 4px; border-radius: 50%; background-color: {{ $dotColor }}; flex-shrink: 0;"></span>
                                             </div>
 
                                             <!-- Tooltip flotante enriquecido en hover -->
