@@ -5,6 +5,39 @@
     {{-- ESTILOS INLINE DEL DASHBOARD                                       --}}
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     <style>
+        /* ------------------------------------------------------------------- */
+        /* EXPERIMENTAL: FONDO ELEGANTE Y CALIDO DEL DASHBOARD                 */
+        /* (Para desactivar / revertir, simplemente borrar este bloque)        */
+        /* ------------------------------------------------------------------- */
+        body.fi-body,
+        body.fi-body .fi-layout,
+        body.fi-body .fi-main-ctn,
+        body.fi-body main.fi-main,
+        body.fi-body .fi-page {
+            background-color: #f8fafc !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.045) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.04) 0px, transparent 45%),
+                radial-gradient(at 50% 35%, rgba(245, 158, 11, 0.025) 0px, transparent 55%),
+                radial-gradient(at 80% 90%, rgba(99, 102, 241, 0.035) 0px, transparent 50%),
+                linear-gradient(180deg, #fbfcfd 0%, #f1f5f9 100%) !important;
+            background-attachment: fixed !important;
+        }
+
+        .dark body.fi-body,
+        .dark body.fi-body .fi-layout,
+        .dark body.fi-body .fi-main-ctn,
+        .dark body.fi-body main.fi-main,
+        .dark body.fi-body .fi-page {
+            background-color: #0b0f19 !important;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.09) 0px, transparent 45%),
+                radial-gradient(at 50% 35%, rgba(245, 158, 11, 0.04) 0px, transparent 55%),
+                linear-gradient(180deg, #0b0f19 0%, #030712 100%) !important;
+            background-attachment: fixed !important;
+        }
+
         /* ── Tarjeta Gasoil (Negro) ─────────────────────────────── */
         .market-card-black {
             background: linear-gradient(145deg, #06080f 0%, #0d1117 40%, #111827 100%);
