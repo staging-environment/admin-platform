@@ -542,10 +542,10 @@
     <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[88vh] max-h-[820px] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95vw] max-w-6xl h-[88vh] max-h-[850px] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
             
             <!-- Modal Header & Navigation Bar -->
-            <div class="shrink-0 px-4 py-2.5 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
+            <div class="shrink-0 px-4 sm:px-6 py-3 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
                 <!-- Left: < > Hoy -->
                 <div class="flex items-center gap-2">
                     <div class="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 shadow-2xs">
@@ -560,7 +560,7 @@
                             </svg>
                         </button>
                     </div>
-                    <button type="button" wire:click="irHoy" class="px-3 py-1 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs">
+                    <button type="button" wire:click="irHoy" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs">
                         Hoy
                     </button>
                 </div>
@@ -573,15 +573,15 @@
                 </div>
 
                 <!-- Right: Search, Legend & Close -->
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-3">
                     <!-- Employee Search Filter -->
-                    <div class="relative w-36 sm:w-44">
+                    <div class="relative w-36 sm:w-48">
                         <input
                             type="text"
                             list="dl-cal-empleados"
                             wire:model.live.debounce.300ms="calendarioEmpleado"
                             placeholder="Filtrar empleado..."
-                            class="w-full text-xs rounded-lg border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-2xs py-1 px-2 focus:ring-indigo-500 h-7"
+                            class="w-full text-xs rounded-lg border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-2xs py-1 px-2.5 focus:ring-indigo-500 h-7"
                         />
                         <datalist id="dl-cal-empleados">
                             @foreach($this->empleados as $emp)
@@ -596,16 +596,16 @@
                     </div>
 
                     <!-- Color Legend -->
-                    <div class="hidden sm:flex items-center gap-1.5 text-[9.5px]">
-                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded font-bold" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">
+                    <div class="hidden sm:flex items-center gap-1.5 text-[10px]">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">
                             <span class="w-1.5 h-1.5 rounded-full" style="background-color: #16a34a;"></span>
                             Aprobada
                         </span>
-                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded font-bold" style="background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a;">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold" style="background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a;">
                             <span class="w-1.5 h-1.5 rounded-full" style="background-color: #d97706;"></span>
                             Pendiente
                         </span>
-                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded font-bold" style="background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca;">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold" style="background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca;">
                             <span class="w-1.5 h-1.5 rounded-full" style="background-color: #dc2626;"></span>
                             Denegada
                         </span>
@@ -621,14 +621,14 @@
             </div>
 
             <!-- Weekdays Header (7 columns: lun, mar, mié, jue, vie, sáb, dom) -->
-            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));" class="shrink-0 border-b border-gray-200 dark:border-white/10 bg-gray-50/80 dark:bg-gray-900/80 text-center py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300">
-                <div class="py-1">lun</div>
-                <div class="py-1">mar</div>
-                <div class="py-1">mié</div>
-                <div class="py-1">jue</div>
-                <div class="py-1">vie</div>
-                <div class="py-1 text-gray-400 dark:text-gray-500">sáb</div>
-                <div class="py-1 text-gray-400 dark:text-gray-500">dom</div>
+            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));" class="shrink-0 border-b border-gray-200 dark:border-white/10 bg-gray-50/80 dark:bg-gray-900/80 text-center py-2 text-xs font-bold text-gray-600 dark:text-gray-300">
+                <div class="py-0.5">lun</div>
+                <div class="py-0.5">mar</div>
+                <div class="py-0.5">mié</div>
+                <div class="py-0.5">jue</div>
+                <div class="py-0.5">vie</div>
+                <div class="py-0.5 text-gray-400 dark:text-gray-500">sáb</div>
+                <div class="py-0.5 text-gray-400 dark:text-gray-500">dom</div>
             </div>
 
             <!-- Month Days Grid (7 columns x 5-6 rows) -->
@@ -641,36 +641,61 @@
                             $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-50');
                         @endphp
 
-                        <div style="min-height: 68px; max-height: 90px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-hidden">
+                        <div style="min-height: 80px; max-height: 105px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
                             <!-- Day Number Header -->
-                            <div class="flex items-center justify-between mb-0.5 leading-none">
+                            <div class="flex items-center justify-between mb-1 leading-none">
                                 <div></div>
-                                <span class="text-[10px] sm:text-[11px] font-bold {{ $isToday ? 'w-4.5 h-4.5 rounded-full flex items-center justify-center bg-indigo-600 text-white font-black shadow-xs' : ($isCurrent ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
+                                <span class="text-[10px] sm:text-[11px] font-bold {{ $isToday ? 'w-5 h-5 rounded-full flex items-center justify-center bg-indigo-600 text-white font-black shadow-xs' : ($isCurrent ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
                                     {{ $d['day'] }}
                                 </span>
                             </div>
 
                             <!-- Day Requests (Pills) -->
                             @if(!empty($d['solicitudes']))
-                                <div class="space-y-0.5 overflow-y-auto max-h-[50px] sm:max-h-[62px] pr-0.5">
+                                <div class="space-y-1 overflow-y-auto max-h-[60px] sm:max-h-[75px] pr-0.5">
                                     @foreach($d['solicitudes'] as $sol)
                                         @php
                                             $st = $sol['estado'];
                                             if ($st === 'Aprobada') {
                                                 $pillStyle = 'background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;';
+                                                $badgeStyle = 'background-color: #16a34a; color: #ffffff;';
                                                 $dotColor = '#16a34a';
                                             } elseif ($st === 'Pendiente') {
                                                 $pillStyle = 'background-color: #fffbeb; border: 1px solid #fde68a; color: #92400e;';
+                                                $badgeStyle = 'background-color: #d97706; color: #ffffff;';
                                                 $dotColor = '#d97706';
                                             } else {
                                                 $pillStyle = 'background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b;';
+                                                $badgeStyle = 'background-color: #dc2626; color: #ffffff;';
                                                 $dotColor = '#dc2626';
                                             }
+                                            $tooltipText = "Empleado: {$sol['empleado']}\nEstado: {$sol['estado']}\nPeriodo: {$sol['fechas_completas']} ({$sol['dias']} días)";
                                         @endphp
 
-                                        <div style="{{ $pillStyle }}" class="px-1 py-0.5 rounded text-[8px] sm:text-[8.5px] font-bold flex items-center justify-between gap-0.5 leading-none shadow-2xs cursor-pointer hover:opacity-85" title="{{ $sol['empleado'] }} ({{ $sol['estado'] }}: {{ $sol['fechas'] }} - {{ $sol['dias'] }} días)">
-                                            <span class="truncate font-black tracking-wider">{{ $sol['iniciales'] }}</span>
-                                            <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $dotColor }};" title="{{ $sol['estado'] }}"></span>
+                                        <div class="relative group/tip" title="{{ $tooltipText }}">
+                                            <!-- Píldora visible -->
+                                            <div style="{{ $pillStyle }}" class="px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9px] font-bold flex items-center justify-between gap-1 leading-none shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.02] transition-all">
+                                                <span class="truncate font-black tracking-wider">{{ $sol['iniciales'] }}</span>
+                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $dotColor }};"></span>
+                                            </div>
+
+                                            <!-- Tooltip flotante enriquecido en hover -->
+                                            <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 hidden group-hover/tip:flex flex-col gap-1 bg-gray-900 text-white text-[10px] rounded-xl p-2.5 shadow-2xl border border-white/10 whitespace-nowrap min-w-[210px]">
+                                                <div class="font-extrabold text-white text-[11px] border-b border-white/10 pb-1 flex items-center justify-between gap-2">
+                                                    <span class="truncate">{{ $sol['empleado'] }}</span>
+                                                    <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase" style="{{ $badgeStyle }}">
+                                                        {{ $sol['estado'] }}
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center justify-between text-gray-300 text-[10px] pt-0.5">
+                                                    <span class="text-gray-400">Periodo:</span>
+                                                    <span class="font-semibold text-white font-mono">{{ $sol['fechas_completas'] }}</span>
+                                                </div>
+                                                <div class="flex items-center justify-between text-gray-300 text-[10px]">
+                                                    <span class="text-gray-400">Duración:</span>
+                                                    <span class="font-bold text-emerald-400">{{ $sol['dias'] }} {{ $sol['dias'] == 1 ? 'día' : 'días' }}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -683,7 +708,7 @@
             <!-- Modal Footer -->
             <div class="shrink-0 px-4 py-2 bg-gray-50/80 dark:bg-gray-900/80 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
                 <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                    Navega con las flechas <span class="font-bold">‹</span> y <span class="font-bold">›</span> para cambiar de mes.
+                    Pasa el ratón sobre cualquier solicitud para ver los detalles de fechas y estado.
                 </div>
                 <button type="button" wire:click="closeCalendarioAnual" class="px-3.5 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all">
                     Cerrar

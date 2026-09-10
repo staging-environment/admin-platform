@@ -580,6 +580,7 @@ class Aprobaciones extends Page
                     $inicioCarbon = Carbon::parse($v->fecha_inicio);
                     $finCarbon = Carbon::parse($v->fecha_fin ?: $v->fecha_inicio);
                     $fechasStr = $inicioCarbon->format('d/m') . ' - ' . $finCarbon->format('d/m');
+                    $fechasCompletas = $inicioCarbon->format('d/m/Y') . ' al ' . $finCarbon->format('d/m/Y');
                     $diasCalculados = $v->dias ?: ($inicioCarbon->diffInDays($finCarbon) + 1);
 
                     $dayVacations[] = [
@@ -588,6 +589,7 @@ class Aprobaciones extends Page
                         'iniciales' => $iniciales,
                         'estado' => $estado,
                         'fechas' => $fechasStr,
+                        'fechas_completas' => $fechasCompletas,
                         'dias' => $diasCalculados,
                     ];
                 }
