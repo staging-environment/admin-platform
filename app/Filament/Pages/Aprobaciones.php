@@ -55,6 +55,7 @@ class Aprobaciones extends Page
 
     // Calendario Modal
     public bool $showCalendarioModal = false;
+    public string $calendarioVista = 'mensual'; // 'mensual' | 'anual'
     public int $calendarioAnio = 2026;
     public int $calendarioMes = 9;
     public string $calendarioEmpleado = '';
@@ -500,6 +501,108 @@ class Aprobaciones extends Page
     {
         $this->calendarioMes = (int) date('n');
         $this->calendarioAnio = (int) date('Y');
+    }
+
+    public function setCalendarioVista(string $vista): void
+    {
+        $this->calendarioVista = in_array($vista, ['mensual', 'anual']) ? $vista : 'mensual';
+    }
+
+    public function anioAnterior(): void
+    {
+        $this->calendarioAnio--;
+    }
+
+    public function anioSiguiente(): void
+    {
+        $this->calendarioAnio++;
+    }
+
+    public function getCalendarioAnualProperty(): array
+    {
+        $year = (int) ($this->calendarioAnio ?: date('Y'));
+        $startDateStr = "{$year}-01-01";
+        $endDateStr = "{$year}-12-31";
+
+        $query = EmpleadoVacacion::with('empleado')
+            ->where(function ($q) use ($startDateStr, $endDateStr) {
+                $q->whereBetween('fecha_inicio', [$startDateStr, $endDateStr])
+                  ->orWhereBetween('fecha_fin', [$startDateStr, $endDateStr])
+                  ->orWhere(function ($q2) use ($startDateStr, $endDateStr) {
+                      $q2->where('fecha_inicio', '<=', $startDateStr)
+                         ->where('fecha_fin', '>=', $endDateStr);
+                  });
+            });
+
+        if (!empty($this->calendarioEmpleado)) {
+            $search = trim($this->calendarioEmpleado);
+            $query->whereHas('empleado', function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('apellidos', 'like', "%{$search}%");
+            });
+        }
+
+        $vacaciones = $query->orderBy('fecha_inicio', 'asc')->get();
+
+        $mesesNombres = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        $meses = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $inicioMes = Carbon::create($year, $m, 1)->startOfMonth()->format('Y-m-d');
+            $finMes = Carbon::create($year, $m, 1)->endOfMonth()->format('Y-m-d');
+
+            $solicitudesMes = [];
+            foreach ($vacaciones as $v) {
+                $vInicio = $v->fecha_inicio;
+                $vFin = $v->fecha_fin ?: $v->fecha_inicio;
+
+                if ($vInicio <= $finMes && $vFin >= $inicioMes) {
+                    $rawEstado = strtolower(trim($v->estado ?? ''));
+                    if (in_array($rawEstado, ['aceptada', 'aprobada', 'aprobado', 'aceptado'])) {
+                        $estado = 'Aprobada';
+                    } elseif (in_array($rawEstado, ['rechazada', 'denegada', 'rechazado', 'denegado', 'cancelada'])) {
+                        $estado = 'Denegada';
+                    } else {
+                        $estado = 'Pendiente';
+                    }
+
+                    $nombre = $v->empleado ? $v->empleado->nombre : '';
+                    $apellidos = $v->empleado ? $v->empleado->apellidos : '';
+                    $empName = trim($nombre . ' ' . $apellidos) ?: 'Empleado';
+
+                    $inicioCarbon = Carbon::parse($v->fecha_inicio);
+                    $finCarbon = Carbon::parse($v->fecha_fin ?: $v->fecha_inicio);
+                    $fechasStr = $inicioCarbon->format('d/m') . ' - ' . $finCarbon->format('d/m');
+                    $fechasCompletas = $inicioCarbon->format('d/m/Y') . ' al ' . $finCarbon->format('d/m/Y');
+                    $diasCalculados = $v->dias ?: ($inicioCarbon->diffInDays($finCarbon) + 1);
+
+                    $solicitudesMes[] = [
+                        'id' => $v->id,
+                        'empleado' => $empName,
+                        'estado' => $estado,
+                        'fechas' => $fechasStr,
+                        'fechas_completas' => $fechasCompletas,
+                        'dias' => $diasCalculados,
+                    ];
+                }
+            }
+
+            $meses[] = [
+                'numero' => $m,
+                'nombre' => $mesesNombres[$m],
+                'solicitudes' => $solicitudesMes,
+                'total' => count($solicitudesMes),
+            ];
+        }
+
+        return [
+            'anio' => $year,
+            'meses' => $meses,
+        ];
     }
 
     public function getCalendarioProperty(): array
