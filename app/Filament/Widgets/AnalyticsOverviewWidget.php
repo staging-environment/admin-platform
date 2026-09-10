@@ -16,8 +16,9 @@ class AnalyticsOverviewWidget extends BaseWidget
             ->distinct('ip_address')
             ->count('ip_address');
             
-        // Calculate average views per visitor
+        // Calculate average views per visitor and daily average
         $avgViews = $uniqueVisitors > 0 ? round($totalViews / $uniqueVisitors, 2) : 0;
+        $dailyAvg = round($totalViews / 30, 0);
 
         return [
             Stat::make('Páginas Vistas (30d)', number_format($totalViews))
@@ -28,8 +29,8 @@ class AnalyticsOverviewWidget extends BaseWidget
                 ->description('Usuarios únicos (basado en IP diaria)')
                 ->descriptionIcon('heroicon-m-users')
                 ->color('success'),
-            Stat::make('Visitas por Usuario', $avgViews)
-                ->description('Promedio de páginas vistas por visitante')
+            Stat::make('Páginas por Visitante (30d)', $avgViews)
+                ->description("Promedio en 30 días (~{$dailyAvg} págs/día)")
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('warning'),
         ];
