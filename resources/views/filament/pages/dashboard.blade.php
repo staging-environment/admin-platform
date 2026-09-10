@@ -14,13 +14,12 @@
         body.fi-body .fi-main-ctn,
         body.fi-body main.fi-main,
         body.fi-body .fi-page {
-            background-color: #f8fafc !important;
+            background-color: #eef2f6 !important;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.045) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.04) 0px, transparent 45%),
-                radial-gradient(at 50% 35%, rgba(245, 158, 11, 0.025) 0px, transparent 55%),
-                radial-gradient(at 80% 90%, rgba(99, 102, 241, 0.035) 0px, transparent 50%),
-                linear-gradient(180deg, #fbfcfd 0%, #f1f5f9 100%) !important;
+                radial-gradient(ellipse 60% 50% at 5% 15%, rgba(245, 158, 11, 0.20) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 95% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 50% 90%, rgba(14, 165, 233, 0.12) 0%, transparent 65%),
+                linear-gradient(160deg, #f8fafc 0%, #e2e8f0 40%, #edf2f7 100%) !important;
             background-attachment: fixed !important;
         }
 
