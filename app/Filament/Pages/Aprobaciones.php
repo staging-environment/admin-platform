@@ -53,6 +53,11 @@ class Aprobaciones extends Page
     public $viewingRecord = null;
     public $viewingType = null;
 
+    // Calendario Anual Modal
+    public bool $showCalendarioModal = false;
+    public int $calendarioAnio = 2026;
+    public string $calendarioEmpleado = '';
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -452,5 +457,158 @@ class Aprobaciones extends Page
     {
         $this->viewingRecord = null;
         $this->viewingType = null;
+    }
+
+    public function openCalendarioAnual(): void
+    {
+        if (empty($this->calendarioAnio)) {
+            $this->calendarioAnio = (int) date('Y');
+        }
+        $this->showCalendarioModal = true;
+    }
+
+    public function closeCalendarioAnual(): void
+    {
+        $this->showCalendarioModal = false;
+    }
+
+    public function cambiarAnioCalendario(int $delta): void
+    {
+        $this->calendarioAnio += $delta;
+    }
+
+    public function getCalendarioAnualProperty(): array
+    {
+        $year = (int) ($this->calendarioAnio ?: date('Y'));
+        $yearStart = "$year-01-01";
+        $yearEnd = "$year-12-31";
+
+        $query = EmpleadoVacacion::with('empleado')
+            ->where(function ($q) use ($yearStart, $yearEnd) {
+                $q->whereBetween('fecha_inicio', [$yearStart, $yearEnd])
+                  ->orWhereBetween('fecha_fin', [$yearStart, $yearEnd])
+                  ->orWhere(function ($q2) use ($yearStart, $yearEnd) {
+                      $q2->where('fecha_inicio', '<=', $yearStart)
+                         ->where('fecha_fin', '>=', $yearEnd);
+                  });
+            });
+
+        if (!empty($this->calendarioEmpleado)) {
+            $search = trim($this->calendarioEmpleado);
+            $query->whereHas('empleado', function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('apellidos', 'like', "%{$search}%");
+            });
+        }
+
+        $vacaciones = $query->orderBy('fecha_inicio', 'asc')->get();
+
+        $mesesNombres = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        $meses = [];
+
+        for ($m = 1; $m <= 12; $m++) {
+            $startOfMonth = Carbon::create($year, $m, 1);
+            $daysInMonth = $startOfMonth->daysInMonth;
+            $firstDayOfWeek = $startOfMonth->dayOfWeekIso; // 1 (Mon) to 7 (Sun)
+            $leadingEmptyDays = $firstDayOfWeek - 1;
+
+            $monthStartStr = sprintf('%04d-%02d-01', $year, $m);
+            $monthEndStr = sprintf('%04d-%02d-%02d', $year, $m, $daysInMonth);
+
+            $monthVacations = $vacaciones->filter(function ($v) use ($monthStartStr, $monthEndStr) {
+                $fin = $v->fecha_fin ?: $v->fecha_inicio;
+                return $v->fecha_inicio <= $monthEndStr && $fin >= $monthStartStr;
+            });
+
+            $aprobadasCount = 0;
+            $pendientesCount = 0;
+            $denegadasCount = 0;
+            $solicitudes = [];
+
+            foreach ($monthVacations as $v) {
+                $estado = in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente');
+                if ($estado === 'Aprobada') $aprobadasCount++;
+                elseif ($estado === 'Pendiente') $pendientesCount++;
+                else $denegadasCount++;
+
+                $empName = $v->empleado ? ($v->empleado->nombre . ' ' . $v->empleado->apellidos) : 'Empleado';
+                $fechasStr = Carbon::parse($v->fecha_inicio)->format('d/m') . ' - ' . ($v->fecha_fin ? Carbon::parse($v->fecha_fin)->format('d/m') : Carbon::parse($v->fecha_inicio)->format('d/m'));
+
+                $solicitudes[] = [
+                    'id' => $v->id,
+                    'empleado' => $empName,
+                    'fechas' => $fechasStr,
+                    'dias' => $v->dias ?: (Carbon::parse($v->fecha_inicio)->diffInDays(Carbon::parse($v->fecha_fin ?: $v->fecha_inicio)) + 1),
+                    'estado' => $estado,
+                    'tipo' => $v->tipo ?: 'Vacaciones',
+                ];
+            }
+
+            $days = [];
+            for ($d = 1; $d <= $daysInMonth; $d++) {
+                $dateStr = sprintf('%04d-%02d-%02d', $year, $m, $d);
+                $dayVacations = [];
+                $hasAprobada = false;
+                $hasPendiente = false;
+                $hasDenegada = false;
+
+                foreach ($monthVacations as $v) {
+                    $fin = $v->fecha_fin ?: $v->fecha_inicio;
+                    if ($dateStr >= $v->fecha_inicio && $dateStr <= $fin) {
+                        $estado = in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente');
+                        if ($estado === 'Aprobada') $hasAprobada = true;
+                        elseif ($estado === 'Pendiente') $hasPendiente = true;
+                        else $hasDenegada = true;
+
+                        $empName = $v->empleado ? ($v->empleado->nombre . ' ' . $v->empleado->apellidos) : 'Empleado';
+                        $dayVacations[] = [
+                            'empleado' => $empName,
+                            'estado' => $estado,
+                            'tipo' => $v->tipo ?: 'Vacaciones',
+                        ];
+                    }
+                }
+
+                $status = null;
+                if ($hasAprobada) $status = 'Aprobada';
+                elseif ($hasPendiente) $status = 'Pendiente';
+                elseif ($hasDenegada) $status = 'Denegada';
+
+                $tooltip = '';
+                if (!empty($dayVacations)) {
+                    $lines = array_map(fn($item) => "{$item['empleado']} ({$item['estado']})", $dayVacations);
+                    $tooltip = implode(' | ', $lines);
+                }
+
+                $days[$d] = [
+                    'day' => $d,
+                    'date' => $dateStr,
+                    'status' => $status,
+                    'count' => count($dayVacations),
+                    'tooltip' => $tooltip,
+                    'items' => $dayVacations,
+                ];
+            }
+
+            $meses[$m] = [
+                'numero' => $m,
+                'nombre' => $mesesNombres[$m],
+                'daysInMonth' => $daysInMonth,
+                'leadingEmptyDays' => $leadingEmptyDays,
+                'aprobadas' => $aprobadasCount,
+                'pendientes' => $pendientesCount,
+                'denegadas' => $denegadasCount,
+                'total' => count($monthVacations),
+                'days' => $days,
+                'solicitudes' => $solicitudes,
+            ];
+        }
+
+        return $meses;
     }
 }

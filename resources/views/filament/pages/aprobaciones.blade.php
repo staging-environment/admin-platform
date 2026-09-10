@@ -221,6 +221,16 @@
                     </button>
                 </div>
                 @endif
+
+                {{-- Botón Calendario Anual --}}
+                <div class="self-end ml-auto">
+                    <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Calendario Anual</span>
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -528,4 +538,214 @@
         </div>
     </div>
     @endif
+
+    <!-- Modal Calendario Anual de Vacaciones (Flotante) -->
+    @if($showCalendarioModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/60 backdrop-blur-sm" wire:click.self="closeCalendarioAnual">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-7xl max-h-[94vh] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-gray-50/70 dark:bg-gray-900/70">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 bg-indigo-500/10 text-indigo-600 rounded-2xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+                            Calendario Anual de Vacaciones
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Consulta mes a mes las vacaciones aprobadas, pendientes y denegadas
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" wire:click="closeCalendarioAnual" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Toolbar: Year Navigator, Employee Filter, Legend -->
+            <div class="px-6 py-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <!-- Year Navigator -->
+                <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800/80 p-1 rounded-2xl">
+                    <button type="button" wire:click="cambiarAnioCalendario(-1)" class="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-xl transition-all text-gray-600 dark:text-gray-300 shadow-none hover:shadow-sm" title="Año anterior">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <span class="px-3 font-black text-sm text-gray-900 dark:text-white tracking-wide">
+                        {{ $calendarioAnio }}
+                    </span>
+                    <button type="button" wire:click="cambiarAnioCalendario(1)" class="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-xl transition-all text-gray-600 dark:text-gray-300 shadow-none hover:shadow-sm" title="Año siguiente">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Employee Filter -->
+                <div class="flex items-center gap-2 min-w-[220px] grow md:grow-0">
+                    <input
+                        type="text"
+                        list="dl-cal-empleados"
+                        wire:model.live.debounce.300ms="calendarioEmpleado"
+                        placeholder="Buscar por empleado..."
+                        class="w-full text-xs rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm py-1.5 px-3 focus:ring-indigo-500"
+                    />
+                    <datalist id="dl-cal-empleados">
+                        @foreach($this->empleados as $emp)
+                            <option value="{{ $emp->nombre }} {{ $emp->apellidos }}"></option>
+                        @endforeach
+                    </datalist>
+                    @if($calendarioEmpleado)
+                        <button type="button" wire:click="$set('calendarioEmpleado', '')" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 font-bold" title="Quitar filtro">
+                            ✕
+                        </button>
+                    @endif
+                </div>
+
+                <!-- Color Legend -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800/40">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        Aprobadas
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[11px] font-bold border border-amber-200 dark:border-amber-800/40">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        Pendientes
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 text-[11px] font-bold border border-rose-200 dark:border-rose-800/40">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        Denegadas
+                    </span>
+                </div>
+            </div>
+
+            <!-- Modal Content: 12 Months Grid -->
+            <div class="p-6 overflow-y-auto max-h-[72vh] space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    @foreach($this->calendarioAnual as $mes)
+                        <div class="bg-gray-50/60 dark:bg-white/[0.02] rounded-2xl p-3.5 border border-gray-100 dark:border-white/5 flex flex-col justify-between hover:border-indigo-200 dark:hover:border-indigo-800/40 transition-all shadow-sm">
+                            
+                            <div>
+                                <!-- Month Header -->
+                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-100 dark:border-white/5">
+                                    <h4 class="font-black text-sm text-gray-800 dark:text-gray-100 tracking-tight">
+                                        {{ $mes['nombre'] }}
+                                    </h4>
+                                    <div class="flex items-center gap-1">
+                                        @if($mes['aprobadas'] > 0)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-white" title="{{ $mes['aprobadas'] }} aprobadas">
+                                                {{ $mes['aprobadas'] }}
+                                            </span>
+                                        @endif
+                                        @if($mes['pendientes'] > 0)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500 text-white" title="{{ $mes['pendientes'] }} pendientes">
+                                                {{ $mes['pendientes'] }}
+                                            </span>
+                                        @endif
+                                        @if($mes['denegadas'] > 0)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500 text-white" title="{{ $mes['denegadas'] }} denegadas">
+                                                {{ $mes['denegadas'] }}
+                                            </span>
+                                        @endif
+                                        @if($mes['total'] === 0)
+                                            <span class="text-[10px] text-gray-300 dark:text-gray-600 font-medium">
+                                                —
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Weekday headers -->
+                                <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 mb-1">
+                                    <span>L</span>
+                                    <span>M</span>
+                                    <span>X</span>
+                                    <span>J</span>
+                                    <span>V</span>
+                                    <span class="text-indigo-400">S</span>
+                                    <span class="text-indigo-400">D</span>
+                                </div>
+
+                                <!-- Days Grid -->
+                                <div class="grid grid-cols-7 gap-1 text-center text-[11px]">
+                                    {{-- Empty leading days --}}
+                                    @for($i = 0; $i < $mes['leadingEmptyDays']; $i++)
+                                        <div class="h-6"></div>
+                                    @endfor
+
+                                    {{-- Month days --}}
+                                    @foreach($mes['days'] as $d)
+                                        @php
+                                            $hasVacation = !empty($d['status']);
+                                            $bgClass = 'text-gray-700 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/10';
+                                            if ($d['status'] === 'Aprobada') {
+                                                $bgClass = 'bg-emerald-500 text-white font-black shadow-sm';
+                                            } elseif ($d['status'] === 'Pendiente') {
+                                                $bgClass = 'bg-amber-400 text-amber-950 font-black shadow-sm';
+                                            } elseif ($d['status'] === 'Denegada') {
+                                                $bgClass = 'bg-rose-500 text-white font-black shadow-sm';
+                                            }
+                                        @endphp
+                                        <div
+                                            class="h-6 flex items-center justify-center rounded-lg transition-all {{ $bgClass }} cursor-default"
+                                            @if($hasVacation) title="{{ $d['day'] }} {{ $mes['nombre'] }}: {{ $d['tooltip'] }}" @endif
+                                        >
+                                            {{ $d['day'] }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- List of requests for this month -->
+                            @if(!empty($mes['solicitudes']))
+                                <div class="mt-3 pt-2 border-t border-gray-100 dark:border-white/5 space-y-1.5">
+                                    @foreach($mes['solicitudes'] as $sol)
+                                        @php
+                                            $pillClass = 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40';
+                                            $badgeClass = 'bg-emerald-500 text-white';
+                                            if ($sol['estado'] === 'Pendiente') {
+                                                $pillClass = 'bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800/40';
+                                                $badgeClass = 'bg-amber-500 text-white';
+                                            } elseif ($sol['estado'] === 'Denegada') {
+                                                $pillClass = 'bg-rose-50 text-rose-900 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800/40';
+                                                $badgeClass = 'bg-rose-500 text-white';
+                                            }
+                                        @endphp
+                                        <div class="p-1.5 rounded-xl border text-[10px] flex items-center justify-between gap-1.5 {{ $pillClass }}">
+                                            <div class="truncate">
+                                                <strong class="block truncate leading-tight">{{ $sol['empleado'] }}</strong>
+                                                <span class="text-[9px] opacity-75">{{ $sol['fechas'] }} ({{ $sol['dias'] }}d)</span>
+                                            </div>
+                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase shrink-0 {{ $badgeClass }}">
+                                                {{ $sol['estado'] }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 bg-gray-50/70 dark:bg-gray-900/70 border-t border-gray-100 dark:border-white/5 flex items-center justify-end">
+                <button type="button" wire:click="closeCalendarioAnual" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-bold transition-all">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </x-filament-panels::page>
+
