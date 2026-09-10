@@ -13,11 +13,11 @@ class BeneficiosChart extends ChartWidget
     public ?Gasolinera $record = null;
     public ?int $gasolineraCodigo = null;
 
-    protected ?string $heading = 'Beneficios (€)';
+    protected ?string $heading = 'Beneficios';
 
     protected int | string | array $columnSpan = 'full';
 
-    protected ?string $maxHeight = '260px';
+    protected ?string $maxHeight = '240px';
 
     public ?string $filter = '6';
 
@@ -34,6 +34,12 @@ class BeneficiosChart extends ChartWidget
             $this->gasolineraCodigo = (int) $record;
             $this->record = Gasolinera::find($this->gasolineraCodigo);
         }
+    }
+
+    public function setTipoNegocio(string $tipo): void
+    {
+        $this->tipoNegocio = $tipo;
+        $this->cachedData = null;
     }
 
     public function updatedFilter(): void

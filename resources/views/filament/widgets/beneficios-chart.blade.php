@@ -18,24 +18,41 @@
         :collapsible="$isCollapsible"
     >
         <x-slot name="afterHeader">
-            <div class="flex flex-wrap items-center gap-2">
-                <x-filament::input.wrapper class="fi-wi-chart-filter">
-                    <x-filament::input.select wire:model.live="tipoNegocio">
-                        <option value="total">📊 Todo</option>
-                        <option value="combustible">⛽ Combustibles</option>
-                        <option value="tienda">🛒 Tienda / Lavadero</option>
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-
-                <x-filament::input.wrapper class="fi-wi-chart-filter">
-                    <x-filament::input.select wire:model.live="filter">
-                        <option value="6">Últimos 6 meses</option>
-                        <option value="12">Últimos 12 meses</option>
-                        <option value="year">Año actual ({{ date('Y') }})</option>
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </div>
+            <x-filament::input.wrapper class="fi-wi-chart-filter">
+                <x-filament::input.select wire:model.live="filter">
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                    <option value="year">Año {{ date('Y') }}</option>
+                </x-filament::input.select>
+            </x-filament::input.wrapper>
         </x-slot>
+
+        <!-- Segmented control for business area -->
+        <div class="mb-3">
+            <div class="grid grid-cols-3 gap-1 p-1 bg-gray-100 dark:bg-gray-800/80 rounded-lg text-xs font-medium">
+                <button
+                    type="button"
+                    wire:click="setTipoNegocio('total')"
+                    class="py-1 px-1 rounded-md transition-all text-center {{ $tipoNegocio === 'total' ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}"
+                >
+                    Todo
+                </button>
+                <button
+                    type="button"
+                    wire:click="setTipoNegocio('combustible')"
+                    class="py-1 px-1 rounded-md transition-all text-center {{ $tipoNegocio === 'combustible' ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}"
+                >
+                    Combustible
+                </button>
+                <button
+                    type="button"
+                    wire:click="setTipoNegocio('tienda')"
+                    class="py-1 px-1 rounded-md transition-all text-center {{ $tipoNegocio === 'tienda' ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm font-semibold' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' }}"
+                >
+                    Tienda
+                </button>
+            </div>
+        </div>
 
         <div
             @if ($pollingInterval = $this->getPollingInterval())
