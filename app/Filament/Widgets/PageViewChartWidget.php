@@ -26,10 +26,11 @@ class PageViewChartWidget extends ChartWidget
     protected function getData(): array
     {
         $days = (int) ($this->filter ?? 30);
+        $startDate = now()->subDays($days - 1)->startOfDay();
         
         $data = PageView::publicPortal()
             ->selectRaw('DATE(created_at) as date, count(*) as count, count(distinct ip_address) as unique_count')
-            ->where('created_at', '>=', now()->subDays($days))
+            ->where('created_at', '>=', $startDate)
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -40,8 +41,12 @@ class PageViewChartWidget extends ChartWidget
         }
 
         foreach ($data as $row) {
-            $dates->put($row->date, ['visits' => $row->count, 'unique' => $row->unique_count]);
+            if ($dates->has($row->date)) {
+                $dates->put($row->date, ['visits' => $row->count, 'unique' => $row->unique_count]);
+            }
         }
+
+        $dates = $dates->sortKeys();
 
         return [
             'datasets' => [
