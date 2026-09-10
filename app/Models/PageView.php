@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,6 +25,16 @@ class PageView extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
+
+    /**
+     * Scope query to only include public portal visits (exclude admin and logged-in employee visits).
+     */
+    public function scopePublicPortal(Builder $query): Builder
+    {
+        return $query->whereNull('user_id')
+            ->where('path', 'not like', '/admin%')
+            ->where('path', 'not like', 'admin%');
+    }
 
     /**
      * Get the user who visited the page, if authenticated.

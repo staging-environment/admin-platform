@@ -8,7 +8,7 @@ use Filament\Widgets\ChartWidget;
 
 class PageViewChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Historial de Visitas';
+    protected ?string $heading = 'Historial de Visitas (Portal Público)';
 
     protected int | string | array $columnSpan = 'full';
 
@@ -27,7 +27,8 @@ class PageViewChartWidget extends ChartWidget
     {
         $days = (int) ($this->filter ?? 30);
         
-        $data = PageView::selectRaw('DATE(created_at) as date, count(*) as count, count(distinct ip_address) as unique_count')
+        $data = PageView::publicPortal()
+            ->selectRaw('DATE(created_at) as date, count(*) as count, count(distinct ip_address) as unique_count')
             ->where('created_at', '>=', now()->subDays($days))
             ->groupBy('date')
             ->orderBy('date')

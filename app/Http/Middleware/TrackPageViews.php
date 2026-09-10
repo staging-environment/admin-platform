@@ -23,10 +23,17 @@ class TrackPageViews
             !$request->ajax() && 
             !$request->wantsJson()) {
             
+            // Do not track authenticated users (employees / internal users)
+            if (auth()->check()) {
+                return $response;
+            }
+
             $path = $request->path();
 
-            // Exclude system paths
+            // Exclude admin panel and system paths
             $excludes = [
+                'admin',
+                'admin/*',
                 'livewire/*',
                 'api/*',
                 'debug-*',
@@ -34,7 +41,7 @@ class TrackPageViews
                 'vendor/*',
                 'build/*',
                 '_debugbar/*',
-                'up' // Health check
+                'up', // Health check
             ];
 
             foreach ($excludes as $exclude) {
@@ -53,7 +60,7 @@ class TrackPageViews
                     'path' => '/' . ltrim($path, '/'),
                     'ip_address' => $hashedIp,
                     'user_agent' => substr($request->userAgent(), 0, 500),
-                    'user_id' => auth()->id(),
+                    'user_id' => null,
                     'created_at' => now(),
                 ]);
             } catch (\Exception $e) {

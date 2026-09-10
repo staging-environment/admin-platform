@@ -9,7 +9,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class MostVisitedPagesWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Páginas Más Visitadas (Top 15)';
+    protected static ?string $heading = 'Páginas Más Visitadas (Portal Público)';
 
     protected int | string | array $columnSpan = 'full';
 
@@ -17,7 +17,7 @@ class MostVisitedPagesWidget extends BaseWidget
     {
         return $table
             ->query(
-                PageView::query()
+                PageView::publicPortal()
                     ->selectRaw('path, count(*) as visits_count, count(distinct ip_address) as unique_visitors_count')
                     ->groupBy('path')
             )
