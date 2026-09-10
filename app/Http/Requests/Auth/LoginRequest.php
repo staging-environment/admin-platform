@@ -52,9 +52,9 @@ class LoginRequest extends FormRequest
 
         $user = Auth::user();
         if ($user) {
-            $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+            $empleado = \App\Models\Empleado::withTrashed()->whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
             if ($empleado) {
-                if ($empleado->estado === 'Baja') {
+                if ($empleado->estado === 'Baja' || $empleado->trashed()) {
                     Auth::logout();
                     $this->session()->invalidate();
                     $this->session()->regenerateToken();

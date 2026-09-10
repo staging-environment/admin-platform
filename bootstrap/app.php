@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\TrackPageViews::class,
             \App\Http\Middleware\EnsurePasswordIsChanged::class,
+            \App\Http\Middleware\EnsureUserIsNotBaja::class,
         ]);
 
         // AÑADE ESTA LÍNEA AQUÍ:

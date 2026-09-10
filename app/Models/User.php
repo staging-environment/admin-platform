@@ -50,9 +50,9 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
 
     public function canAccessPanel(Panel $panel): bool
     {
-        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($this->email)])->first();
+        $empleado = \App\Models\Empleado::withTrashed()->whereRaw('LOWER(email) = ?', [strtolower($this->email)])->first();
         if ($empleado) {
-            if ($empleado->estado === 'Baja' || $empleado->estaSuspendido()) {
+            if ($empleado->estado === 'Baja' || $empleado->trashed() || $empleado->estaSuspendido()) {
                 return false;
             }
         }

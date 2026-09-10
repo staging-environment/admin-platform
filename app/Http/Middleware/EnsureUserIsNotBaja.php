@@ -17,16 +17,28 @@ class EnsureUserIsNotBaja
         $user = Auth::user();
 
         if ($user) {
-            $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+            // Superadmin bypass
+            if ($user->id === 1 || $user->email === 'jarodriguezbonilla@gmail.com') {
+                return $next($request);
+            }
+
+            // Permitir logout siempre
+            if ($request->is('logout') || $request->is('admin/logout')) {
+                return $next($request);
+            }
+
+            $empleado = \App\Models\Empleado::withTrashed()
+                ->whereRaw('LOWER(email) = ?', [strtolower($user->email)])
+                ->first();
 
             if ($empleado) {
-                if ($empleado->estado === 'Baja') {
+                if ($empleado->estado === 'Baja' || $empleado->trashed()) {
                     Auth::logout();
                     $request->session()->invalidate();
                     $request->session()->regenerateToken();
 
                     return redirect()->route('filament.admin.auth.login')->withErrors([
-                        'email' => 'Tu usuario se encuentra dado de baja en el sistema. El acceso ha sido bloqueado.',
+                        'email' => 'Tu usuario se encuentra dado de baja en la empresa. El acceso ha sido bloqueado.',
                     ]);
                 }
 
