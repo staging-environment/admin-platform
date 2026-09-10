@@ -6,35 +6,41 @@
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     <style>
         /* ------------------------------------------------------------------- */
-        /* EXPERIMENTAL: FONDO ELEGANTE Y CALIDO DEL DASHBOARD                 */
-        /* (Para desactivar / revertir, simplemente borrar este bloque)        */
+        /* FONDO: TEXTURA DE ASFALTO / CARRETERA & MICRO-PATRON DE REPOSTAJE   */
+        /* (Reversible: retirar o comentar este bloque para restaurar)         */
         /* ------------------------------------------------------------------- */
         body.fi-body,
         body.fi-body .fi-layout,
         body.fi-body .fi-main-ctn,
         body.fi-body main.fi-main,
         body.fi-body .fi-page {
-            background-color: #eef2f6 !important;
+            background-color: #0b0f19 !important;
             background-image: 
-                radial-gradient(ellipse 60% 50% at 5% 15%, rgba(245, 158, 11, 0.20) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 95% 15%, rgba(16, 185, 129, 0.18) 0%, transparent 60%),
-                radial-gradient(ellipse 70% 50% at 50% 90%, rgba(14, 165, 233, 0.12) 0%, transparent 65%),
-                linear-gradient(160deg, #f8fafc 0%, #e2e8f0 40%, #edf2f7 100%) !important;
+                /* 1. Iluminacion de marquesina de repostaje: Ambar Diesel a la izquierda */
+                radial-gradient(ellipse 55% 45% at 0% 15%, rgba(245, 158, 11, 0.16) 0%, transparent 60%),
+                /* 2. Iluminacion de marquesina de repostaje: Verde Gasolina a la derecha */
+                radial-gradient(ellipse 55% 45% at 100% 15%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
+                /* 3. Reflejo profundo de hidrocarburos / noche */
+                radial-gradient(ellipse 70% 50% at 50% 95%, rgba(30, 58, 138, 0.22) 0%, transparent 65%),
+                /* 4. Micro-patron geometrico de repostaje (Puntos de telemetria y balizas) */
+                radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+                /* 5. Trama tecnica de calzada y asfalto (Lineas sutiles de bahia de repostaje a 45deg) */
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 24px),
+                /* 6. Base gradiente de asfalto y carretera nocturna */
+                linear-gradient(180deg, #111827 0%, #0c121e 50%, #070a12 100%) !important;
+            background-size: 
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                28px 28px,
+                36px 36px,
+                100% 100% !important;
             background-attachment: fixed !important;
         }
 
-        .dark body.fi-body,
-        .dark body.fi-body .fi-layout,
-        .dark body.fi-body .fi-main-ctn,
-        .dark body.fi-body main.fi-main,
-        .dark body.fi-body .fi-page {
-            background-color: #0b0f19 !important;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.09) 0px, transparent 45%),
-                radial-gradient(at 50% 35%, rgba(245, 158, 11, 0.04) 0px, transparent 55%),
-                linear-gradient(180deg, #0b0f19 0%, #030712 100%) !important;
-            background-attachment: fixed !important;
+        /* Elevacion tecnica de tarjetas sobre el asfalto */
+        #competitors-container > div > div {
+            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
         }
 
         /* ── Tarjeta Gasoil (Negro) ─────────────────────────────── */
