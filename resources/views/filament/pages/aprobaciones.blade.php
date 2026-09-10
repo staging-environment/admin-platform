@@ -222,13 +222,13 @@
                 </div>
                 @endif
 
-                {{-- Botón Calendario Anual --}}
+                {{-- Botón Calendario Vacaciones --}}
                 <div class="self-end ml-auto">
                     <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>Calendario Anual</span>
+                        <span>Calendario vacaciones</span>
                     </button>
                 </div>
             </div>
