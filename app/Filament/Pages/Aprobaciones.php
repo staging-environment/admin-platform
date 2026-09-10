@@ -16,8 +16,8 @@ class Aprobaciones extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-check-badge';
 
-    protected static ?string $navigationLabel = 'Aprobación de Solicitudes';
-    protected static ?string $title = 'Aprobación de Solicitudes';
+    protected static ?string $navigationLabel = 'Vacaciones';
+    protected static ?string $title = 'Vacaciones';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Administración';
     protected static ?int $navigationSort = 4;
