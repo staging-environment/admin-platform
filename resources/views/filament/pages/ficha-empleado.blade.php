@@ -161,9 +161,9 @@
                                                     @endif
                                                 </div>
                                                 @if($fichaje->server_checkin_at)
-                                                    <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px]" title="Hora real del sistema: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
+                                                    <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px] whitespace-nowrap" title="Hora real del sistema: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
                                                         <svg class="w-2.5 h-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                        Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('H:i:s') }}
+                                                        Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -183,9 +183,9 @@
                                                         @endif
                                                     </div>
                                                     @if($fichaje->server_checkout_at)
-                                                        <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px]" title="Hora real del sistema: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
+                                                        <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px] whitespace-nowrap" title="Hora real del sistema: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
                                                             <svg class="w-2.5 h-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                            Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('H:i:s') }}
+                                                            Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -610,9 +610,9 @@
                                                 @endif
                                             </div>
                                             @if($isAdmin && $fichaje->server_checkin_at)
-                                                <span class="inline-flex items-center gap-1 text-[10.5px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono w-fit" title="Hora real registrada por el sistema: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
+                                                <span class="inline-flex items-center gap-1 text-[10.5px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono w-fit whitespace-nowrap" title="Hora real registrada por el sistema: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
                                                     <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                    Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('H:i:s') }}
+                                                    Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -632,9 +632,9 @@
                                                     @endif
                                                 </div>
                                                 @if($isAdmin && $fichaje->server_checkout_at)
-                                                    <span class="inline-flex items-center gap-1 text-[10.5px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono w-fit" title="Hora real registrada por el sistema: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
+                                                    <span class="inline-flex items-center gap-1 text-[10.5px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded font-mono w-fit whitespace-nowrap" title="Hora real registrada por el sistema: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
                                                         <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                        Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('H:i:s') }}
+                                                        Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
                                                     </span>
                                                 @endif
                                             </div>
