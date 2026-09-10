@@ -719,29 +719,11 @@
                                                 $tooltipText = "Empleado: {$sol['empleado']}\nEstado: {$sol['estado']}\nPeriodo: {$sol['fechas_completas']} ({$sol['dias']} días)";
                                             @endphp
 
-                                            <div class="relative group/tip" title="{{ $tooltipText }}">
+                                            <div title="{{ $tooltipText }}">
                                                 <!-- Píldora visible con nombre completo del empleado (fuente fina 8px) -->
                                                 <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1; padding: 2px 5px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 transition-all">
                                                     <span class="truncate" style="font-size: 8px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['empleado'] }}</span>
                                                     <span style="width: 4px; height: 4px; border-radius: 50%; background-color: {{ $dotColor }}; flex-shrink: 0;"></span>
-                                                </div>
-
-                                                <!-- Tooltip flotante enriquecido en hover -->
-                                                <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 hidden group-hover/tip:flex flex-col gap-1 bg-gray-900 text-white text-[10px] rounded-xl p-2.5 shadow-2xl border border-white/10 whitespace-nowrap min-w-[210px]">
-                                                    <div class="font-extrabold text-white text-[11px] border-b border-white/10 pb-1 flex items-center justify-between gap-2">
-                                                        <span class="truncate">{{ $sol['empleado'] }}</span>
-                                                        <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase" style="{{ $badgeStyle }}">
-                                                            {{ $sol['estado'] }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="flex items-center justify-between text-gray-300 text-[10px] pt-0.5">
-                                                        <span class="text-gray-400">Periodo:</span>
-                                                        <span class="font-semibold text-white font-mono">{{ $sol['fechas_completas'] }}</span>
-                                                    </div>
-                                                    <div class="flex items-center justify-between text-gray-300 text-[10px]">
-                                                        <span class="text-gray-400">Duración:</span>
-                                                        <span class="font-bold text-emerald-400">{{ $sol['dias'] }} {{ $sol['dias'] == 1 ? 'día' : 'días' }}</span>
-                                                    </div>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -798,31 +780,13 @@
                                             $tooltipText = "Empleado: {$sol['empleado']}\nEstado: {$sol['estado']}\nPeriodo: {$sol['fechas_completas']} ({$sol['dias']} días)";
                                         @endphp
 
-                                        <div class="relative group/tip" title="{{ $tooltipText }}">
+                                        <div title="{{ $tooltipText }}">
                                             <!-- Píldora visible con nombre completo del empleado (fuente fina 8px) -->
                                             <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1.1; padding: 2.5px 6px; border-radius: 4px;" class="flex items-center justify-between gap-1.5 shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all">
                                                 <span class="truncate font-bold tracking-tight" style="font-size: 8px;">{{ $sol['empleado'] }}</span>
                                                 <div class="flex items-center gap-1 shrink-0">
                                                     <span class="text-[7.5px] opacity-75 font-mono">{{ $sol['fechas'] }}</span>
                                                     <span style="width: 4px; height: 4px; border-radius: 50%; background-color: {{ $dotColor }}; flex-shrink: 0;"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Tooltip flotante enriquecido en hover -->
-                                            <div class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-50 hidden group-hover/tip:flex flex-col gap-1 bg-gray-900 text-white text-[10px] rounded-xl p-2.5 shadow-2xl border border-white/10 whitespace-nowrap min-w-[210px]">
-                                                <div class="font-extrabold text-white text-[11px] border-b border-white/10 pb-1 flex items-center justify-between gap-2">
-                                                    <span class="truncate">{{ $sol['empleado'] }}</span>
-                                                    <span class="px-1.5 py-0.2 rounded text-[8px] font-black uppercase" style="{{ $badgeStyle }}">
-                                                        {{ $sol['estado'] }}
-                                                    </span>
-                                                </div>
-                                                <div class="flex items-center justify-between text-gray-300 text-[10px] pt-0.5">
-                                                    <span class="text-gray-400">Periodo:</span>
-                                                    <span class="font-semibold text-white font-mono">{{ $sol['fechas_completas'] }}</span>
-                                                </div>
-                                                <div class="flex items-center justify-between text-gray-300 text-[10px]">
-                                                    <span class="text-gray-400">Duración:</span>
-                                                    <span class="font-bold text-emerald-400">{{ $sol['dias'] }} {{ $sol['dias'] == 1 ? 'día' : 'días' }}</span>
                                                 </div>
                                             </div>
                                         </div>
