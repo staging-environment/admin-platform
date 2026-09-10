@@ -82,26 +82,23 @@ class AdminPanelProvider extends PanelProvider
                     // Estilos globales de tipografía compacta y márgenes reducidos para todas las secciones
                     $css .= "
                     <style>
-                        /* Títulos principales de página reducidos en todas las secciones */
+                        /* Ocultar el título principal de página en todas las secciones */
                         .fi-header-heading,
                         h1.fi-header-heading,
                         .fi-page-header .fi-header-heading,
                         .fi-header h1 {
-                            font-size: 1.35rem !important; /* ~21px */
-                            line-height: 1.25 !important;
-                            font-weight: 700 !important;
-                            letter-spacing: -0.015em !important;
+                            display: none !important;
                         }
 
                         /* Reducción de márgenes en la cabecera de página */
                         .fi-header {
-                            margin-bottom: 0.65rem !important;
+                            margin-bottom: 0.25rem !important;
                             padding-bottom: 0px !important;
-                            gap: 0.35rem !important;
+                            gap: 0.25rem !important;
                         }
                         .fi-page-header-main-ctn {
-                            padding-top: 0.25rem !important;
-                            padding-bottom: 0.25rem !important;
+                            padding-top: 0px !important;
+                            padding-bottom: 0.15rem !important;
                         }
 
                         /* Títulos secundarios reducidos en todas las secciones */
