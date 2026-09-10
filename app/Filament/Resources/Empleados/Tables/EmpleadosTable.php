@@ -71,32 +71,67 @@ class EmpleadosTable
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('centro_trabajo')
                     ->label('Ubicación de trabajo')
-                    ->options([
-                        'Sevilla' => 'Sevilla',
-                        'Utrera' => 'Utrera',
-                        'El Cuervo' => 'El Cuervo',
-                        'Lebrija' => 'Lebrija',
-                    ])
+                    ->options(function () {
+                        try {
+                            $estaciones = \App\Models\Gasolinera::query()
+                                ->whereNotNull('Nombre')
+                                ->where('Nombre', '!=', '')
+                                ->distinct()
+                                ->orderBy('Nombre')
+                                ->pluck('Nombre', 'Nombre')
+                                ->toArray();
+                            if (!empty($estaciones)) {
+                                return $estaciones;
+                            }
+                        } catch (\Throwable $e) {
+                            // Fallback si la conexión a la base de datos externa no está disponible
+                        }
+
+                        return [
+                            'E.S. ATENAS' => 'E.S. ATENAS',
+                            'E.S. RODALABOTA' => 'E.S. RODALABOTA',
+                            'E.S. VISTALEGRE' => 'E.S. VISTALEGRE',
+                            'RONDA NORTE' => 'RONDA NORTE',
+                        ];
+                    })
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $query->when(
                             $data['value'] ?? null,
                             function (\Illuminate\Database\Eloquent\Builder $query, $centro) {
-                                $map = [
-                                    'Sevilla' => 2,
-                                    'Utrera' => 1,
-                                    'El Cuervo' => 3,
-                                    'Lebrija' => 4,
-                                ];
-                                $codigo = $map[$centro] ?? null;
+                                $codigo = null;
+                                try {
+                                    $codigo = \App\Models\Gasolinera::where('Nombre', $centro)->value('Codigo');
+                                } catch (\Throwable $e) {
+                                    $codigo = null;
+                                }
+
+                                if (!$codigo) {
+                                    $map = [
+                                        'E.S. VISTALEGRE' => 1,
+                                        'RONDA NORTE' => 2,
+                                        'E.S. RODALABOTA' => 3,
+                                        'E.S RODALABOTA' => 3,
+                                        'E.S. ATENAS' => 4,
+                                        'Sevilla' => 2,
+                                        'Utrera' => 1,
+                                        'El Cuervo' => 3,
+                                        'Lebrija' => 4,
+                                    ];
+                                    $codigo = $map[$centro] ?? (is_numeric($centro) ? (int) $centro : null);
+                                }
+
                                 if (!$codigo) return $query;
 
-                                return $query->whereIn('id', function ($subQuery) use ($codigo) {
-                                    $subQuery->select('ed1.empleado_id')
-                                        ->from('empleado_documentos as ed1')
-                                        ->where('ed1.tipo', 'Contratos')
-                                        ->where('ed1.gasolinera_codigo', $codigo)
-                                        ->whereRaw('ed1.id = (select ed2.id from empleado_documentos as ed2 where ed2.empleado_id = ed1.empleado_id and ed2.tipo = "Contratos" order by ed2.id desc limit 1)');
-                                    });
+                                return $query->where(function ($q) use ($codigo) {
+                                    $q->where('gasolinera_codigo', $codigo)
+                                      ->orWhereIn('id', function ($subQuery) use ($codigo) {
+                                          $subQuery->select('ed1.empleado_id')
+                                              ->from('empleado_documentos as ed1')
+                                              ->where('ed1.tipo', 'Contratos')
+                                              ->where('ed1.gasolinera_codigo', $codigo)
+                                              ->whereRaw('ed1.id = (select ed2.id from empleado_documentos as ed2 where ed2.empleado_id = ed1.empleado_id and ed2.tipo = "Contratos" order by ed2.id desc limit 1)');
+                                      });
+                                });
                             }
                         );
                     }),

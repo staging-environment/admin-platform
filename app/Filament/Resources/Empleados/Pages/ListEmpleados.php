@@ -51,6 +51,34 @@ class ListEmpleados extends ListRecords
 
         $filters = $this->tableFilters ?? [];
         $centroTrabajo = $filters['centro_trabajo']['value'] ?? null;
+        if ($centroTrabajo) {
+            $estacionesMap = [
+                1 => 'E.S. VISTALEGRE',
+                2 => 'RONDA NORTE',
+                3 => 'E.S. RODALABOTA',
+                4 => 'E.S. ATENAS',
+                '1' => 'E.S. VISTALEGRE',
+                '2' => 'RONDA NORTE',
+                '3' => 'E.S. RODALABOTA',
+                '4' => 'E.S. ATENAS',
+                'Sevilla' => 'RONDA NORTE',
+                'Utrera' => 'E.S. VISTALEGRE',
+                'El Cuervo' => 'E.S. RODALABOTA',
+                'Lebrija' => 'E.S. ATENAS',
+            ];
+            if (isset($estacionesMap[$centroTrabajo])) {
+                $centroTrabajo = $estacionesMap[$centroTrabajo];
+            } elseif (is_numeric($centroTrabajo)) {
+                try {
+                    $gasolinera = \App\Models\Gasolinera::where('Codigo', (int) $centroTrabajo)->first();
+                    if ($gasolinera?->Nombre) {
+                        $centroTrabajo = $gasolinera->Nombre;
+                    }
+                } catch (\Throwable $e) {
+                    // Fallback
+                }
+            }
+        }
         $estado = $filters['estado']['value'] ?? null;
         $search = $filters['search']['query'] ?? $this->getTableSearch() ?? null;
 
