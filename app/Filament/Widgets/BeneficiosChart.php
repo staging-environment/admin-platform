@@ -16,7 +16,7 @@ class BeneficiosChart extends ChartWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $maxHeight = '260px';
+    protected ?string $maxHeight = '260px';
 
     public ?string $filter = '6';
 
