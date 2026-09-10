@@ -1,6 +1,27 @@
 <x-filament-panels::page>
     <div class="space-y-6">
 
+        <!-- Top Bar: Calendario vacaciones -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:px-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-2xl shadow-xs">
+            <div class="flex items-center gap-3">
+                <span class="p-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </span>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Calendario General de Vacaciones</h4>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Consulta anual y mensual de todas las solicitudes aprobadas, pendientes y denegadas.</p>
+                </div>
+            </div>
+            <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Calendario vacaciones</span>
+            </button>
+        </div>
+
         <!-- Vacations Section -->
         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
             <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
@@ -221,16 +242,6 @@
                     </button>
                 </div>
                 @endif
-
-                {{-- Botón Calendario Vacaciones --}}
-                <div class="self-end ml-auto">
-                    <button type="button" wire:click="openCalendarioAnual" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span>Calendario vacaciones</span>
-                    </button>
-                </div>
             </div>
 
             <div class="overflow-x-auto">
