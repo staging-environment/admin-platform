@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Gasolinera;
 use App\Services\ReportService;
 use Carbon\Carbon;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class BeneficiosChart extends ChartWidget
@@ -20,6 +21,10 @@ class BeneficiosChart extends ChartWidget
 
     public ?string $filter = '6';
 
+    public ?string $tipoNegocio = 'total';
+
+    protected string $view = 'filament.widgets.beneficios-chart';
+
     public function mount($record = null): void
     {
         if ($record instanceof Gasolinera) {
@@ -31,13 +36,14 @@ class BeneficiosChart extends ChartWidget
         }
     }
 
-    protected function getFilters(): ?array
+    public function updatedFilter(): void
     {
-        return [
-            '6' => 'Últimos 6 meses',
-            '12' => 'Últimos 12 meses',
-            'year' => 'Año actual (' . date('Y') . ')',
-        ];
+        $this->cachedData = null;
+    }
+
+    public function updatedTipoNegocio(): void
+    {
+        $this->cachedData = null;
     }
 
     protected function getData(): array
@@ -66,6 +72,18 @@ class BeneficiosChart extends ChartWidget
                 $end = (clone $now)->startOfMonth();
             }
 
+            $groupCodes = match ($this->tipoNegocio) {
+                'combustible' => ['01'],
+                'tienda' => ['3', '4'],
+                default => ['01', '3', '4'],
+            };
+
+            $datasetLabel = match ($this->tipoNegocio) {
+                'combustible' => 'Beneficio Combustibles (€)',
+                'tienda' => 'Beneficio Tienda/Lavado (€)',
+                default => 'Beneficio Total (€)',
+            };
+
             /** @var ReportService $reportService */
             $reportService = app(ReportService::class);
             $evolucion = $reportService->getEvolucionMensual(
@@ -73,7 +91,7 @@ class BeneficiosChart extends ChartWidget
                 (int) $start->format('Y'),
                 (int) $end->format('m'),
                 (int) $end->format('Y'),
-                ['3', '4'],
+                $groupCodes,
                 (int) $codigo
             );
 
@@ -91,7 +109,7 @@ class BeneficiosChart extends ChartWidget
             return [
                 'datasets' => [
                     [
-                        'label' => 'Beneficio (€)',
+                        'label' => $datasetLabel,
                         'data' => $beneficios,
                         'backgroundColor' => $bgColors,
                         'borderColor' => $borderColors,
@@ -110,9 +128,9 @@ class BeneficiosChart extends ChartWidget
         }
     }
 
-    protected function getOptions(): \Filament\Support\RawJs
+    protected function getOptions(): RawJs
     {
-        return \Filament\Support\RawJs::make(<<<JS
+        return RawJs::make(<<<JS
             {
                 scales: {
                     y: {
@@ -129,7 +147,7 @@ class BeneficiosChart extends ChartWidget
                         callbacks: {
                             label: function (context) {
                                 let val = context.raw || 0;
-                                return 'Beneficio: ' + new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
+                                return (context.dataset.label || 'Beneficio') + ': ' + new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(val);
                             },
                         },
                     },
