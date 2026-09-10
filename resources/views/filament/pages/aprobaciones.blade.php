@@ -535,7 +535,11 @@
                     Cerrar Detalles
                 </button>
             </div>
-        </div>    <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
+        </div>
+    </div>
+    @endif
+
+    <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
         <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[88vh] max-h-[820px] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
