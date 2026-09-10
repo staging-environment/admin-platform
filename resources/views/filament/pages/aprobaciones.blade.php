@@ -541,8 +541,8 @@
 
     <!-- Modal Calendario Anual de Vacaciones (Flotante) -->
     @if($showCalendarioModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/60 backdrop-blur-sm" wire:click.self="closeCalendarioAnual">
-        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-7xl max-h-[94vh] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/60 backdrop-blur-sm" wire:click.self="closeCalendarioAnual">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-7xl max-h-[92vh] flex flex-col overflow-hidden border border-gray-100 dark:border-white/10">
             
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-gray-50/70 dark:bg-gray-900/70">
@@ -554,10 +554,10 @@
                     </span>
                     <div>
                         <h3 class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
-                            Calendario Anual de Vacaciones
+                            Calendario Anual de Solicitudes
                         </h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            Consulta mes a mes las vacaciones aprobadas, pendientes y denegadas
+                            Resumen de vacaciones por trabajador en cada mes del año
                         </p>
                     </div>
                 </div>
@@ -591,7 +591,7 @@
                 </div>
 
                 <!-- Employee Filter -->
-                <div class="flex items-center gap-2 min-w-[220px] grow md:grow-0">
+                <div class="flex items-center gap-2 min-w-[240px] grow md:grow-0">
                     <input
                         type="text"
                         list="dl-cal-empleados"
@@ -615,123 +615,105 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800/40">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        Aprobadas
+                        Aprobada
                     </span>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[11px] font-bold border border-amber-200 dark:border-amber-800/40">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        Pendientes
+                        Pendiente
                     </span>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 text-[11px] font-bold border border-rose-200 dark:border-rose-800/40">
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        Denegadas
+                        Denegada
                     </span>
                 </div>
             </div>
 
-            <!-- Modal Content: 12 Months Grid -->
-            <div class="p-6 overflow-y-auto max-h-[72vh] space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Modal Content: 12 Month Boxes Grid -->
+            <div class="p-6 overflow-y-auto max-h-[72vh]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($this->calendarioAnual as $mes)
-                        <div class="bg-gray-50/60 dark:bg-white/[0.02] rounded-2xl p-3.5 border border-gray-100 dark:border-white/5 flex flex-col justify-between hover:border-indigo-200 dark:hover:border-indigo-800/40 transition-all shadow-sm">
+                        <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 border border-gray-200/80 dark:border-white/10 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-600 transition-all">
                             
                             <div>
                                 <!-- Month Header -->
-                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-100 dark:border-white/5">
-                                    <h4 class="font-black text-sm text-gray-800 dark:text-gray-100 tracking-tight">
+                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100 dark:border-white/5">
+                                    <h4 class="font-black text-sm text-gray-900 dark:text-white tracking-wide">
                                         {{ $mes['nombre'] }}
                                     </h4>
+                                    
                                     <div class="flex items-center gap-1">
                                         @if($mes['aprobadas'] > 0)
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-white" title="{{ $mes['aprobadas'] }} aprobadas">
-                                                {{ $mes['aprobadas'] }}
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300" title="{{ $mes['aprobadas'] }} aprobadas">
+                                                ● {{ $mes['aprobadas'] }}
                                             </span>
                                         @endif
                                         @if($mes['pendientes'] > 0)
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500 text-white" title="{{ $mes['pendientes'] }} pendientes">
-                                                {{ $mes['pendientes'] }}
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300" title="{{ $mes['pendientes'] }} pendientes">
+                                                ● {{ $mes['pendientes'] }}
                                             </span>
                                         @endif
                                         @if($mes['denegadas'] > 0)
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500 text-white" title="{{ $mes['denegadas'] }} denegadas">
-                                                {{ $mes['denegadas'] }}
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300" title="{{ $mes['denegadas'] }} denegadas">
+                                                ● {{ $mes['denegadas'] }}
                                             </span>
                                         @endif
                                         @if($mes['total'] === 0)
-                                            <span class="text-[10px] text-gray-300 dark:text-gray-600 font-medium">
-                                                —
+                                            <span class="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                                                0
                                             </span>
                                         @endif
                                     </div>
                                 </div>
 
-                                <!-- Weekday headers -->
-                                <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-black text-gray-400 dark:text-gray-500 mb-1">
-                                    <span>L</span>
-                                    <span>M</span>
-                                    <span>X</span>
-                                    <span>J</span>
-                                    <span>V</span>
-                                    <span class="text-indigo-400">S</span>
-                                    <span class="text-indigo-400">D</span>
-                                </div>
+                                <!-- Request Items List for this Month -->
+                                @if(!empty($mes['solicitudes']))
+                                    <div class="space-y-2.5">
+                                        @foreach($mes['solicitudes'] as $sol)
+                                            @php
+                                                if ($sol['estado'] === 'Aprobada') {
+                                                    $cardClass = 'bg-emerald-50/80 border-l-4 border-l-emerald-500 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800/50 dark:border-l-emerald-500';
+                                                    $badgeClass = 'bg-emerald-600 text-white';
+                                                    $textColor = 'text-emerald-950 dark:text-emerald-200';
+                                                } elseif ($sol['estado'] === 'Pendiente') {
+                                                    $cardClass = 'bg-amber-50/80 border-l-4 border-l-amber-500 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/50 dark:border-l-amber-500';
+                                                    $badgeClass = 'bg-amber-500 text-white';
+                                                    $textColor = 'text-amber-950 dark:text-amber-200';
+                                                } else {
+                                                    $cardClass = 'bg-rose-50/80 border-l-4 border-l-rose-500 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800/50 dark:border-l-rose-500';
+                                                    $badgeClass = 'bg-rose-600 text-white';
+                                                    $textColor = 'text-rose-950 dark:text-rose-200';
+                                                }
+                                            @endphp
 
-                                <!-- Days Grid -->
-                                <div class="grid grid-cols-7 gap-1 text-center text-[11px]">
-                                    {{-- Empty leading days --}}
-                                    @for($i = 0; $i < $mes['leadingEmptyDays']; $i++)
-                                        <div class="h-6"></div>
-                                    @endfor
+                                            <div class="p-2.5 rounded-xl border text-xs shadow-xs transition-all flex flex-col gap-1 {{ $cardClass }}">
+                                                <!-- Top Row: Employee Name & State Badge -->
+                                                <div class="flex items-start justify-between gap-1.5">
+                                                    <span class="font-bold leading-snug {{ $textColor }} break-words">
+                                                        {{ $sol['empleado'] }}
+                                                    </span>
+                                                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase shrink-0 shadow-xs {{ $badgeClass }}">
+                                                        {{ $sol['estado'] }}
+                                                    </span>
+                                                </div>
 
-                                    {{-- Month days --}}
-                                    @foreach($mes['days'] as $d)
-                                        @php
-                                            $hasVacation = !empty($d['status']);
-                                            $bgClass = 'text-gray-700 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-white/10';
-                                            if ($d['status'] === 'Aprobada') {
-                                                $bgClass = 'bg-emerald-500 text-white font-black shadow-sm';
-                                            } elseif ($d['status'] === 'Pendiente') {
-                                                $bgClass = 'bg-amber-400 text-amber-950 font-black shadow-sm';
-                                            } elseif ($d['status'] === 'Denegada') {
-                                                $bgClass = 'bg-rose-500 text-white font-black shadow-sm';
-                                            }
-                                        @endphp
-                                        <div
-                                            class="h-6 flex items-center justify-center rounded-lg transition-all {{ $bgClass }} cursor-default"
-                                            @if($hasVacation) title="{{ $d['day'] }} {{ $mes['nombre'] }}: {{ $d['tooltip'] }}" @endif
-                                        >
-                                            {{ $d['day'] }}
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <!-- List of requests for this month -->
-                            @if(!empty($mes['solicitudes']))
-                                <div class="mt-3 pt-2 border-t border-gray-100 dark:border-white/5 space-y-1.5">
-                                    @foreach($mes['solicitudes'] as $sol)
-                                        @php
-                                            $pillClass = 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40';
-                                            $badgeClass = 'bg-emerald-500 text-white';
-                                            if ($sol['estado'] === 'Pendiente') {
-                                                $pillClass = 'bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800/40';
-                                                $badgeClass = 'bg-amber-500 text-white';
-                                            } elseif ($sol['estado'] === 'Denegada') {
-                                                $pillClass = 'bg-rose-50 text-rose-900 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800/40';
-                                                $badgeClass = 'bg-rose-500 text-white';
-                                            }
-                                        @endphp
-                                        <div class="p-1.5 rounded-xl border text-[10px] flex items-center justify-between gap-1.5 {{ $pillClass }}">
-                                            <div class="truncate">
-                                                <strong class="block truncate leading-tight">{{ $sol['empleado'] }}</strong>
-                                                <span class="text-[9px] opacity-75">{{ $sol['fechas'] }} ({{ $sol['dias'] }}d)</span>
+                                                <!-- Dates and Days -->
+                                                <div class="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-black/5 dark:border-white/5">
+                                                    <span class="font-medium">
+                                                        📅 {{ $sol['fechas'] }}
+                                                    </span>
+                                                    <span class="font-bold">
+                                                        {{ $sol['dias'] }} {{ $sol['dias'] == 1 ? 'día' : 'días' }}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase shrink-0 {{ $badgeClass }}">
-                                                {{ $sol['estado'] }}
-                                            </span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="py-8 text-center text-xs text-gray-400 dark:text-gray-500 italic">
+                                        Sin solicitudes
+                                    </div>
+                                @endif
+                            </div>
 
                         </div>
                     @endforeach
@@ -748,4 +730,3 @@
     </div>
     @endif
 </x-filament-panels::page>
-

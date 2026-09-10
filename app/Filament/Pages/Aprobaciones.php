@@ -514,8 +514,6 @@ class Aprobaciones extends Page
         for ($m = 1; $m <= 12; $m++) {
             $startOfMonth = Carbon::create($year, $m, 1);
             $daysInMonth = $startOfMonth->daysInMonth;
-            $firstDayOfWeek = $startOfMonth->dayOfWeekIso; // 1 (Mon) to 7 (Sun)
-            $leadingEmptyDays = $firstDayOfWeek - 1;
 
             $monthStartStr = sprintf('%04d-%02d-01', $year, $m);
             $monthEndStr = sprintf('%04d-%02d-%02d', $year, $m, $daysInMonth);
@@ -537,74 +535,29 @@ class Aprobaciones extends Page
                 else $denegadasCount++;
 
                 $empName = $v->empleado ? ($v->empleado->nombre . ' ' . $v->empleado->apellidos) : 'Empleado';
-                $fechasStr = Carbon::parse($v->fecha_inicio)->format('d/m') . ' - ' . ($v->fecha_fin ? Carbon::parse($v->fecha_fin)->format('d/m') : Carbon::parse($v->fecha_inicio)->format('d/m'));
+                
+                $inicioCarbon = Carbon::parse($v->fecha_inicio);
+                $finCarbon = Carbon::parse($v->fecha_fin ?: $v->fecha_inicio);
+                $fechasStr = $inicioCarbon->format('d/m/Y') . ' - ' . $finCarbon->format('d/m/Y');
+                $diasCalculados = $v->dias ?: ($inicioCarbon->diffInDays($finCarbon) + 1);
 
                 $solicitudes[] = [
                     'id' => $v->id,
                     'empleado' => $empName,
                     'fechas' => $fechasStr,
-                    'dias' => $v->dias ?: (Carbon::parse($v->fecha_inicio)->diffInDays(Carbon::parse($v->fecha_fin ?: $v->fecha_inicio)) + 1),
+                    'dias' => $diasCalculados,
                     'estado' => $estado,
                     'tipo' => $v->tipo ?: 'Vacaciones',
-                ];
-            }
-
-            $days = [];
-            for ($d = 1; $d <= $daysInMonth; $d++) {
-                $dateStr = sprintf('%04d-%02d-%02d', $year, $m, $d);
-                $dayVacations = [];
-                $hasAprobada = false;
-                $hasPendiente = false;
-                $hasDenegada = false;
-
-                foreach ($monthVacations as $v) {
-                    $fin = $v->fecha_fin ?: $v->fecha_inicio;
-                    if ($dateStr >= $v->fecha_inicio && $dateStr <= $fin) {
-                        $estado = in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente');
-                        if ($estado === 'Aprobada') $hasAprobada = true;
-                        elseif ($estado === 'Pendiente') $hasPendiente = true;
-                        else $hasDenegada = true;
-
-                        $empName = $v->empleado ? ($v->empleado->nombre . ' ' . $v->empleado->apellidos) : 'Empleado';
-                        $dayVacations[] = [
-                            'empleado' => $empName,
-                            'estado' => $estado,
-                            'tipo' => $v->tipo ?: 'Vacaciones',
-                        ];
-                    }
-                }
-
-                $status = null;
-                if ($hasAprobada) $status = 'Aprobada';
-                elseif ($hasPendiente) $status = 'Pendiente';
-                elseif ($hasDenegada) $status = 'Denegada';
-
-                $tooltip = '';
-                if (!empty($dayVacations)) {
-                    $lines = array_map(fn($item) => "{$item['empleado']} ({$item['estado']})", $dayVacations);
-                    $tooltip = implode(' | ', $lines);
-                }
-
-                $days[$d] = [
-                    'day' => $d,
-                    'date' => $dateStr,
-                    'status' => $status,
-                    'count' => count($dayVacations),
-                    'tooltip' => $tooltip,
-                    'items' => $dayVacations,
                 ];
             }
 
             $meses[$m] = [
                 'numero' => $m,
                 'nombre' => $mesesNombres[$m],
-                'daysInMonth' => $daysInMonth,
-                'leadingEmptyDays' => $leadingEmptyDays,
                 'aprobadas' => $aprobadasCount,
                 'pendientes' => $pendientesCount,
                 'denegadas' => $denegadasCount,
                 'total' => count($monthVacations),
-                'days' => $days,
                 'solicitudes' => $solicitudes,
             ];
         }
