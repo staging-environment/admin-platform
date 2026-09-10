@@ -113,9 +113,9 @@
                                 $timeAgo = isset($alert['created_at']) ? \Carbon\Carbon::createFromTimestamp($alert['created_at'])->diffForHumans() : '';
                             @endphp
 
-                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
-                                <!-- Cabecera de la alerta concreta -->
-                                <div class="px-4 py-2 bg-gray-100/80 dark:bg-gray-700/50 flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm" style="border: 1.5px solid {{ $isDiesel ? '#374151' : '#16a34a' }} !important;">
+                                <!-- Cabecera de la alerta concreta con pastilla contrastada -->
+                                <div class="px-4 py-2.5 bg-gray-100/90 dark:bg-gray-700/60 flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 dark:border-gray-700">
                                     <div class="flex items-center gap-2">
                                         <div class="flex items-center gap-1 font-bold text-gray-900 dark:text-white text-xs uppercase tracking-wider">
                                             <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -124,10 +124,18 @@
                                             </svg>
                                             {{ $alert['locality_name'] ?? $localityName ?? 'Localidad' }}
                                         </div>
-                                        <span class="inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded {{ $isDiesel ? 'bg-gray-900 text-white' : 'bg-green-600 text-white' }}">
-                                            <span class="w-1.5 h-1.5 rounded-full {{ $isDiesel ? 'bg-amber-400' : 'bg-white' }}"></span>
-                                            Cambio en {!! $isDiesel ? 'DI&Eacute;SEL' : 'GASOLINA 95' !!}
-                                        </span>
+
+                                        @if($isDiesel)
+                                            <span style="background-color: #111827 !important; color: #ffffff !important; padding: 3px 10px !important; border-radius: 9999px !important; font-size: 10px !important; font-weight: 900 !important; display: inline-flex !important; align-items: center !important; gap: 6px !important; letter-spacing: 0.04em !important; box-shadow: 0 1px 3px rgba(0,0,0,0.35) !important;">
+                                                <span style="width: 7px !important; height: 7px !important; border-radius: 9999px !important; background-color: #f59e0b !important; display: inline-block !important; flex-shrink: 0 !important;"></span>
+                                                CAMBIO EN DI&Eacute;SEL
+                                            </span>
+                                        @else
+                                            <span style="background-color: #15803d !important; color: #ffffff !important; padding: 3px 10px !important; border-radius: 9999px !important; font-size: 10px !important; font-weight: 900 !important; display: inline-flex !important; align-items: center !important; gap: 6px !important; letter-spacing: 0.04em !important; box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;">
+                                                <span style="width: 7px !important; height: 7px !important; border-radius: 9999px !important; background-color: #ffffff !important; display: inline-block !important; flex-shrink: 0 !important;"></span>
+                                                CAMBIO EN GASOLINA 95
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 tabular-nums">
                                         <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -146,19 +154,25 @@
                                         @endphp
 
                                         <div class="pt-2 first:pt-0 flex items-center justify-between gap-3 text-xs {{ $changed ? 'p-2 rounded-lg bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/30' : '' }}">
-                                            <div class="flex items-center gap-2 min-w-0 flex-1">
-                                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 {{ $isDiesel ? 'bg-gray-900 text-white' : 'bg-green-600 text-white' }}">
+                                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                                <!-- Chip numerico con color explicito de combustible -->
+                                                <span style="background-color: {{ $isDiesel ? '#1f2937' : '#15803d' }} !important; color: #ffffff !important; width: 22px !important; height: 22px !important; min-width: 22px !important; border-radius: 9999px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 11px !important; font-weight: 900 !important; flex-shrink: 0 !important; line-height: 1 !important;">
                                                     {{ $station['rank'] ?? '&bull;' }}
                                                 </span>
                                                 <div class="min-w-0 flex-1">
                                                     <p class="font-bold truncate text-gray-900 dark:text-white text-xs">
                                                         {{ $station['name'] ?? 'Estaci&oacute;n' }}
                                                     </p>
-                                                    @if(!empty($station['address']))
-                                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">
-                                                            {{ $station['address'] }}
-                                                        </p>
-                                                    @endif
+                                                    <div class="flex items-center gap-2">
+                                                        @if(!empty($station['address']))
+                                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                                                                {{ $station['address'] }}
+                                                            </p>
+                                                        @endif
+                                                        <span style="font-size: 9px !important; font-weight: 700 !important; color: {{ $isDiesel ? '#4b5563' : '#15803d' }} !important; text-transform: uppercase !important;">
+                                                            {{ $isDiesel ? 'Di&eacute;sel' : 'Gasolina 95' }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
 
