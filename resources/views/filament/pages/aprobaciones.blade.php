@@ -673,9 +673,9 @@
                                         @endphp
 
                                         <div class="relative group/tip" title="{{ $tooltipText }}">
-                                            <!-- Píldora visible con iniciales compactas y discretas (inline style seguro) -->
-                                            <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1; padding: 2px 4px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 transition-all">
-                                                <span class="truncate" style="font-size: 8px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['iniciales'] }}</span>
+                                            <!-- Píldora visible con nombre completo del empleado (fuente fina 8px) -->
+                                            <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1; padding: 2px 5px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 transition-all">
+                                                <span class="truncate" style="font-size: 8px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['empleado'] }}</span>
                                                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: {{ $dotColor }}; flex-shrink: 0;"></span>
                                             </div>
 
