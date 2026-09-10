@@ -12,8 +12,8 @@ trait HasMenuBreadcrumbs
     {
         $resource = static::getResource();
 
-        // 1. Caso especial: JobOffers (Ver Ofertas)
-        // Jerarquía: Recursos humanos > Ofertas de Empleo > Ver Ofertas > Listado
+        // 1. Caso especial: JobOffers (Ofertas de Empleo)
+        // Jerarqu?a directa: Recursos humanos > Ofertas de Empleo > Listado
         if ($resource === JobOfferResource::class) {
             $action = $this->getBreadcrumb();
             $isIndex = in_array(strtolower($action), ['listado', 'list', '']);
@@ -22,21 +22,19 @@ trait HasMenuBreadcrumbs
                 return [
                     'Recursos humanos',
                     'Ofertas de Empleo',
-                    'Ver Ofertas',
                     'Listado',
                 ];
             }
 
             return [
                 'Recursos humanos',
-                'Ofertas de Empleo',
-                $resource::getUrl('index') => 'Ver Ofertas',
+                $resource::getUrl('index') => 'Ofertas de Empleo',
                 $action,
             ];
         }
 
         // 2. Caso especial: JobApplications (Inscritos a Ofertas)
-        // Jerarquía: Recursos humanos > Ofertas de Empleo > Inscritos a Ofertas > Listado
+        // Jerarqu?a directa: Recursos humanos > Inscritos a Ofertas > Listado
         if ($resource === JobApplicationResource::class) {
             $action = $this->getBreadcrumb();
             $isIndex = in_array(strtolower($action), ['listado', 'list', 'inscripciones', '']);
@@ -44,7 +42,6 @@ trait HasMenuBreadcrumbs
             if ($isIndex) {
                 return [
                     'Recursos humanos',
-                    'Ofertas de Empleo',
                     'Inscritos a Ofertas',
                     'Listado',
                 ];
@@ -52,13 +49,12 @@ trait HasMenuBreadcrumbs
 
             return [
                 'Recursos humanos',
-                'Ofertas de Empleo',
                 $resource::getUrl('index') => 'Inscritos a Ofertas',
                 $action,
             ];
         }
 
-        // 3. Obtener grupo padre según navegación
+        // 3. Obtener grupo padre seg?n navegaci?n
         $group = $resource::getNavigationGroup();
         $groupName = is_string($group) ? $group : ($group ? $group->getLabel() : null);
 
