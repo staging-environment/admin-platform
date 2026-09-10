@@ -86,9 +86,9 @@
         .station-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            border-radius: 8px;
-            padding: 5px 7px;
+            gap: 6px;
+            border-radius: 6px;
+            padding: 3px 6px;
             transition: background 0.15s;
         }
         .station-row:hover { background: rgba(0,0,0,0.04); }
@@ -99,10 +99,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 19px;
-            height: 19px;
+            width: 17px;
+            height: 17px;
             border-radius: 50%;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
             flex-shrink: 0;
             line-height: 1;
@@ -121,7 +121,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 
-    <div class="space-y-7" wire:poll.30s="loadData">
+    <div class="space-y-3.5" wire:poll.30s="loadData">
 
         {{-- BLOQUE BOT MITECO: Oculto temporalmente a petición del usuario. Para restaurar, retirar 'false && ' --}}
         @if(false && auth()->user() && (auth()->user()->can('ver_dashboard') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
@@ -257,8 +257,8 @@
         {{-- ═══════════════════════════════════════════════════════════════ --}}
 
         <section>
-            <div class="flex items-center gap-2.5 mb-4">
-                <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#fbbf24,#f59e0b)"></div>
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-1 h-4 rounded-full" style="background:linear-gradient(180deg,#fbbf24,#f59e0b)"></div>
                 <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Mercados Energéticos <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(actualización cada 3s)</span></h2>
                 <span class="ml-auto flex items-center gap-1.5 text-xs" style="color:#6b7280">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
@@ -266,22 +266,22 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                 {{-- ── TARJETA 1: GASOIL BRENT LONDRES (BZ=F) ─────────── --}}
-                <div class="market-card-black rounded-2xl px-5 py-3 shadow-2xl" id="card-gasoil">
-                    <div class="flex items-center justify-between gap-4">
+                <div class="market-card-black rounded-xl px-3.5 py-1.5 shadow-md" id="card-gasoil">
+                    <div class="flex items-center justify-between gap-3">
                         {{-- Izquierda: Título e Icono --}}
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
-                                <svg class="w-4 h-4" style="color:#fbbf24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
+                                <svg class="w-3.5 h-3.5" style="color:#fbbf24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-black text-white leading-tight">Gasoil Londres (ICE)</h3>
-                                <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(251,191,36,0.25); color:#fbbf24; width: fit-content; line-height: 1;">
-                                    <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
+                                <h3 class="text-xs font-black text-white leading-tight">Gasoil Londres (ICE)</h3>
+                                <div class="flex items-center gap-1 mt-0.5 font-mono text-[8px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(251,191,36,0.25); color:#fbbf24; width: fit-content; line-height: 1;">
+                                    <span style="font-size: 7.5px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
                                     <span id="gasoil-updated" class="tabular-nums font-bold">
                                         {{ $gasoilData['updated_at'] ?? '—' }}
                                     </span>
@@ -292,17 +292,17 @@
                         {{-- Derecha: Precio y Variación (Formato Investing) --}}
                         <div class="text-right flex flex-col justify-center items-end">
                             <div class="flex items-baseline justify-end gap-1">
-                                <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.75rem;line-height:1;letter-spacing:-0.02em">
+                                <span id="gasoil-price" class="font-black text-white tabular-nums" style="font-size:1.35rem;line-height:1;letter-spacing:-0.02em">
                                     @if($gasoilData['price'])
                                         {{ number_format($gasoilData['price'], 4, '.', ',') }}
                                     @else
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-bold" style="color:rgba(255,255,255,0.4)">USD/t</span>
+                                <span class="text-[10px] font-bold" style="color:rgba(255,255,255,0.4)">USD/t</span>
                             </div>
 
-                            <div class="flex items-center justify-end gap-1.5 mt-1 font-bold" id="gasoil-change-row" style="font-size: 0.9rem;">
+                            <div class="flex items-center justify-end gap-1 mt-0.5 font-bold" id="gasoil-change-row" style="font-size: 0.8rem;">
                                 <span id="gasoil-arrow" class="hidden"></span>
                                 <span id="gasoil-change" class="text-xs font-semibold opacity-90 tabular-nums {{ $gasoilData['is_up'] === true ? 'change-badge-up' : ($gasoilData['is_up'] === false ? 'change-badge-down' : 'change-badge-null') }}">
                                     @if($gasoilData['change'] !== null)
@@ -328,19 +328,19 @@
                 </div>
 
                 {{-- ── TARJETA 2: GASOLINA RBOB (RB=F) ────────────────── --}}
-                <div class="market-card-green rounded-2xl px-5 py-3 shadow-2xl" id="card-rbob">
-                    <div class="flex items-center justify-between gap-4">
+                <div class="market-card-green rounded-xl px-3.5 py-1.5 shadow-md" id="card-rbob">
+                    <div class="flex items-center justify-between gap-3">
                         {{-- Izquierda: Título e Icono --}}
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">
-                                <svg class="w-4 h-4" style="color:#34d399" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">
+                                <svg class="w-3.5 h-3.5" style="color:#34d399" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-black text-white leading-tight">Gasolina RBOB (NYMEX)</h3>
-                                <div class="flex items-center gap-1 mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(52,211,153,0.25); color:#34d399; width: fit-content; line-height: 1;">
-                                    <span style="font-size: 8px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
+                                <h3 class="text-xs font-black text-white leading-tight">Gasolina RBOB (NYMEX)</h3>
+                                <div class="flex items-center gap-1 mt-0.5 font-mono text-[8px] px-1.5 py-0.5 rounded border" style="background:rgba(255,255,255,0.07); border-color:rgba(52,211,153,0.25); color:#34d399; width: fit-content; line-height: 1;">
+                                    <span style="font-size: 7.5px; text-transform: uppercase; opacity: 0.9; color: rgba(255,255,255,0.9);">Actualizado:</span>
                                     <span id="rbob-updated" class="tabular-nums font-bold">
                                         {{ $rbobData['updated_at'] ?? '—' }}
                                     </span>
@@ -351,17 +351,17 @@
                         {{-- Derecha: Precio y Variación (Formato Investing) --}}
                         <div class="text-right flex flex-col justify-center items-end">
                             <div class="flex items-baseline justify-end gap-1">
-                                <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.75rem;line-height:1;letter-spacing:-0.02em">
+                                <span id="rbob-price" class="font-black text-white tabular-nums" style="font-size:1.35rem;line-height:1;letter-spacing:-0.02em">
                                     @if($rbobData['price'])
                                         {{ number_format($rbobData['price'], 4, '.', ',') }}
                                     @else
                                         <span class="market-spinner" style="width:14px;height:14px;"></span>
                                     @endif
                                 </span>
-                                <span class="text-xs font-bold" style="color:rgba(255,255,255,0.4)">USD/gal</span>
+                                <span class="text-[10px] font-bold" style="color:rgba(255,255,255,0.4)">USD/gal</span>
                             </div>
 
-                            <div class="flex items-center justify-end gap-1.5 mt-1 font-bold" id="rbob-change-row" style="font-size: 0.9rem;">
+                            <div class="flex items-center justify-end gap-1 mt-0.5 font-bold" id="rbob-change-row" style="font-size: 0.8rem;">
                                 <span id="rbob-arrow" class="hidden"></span>
                                 <span id="rbob-change" class="text-xs font-semibold opacity-90 tabular-nums" style="color:{{ $rbobData['is_up'] === true ? '#6ee7b7' : ($rbobData['is_up'] === false ? '#fca5a5' : 'rgba(52,211,153,0.5)') }}">
                                     @if($rbobData['change'] !== null)
@@ -394,8 +394,8 @@
         {{-- ═══════════════════════════════════════════════════════════════ --}}
 
         <section>
-            <div class="flex items-center gap-2.5 mb-4">
-                <div class="w-1 h-5 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-1 h-4 rounded-full" style="background:linear-gradient(180deg,#60a5fa,#3b82f6)"></div>
                 <h2 class="text-xs font-bold tracking-widest uppercase" style="color:#9ca3af">Competencia Local <span class="text-[10px] font-normal lowercase opacity-60" style="color:#9ca3af; margin-left: 4px;">(consulta cada 15 min)</span></h2>
                 <span class="ml-auto text-xs" style="color:#6b7280">
                     Datos oficiales · Ministerio para la Transición Ecológica (MITECO)

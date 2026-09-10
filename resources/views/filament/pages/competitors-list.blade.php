@@ -7,24 +7,24 @@
     ];
 @endphp
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
     @foreach($localities as $key => $localityName)
         @php $ldata = $localityData[$key] ?? ['diesel' => [], 'gas95' => [], 'updated_at' => null]; @endphp
 
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden" style="border:1px solid rgba(0,0,0,0.07)">
+        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden" style="border:1px solid rgba(0,0,0,0.07)">
 
             {{-- Cabecera de tarjeta de localidad --}}
-            <div class="flex items-center justify-between px-5 py-3.5" style="background:linear-gradient(90deg,#111827,#1f2937)">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(255,255,255,0.06)">
-                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="flex items-center justify-between px-3.5 py-1.5" style="background:linear-gradient(90deg,#111827,#1f2937)">
+                <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded flex items-center justify-center" style="background:rgba(255,255,255,0.06)">
+                        <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
                         </svg>
                     </div>
-                    <h3 class="text-sm font-bold text-white">{{ $localityName }}</h3>
+                    <h3 class="text-xs font-bold text-white leading-tight">{{ $localityName }}</h3>
                 </div>
-                <span id="updated-time-{{ $key }}" class="text-xs font-medium tabular-nums" style="color:#9ca3af; font-size: 10px;">
+                <span id="updated-time-{{ $key }}" class="text-[9px] font-medium tabular-nums" style="color:#9ca3af;">
                     @if(isset($ldata['checked_at']))
                         Última comprobación: {{ $ldata['checked_at'] }}
                     @elseif($ldata['updated_at'])
@@ -37,13 +37,13 @@
             <div class="grid grid-cols-2 divide-x dark:divide-gray-800" style="border-top:1px solid rgba(0,0,0,0.05);divide-color:rgba(0,0,0,0.06)">
 
                 {{-- ── COLUMNA DIESEL (negro/oscuro) ──────────── --}}
-                <div class="p-4">
-                    <div class="flex items-center gap-1.5 mb-3">
+                <div class="p-2.5 sm:p-3">
+                    <div class="flex items-center gap-1.5 mb-1.5">
                         <div class="w-2 h-2 rounded-full" style="background:#1f2937"></div>
                         <span class="text-xs font-black uppercase tracking-widest" style="color:#1f2937;font-size:9px">Diesel</span>
                     </div>
 
-                    <div id="rows-{{ $key }}-diesel" class="space-y-1">
+                    <div id="rows-{{ $key }}-diesel" class="space-y-0.5">
                         @if(count($ldata['diesel']) > 0)
                             @foreach($ldata['diesel'] as $rank => $station)
                                 <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}">
@@ -82,13 +82,13 @@
                 </div>
 
                 {{-- ── COLUMNA GASOLINA 95 (verde) ─────────────── --}}
-                <div class="p-4">
-                    <div class="flex items-center gap-1.5 mb-3">
+                <div class="p-2.5 sm:p-3">
+                    <div class="flex items-center gap-1.5 mb-1.5">
                         <div class="w-2 h-2 rounded-full" style="background:#16a34a"></div>
                         <span class="text-xs font-black uppercase tracking-widest" style="color:#16a34a;font-size:9px">Gasolina 95</span>
                     </div>
 
-                    <div id="rows-{{ $key }}-gas95" class="space-y-1">
+                    <div id="rows-{{ $key }}-gas95" class="space-y-0.5">
                         @if(count($ldata['gas95']) > 0)
                             @foreach($ldata['gas95'] as $rank => $station)
                                 <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}" style="{{ $rank === 0 ? 'background:rgba(22,163,74,0.05)' : '' }}">
