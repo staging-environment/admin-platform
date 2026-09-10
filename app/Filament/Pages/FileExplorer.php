@@ -284,6 +284,10 @@ class FileExplorer extends Page
             Action::make('createFolder')
                 ->label('Crear Carpeta')
                 ->icon('heroicon-o-folder-plus')
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                ])
                 ->form([
                     TextInput::make('folderName')
                         ->label('Nombre de la carpeta')
@@ -315,6 +319,10 @@ class FileExplorer extends Page
             Action::make('uploadFiles')
                 ->label('Subir Archivos')
                 ->icon('heroicon-o-arrow-up-tray')
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                ])
                 ->form([
                     FileUpload::make('files')
                         ->label('Seleccionar Archivos')
