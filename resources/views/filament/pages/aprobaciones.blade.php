@@ -101,27 +101,27 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            <th class="py-3 px-4">Empleado</th>
-                            <th class="py-3 px-4">Tipo</th>
-                            <th class="py-3 px-4">Fechas</th>
-                            <th class="py-3 px-4">Días</th>
-                            <th class="py-3 px-4 text-right">Acciones</th>
+                        <tr class="border-b border-gray-100 dark:border-white/5 text-[10.5px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th class="py-2 px-3.5">Empleado</th>
+                            <th class="py-2 px-3.5">Tipo</th>
+                            <th class="py-2 px-3.5">Fechas</th>
+                            <th class="py-2 px-3.5">Días</th>
+                            <th class="py-2 px-3.5 text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
+                    <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-xs">
                         @forelse($this->vacacionesPendientes as $vac)
                             <tr>
-                                <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
+                                <td class="py-2.5 px-3.5 font-semibold text-gray-900 dark:text-white text-xs">
                                     {{ $vac->empleado ? $vac->empleado->nombre . ' ' . $vac->empleado->apellidos : 'N/A' }}
                                 </td>
-                                <td class="py-4 px-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400">
+                                <td class="py-2.5 px-3.5">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400">
                                         {{ $vac->tipo }}
                                     </span>
                                     @if($vac->justificante_path)
-                                        <div class="mt-1">
-                                            <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $vac->justificante_path]) }}" class="text-[11px] text-amber-600 dark:text-amber-400 font-bold hover:underline inline-flex items-center gap-1" target="_blank">
+                                        <div class="mt-0.5">
+                                            <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $vac->justificante_path]) }}" class="text-[10.5px] text-amber-600 dark:text-amber-400 font-bold hover:underline inline-flex items-center gap-1" target="_blank">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                                 </svg>
@@ -130,13 +130,13 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td class="py-4 px-4 text-gray-500 dark:text-gray-400 text-xs">
+                                <td class="py-2.5 px-3.5 text-gray-500 dark:text-gray-400 text-xs">
                                     Del {{ \Carbon\Carbon::parse($vac->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($vac->fecha_fin)->format('d/m/Y') }}
                                 </td>
-                                <td class="py-4 px-4 font-bold text-gray-700 dark:text-gray-300">
+                                <td class="py-2.5 px-3.5 font-bold text-gray-700 dark:text-gray-300 text-xs">
                                     {{ $vac->dias_solicitados }}
                                 </td>
-                                <td class="py-4 px-4 text-right">
+                                <td class="py-2.5 px-3.5 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <button type="button" wire:click="iniciarAprobacion({{ $vac->id }})" style="background-color: #16a34a; color: #ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:bg-green-700">
                                             Aprobar
@@ -247,57 +247,57 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-gray-100 dark:border-white/5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            <th class="py-3 px-4">Empleado</th>
-                            <th class="py-3 px-4">Tipo</th>
-                            <th class="py-3 px-4">Fechas</th>
-                            <th class="py-3 px-4">Estado</th>
-                            <th class="py-3 px-4">Resolución</th>
-                            <th class="py-3 px-4 text-right">Acciones</th>
+                        <tr class="border-b border-gray-100 dark:border-white/5 text-[10.5px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th class="py-2 px-3.5">Empleado</th>
+                            <th class="py-2 px-3.5">Tipo</th>
+                            <th class="py-2 px-3.5">Fechas</th>
+                            <th class="py-2 px-3.5">Estado</th>
+                            <th class="py-2 px-3.5">Resolución</th>
+                            <th class="py-2 px-3.5 text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-sm">
+                    <tbody class="divide-y divide-gray-50 dark:divide-white/5 text-xs">
                         @forelse($this->historicoProcesadas as $record)
                             <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
+                                <td class="py-2.5 px-3.5 font-semibold text-gray-900 dark:text-white text-xs">
                                     {{ $record->empleado ? $record->empleado->nombre . ' ' . $record->empleado->apellidos : 'N/A' }}
                                 </td>
-                                <td class="py-4 px-4 text-gray-600 dark:text-gray-400 font-medium text-xs">
+                                <td class="py-2.5 px-3.5 text-gray-600 dark:text-gray-400 font-medium text-xs">
                                     @if(isset($record->dias_solicitados))
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-bold text-[10px] uppercase">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-bold text-[9.5px] uppercase">
                                             Vacaciones
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 font-bold text-[10px] uppercase">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 font-bold text-[9.5px] uppercase">
                                             Baja Médica
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-4 px-4 text-gray-700 dark:text-gray-300 font-mono text-xs">
+                                <td class="py-2.5 px-3.5 text-gray-700 dark:text-gray-300 font-mono text-xs">
                                     @if(isset($record->dias_solicitados))
                                         {{ \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') }}
                                     @else
                                         {{ \Carbon\Carbon::parse($record->fecha_inicio)->format('d/m/Y') }} @if($record->fecha_fin) - {{ \Carbon\Carbon::parse($record->fecha_fin)->format('d/m/Y') }} @else (Indefinida) @endif
                                     @endif
                                 </td>
-                                <td class="py-4 px-4">
+                                <td class="py-2.5 px-3.5">
                                     @if($record->estado === 'Aceptada')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-xs font-bold">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 text-[11px] font-bold">
                                             Aprobada
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-xs font-bold">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 text-[11px] font-bold">
                                             Denegada
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-4 px-4 text-gray-500 dark:text-gray-400 text-xs font-medium">
+                                <td class="py-2.5 px-3.5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                                     Resuelto: {{ \Carbon\Carbon::parse($record->updated_at)->translatedFormat('d \d\e F \d\e Y H:i') }}
                                 </td>
-                                <td class="py-4 px-4 text-right">
+                                <td class="py-2.5 px-3.5 text-right">
                                     <button type="button" wire:click="verDetalles({{ $record->id }}, '{{ isset($record->dias_solicitados) ? 'vacacion' : 'baja' }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
                                         Ver Detalles
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>

@@ -125,6 +125,43 @@ class AdminPanelProvider extends PanelProvider
                         .fi-section {
                             margin-bottom: 0.875rem !important;
                         }
+
+                        /* 5. Tablas y listados compactos en todas las secciones */
+                        .fi-ta-table td,
+                        .fi-ta-table th,
+                        table tbody td,
+                        table thead th {
+                            padding-top: 0.5rem !important; /* 8px en vez de 16px */
+                            padding-bottom: 0.5rem !important;
+                            padding-left: 0.85rem !important;
+                            padding-right: 0.85rem !important;
+                        }
+
+                        /* Títulos y textos principales en filas de listados (ej. nombre de empleado) */
+                        .fi-ta-table td .fi-ta-text-item-label,
+                        .fi-ta-table td .fi-ta-text-item,
+                        table tbody td:first-child,
+                        table tbody td.font-semibold,
+                        .fi-ta-record td:first-child {
+                            font-size: 0.8rem !important; /* ~12.8px */
+                            line-height: 1.25 !important;
+                            font-weight: 600 !important;
+                        }
+
+                        /* Tipografía general más compacta en el contenido de las tablas */
+                        .fi-ta-table tbody tr,
+                        table tbody tr {
+                            font-size: 0.775rem !important; /* ~12.4px */
+                        }
+
+                        /* Encabezados de tablas reducidos */
+                        .fi-ta-table thead th,
+                        table thead th {
+                            padding-top: 0.45rem !important;
+                            padding-bottom: 0.45rem !important;
+                            font-size: 0.675rem !important; /* ~10.8px */
+                            letter-spacing: 0.05em !important;
+                        }
                     </style>
                     ";
 
