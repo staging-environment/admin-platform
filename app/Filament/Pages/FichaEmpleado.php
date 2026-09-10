@@ -17,7 +17,8 @@ class FichaEmpleado extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
 
-    protected static ?string $navigationLabel = 'Ficha de Empleado';
+    protected static ?string $slug = 'portal-empleado';
+    protected static ?string $navigationLabel = 'Portal de Empleado';
     protected static ?string $title = 'Portal de Empleado';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Recursos humanos';
@@ -26,8 +27,7 @@ class FichaEmpleado extends Page
     {
         return [
             'Recursos humanos',
-            'Fichajes',
-            'Listado',
+            'Portal de Empleado',
         ];
     }
 
@@ -96,8 +96,6 @@ class FichaEmpleado extends Page
         if (!$user) return false;
         
         return $user->can('acceder_portal_fichajes') 
-            || $user->can('ver_ficha_empleado')
-            || $user->can('gestion_recursos_humanos')
             || $user->email === 'jarodriguezbonilla@gmail.com' 
             || $user->id === 1;
     }
@@ -136,20 +134,14 @@ class FichaEmpleado extends Page
 
         $empleadoId = request()->query('empleado_id');
 
-        if ($isAdmin && !$empleadoId) {
-            $this->isViewingAdminList = true;
-            $this->empleado = null;
+        if ($isAdmin && $empleadoId) {
+            $this->empleado = Empleado::find($empleadoId);
         } else {
-            $this->isViewingAdminList = false;
-            if ($isAdmin && $empleadoId) {
-                $this->empleado = Empleado::find($empleadoId);
-            } else {
-                $this->empleado = Empleado::where('email', $user->email)->first();
-            }
+            $this->empleado = Empleado::where('email', $user->email)->first();
         }
 
         // Auto-create mock employee for admin users who also have the Empleado role (or are testing)
-        if (!$this->empleado && !$this->isViewingAdminList && ($user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)) {
+        if (!$this->empleado && ($user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)) {
             $this->empleado = Empleado::create([
                 'nombre' => $user->name ?: 'jarodriguezbonilla',
                 'apellidos' => '(Admin)',
@@ -224,13 +216,7 @@ class FichaEmpleado extends Page
 
     public function loadFichajes(): void
     {
-        if ($this->isViewingAdminList) {
-            $this->todasLasVacaciones = [];
-            $this->todasLasBajas = [];
-            $this->fichajeDelDia = null;
-            $this->recentFichajes = collect();
-            return;
-        }
+
 
         if (!$this->empleado) {
             $this->fichajeDelDia = null;

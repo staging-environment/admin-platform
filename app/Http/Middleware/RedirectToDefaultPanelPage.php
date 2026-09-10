@@ -46,13 +46,18 @@ class RedirectToDefaultPanelPage
                     \Illuminate\Support\Facades\Log::info("Redirecting non-admin user to check-in screen (fichaje missing today)", [
                         'user_email' => $user->email
                     ]);
-                    return redirect('/admin/ficha-empleado');
+                    return redirect('/admin/portal-empleado');
                 }
 
                 // If already checked in today, normal redirect logic
-                if ($user->can('acceder_portal_fichajes') || $user->can('ver_ficha_empleado')) {
-                    \Illuminate\Support\Facades\Log::info("Redirecting employee to /admin/ficha-empleado");
-                    return redirect('/admin/ficha-empleado');
+                if ($user->can('acceder_portal_fichajes')) {
+                    \Illuminate\Support\Facades\Log::info("Redirecting employee to /admin/portal-empleado");
+                    return redirect('/admin/portal-empleado');
+                }
+
+                if ($user->can('ver_listado_fichajes')) {
+                    \Illuminate\Support\Facades\Log::info("Redirecting user to /admin/fichajes");
+                    return redirect('/admin/fichajes');
                 }
                 
                 if ($user->can('gestion_recursos_humanos')) {

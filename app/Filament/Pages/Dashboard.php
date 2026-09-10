@@ -37,7 +37,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     {
         $user = auth()->user();
         if ($user && $user->can('ver_ficha_empleado') && !$user->can('ver_dashboard')) {
-            redirect()->to('/admin/ficha-empleado');
+            redirect()->to('/admin/portal-empleado');
             return;
         }
 

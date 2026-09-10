@@ -27,7 +27,7 @@ class FichajePendienteReminderMail extends Mailable
 
     private function getEmailContent()
     {
-        $url = url('/admin/ficha-empleado');
+        $url = url('/admin/portal-empleado');
         return "
         <!DOCTYPE html>
         <html>

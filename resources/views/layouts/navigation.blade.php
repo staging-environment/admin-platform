@@ -21,7 +21,7 @@
                         || request()->routeIs('dashboard');
 
                     $isRrHhActive = request()->is('admin/recursos-humanos*') 
-                        || request()->is('admin/ficha-empleado*') 
+                        || request()->is('admin/fichajes*') || request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*') 
                         || request()->is('admin/aprobaciones*') 
                         || request()->is('admin/solicitudes-vacaciones*') 
                         || request()->is('admin/job-offers*') 
@@ -60,9 +60,15 @@
                                 </x-slot>
 
                                 <x-slot name="content">
-                                     @if(auth()->user()?->can('acceder_portal_fichajes'))
-                                     <x-dropdown-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                                     @if(auth()->user()?->can('ver_listado_fichajes'))
+                                     <x-dropdown-link href="/admin/fichajes" :active="request()->is('admin/fichajes*')">
                                          {{ __('Fichajes') }}
+                                     </x-dropdown-link>
+                                     @endif
+
+                                     @if(auth()->user()?->can('acceder_portal_fichajes'))
+                                     <x-dropdown-link href="/admin/portal-empleado" :active="request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')">
+                                         {{ __('Portal del Empleado') }}
                                      </x-dropdown-link>
                                      @endif
 
@@ -250,9 +256,15 @@
                         {{ __('Recursos humanos') }}
                     </div>
                     <div class="mt-2 space-y-1">
-                        @if(auth()->user()?->can('acceder_portal_fichajes'))
-                        <x-responsive-nav-link href="/admin/ficha-empleado" :active="request()->is('admin/ficha-empleado*')">
+                        @if(auth()->user()?->can('ver_listado_fichajes'))
+                        <x-responsive-nav-link href="/admin/fichajes" :active="request()->is('admin/fichajes*')">
                             {{ __('Fichajes') }}
+                        </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()?->can('acceder_portal_fichajes'))
+                        <x-responsive-nav-link href="/admin/portal-empleado" :active="request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')">
+                            {{ __('Portal del Empleado') }}
                         </x-responsive-nav-link>
                         @endif
 

@@ -52,7 +52,7 @@ class PasswordController extends Controller
         session()->flash('success', 'Tu contraseña ha sido cambiada con éxito.');
 
         if ($user->can('acceder_portal_fichajes') || $user->can('ver_ficha_empleado')) {
-            return redirect('/admin/ficha-empleado');
+            return redirect('/admin/portal-empleado');
         }
 
         if ($user->can('gestion_recursos_humanos')) {

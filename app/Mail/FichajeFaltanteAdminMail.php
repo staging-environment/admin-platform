@@ -29,7 +29,7 @@ class FichajeFaltanteAdminMail extends Mailable
 
     private function getEmailContent()
     {
-        $url = url('/admin/ficha-empleado');
+        $url = url('/admin/fichajes');
         return "
         <!DOCTYPE html>
         <html>

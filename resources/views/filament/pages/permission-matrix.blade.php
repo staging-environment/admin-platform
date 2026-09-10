@@ -64,7 +64,8 @@
                         'Recursos Humanos / Empleados' => [
                             'gestion_recursos_humanos' => 'Acceso General a Recursos Humanos',
                             'ver_ficha_empleado' => 'Ver Ficha de Empleado (Detalle)',
-                            'acceder_portal_fichajes' => 'Acceder al listado / portal de Fichajes',
+                            'ver_listado_fichajes' => 'Ver y Supervisar Listado de Fichajes',
+                            'acceder_portal_fichajes' => 'Acceder al Portal del Empleado (Fichar y Solicitudes)',
                             'gestion_alta_empleados' => 'Alta de nuevos empleados',
                             'gestion_editar_empleados' => 'Edición de ficha principal',
                             'gestion_eliminar_empleados' => 'Eliminar empleados',

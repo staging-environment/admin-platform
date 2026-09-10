@@ -207,6 +207,9 @@ Route::post('/contacto', function (Request $request) {
 // --- SECCIÓN PRIVADA (BACKEND) ---
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('/admin/dashboard', '/admin');
+    Route::get('/admin/ficha-empleado', function (\Illuminate\Http\Request $request) {
+        return redirect('/admin/portal-empleado' . ($request->getQueryString() ? '?' . $request->getQueryString() : ''));
+    });
     Route::redirect('/dashboard', '/admin')->name('dashboard');
     // Endpoint JSON para AJAX polling de mercados energeticos (dashboard)
     Route::get('/admin/api/fuel-markets-data', function () {

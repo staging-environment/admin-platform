@@ -58,6 +58,7 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
         }
 
         return $this->can('acceder_portal_fichajes')
+            || $this->can('ver_listado_fichajes')
             || $this->can('ver_dashboard')
             || $this->can('gestion_recursos_humanos')
             || $this->permissions()->exists()
