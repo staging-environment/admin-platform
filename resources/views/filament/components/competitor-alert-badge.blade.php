@@ -13,13 +13,14 @@
             $totalChanged += ($a['changed_stations_count'] ?? 1);
         }
         $countDisplay = $totalChanged > 0 ? $totalChanged : $totalAlerts;
+        $isGlobalBadge = $isGlobal ?? empty($localityName);
     @endphp
 
     @if ($totalAlerts > 0)
-        <!-- Boton pulsante de alerta identico al de empleados, especifico por localidad -->
+        <!-- Boton pulsante de alerta -->
         <button type="button" 
                 @click.stop="open = true" 
-                style="position: relative !important; z-index: 10 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; margin-left: 6px !important; padding: 0 7px !important; height: 18px !important; border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: all 0.2s !important; box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4) !important; flex-shrink: 0 !important; outline: none !important; animation: alert-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
+                style="position: relative !important; z-index: 10 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; {{ $isGlobalBadge ? 'padding: 0 9px !important; height: 20px !important;' : 'margin-left: 6px !important; padding: 0 7px !important; height: 18px !important;' }} border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: all 0.2s !important; box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4) !important; flex-shrink: 0 !important; outline: none !important; animation: alert-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'"
                 title="Cambios de precio detectados por MITECO en las ultimas 2 horas">
@@ -27,7 +28,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span style="font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; line-height: 1 !important; white-space: nowrap !important; letter-spacing: 0.02em !important;">
-                MITECO: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio' : 'cambios' }}
+                @if ($isGlobalBadge)
+                    MITECO: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio detectado' : 'cambios detectados' }}
+                @else
+                    MITECO: {{ $countDisplay }} {{ $countDisplay === 1 ? 'cambio' : 'cambios' }}
+                @endif
             </span>
         </button>
 
@@ -69,6 +74,8 @@
                                     <span>Variaciones de Precios Detectadas por MITECO</span>
                                     @if(!empty($localityName))
                                         <span class="text-xs font-normal text-gray-300">&bull; {{ $localityName }}</span>
+                                    @else
+                                        <span class="text-xs font-normal text-gray-300">&bull; Todas las localidades</span>
                                     @endif
                                 </h3>
                                 <p class="text-[10px] text-gray-400 mt-0.5">
@@ -83,7 +90,7 @@
                         </button>
                     </div>
                     
-                    <!-- Cuerpo con listado de alertas de la localidad -->
+                    <!-- Cuerpo con listado de alertas -->
                     <div class="p-4 sm:p-5 space-y-4 max-h-[70vh] overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50">
                         @foreach ($alerts as $alert)
                             @php
