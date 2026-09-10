@@ -916,3 +916,28 @@ label .text-danger-400,
 .fi-resource-edit-record-page.fi-resource-recursos-humanos .fi-form-actions .fi-btn-color-success span {
     color: #ffffff !important;
 }
+
+/* Botones verdes para Usuarios (Crear Usuario y Aplicar Filtros) */
+.fi-resource-users .fi-header-actions .fi-btn-color-primary,
+.fi-resource-users .fi-header-actions .fi-btn-color-success {
+    background-color: #16a34a !important;
+    border-color: #16a34a !important;
+    color: #ffffff !important;
+}
+
+.fi-resource-users .fi-header-actions .fi-btn-color-primary:hover,
+.fi-resource-users .fi-header-actions .fi-btn-color-success:hover {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}
+
+.fi-resource-users .fi-ta-filters-actions-ctn button {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    border-color: #16a34a !important;
+}
+
+.fi-resource-users .fi-ta-filters-actions-ctn button:hover {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+}

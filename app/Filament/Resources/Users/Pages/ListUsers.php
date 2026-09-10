@@ -14,7 +14,11 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                ]),
         ];
     }
 
