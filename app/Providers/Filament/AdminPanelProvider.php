@@ -151,6 +151,41 @@ class AdminPanelProvider extends PanelProvider
                             margin-bottom: 0.65rem !important;
                         }
 
+                        
+                        /* Botones de acción compactos en cabecera para mantener altura homogénea con las migas de pan */
+                        .fi-header-actions,
+                        .fi-page-header-actions {
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 0.35rem !important;
+                        }
+
+                        .fi-header-actions .fi-btn,
+                        .fi-page-header-actions .fi-btn {
+                            padding-top: 0.25rem !important;
+                            padding-bottom: 0.25rem !important;
+                            padding-block: 0.25rem !important;
+                            padding-inline: 0.65rem !important;
+                            font-size: 0.75rem !important;
+                            line-height: 1.25 !important;
+                            min-height: 28px !important;
+                            height: 28px !important;
+                            border-radius: 0.5rem !important;
+                        }
+
+                        .fi-header-actions .fi-btn .fi-btn-label,
+                        .fi-page-header-actions .fi-btn .fi-btn-label {
+                            font-size: 0.75rem !important;
+                            font-weight: 600 !important;
+                        }
+
+                        .fi-header-actions .fi-btn .fi-btn-icon,
+                        .fi-header-actions .fi-btn svg,
+                        .fi-page-header-actions .fi-btn svg {
+                            width: 0.85rem !important;
+                            height: 0.85rem !important;
+                        }
+
                         /* 4. Títulos secundarios reducidos en todas las secciones */
                         .fi-section-header-heading,
                         .fi-sc-section-header-heading,

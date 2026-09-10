@@ -23,11 +23,16 @@ class ListEmpleados extends ListRecords
                 ->label('Exportar PDF')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('danger')
+                ->size(\Filament\Support\Enums\Size::ExtraSmall)
+                ->extraAttributes([
+                    'style' => 'padding: 0.25rem 0.65rem !important; font-size: 0.75rem !important; min-height: 28px !important; height: 28px !important;',
+                ])
                 ->action(fn () => $this->exportPdf()),
             CreateAction::make()
                 ->color('success')
+                ->size(\Filament\Support\Enums\Size::ExtraSmall)
                 ->extraAttributes([
-                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important;',
+                    'style' => 'background-color: #16a34a !important; color: #ffffff !important; border-color: #16a34a !important; padding: 0.25rem 0.65rem !important; font-size: 0.75rem !important; min-height: 28px !important; height: 28px !important;',
                 ]),
         ];
     }
