@@ -621,38 +621,38 @@
             </div>
 
             <!-- Weekdays Header (7 columns: lun, mar, mié, jue, vie, sáb, dom) -->
-            <div class="shrink-0 grid grid-cols-7 border-b border-gray-200 dark:border-white/10 bg-gray-50/70 dark:bg-gray-900/70 text-center py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300">
-                <div>lun</div>
-                <div>mar</div>
-                <div>mié</div>
-                <div>jue</div>
-                <div>vie</div>
-                <div class="text-gray-400 dark:text-gray-500">sáb</div>
-                <div class="text-gray-400 dark:text-gray-500">dom</div>
+            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));" class="shrink-0 border-b border-gray-200 dark:border-white/10 bg-gray-50/80 dark:bg-gray-900/80 text-center py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300">
+                <div class="py-1">lun</div>
+                <div class="py-1">mar</div>
+                <div class="py-1">mié</div>
+                <div class="py-1">jue</div>
+                <div class="py-1">vie</div>
+                <div class="py-1 text-gray-400 dark:text-gray-500">sáb</div>
+                <div class="py-1 text-gray-400 dark:text-gray-500">dom</div>
             </div>
 
             <!-- Month Days Grid (7 columns x 5-6 rows) -->
             <div class="flex-1 min-h-0 overflow-y-auto bg-gray-200 dark:bg-white/10 p-px" style="overflow-y: auto !important;">
-                <div class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-white/10 h-full">
+                <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));" class="gap-px bg-gray-200 dark:bg-white/10">
                     @foreach($this->calendario['days'] as $d)
                         @php
                             $isCurrent = $d['isCurrentMonth'];
                             $isToday = $d['isToday'];
-                            $cellBg = $isToday ? 'bg-indigo-50/60 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-60');
+                            $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-50');
                         @endphp
 
-                        <div class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start min-h-[65px] sm:min-h-[80px] transition-colors relative group">
+                        <div style="min-height: 68px; max-height: 90px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-hidden">
                             <!-- Day Number Header -->
-                            <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center justify-between mb-0.5 leading-none">
                                 <div></div>
-                                <span class="text-[10px] sm:text-[11px] font-bold {{ $isToday ? 'w-5 h-5 rounded-full flex items-center justify-center bg-indigo-600 text-white font-black shadow-xs' : ($isCurrent ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
+                                <span class="text-[10px] sm:text-[11px] font-bold {{ $isToday ? 'w-4.5 h-4.5 rounded-full flex items-center justify-center bg-indigo-600 text-white font-black shadow-xs' : ($isCurrent ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
                                     {{ $d['day'] }}
                                 </span>
                             </div>
 
                             <!-- Day Requests (Pills) -->
                             @if(!empty($d['solicitudes']))
-                                <div class="space-y-0.5 overflow-y-auto max-h-[55px] sm:max-h-[70px] pr-0.5">
+                                <div class="space-y-0.5 overflow-y-auto max-h-[50px] sm:max-h-[62px] pr-0.5">
                                     @foreach($d['solicitudes'] as $sol)
                                         @php
                                             $st = $sol['estado'];
@@ -668,7 +668,7 @@
                                             }
                                         @endphp
 
-                                        <div style="{{ $pillStyle }}" class="px-1 py-0.5 rounded text-[8.5px] font-bold flex items-center justify-between gap-1 leading-none shadow-2xs cursor-pointer hover:opacity-85" title="{{ $sol['empleado'] }} ({{ $sol['estado'] }}: {{ $sol['fechas'] }} - {{ $sol['dias'] }} días)">
+                                        <div style="{{ $pillStyle }}" class="px-1 py-0.5 rounded text-[8px] sm:text-[8.5px] font-bold flex items-center justify-between gap-0.5 leading-none shadow-2xs cursor-pointer hover:opacity-85" title="{{ $sol['empleado'] }} ({{ $sol['estado'] }}: {{ $sol['fechas'] }} - {{ $sol['dias'] }} días)">
                                             <span class="truncate font-black tracking-wider">{{ $sol['iniciales'] }}</span>
                                             <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $dotColor }};" title="{{ $sol['estado'] }}"></span>
                                         </div>
