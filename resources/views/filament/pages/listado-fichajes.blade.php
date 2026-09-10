@@ -140,46 +140,54 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
-                                            <div class="flex flex-col gap-1">
-                                                <div class="flex items-center gap-1.5">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-mono text-xs font-bold w-fit">
-                                                        {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '-' }}
-                                                    </span>
-                                                    @if($fichaje->checkin_latitude && $fichaje->checkin_longitude)
-                                                        <a href="https://www.google.com/maps?q={{ $fichaje->checkin_latitude }},{{ $fichaje->checkin_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkin_latitude }}, {{ $fichaje->checkin_longitude }})">
-                                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                            Mapa
-                                                        </a>
+﻿                                        <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
+                                            @php
+                                                $realCheckin = $fichaje->server_checkin_at
+                                                    ? $fichaje->server_checkin_at->timezone("Europe/Madrid")->format("d/m/Y H:i:s")
+                                                    : ($fichaje->fecha && $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->fecha . " " . $fichaje->hora_entrada)->format("d/m/Y H:i:s") : null);
+                                                $tooltipEntrada = $realCheckin ? "Real: " . $realCheckin : null;
+                                            @endphp
+                                            <div class="flex items-center gap-1.5">
+                                                <span 
+                                                    class="inline-flex items-center px-2 py-0.5 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 font-mono text-xs font-bold w-fit cursor-help transition-all hover:bg-green-100 dark:hover:bg-green-900/50"
+                                                    @if($tooltipEntrada)
+                                                        x-tooltip="{ content: @js($tooltipEntrada), theme: $store.theme }"
+                                                        title="{{ $tooltipEntrada }}"
                                                     @endif
-                                                </div>
-                                                @if($fichaje->server_checkin_at)
-                                                    <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px] whitespace-nowrap" title="Hora real del sistema: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
-                                                        <svg class="w-2.5 h-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                        Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
-                                                    </span>
+                                                >
+                                                    {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format("H:i") : "-" }}
+                                                </span>
+                                                @if($fichaje->checkin_latitude && $fichaje->checkin_longitude)
+                                                    <a href="https://www.google.com/maps?q={{ $fichaje->checkin_latitude }},{{ $fichaje->checkin_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkin_latitude }}, {{ $fichaje->checkin_longitude }})">
+                                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                        Mapa
+                                                    </a>
                                                 @endif
                                             </div>
                                         </td>
                                         <td class="py-2 px-4 text-gray-600 dark:text-gray-400">
                                             @if($fichaje->hora_salida)
-                                                <div class="flex flex-col gap-1">
-                                                    <div class="flex items-center gap-1.5">
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 font-mono text-xs font-bold w-fit">
-                                                            {{ \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') }}
-                                                        </span>
-                                                        @if($fichaje->checkout_latitude && $fichaje->checkout_longitude)
-                                                            <a href="https://www.google.com/maps?q={{ $fichaje->checkout_latitude }},{{ $fichaje->checkout_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkout_latitude }}, {{ $fichaje->checkout_longitude }})">
-                                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                                Mapa
-                                                            </a>
+                                                @php
+                                                    $realCheckout = $fichaje->server_checkout_at
+                                                        ? $fichaje->server_checkout_at->timezone("Europe/Madrid")->format("d/m/Y H:i:s")
+                                                        : ($fichaje->fecha && $fichaje->hora_salida ? \Carbon\Carbon::parse($fichaje->fecha . " " . $fichaje->hora_salida)->format("d/m/Y H:i:s") : null);
+                                                    $tooltipSalida = $realCheckout ? "Real: " . $realCheckout : null;
+                                                @endphp
+                                                <div class="flex items-center gap-1.5">
+                                                    <span 
+                                                        class="inline-flex items-center px-2 py-0.5 rounded bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 font-mono text-xs font-bold w-fit cursor-help transition-all hover:bg-orange-100 dark:hover:bg-orange-900/50"
+                                                        @if($tooltipSalida)
+                                                            x-tooltip="{ content: @js($tooltipSalida), theme: $store.theme }"
+                                                            title="{{ $tooltipSalida }}"
                                                         @endif
-                                                    </div>
-                                                    @if($fichaje->server_checkout_at)
-                                                        <span class="inline-flex items-center gap-0.5 text-gray-500 dark:text-gray-400 font-mono text-[10px] whitespace-nowrap" title="Hora real del sistema: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}">
-                                                            <svg class="w-2.5 h-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                            Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}
-                                                        </span>
+                                                    >
+                                                        {{ \Carbon\Carbon::parse($fichaje->hora_salida)->format("H:i") }}
+                                                    </span>
+                                                    @if($fichaje->checkout_latitude && $fichaje->checkout_longitude)
+                                                        <a href="https://www.google.com/maps?q={{ $fichaje->checkout_latitude }},{{ $fichaje->checkout_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[10px] transition-colors" title="Ver ubicación en Google Maps ({{ $fichaje->checkout_latitude }}, {{ $fichaje->checkout_longitude }})">
+                                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                            Mapa
+                                                        </a>
                                                     @endif
                                                 </div>
                                             @else
