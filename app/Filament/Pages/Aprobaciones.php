@@ -53,9 +53,10 @@ class Aprobaciones extends Page
     public $viewingRecord = null;
     public $viewingType = null;
 
-    // Calendario Anual Modal
+    // Calendario Modal
     public bool $showCalendarioModal = false;
     public int $calendarioAnio = 2026;
+    public int $calendarioMes = 9;
     public string $calendarioEmpleado = '';
 
     public static function canAccess(): bool
@@ -464,6 +465,9 @@ class Aprobaciones extends Page
         if (empty($this->calendarioAnio)) {
             $this->calendarioAnio = (int) date('Y');
         }
+        if (empty($this->calendarioMes)) {
+            $this->calendarioMes = (int) date('n');
+        }
         $this->showCalendarioModal = true;
     }
 
@@ -472,24 +476,60 @@ class Aprobaciones extends Page
         $this->showCalendarioModal = false;
     }
 
-    public function cambiarAnioCalendario(int $delta): void
+    public function mesAnterior(): void
     {
-        $this->calendarioAnio += $delta;
+        if ($this->calendarioMes === 1) {
+            $this->calendarioMes = 12;
+            $this->calendarioAnio--;
+        } else {
+            $this->calendarioMes--;
+        }
     }
 
-    public function getCalendarioAnualProperty(): array
+    public function mesSiguiente(): void
+    {
+        if ($this->calendarioMes === 12) {
+            $this->calendarioMes = 1;
+            $this->calendarioAnio++;
+        } else {
+            $this->calendarioMes++;
+        }
+    }
+
+    public function irHoy(): void
+    {
+        $this->calendarioMes = (int) date('n');
+        $this->calendarioAnio = (int) date('Y');
+    }
+
+    public function getCalendarioProperty(): array
     {
         $year = (int) ($this->calendarioAnio ?: date('Y'));
-        $yearStart = "$year-01-01";
-        $yearEnd = "$year-12-31";
+        $month = (int) ($this->calendarioMes ?: date('n'));
+
+        $inicioMes = Carbon::create($year, $month, 1);
+        $diasEnMes = $inicioMes->daysInMonth;
+        $primerDiaSemana = $inicioMes->dayOfWeekIso; // 1 (Lun) a 7 (Dom)
+        $diasPrevios = $primerDiaSemana - 1;
+
+        $startDate = $inicioMes->copy()->subDays($diasPrevios);
+        
+        // Verificamos si caben en 35 días (5 semanas) o 42 días (6 semanas)
+        $day35Date = $startDate->copy()->addDays(34);
+        $totalDays = ($day35Date->month == $month && $day35Date->day < $diasEnMes) ? 42 : 35;
+        
+        $endDate = $startDate->copy()->addDays($totalDays - 1);
+
+        $startDateStr = $startDate->format('Y-m-d');
+        $endDateStr = $endDate->format('Y-m-d');
 
         $query = EmpleadoVacacion::with('empleado')
-            ->where(function ($q) use ($yearStart, $yearEnd) {
-                $q->whereBetween('fecha_inicio', [$yearStart, $yearEnd])
-                  ->orWhereBetween('fecha_fin', [$yearStart, $yearEnd])
-                  ->orWhere(function ($q2) use ($yearStart, $yearEnd) {
-                      $q2->where('fecha_inicio', '<=', $yearStart)
-                         ->where('fecha_fin', '>=', $yearEnd);
+            ->where(function ($q) use ($startDateStr, $endDateStr) {
+                $q->whereBetween('fecha_inicio', [$startDateStr, $endDateStr])
+                  ->orWhereBetween('fecha_fin', [$startDateStr, $endDateStr])
+                  ->orWhere(function ($q2) use ($startDateStr, $endDateStr) {
+                      $q2->where('fecha_inicio', '<=', $startDateStr)
+                         ->where('fecha_fin', '>=', $endDateStr);
                   });
             });
 
@@ -504,64 +544,87 @@ class Aprobaciones extends Page
         $vacaciones = $query->orderBy('fecha_inicio', 'asc')->get();
 
         $mesesNombres = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+            1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+            5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+            9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
         ];
 
-        $meses = [];
+        $todayStr = date('Y-m-d');
+        $days = [];
 
-        for ($m = 1; $m <= 12; $m++) {
-            $startOfMonth = Carbon::create($year, $m, 1);
-            $daysInMonth = $startOfMonth->daysInMonth;
+        for ($i = 0; $i < $totalDays; $i++) {
+            $currentDate = $startDate->copy()->addDays($i);
+            $dateStr = $currentDate->format('Y-m-d');
+            $isCurrentMonth = ($currentDate->month === $month);
+            $isToday = ($dateStr === $todayStr);
+            $isWeekend = ($currentDate->dayOfWeekIso >= 6);
 
-            $monthStartStr = sprintf('%04d-%02d-01', $year, $m);
-            $monthEndStr = sprintf('%04d-%02d-%02d', $year, $m, $daysInMonth);
-
-            $monthVacations = $vacaciones->filter(function ($v) use ($monthStartStr, $monthEndStr) {
+            $dayVacations = [];
+            foreach ($vacaciones as $v) {
                 $fin = $v->fecha_fin ?: $v->fecha_inicio;
-                return $v->fecha_inicio <= $monthEndStr && $fin >= $monthStartStr;
-            });
+                if ($v->fecha_inicio <= $dateStr && $fin >= $dateStr) {
+                    $rawEstado = strtolower(trim($v->estado ?? ''));
+                    if (in_array($rawEstado, ['aceptada', 'aprobada', 'aprobado', 'aceptado'])) {
+                        $estado = 'Aprobada';
+                    } elseif (in_array($rawEstado, ['rechazada', 'denegada', 'rechazado', 'denegado', 'cancelada'])) {
+                        $estado = 'Denegada';
+                    } else {
+                        $estado = 'Pendiente';
+                    }
 
-            $aprobadasCount = 0;
-            $pendientesCount = 0;
-            $denegadasCount = 0;
-            $solicitudes = [];
+                    $nombre = $v->empleado ? $v->empleado->nombre : '';
+                    $apellidos = $v->empleado ? $v->empleado->apellidos : '';
+                    $empName = trim($nombre . ' ' . $apellidos) ?: 'Empleado';
+                    $iniciales = self::extractIniciales($nombre, $apellidos);
 
-            foreach ($monthVacations as $v) {
-                $estado = in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente');
-                if ($estado === 'Aprobada') $aprobadasCount++;
-                elseif ($estado === 'Pendiente') $pendientesCount++;
-                else $denegadasCount++;
+                    $inicioCarbon = Carbon::parse($v->fecha_inicio);
+                    $finCarbon = Carbon::parse($v->fecha_fin ?: $v->fecha_inicio);
+                    $fechasStr = $inicioCarbon->format('d/m') . ' - ' . $finCarbon->format('d/m');
+                    $diasCalculados = $v->dias ?: ($inicioCarbon->diffInDays($finCarbon) + 1);
 
-                $empName = $v->empleado ? ($v->empleado->nombre . ' ' . $v->empleado->apellidos) : 'Empleado';
-                
-                $inicioCarbon = Carbon::parse($v->fecha_inicio);
-                $finCarbon = Carbon::parse($v->fecha_fin ?: $v->fecha_inicio);
-                $fechasStr = $inicioCarbon->format('d/m/Y') . ' - ' . $finCarbon->format('d/m/Y');
-                $diasCalculados = $v->dias ?: ($inicioCarbon->diffInDays($finCarbon) + 1);
-
-                $solicitudes[] = [
-                    'id' => $v->id,
-                    'empleado' => $empName,
-                    'fechas' => $fechasStr,
-                    'dias' => $diasCalculados,
-                    'estado' => $estado,
-                    'tipo' => $v->tipo ?: 'Vacaciones',
-                ];
+                    $dayVacations[] = [
+                        'id' => $v->id,
+                        'empleado' => $empName,
+                        'iniciales' => $iniciales,
+                        'estado' => $estado,
+                        'fechas' => $fechasStr,
+                        'dias' => $diasCalculados,
+                    ];
+                }
             }
 
-            $meses[$m] = [
-                'numero' => $m,
-                'nombre' => $mesesNombres[$m],
-                'aprobadas' => $aprobadasCount,
-                'pendientes' => $pendientesCount,
-                'denegadas' => $denegadasCount,
-                'total' => count($monthVacations),
-                'solicitudes' => $solicitudes,
+            $days[] = [
+                'date' => $dateStr,
+                'day' => $currentDate->day,
+                'isCurrentMonth' => $isCurrentMonth,
+                'isToday' => $isToday,
+                'isWeekend' => $isWeekend,
+                'solicitudes' => $dayVacations,
             ];
         }
 
-        return $meses;
+        return [
+            'mesNombre' => $mesesNombres[$month],
+            'mesNumero' => $month,
+            'anio' => $year,
+            'totalDias' => $totalDays,
+            'days' => $days,
+        ];
+    }
+
+    public static function extractIniciales(?string $nombre, ?string $apellidos = null): string
+    {
+        $fullName = trim(($nombre ?? '') . ' ' . ($apellidos ?? ''));
+        if (empty($fullName)) {
+            return 'EMP';
+        }
+        $words = preg_split('/\s+/', $fullName);
+        $initials = '';
+        foreach ($words as $w) {
+            if ($w !== '') {
+                $initials .= mb_strtoupper(mb_substr($w, 0, 1));
+            }
+        }
+        return mb_substr($initials, 0, 4) ?: 'EMP';
     }
 }
