@@ -4,9 +4,8 @@
             $now = \Carbon\Carbon::now();
             $year = $now->year;
 
-            $sept8 = \Carbon\Carbon::create($year, 9, 8, 0, 0, 0);
             $startFeria = \Carbon\Carbon::create($year, 9, 4, 20, 0, 0);
-            $endFeria = $sept8->copy()->endOfWeek()->addDay()->setTime(8, 0, 0);
+            $endFeria = \Carbon\Carbon::create($year, 9, 8, 23, 59, 59);
 
             return $now->between($startFeria, $endFeria);
         })();

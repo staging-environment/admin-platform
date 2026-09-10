@@ -4,11 +4,9 @@
         $year = $now->year;
 
         // Calendario Oficial de la Feria y Fiestas de Ntra. Sra. de Consolación de Utrera:
-        // Arranca la Noche del Pescaíto (4 de Septiembre a las 20:00) y finaliza tras el día de la Patrona (8 de Septiembre),
-        // volviendo al estado normal el lunes por la mañana a las 08:00 AM.
-        $sept8 = \Carbon\Carbon::create($year, 9, 8, 0, 0, 0);
+        // Arranca la Noche del Pescaíto (4 de Septiembre a las 20:00) y finaliza el 8 de Septiembre a las 23:59:59 (Día de la Patrona).
         $startFeria = \Carbon\Carbon::create($year, 9, 4, 20, 0, 0);
-        $endFeria = $sept8->copy()->endOfWeek()->addDay()->setTime(8, 0, 0);
+        $endFeria = \Carbon\Carbon::create($year, 9, 8, 23, 59, 59);
 
         return $now->between($startFeria, $endFeria);
     })();
