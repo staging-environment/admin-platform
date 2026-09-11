@@ -246,6 +246,85 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('admin.competitor.dismiss_alerts');
 
+    Route::post('/admin/api/apply-suggested-price', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'locality_key' => 'required|string',
+            'fuel_type'    => 'required|string|in:diesel,gas95',
+            'price'        => 'required|numeric|min:0.5|max:3.5',
+        ]);
+
+        $localityMap = [
+            'utrera'    => ['name' => 'Utrera', 'station_code' => 1, 'station_name' => 'E.S. VISTALEGRE'],
+            'sevilla'   => ['name' => 'Sevilla', 'station_code' => 2, 'station_name' => 'RONDA NORTE'],
+            'el_cuervo' => ['name' => 'El Cuervo de Sevilla', 'station_code' => 3, 'station_name' => 'E.S. RODALABOTA'],
+            'lebrija'   => ['name' => 'Lebrija', 'station_code' => 4, 'station_name' => 'E.S. ATENAS'],
+        ];
+
+        $productMap = [
+            'diesel' => ['code' => '1', 'name' => 'Diésel (Gasóleo A)'],
+            'gas95'  => ['code' => '2', 'name' => 'Gasolina 95'],
+        ];
+
+        $locKey = strtolower($request->input('locality_key'));
+        $fuelType = strtolower($request->input('fuel_type'));
+        $price = round((float) $request->input('price'), 3);
+
+        if (!isset($localityMap[$locKey])) {
+            return response()->json(['success' => false, 'message' => "Localidad '{$locKey}' no reconocida."], 422);
+        }
+        if (!isset($productMap[$fuelType])) {
+            return response()->json(['success' => false, 'message' => "Combustible '{$fuelType}' no reconocido."], 422);
+        }
+
+        $loc = $localityMap[$locKey];
+        $prod = $productMap[$fuelType];
+        $stationCode = $loc['station_code'];
+        $productCode = $prod['code'];
+
+        try {
+            $db = \Illuminate\Support\Facades\DB::connection('virtusgesnet');
+            
+            $affected = $db->table('preciosdeproductos')
+                ->where('CodigoEstacion', $stationCode)
+                ->where('CodigoProducto', $productCode)
+                ->update(['PVP' => $price]);
+
+            if ($affected === 0) {
+                $exists = $db->table('preciosdeproductos')
+                    ->where('CodigoEstacion', $stationCode)
+                    ->where('CodigoProducto', $productCode)
+                    ->exists();
+
+                if (!$exists) {
+                    $db->table('preciosdeproductos')->insert([
+                        'CodigoEstacion'     => $stationCode,
+                        'CodigoProducto'     => $productCode,
+                        'AmbitoDeEstaciones' => 'Estacion',
+                        'PVP'                => $price,
+                    ]);
+                }
+            }
+
+            \Illuminate\Support\Facades\Log::info("VirtusGesNet PVP actualizado manualmente: Estación {$loc['station_name']} (Cod: {$stationCode}), {$prod['name']} -> {$price} € por usuario " . (auth()->user()->email ?? 'desconocido'));
+
+            return response()->json([
+                'success'         => true,
+                'message'         => "Precio de {$prod['name']} actualizado a " . number_format($price, 3, ',', '.') . " € en {$loc['station_name']} ({$loc['name']}) en la base de datos VirtusGesNet.",
+                'station_name'    => $loc['station_name'],
+                'locality'        => $loc['name'],
+                'fuel_name'       => $prod['name'],
+                'new_price'       => $price,
+                'formatted_price' => number_format($price, 3, ',', '.') . ' €',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error actualizando PVP en VirtusGesNet: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al conectar o actualizar en VirtusGesNet: ' . $e->getMessage(),
+            ], 500);
+        }
+    })->name('admin.competitor.apply_suggested_price');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

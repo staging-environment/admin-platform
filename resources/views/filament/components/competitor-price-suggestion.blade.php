@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'alert' => [],
     'gasoilData' => null,
     'rbobData' => null,
@@ -77,17 +77,40 @@
                 </p>
             </div>
         </div>
-        <span style="padding: 3px 10px !important; border-radius: 9999px !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; {{ $strategyBadgeStyle }}">
-            {{ $strategyTitle }}
-        </span>
+        <div style="display: flex !important; align-items: center !important; gap: 8px !important; flex-wrap: wrap !important;">
+            @if($suggestedPrice)
+                <button type="button" 
+                        @click="window.applySuggestedPrice ? window.applySuggestedPrice('{{ $alert['locality_key'] ?? '' }}', '{{ $alert['fuel_type'] ?? '' }}', {{ $suggestedPrice }}, '{{ $locality }}', '{{ $isDiesel ? 'Diésel' : 'Gasolina 95' }}', $el) : null"
+                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: #ffffff !important; border: 1px solid rgba(52, 211, 153, 0.4) !important; padding: 4px 11px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; display: inline-flex !important; align-items: center !important; gap: 5px !important; cursor: pointer !important; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important; transition: all 0.2s ease !important;"
+                        title="Actualizar precio sugerido en la base de datos VirtusGesNet">
+                    <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Actualizar en VirtusGesNet</span>
+                </button>
+            @endif
+            <span style="padding: 3px 10px !important; border-radius: 9999px !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: 0.04em !important; {{ $strategyBadgeStyle }}">
+                {{ $strategyTitle }}
+            </span>
+        </div>
     </div>
 
     <div style="display: grid !important; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important; gap: 10px !important; margin: 10px 0 !important;">
         <!-- Precio Sugerido -->
         <div style="padding: 10px 12px !important; border-radius: 10px !important; background: rgba(255, 255, 255, 0.06) !important; border: 1px solid rgba(255, 255, 255, 0.12) !important; display: flex !important; flex-direction: column !important; justify-content: center !important;">
-            <span style="font-size: 9px !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #94a3b8 !important; font-weight: 800 !important;">
-                Precio Sugerido
-            </span>
+            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+                <span style="font-size: 9px !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; color: #94a3b8 !important; font-weight: 800 !important;">
+                    Precio Sugerido
+                </span>
+                @if($suggestedPrice)
+                    <button type="button" 
+                            @click="window.applySuggestedPrice ? window.applySuggestedPrice('{{ $alert['locality_key'] ?? '' }}', '{{ $alert['fuel_type'] ?? '' }}', {{ $suggestedPrice }}, '{{ $locality }}', '{{ $isDiesel ? 'Diésel' : 'Gasolina 95' }}', $el) : null"
+                            style="background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; border: 1px solid rgba(52, 211, 153, 0.4) !important; padding: 2px 7px !important; border-radius: 6px !important; font-size: 9px !important; font-weight: 900 !important; text-transform: uppercase !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 3px !important; transition: all 0.2s ease !important;"
+                            title="Actualizar precio en VirtusGesNet">
+                        <span>⚡ Aplicar</span>
+                    </button>
+                @endif
+            </div>
             <div style="display: flex !important; align-items: baseline !important; gap: 4px !important; margin-top: 3px !important;">
                 @if($suggestedPrice)
                     <span style="font-size: 18px !important; font-weight: 900 !important; color: #34d399 !important; font-variant-numeric: tabular-nums !important; letter-spacing: -0.02em !important; line-height: 1 !important;">

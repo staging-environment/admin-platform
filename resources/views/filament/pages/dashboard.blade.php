@@ -819,41 +819,109 @@
 
         // Funcion global para desactivar alertas manualmente
         window.dismissCompetitorAlerts = function () {
-            fetch(''{{ route("admin.competitor.dismiss_alerts") }}'', {
-                method: ''POST'',
+            fetch("{{ route('admin.competitor.dismiss_alerts') }}", {
+                method: "POST",
                 headers: {
-                    ''Content-Type'': ''application/json'',
-                    ''X-CSRF-TOKEN'': ''{{ csrf_token() }}'',
-                    ''Accept'': ''application/json''
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
                 }
             })
             .then(function (res) { return res.json(); })
             .then(function (data) {
-                var banner = document.getElementById(''competitor-global-alert-wrapper'');
+                var banner = document.getElementById("competitor-global-alert-wrapper");
                 if (banner) {
-                    banner.style.transition = ''all 0.3s ease'';
-                    banner.style.opacity = ''0'';
-                    banner.style.transform = ''translateY(-10px)'';
-                    setTimeout(function () { banner.style.display = ''none''; }, 300);
+                    banner.style.transition = "all 0.3s ease";
+                    banner.style.opacity = "0";
+                    banner.style.transform = "translateY(-10px)";
+                    setTimeout(function () { banner.style.display = "none"; }, 300);
                 }
 
-                document.querySelectorAll(''.locality-alert-badge-wrapper'').forEach(function (el) {
-                    el.innerHTML = '''';
+                document.querySelectorAll(".locality-alert-badge-wrapper").forEach(function (el) {
+                    el.innerHTML = "";
                 });
 
-                document.querySelectorAll(''.station-row-alert'').forEach(function (row) {
-                    row.classList.remove(''station-row-alert'');
+                document.querySelectorAll(".station-row-alert").forEach(function (row) {
+                    row.classList.remove("station-row-alert");
                 });
-                document.querySelectorAll(''.station-diff-badge'').forEach(function (b) {
+                document.querySelectorAll(".station-diff-badge").forEach(function (b) {
                     b.remove();
                 });
 
-                if (typeof fetchCompetitors === ''function'') {
+                if (typeof fetchCompetitors === "function") {
                     fetchCompetitors();
                 }
             })
             .catch(function (err) {
-                console.error(''Error al desactivar alertas:'', err);
+                console.error("Error al desactivar alertas:", err);
+            });
+        };
+
+        // Funcion global para aplicar precio sugerido en VirtusGesNet
+        window.applySuggestedPrice = function (localityKey, fuelType, price, localityName, fuelName, btnElement) {
+            if (!localityKey || !fuelType || !price) {
+                alert("Datos incompletos para actualizar el precio.");
+                return;
+            }
+
+            var formattedPrice = parseFloat(price).toFixed(3).replace(".", ",") + " €";
+            var confirmMsg = "¿Confirmas que deseas aplicar y actualizar el precio de " + fuelName + " a " + formattedPrice + " para " + localityName + " en la base de datos de VirtusGesNet?";
+
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            var originalHtml = btnElement ? btnElement.innerHTML : "";
+            if (btnElement) {
+                btnElement.disabled = true;
+                btnElement.innerHTML = "⏳ Aplicando...";
+                btnElement.style.opacity = "0.7";
+            }
+
+            fetch("{{ route('admin.competitor.apply_suggested_price') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    locality_key: localityKey,
+                    fuel_type: fuelType,
+                    price: price
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (btnElement) {
+                    btnElement.disabled = false;
+                    btnElement.style.opacity = "1";
+                }
+                if (data.success) {
+                    if (btnElement) {
+                        btnElement.innerHTML = "✅ Aplicado en BD";
+                        btnElement.style.background = "#059669";
+                        setTimeout(function () {
+                            btnElement.innerHTML = originalHtml;
+                            btnElement.style.background = "";
+                        }, 4000);
+                    }
+                    alert("✅ " + data.message);
+                } else {
+                    if (btnElement) {
+                        btnElement.innerHTML = originalHtml;
+                    }
+                    alert("❌ Error: " + (data.message || "No se pudo actualizar el precio."));
+                }
+            })
+            .catch(function (err) {
+                console.error("Error aplicando precio en VirtusGesNet:", err);
+                if (btnElement) {
+                    btnElement.disabled = false;
+                    btnElement.style.opacity = "1";
+                    btnElement.innerHTML = originalHtml;
+                }
+                alert("❌ Error de conexión al actualizar en VirtusGesNet.");
             });
         };
 
