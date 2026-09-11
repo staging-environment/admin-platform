@@ -49,15 +49,6 @@ class UsersTable
                             return mb_strtoupper($primerApellido) . ', ' . mb_strtoupper($nombre);
                         }
                     })
-                    ->searchable(query: function ($query, $search) {
-                        return $query->where(function ($q) use ($search) {
-                            $q->where('name', 'like', "%{$search}%")
-                              ->orWhereHas('empleado', function ($eq) use ($search) {
-                                  $eq->where('nombre', 'like', "%{$search}%")
-                                     ->orWhere('apellidos', 'like', "%{$search}%");
-                              });
-                        });
-                    })
                     ->sortable(query: function ($query, $direction) {
                         return $query->orderBy(
                             \Illuminate\Support\Facades\DB::raw("COALESCE((

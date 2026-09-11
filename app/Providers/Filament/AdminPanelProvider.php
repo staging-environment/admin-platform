@@ -669,6 +669,15 @@ class AdminPanelProvider extends PanelProvider
     height: 14px !important;
 }
 
+
+/* Ocultar barra de busqueda redundante en Usuarios */
+.fi-resource-users .fi-ta-header-toolbar,
+.fi-resource-users .fi-ta-search-field,
+[class*=resource-users] .fi-ta-header-toolbar,
+[class*=resource-users] .fi-ta-search-field {
+    display: none !important;
+}
+
 </style>
                     ";
 

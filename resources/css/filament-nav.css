@@ -1605,3 +1605,12 @@ a.fi-breadcrumbs-item-label:hover {
     width: 14px !important;
     height: 14px !important;
 }
+
+
+/* Ocultar barra de busqueda redundante de la tabla de usuarios */
+.fi-resource-users .fi-ta-header-toolbar,
+.fi-resource-users .fi-ta-search-field,
+[class*="resource-users"] .fi-ta-header-toolbar,
+[class*="resource-users"] .fi-ta-search-field {
+    display: none !important;
+}
