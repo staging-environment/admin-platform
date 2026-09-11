@@ -296,14 +296,69 @@ class AdminPanelProvider extends PanelProvider
                         }
 
                         /* 6. Tablas y listados compactos en todas las secciones */
+                        .fi-resource-users .fi-ta-cell,
+                        .fi-resource-users tr.fi-ta-row > td.fi-ta-cell {
+                            padding-top: 0px !important;
+                            padding-bottom: 0px !important;
+                            padding-left: 8px !important;
+                            padding-right: 8px !important;
+                            height: 34px !important;
+                        }
+                        .fi-resource-users .fi-ta-cell > div,
+                        .fi-resource-users .fi-ta-col-wrp,
+                        .fi-resource-users .fi-ta-text,
+                        .fi-resource-users .fi-ta-text-item,
+                        .fi-resource-users .fi-ta-selection-cell,
+                        .fi-resource-users .fi-ta-actions-cell {
+                            padding-top: 0px !important;
+                            padding-bottom: 0px !important;
+                            margin-top: 0px !important;
+                            margin-bottom: 0px !important;
+                            min-height: 0px !important;
+                        }
+                        .fi-resource-users tr.fi-ta-row {
+                            height: 34px !important;
+                        }
+                        .fi-resource-users .fi-ta-row td * {
+                            font-size: 0.8125rem !important;
+                        }
+                        .fi-resource-users .fi-badge {
+                            padding-top: 1px !important;
+                            padding-bottom: 1px !important;
+                            padding-left: 6px !important;
+                            padding-right: 6px !important;
+                            font-size: 0.725rem !important;
+                            line-height: 1.2 !important;
+                            min-height: 20px !important;
+                        }
+                        .fi-resource-users .fi-ta-actions button,
+                        .fi-resource-users .fi-ta-actions a {
+                            padding: 2px !important;
+                            min-height: 24px !important;
+                            height: 24px !important;
+                        }
+                        .fi-resource-users .fi-ta-actions svg {
+                            width: 15px !important;
+                            height: 15px !important;
+                        }
+
                         .fi-ta-table td,
                         .fi-ta-table th,
                         table tbody td,
                         table thead th {
-                            padding-top: 0.5rem !important; /* 8px en vez de 16px */
-                            padding-bottom: 0.5rem !important;
-                            padding-left: 0.85rem !important;
-                            padding-right: 0.85rem !important;
+                            padding-top: 0.15rem !important;
+                            padding-bottom: 0.15rem !important;
+                            padding-left: 0.75rem !important;
+                            padding-right: 0.75rem !important;
+                        }
+
+                        .fi-ta-table .fi-ta-text,
+                        .fi-ta-table .fi-ta-col-wrp,
+                        .fi-ta-table .fi-ta-selection-cell,
+                        .fi-ta-table .fi-ta-actions-cell {
+                            padding-top: 0px !important;
+                            padding-bottom: 0px !important;
+                            min-height: 0px !important;
                         }
 
                         .fi-ta-table td .fi-ta-text-item-label,
@@ -466,7 +521,155 @@ class AdminPanelProvider extends PanelProvider
                             background-color: rgba(79, 70, 229, 0.25) !important;
                             border-color: rgba(99, 102, 241, 0.4) !important;
                         }
-                    </style>
+                    
+.fi-resource-users .fi-ta-cell,
+.fi-resource-users tr.fi-ta-row > td,
+.fi-resource-users td,
+[class*=resource-users] td,
+[class*=resource-users] .fi-ta-cell {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 30px !important;
+    line-height: 1.2 !important;
+}
+
+.fi-resource-users tr.fi-ta-row,
+.fi-resource-users tbody tr,
+[class*=resource-users] tr {
+    height: 30px !important;
+}
+
+.fi-resource-users .fi-ta-cell > div,
+.fi-resource-users .fi-ta-col-wrp,
+.fi-resource-users .fi-ta-text,
+.fi-resource-users .fi-ta-text-item,
+.fi-resource-users .fi-ta-selection-cell,
+.fi-resource-users .fi-ta-actions-cell,
+.fi-resource-users .fi-ta-actions,
+[class*=resource-users] .fi-ta-cell > div,
+[class*=resource-users] .fi-ta-col-wrp,
+[class*=resource-users] .fi-ta-text {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    margin-block: 0px !important;
+    min-height: 0px !important;
+}
+
+.fi-resource-users .fi-badge,
+[class*=resource-users] .fi-badge {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+    min-height: 18px !important;
+    height: 18px !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a,
+.fi-resource-users .fi-icon-btn,
+[class*=resource-users] .fi-ta-actions button {
+    padding: 1px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+}
+
+.fi-resource-users .fi-ta-actions svg,
+[class*=resource-users] .fi-ta-actions svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+/* extra_compact_users */
+
+/* =====================================================================
+   USUARIOS - Compactacion maxima de filas y eliminacion de padding
+   ===================================================================== */
+.fi-resource-users table tbody tr,
+.fi-resource-users tr.fi-ta-row,
+.fi-resource-users tbody tr,
+[class*=resource-users] tbody tr {
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 32px !important;
+}
+
+.fi-resource-users .fi-ta-cell,
+.fi-resource-users tr.fi-ta-row > td,
+.fi-resource-users td,
+.fi-resource-users th,
+[class*=resource-users] td,
+[class*=resource-users] th {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 28px !important;
+    line-height: 1.2 !important;
+}
+
+.fi-resource-users .fi-ta-cell > *,
+.fi-resource-users .fi-ta-col,
+.fi-resource-users .fi-ta-col-wrp,
+.fi-resource-users .fi-ta-text,
+.fi-resource-users .fi-ta-text-item,
+.fi-resource-users .fi-ta-selection-cell,
+.fi-resource-users .fi-ta-actions-cell,
+.fi-resource-users .fi-ta-actions,
+[class*=resource-users] .fi-ta-cell > *,
+[class*=resource-users] .fi-ta-col,
+[class*=resource-users] .fi-ta-text {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    margin-block: 0px !important;
+    min-height: 0px !important;
+    height: auto !important;
+}
+
+.fi-resource-users .fi-badge,
+[class*=resource-users] .fk-badge {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+    min-height: 18px !important;
+    height: 18px !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a,
+.fi-resource-users .fi-icon-btn,
+[class*=resource-users] .fi-ta-actions button {
+    padding: 0px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+}
+
+.fi-resource-users .fi-ta-actions svg,
+[class*=resource-users] .fi-ta-actions svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+</style>
                     ";
 
                     return $css;

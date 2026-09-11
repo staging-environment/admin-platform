@@ -932,6 +932,100 @@ label .text-danger-400,
     color: #ffffff !important;
 }
 
+/* =====================================================================
+   USUARIOS --- Tabla compacta y reduccion de margenes entre filas
+   ===================================================================== */
+
+/* Filas compactas y celdas con espaciado vertical reducido */
+.fi-resource-users .fi-ta-cell,
+.fi-resource-users tr.fi-ta-row > td.fi-ta-cell {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 34px !important;
+}
+
+/* Remover padding y alturas minimas de contenedores internos */
+.fi-resource-users .fi-ta-cell > div,
+.fi-resource-users .fi-ta-col-wrp,
+.fi-resource-users .fi-ta-text,
+.fi-resource-users .fi-ta-text-item,
+.fi-resource-users .fi-ta-selection-cell,
+.fi-resource-users .fi-ta-actions-cell {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    min-height: 0px !important;
+}
+
+.fi-resource-users tr.fi-ta-row {
+    height: 34px !important;
+}
+
+.fi-resource-users .fi-ta-row td * {
+    font-size: 0.8125rem !important;
+}
+
+/* Columna de Nombre */
+.fi-resource-users .fi-ta-row td .fi-ta-text-item {
+    font-size: 0.8125rem !important;
+}
+
+/* Cabecera de la tabla de usuarios */
+.fi-resource-users .fi-ta-header th,
+.fi-resource-users .fi-ta-header-cell {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+/* Badges en la columna de roles */
+.fi-resource-users .fi-badge,
+.fi-resource-users .fi-ta-badge {
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    font-size: 0.725rem !important;
+    line-height: 1.2 !important;
+    min-height: 20px !important;
+}
+
+/* Botones de accion en fila compactos y alineados */
+.fi-resource-users .fi-ta-actions {
+    gap: 0.25rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+   justify-content: flex-end !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a {
+    padding: 2px !important;
+    flex-shrink: 0 !important;
+    min-height: 24px !important;
+    height: 24px !important;
+}
+
+.fi-resource-users .fi-ta-actions svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.fi-resource-users .fi-ta-selection-cell input[type="checkbox"],
+.fi-resource-users .fi-ta-cell input[type="checkbox"] {
+    margin: 0 !important;
+}
+
 /* Botones verdes para Usuarios (Crear Usuario y Aplicar Filtros) */
 .fi-resource-users .fi-header-actions .fi-btn-color-primary,
 .fi-resource-users .fi-header-actions .fi-btn-color-success {
@@ -1363,3 +1457,151 @@ a.fi-breadcrumbs-item-label:hover {
 }
 
 
+
+/* extra_compact_users */
+
+.fi-resource-users .fi-ta-cell,
+.fi-resource-users tr.fi-ta-row > td,
+.fi-resource-users td,
+[class*="resource-users"] td,
+[class*="resource-users"] .fi-ta-cell {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 30px !important;
+    line-height: 1.2 !important;
+}
+
+.fi-resource-users tr.fi-ta-row,
+.fi-resource-users tbody tr,
+[class*="resource-users"] tr {
+    height: 30px !important;
+}
+
+.fi-resource-users .fi-ta-cell > div,
+.fi-resource-users .fi-ta-col-wrp,
+.fi-resource-users .fi-ta-text,
+.fi-resource-users .fi-ta-text-item,
+.fi-resource-users .fi-ta-selection-cell,
+.fi-resource-users .fi-ta-actions-cell,
+.fi-resource-users .fi-ta-actions,
+[class*="resource-users"] .fi-ta-cell > div,
+[class*="resource-users"] .fi-ta-col-wrp,
+[class*="resource-users"] .fi-ta-text {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    margin-block: 0px !important;
+    min-height: 0px !important;
+}
+
+.fi-resource-users .fi-badge,
+[class*="resource-users"] .fi-badge {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+    min-height: 18px !important;
+    height: 18px !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a,
+.fi-resource-users .fi-icon-btn,
+[class*="resource-users"] .fi-ta-actions button {
+    padding: 1px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+}
+
+.fi-resource-users .fi-ta-actions svg,
+[class*="resource-users"] .fi-ta-actions svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+
+/* =====================================================================
+   USUARIOS - Compactacion maxima de filas y eliminacion de padding
+   ===================================================================== */
+.fi-resource-users table tbody tr,
+.fi-resource-users tr.fi-ta-row,
+.fi-resource-users tbody tr,
+[class*="resource-users"] tbody tr {
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 32px !important;
+}
+
+.fi-resource-users .fi-ta-cell,
+.fi-resource-users tr.fi-ta-row > td,
+.fi-resource-users td,
+.fi-resource-users th,
+[class*="resource-users"] td,
+[class*="resource-users"] th {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    height: 28px !important;
+    line-height: 1.2 !important;
+}
+
+.fi-resource-users .fi-ta-cell > *,
+.fi-resource-users .fi-ta-col,
+.fi-resource-users .fi-ta-col-wrp,
+.fi-resource-users .fi-ta-text,
+.fi-resource-users .fi-ta-text-item,
+.fi-resource-users .fi-ta-selection-cell,
+.fi-resource-users .fi-ta-actions-cell,
+.fi-resource-users .fi-ta-actions,
+[class*="resource-users"] .fi-ta-cell > *,
+[class*="resource-users"] .fi-ta-col,
+[class*="resource-users"] .fi-ta-text {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-block: 0px !important;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    margin-block: 0px !important;
+    min-height: 0px !important;
+    height: auto !important;
+}
+
+.fi-resource-users .fi-badge,
+[class*="resource-users"] .fk-badge {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    font-size: 0.7rem !important;
+    line-height: 1.1 !important;
+    min-height: 18px !important;
+    height: 18px !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a,
+.fi-resource-users .fi-icon-btn,
+[class*="resource-users"] .fi-ta-actions button {
+    padding: 0px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+}
+
+.fi-resource-users .fi-ta-actions svg,
+[class*="resource-users"] .fi-ta-actions svg {
+    width: 14px !important;
+    height: 14px !important;
+}

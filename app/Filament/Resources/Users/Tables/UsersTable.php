@@ -147,12 +147,15 @@ class UsersTable
             ->actions([
                 Impersonate::make()
                     ->iconButton()
+                    ->size(\Filament\Support\Enums\Size::ExtraSmall)
                     ->tooltip('Suplantar usuario'),
                 EditAction::make()
                     ->iconButton()
+                    ->size(\Filament\Support\Enums\Size::ExtraSmall)
                     ->tooltip('Editar'),
                 \Filament\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->size(\Filament\Support\Enums\Size::ExtraSmall)
                     ->tooltip('Borrar')
                     ->visible(fn () => auth()->user()->can('gestion_eliminar_usuarios'))
                     ->before(function ($record) {
