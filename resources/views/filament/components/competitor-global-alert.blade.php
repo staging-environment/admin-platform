@@ -7,13 +7,21 @@
 @if(!empty($alerts))
     @php
         $totalChangedStations = 0;
-        // Group by locality
+        // Group by locality with changed station names
         $byLocality = [];
         foreach ($alerts as $a) {
             $loc = $a['locality_name'] ?? 'Localidad';
             $fuel = $a['fuel_label'] ?? (($a['fuel_type'] ?? '') === 'diesel' ? 'Diésel' : 'Gasolina 95');
             $count = $a['changed_stations_count'] ?? 1;
             $totalChangedStations += $count;
+
+            $changedNames = [];
+            foreach ($a['stations'] ?? [] as $st) {
+                if (!empty($st['is_changed'])) {
+                    $changedNames[] = $st['name'] ?? 'Estación';
+                }
+            }
+
             if (!isset($byLocality[$loc])) {
                 $byLocality[$loc] = [];
             }
@@ -21,6 +29,7 @@
                 'fuel' => $fuel,
                 'fuel_type' => $a['fuel_type'] ?? 'diesel',
                 'count' => $count,
+                'station_names' => $changedNames,
             ];
         }
     @endphp
@@ -46,23 +55,28 @@
                         </span>
                     </div>
 
-                    {{-- Localidades con cambios detectados --}}
+                    {{-- Gasolineras y localidades con cambios detectados --}}
                     <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
                         <span class="text-[11px] text-red-100 font-semibold flex items-center gap-1">
-                            <span>Localidades con cambios:</span>
+                            <span>Gasolineras con cambios:</span>
                         </span>
                         @foreach($byLocality as $locName => $items)
                             @php
-                                $itemTexts = [];
+                                $detailParts = [];
                                 foreach ($items as $it) {
-                                    $itemTexts[] = ($it['count'] > 1 ? "{$it['count']} en " : '') . $it['fuel'];
+                                    $stList = !empty($it['station_names']) ? implode(', ', $it['station_names']) : '';
+                                    if ($stList) {
+                                        $detailParts[] = "{$stList} ({$it['fuel']})";
+                                    } else {
+                                        $detailParts[] = ($it['count'] > 1 ? "{$it['count']} en " : '') . $it['fuel'];
+                                    }
                                 }
-                                $desc = implode(', ', $itemTexts);
+                                $desc = implode(' · ', $detailParts);
                             @endphp
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/25 text-white text-[11px] font-bold border border-white/20 shadow-sm">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
-                                <span>{{ $locName }}</span>
-                                <span class="font-normal text-[10px] text-red-100">({{ $desc }})</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/25 text-white text-[11px] font-bold border border-white/20 shadow-sm flex-wrap">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-300 flex-shrink-0"></span>
+                                <span class="font-extrabold text-amber-200">{{ $locName }}:</span>
+                                <span class="font-semibold text-white">{{ $desc }}</span>
                             </span>
                         @endforeach
                     </div>
