@@ -295,8 +295,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                 {{-- ── TARJETA 1: GASOIL BRENT LONDRES (BZ=F) ─────────── --}}
-                <div class="market-card-black rounded-xl px-3.5 py-1.5 shadow-md" id="card-gasoil">
-                    <div class="flex items-center justify-between gap-3">
+                <div class="market-card-black rounded-xl px-3.5 py-2 sm:py-1.5 shadow-md" id="card-gasoil">
+                    <div class="flex items-center justify-between flex-wrap sm:flex-nowrap gap-2 sm:gap-3">
                         {{-- Izquierda: Título e Icono --}}
                         <div class="flex items-center gap-3">
                             <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)">
@@ -354,8 +354,8 @@
                 </div>
 
                 {{-- ── TARJETA 2: GASOLINA RBOB (RB=F) ────────────────── --}}
-                <div class="market-card-green rounded-xl px-3.5 py-1.5 shadow-md" id="card-rbob">
-                    <div class="flex items-center justify-between gap-3">
+                <div class="market-card-green rounded-xl px-3.5 py-2 sm:py-1.5 shadow-md" id="card-rbob">
+                    <div class="flex items-center justify-between flex-wrap sm:flex-nowrap gap-2 sm:gap-3">
                         {{-- Izquierda: Título e Icono --}}
                         <div class="flex items-center gap-3">
                             <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.15)">

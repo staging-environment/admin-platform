@@ -49,7 +49,7 @@
         <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden" style="border:1px solid rgba(0,0,0,0.07)">
 
             {{-- Cabecera de tarjeta de localidad --}}
-            <div class="flex items-center justify-between px-3.5 py-1.5" style="background:linear-gradient(90deg,#111827,#1f2937)">
+            <div class="flex items-center justify-between px-3.5 py-2 sm:py-1.5 flex-wrap gap-1.5" style="background:linear-gradient(90deg,#111827,#1f2937)">
                 <div class="flex items-center gap-2">
                     <div class="w-5 h-5 rounded flex items-center justify-center" style="background:rgba(255,255,255,0.06)">
                         <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -80,7 +80,7 @@
             </div>
 
             {{-- Columnas Diesel | Gasolina 95 --}}
-            <div class="grid grid-cols-2 divide-x dark:divide-gray-800" style="border-top:1px solid rgba(0,0,0,0.05);divide-color:rgba(0,0,0,0.06)">
+            <div class="grid grid-cols-1 min-[520px]:grid-cols-2 divide-y min-[520px]:divide-y-0 min-[520px]:divide-x dark:divide-gray-800" style="border-top:1px solid rgba(0,0,0,0.05);divide-color:rgba(0,0,0,0.06)">
 
                 {{-- ── COLUMNA DIESEL (negro/oscuro) ──────────── --}}
                 <div class="p-2.5 sm:p-3">

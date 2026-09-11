@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <div style="display: grid !important; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important; gap: 10px !important; margin: 10px 0 !important;">
+    <div style="display: grid !important; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important; gap: 8px !important; margin: 10px 0 !important;">
         <!-- Precio Sugerido -->
         <div style="padding: 10px 12px !important; border-radius: 10px !important; background: rgba(255, 255, 255, 0.06) !important; border: 1px solid rgba(255, 255, 255, 0.12) !important; display: flex !important; flex-direction: column !important; justify-content: center !important;">
             <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">

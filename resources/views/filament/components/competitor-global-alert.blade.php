@@ -83,7 +83,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 flex-shrink-0 self-end md:self-center mt-2 md:mt-0">
+            <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end mt-2.5 sm:mt-0">
                 <button type="button" 
                         @click="open = true" 
                         class="inline-flex items-center justify-center px-3.5 py-1.5 bg-white hover:bg-gray-100 text-red-600 rounded-lg font-black shadow hover:shadow-md transition-all text-xs flex-shrink-0 cursor-pointer" 
