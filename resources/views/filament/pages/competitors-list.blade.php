@@ -28,7 +28,12 @@
                     <h3 class="text-xs font-bold text-white leading-tight">{{ $localityName }}</h3>
 
                     @if(!empty($locAlerts))
-                        @include('filament.components.competitor-alert-badge', ['alerts' => $locAlerts, 'localityName' => $localityName])
+                        @include('filament.components.competitor-alert-badge', [
+                            'alerts' => $locAlerts,
+                            'localityName' => $localityName,
+                            'gasoilData' => $gasoilData ?? null,
+                            'rbobData' => $rbobData ?? null,
+                        ])
                     @endif
                 </div>
                 <span id="updated-time-{{ $key }}" class="text-[9px] font-medium tabular-nums" style="color:#9ca3af;">

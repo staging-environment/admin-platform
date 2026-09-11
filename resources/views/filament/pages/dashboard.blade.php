@@ -256,6 +256,8 @@
         @if(!empty($competitorAlerts))
             @include('filament.components.competitor-global-alert', [
                 'alerts' => $competitorAlerts,
+                'gasoilData' => $gasoilData,
+                'rbobData' => $rbobData,
             ])
         @endif
 
@@ -427,6 +429,8 @@
                 @include('filament.pages.competitors-list', [
                     'localityData' => $localityData,
                     'competitorAlerts' => $competitorAlerts,
+                    'gasoilData' => $gasoilData,
+                    'rbobData' => $rbobData,
                 ])
             </div>
         </section>

@@ -1,3 +1,11 @@
+@props([
+    'alerts' => [],
+    'localityName' => null,
+    'isGlobal' => false,
+    'gasoilData' => null,
+    'rbobData' => null,
+])
+
 <style>
     @keyframes alert-pulse-animation {
         0%, 100% { opacity: 1; transform: scale(1); }
@@ -144,6 +152,13 @@
                                         {{ $alert['formatted_time'] ?? '' }} ({{ $timeAgo }})
                                     </div>
                                 </div>
+
+                                {{-- Sugerencia Estratégica de Precio --}}
+                                @include('filament.components.competitor-price-suggestion', [
+                                    'alert' => $alert,
+                                    'gasoilData' => $gasoilData,
+                                    'rbobData' => $rbobData,
+                                ])
 
                                 <!-- Listado de estaciones TOP 5 de la localidad -->
                                 <div class="p-3 divide-y divide-gray-100 dark:divide-gray-700/50 space-y-2">
