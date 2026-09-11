@@ -553,12 +553,12 @@
     <!-- Modal Calendario Mensual de Solicitudes (Flotante) -->
     @if($showCalendarioModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto" wire:click.self="closeCalendarioAnual">
-        <div style="width: min(1300px, 96vw); height: min(820px, 88vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
+        <div style="width: min(1380px, 98vw); height: min(880px, 94vh);" class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 dark:border-white/10 my-auto">
             
             <!-- Modal Header & Navigation Bar -->
-            <div class="shrink-0 px-4 sm:px-6 py-3 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900">
+            <div class="shrink-0 px-3 sm:px-6 py-2.5 border-b border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-2.5 bg-white dark:bg-gray-900">
                 <!-- Left: < > Hoy + Selector [ Mensual | Anual ] -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <div class="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 shadow-2xs">
                         @if($calendarioVista === 'mensual')
                             <button type="button" wire:click="mesAnterior" class="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-md transition-all text-gray-700 dark:text-gray-200" title="Mes anterior">
@@ -584,23 +584,23 @@
                             </button>
                         @endif
                     </div>
-                    <button type="button" wire:click="irHoy" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs">
+                    <button type="button" wire:click="irHoy" class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs">
                         Hoy
                     </button>
 
                     <!-- Segmented Control: Mensual / Anual -->
-                    <div class="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1 border border-gray-200/70 dark:border-white/10 text-xs font-bold shadow-2xs">
+                    <div class="inline-flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-0.5 sm:p-1 border border-gray-200/70 dark:border-white/10 text-xs font-bold shadow-2xs">
                         <button
                             type="button"
                             wire:click="setCalendarioVista('mensual')"
-                            class="px-3 py-1 rounded-lg transition-all {{ $calendarioVista === 'mensual' ? 'bg-indigo-600 text-white shadow-xs font-black' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}"
+                            class="px-2.5 sm:px-3 py-1 rounded-lg transition-all {{ $calendarioVista === 'mensual' ? 'bg-indigo-600 text-white shadow-xs font-black' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}"
                         >
                             Mensual
                         </button>
                         <button
                             type="button"
                             wire:click="setCalendarioVista('anual')"
-                            class="px-3 py-1 rounded-lg transition-all {{ $calendarioVista === 'anual' ? 'bg-indigo-600 text-white shadow-xs font-black' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}"
+                            class="px-2.5 sm:px-3 py-1 rounded-lg transition-all {{ $calendarioVista === 'anual' ? 'bg-indigo-600 text-white shadow-xs font-black' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' }}"
                         >
                             Anual
                         </button>
@@ -609,7 +609,7 @@
 
                 <!-- Center: Month & Year Title -->
                 <div class="text-center">
-                    <h3 class="text-base sm:text-lg font-black text-gray-900 dark:text-white tracking-wide">
+                    <h3 class="text-sm sm:text-lg font-black text-gray-900 dark:text-white tracking-wide">
                         @if($calendarioVista === 'mensual')
                             <span class="lowercase">{{ $this->calendario['mesNombre'] }}</span> de {{ $this->calendario['anio'] }}
                         @else
@@ -619,9 +619,9 @@
                 </div>
 
                 <!-- Right: Search, Legend & Close -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <!-- Employee Search Filter -->
-                    <div class="relative w-36 sm:w-52">
+                    <div class="relative w-32 sm:w-52">
                         <input
                             type="text"
                             list="dl-cal-empleados"
@@ -642,7 +642,7 @@
                     </div>
 
                     <!-- Color Legend -->
-                    <div class="hidden sm:flex items-center gap-1.5 text-[10px]">
+                    <div class="hidden md:flex items-center gap-1.5 text-[10px]">
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-bold" style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">
                             <span class="w-1.5 h-1.5 rounded-full" style="background-color: #16a34a;"></span>
                             Aprobada
@@ -688,7 +688,7 @@
                                 $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-50');
                             @endphp
 
-                            <div style="min-height: 95px; max-height: 125px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
+                            <div style="min-height: 90px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
                                 <!-- Day Number Header -->
                                 <div class="flex items-center justify-between mb-1 leading-none">
                                     <div></div>
@@ -734,33 +734,33 @@
                     </div>
                 </div>
             @else
-                <!-- Vista Anual: Cuadrícula de 12 meses (4 columnas x 3 filas) -->
-                <div class="flex-1 min-h-0 overflow-y-auto bg-gray-200 dark:bg-white/10 p-px" style="overflow-y: auto !important;">
-                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px;" class="bg-gray-200 dark:bg-white/10">
+                <!-- Vista Anual: Cuadrícula de 12 meses (4 columnas x 3 filas) ajustada sin scroll externo en pantallas medianas y grandes -->
+                <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden bg-gray-200 dark:bg-white/10 p-px">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-3 gap-px bg-gray-200 dark:bg-white/10 h-full">
                         @foreach($this->calendarioAnual['meses'] as $mes)
                             @php
                                 $isCurrentMonthNow = ($this->calendarioAnual['anio'] == date('Y') && $mes['numero'] == date('n'));
                             @endphp
-                            <div style="min-height: 220px;" class="{{ $isCurrentMonthNow ? 'bg-indigo-50/50 dark:bg-indigo-950/30' : 'bg-white dark:bg-gray-900' }} p-3 flex flex-col justify-start transition-colors relative overflow-hidden">
+                            <div class="{{ $isCurrentMonthNow ? 'bg-indigo-50/50 dark:bg-indigo-950/30' : 'bg-white dark:bg-gray-900' }} p-2 sm:p-2.5 flex flex-col justify-start transition-colors relative overflow-hidden min-h-[140px] lg:min-h-0">
                                 <!-- Header del Mes -->
-                                <div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-100 dark:border-white/5">
+                                <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-gray-100 dark:border-white/5 shrink-0">
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">
+                                        <span class="text-[11px] sm:text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">
                                             {{ $mes['nombre'] }}
                                         </span>
                                         @if($isCurrentMonthNow)
-                                            <span class="px-1.5 py-0.5 rounded-full bg-indigo-600 text-white font-black text-[9px] uppercase leading-none">
+                                            <span class="px-1.5 py-0.5 rounded-full bg-indigo-600 text-white font-black text-[8px] sm:text-[9px] uppercase leading-none">
                                                 Actual
                                             </span>
                                         @endif
                                     </div>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $mes['total'] > 0 ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold {{ $mes['total'] > 0 ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-400' }}">
                                         {{ $mes['total'] }} {{ $mes['total'] == 1 ? 'solicitud' : 'solicitudes' }}
                                     </span>
                                 </div>
 
-                                <!-- Lista de Solicitudes del Mes -->
-                                <div class="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-[175px]">
+                                <!-- Lista de Solicitudes del Mes (con scroll interno por mes si tiene muchas) -->
+                                <div class="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1">
                                     @forelse($mes['solicitudes'] as $sol)
                                         @php
                                             $st = $sol['estado'];
@@ -782,7 +782,7 @@
 
                                         <div title="{{ $tooltipText }}">
                                             <!-- Píldora visible con nombre completo del empleado (fuente fina 8px) -->
-                                            <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1.1; padding: 2.5px 6px; border-radius: 4px;" class="flex items-center justify-between gap-1.5 shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all">
+                                            <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1.1; padding: 2px 5px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all">
                                                 <span class="truncate font-bold tracking-tight" style="font-size: 8px;">{{ $sol['empleado'] }}</span>
                                                 <div class="flex items-center gap-1 shrink-0">
                                                     <span class="text-[7.5px] opacity-75 font-mono">{{ $sol['fechas'] }}</span>
@@ -791,7 +791,7 @@
                                             </div>
                                         </div>
                                     @empty
-                                        <div class="text-[10px] text-gray-400 dark:text-gray-500 italic py-6 text-center">
+                                        <div class="text-[10px] text-gray-400 dark:text-gray-500 italic py-2 sm:py-4 text-center flex items-center justify-center h-full">
                                             Sin solicitudes
                                         </div>
                                     @endforelse
@@ -804,7 +804,7 @@
 
             <!-- Modal Footer -->
             <div class="shrink-0 px-4 py-2 bg-gray-50/80 dark:bg-gray-900/80 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
-                <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                <div class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400">
                     Pasa el ratón sobre cualquier solicitud para ver los detalles de fechas y estado.
                 </div>
                 <button type="button" wire:click="closeCalendarioAnual" class="px-3.5 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all">
