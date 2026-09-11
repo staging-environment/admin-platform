@@ -678,6 +678,39 @@ class AdminPanelProvider extends PanelProvider
     display: none !important;
 }
 
+/* Separacion de iconos de accion en Usuarios */
+.fi-resource-users .fi-ta-actions,
+ .fi-ta-actions,
+[class*=resource-users] .fi-ta-actions {
+    gap: 0.65rem !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+.fi-resource-users .fi-ta-actions button,
+.fi-resource-users .fi-ta-actions a,
+.fi-resource-users .fi-icon-btn,
+[class*=resource-users] .fi-ta-actions button,
+[class*=resource-users] .fi-ta-actions a {
+    padding: 2px !important;
+    margin: 0 2px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.fi-resource-users .fi-ta-actions svg,
+[class*=resource-users] .fi-ta-actions svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
 </style>
                     ";
 
