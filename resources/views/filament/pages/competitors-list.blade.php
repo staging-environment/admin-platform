@@ -1,4 +1,4 @@
-@php
+﻿@php
     $localities = [
         'utrera'    => 'Utrera',
         'sevilla'   => 'Sevilla',
@@ -59,14 +59,16 @@
                     </div>
                     <h3 class="text-xs font-bold text-white leading-tight">{{ $localityName }}</h3>
 
-                    @if(!empty($locAlerts))
-                        @include('filament.components.competitor-alert-badge', [
-                            'alerts' => $locAlerts,
-                            'localityName' => $localityName,
-                            'gasoilData' => $gasoilData ?? null,
-                            'rbobData' => $rbobData ?? null,
-                        ])
-                    @endif
+                    <div id="locality-alert-wrapper-{{ $key }}" class="locality-alert-badge-wrapper inline-flex items-center">
+                        @if(!empty($locAlerts))
+                            @include('filament.components.competitor-alert-badge', [
+                                'alerts' => $locAlerts,
+                                'localityName' => $localityName,
+                                'gasoilData' => $gasoilData ?? null,
+                                'rbobData' => $rbobData ?? null,
+                            ])
+                        @endif
+                    </div>
                 </div>
                 <span id="updated-time-{{ $key }}" class="text-[9px] font-medium tabular-nums" style="color:#9ca3af;">
                     @if(isset($ldata['checked_at']))
@@ -111,7 +113,7 @@
                                                     {{ Str::limit($station['name'], 22) }}
                                                 </p>
                                                 @if($isAlert)
-                                                    <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
+                                                    <span class="station-diff-badge inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
                                                         {{ ($alertSt['direction'] ?? '') === 'sube' ? '▲' : '▼' }} {{ $alertSt['diff_text'] ?? '' }}
                                                     </span>
                                                 @endif
@@ -169,7 +171,7 @@
                                                     {{ Str::limit($station['name'], 22) }}
                                                 </p>
                                                 @if($isAlert)
-                                                    <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
+                                                    <span class="station-diff-badge inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
                                                         {{ ($alertSt['direction'] ?? '') === 'sube' ? '▲' : '▼' }} {{ $alertSt['diff_text'] ?? '' }}
                                                     </span>
                                                 @endif

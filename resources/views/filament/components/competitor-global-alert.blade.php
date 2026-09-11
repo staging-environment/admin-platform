@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'alerts' => [],
     'gasoilData' => null,
     'rbobData' => null,
@@ -79,6 +79,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     VER DETALLES
+                </button>
+                <button type="button" 
+                        @click="if (confirm('¿Deseas desactivar y ocultar todos los avisos de alerta actuales?')) { window.dismissCompetitorAlerts ? window.dismissCompetitorAlerts() : null; open = false; }"
+                        title="Desactivar avisos de alerta manualmente"
+                        class="inline-flex items-center justify-center px-3 py-1.5 bg-red-950/40 hover:bg-red-950/70 text-red-100 hover:text-white border border-red-300/40 rounded-lg font-bold shadow-sm transition-all text-xs flex-shrink-0 cursor-pointer">
+                    <svg class="w-3.5 h-3.5 mr-1 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    DESACTIVAR
                 </button>
             </div>
         </div>
@@ -249,13 +258,23 @@
                     </div>
                     
                     <!-- Pie del modal -->
-                    <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-wrap gap-2">
                         <span class="text-[11px] text-gray-500 dark:text-gray-400">
                             Esta alerta desaparecer&aacute; autom&aacute;ticamente tras 2 horas de la detecci&oacute;n de MITECO.
                         </span>
-                        <button type="button" @click="open = false" class="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition-all shadow-sm">
-                            Cerrar
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" 
+                                    @click="if (confirm('¿Deseas desactivar y ocultar todos los avisos de alerta actuales?')) { window.dismissCompetitorAlerts ? window.dismissCompetitorAlerts() : null; open = false; }" 
+                                    class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Desactivar alertas
+                            </button>
+                            <button type="button" @click="open = false" class="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition-all shadow-sm cursor-pointer">
+                                Cerrar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

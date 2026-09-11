@@ -1,4 +1,4 @@
-<x-filament-panels::page>
+﻿<x-filament-panels::page>
 
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
@@ -268,13 +268,15 @@
         @endif
 
         {{-- ALERTA GLOBAL DE VARIACIÓN DE PRECIOS EN COMPETENCIA (MITECO) --}}
-        @if(!empty($competitorAlerts))
-            @include('filament.components.competitor-global-alert', [
-                'alerts' => $competitorAlerts,
-                'gasoilData' => $gasoilData,
-                'rbobData' => $rbobData,
-            ])
-        @endif
+        <div id="competitor-global-alert-wrapper">
+            @if(!empty($competitorAlerts))
+                @include('filament.components.competitor-global-alert', [
+                    'alerts' => $competitorAlerts,
+                    'gasoilData' => $gasoilData,
+                    'rbobData' => $rbobData,
+                ])
+            @endif
+        </div>
 
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         {{-- ZONA SUPERIOR: MERCADOS ENERGÉTICOS INTERNACIONALES            --}}
@@ -781,7 +783,18 @@
                             gas95Container.appendChild(createEmptyState());
                         }
                     }
+
+                    // If no alerts for this locality, clean badge wrapper
+                    if (locAlerts.length === 0) {
+                        var badgeWrapper = document.getElementById('locality-alert-wrapper-' + key);
+                        if (badgeWrapper) badgeWrapper.innerHTML = '';
+                    }
                 });
+
+                if (!data.alerts || data.alerts.length === 0) {
+                    var globalBanner = document.getElementById('competitor-global-alert-wrapper');
+                    if (globalBanner) globalBanner.style.display = 'none';
+                }
 
                 // Trigger flash on all local prices
                 var prices = document.querySelectorAll('.local-price-blink');
@@ -803,6 +816,46 @@
                 console.warn('[Dashboard] Error fetching competitor data:', err);
             });
         }
+
+        // Funcion global para desactivar alertas manualmente
+        window.dismissCompetitorAlerts = function () {
+            fetch(''{{ route("admin.competitor.dismiss_alerts") }}'', {
+                method: ''POST'',
+                headers: {
+                    ''Content-Type'': ''application/json'',
+                    ''X-CSRF-TOKEN'': ''{{ csrf_token() }}'',
+                    ''Accept'': ''application/json''
+                }
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                var banner = document.getElementById(''competitor-global-alert-wrapper'');
+                if (banner) {
+                    banner.style.transition = ''all 0.3s ease'';
+                    banner.style.opacity = ''0'';
+                    banner.style.transform = ''translateY(-10px)'';
+                    setTimeout(function () { banner.style.display = ''none''; }, 300);
+                }
+
+                document.querySelectorAll(''.locality-alert-badge-wrapper'').forEach(function (el) {
+                    el.innerHTML = '''';
+                });
+
+                document.querySelectorAll(''.station-row-alert'').forEach(function (row) {
+                    row.classList.remove(''station-row-alert'');
+                });
+                document.querySelectorAll(''.station-diff-badge'').forEach(function (b) {
+                    b.remove();
+                });
+
+                if (typeof fetchCompetitors === ''function'') {
+                    fetchCompetitors();
+                }
+            })
+            .catch(function (err) {
+                console.error(''Error al desactivar alertas:'', err);
+            });
+        };
 
         // Ejecutar de inmediato y luego cada 5 minutos (sincronizado con el Ministerio/cron)
         fetchCompetitors();

@@ -50,139 +50,101 @@ Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', fu
         return;
     }
 
-    // Alerta 1: Utrera (Diesel) - 2 estaciones cambiadas
+    // Alerta 1: Utrera (Diesel) - Se toman las estaciones reales en cache
+    $utreraData = $service->getLocalityData('utrera');
+    $utreraDiesel = $utreraData['diesel'] ?? [];
+
+    $utreraStations = [];
+    if (!empty($utreraDiesel)) {
+        foreach ($utreraDiesel as $idx => $st) {
+            $rank = $idx + 1;
+            $isChanged = $rank <= 2; // 2 primeras cambiadas
+            $currentPrice = (float) ($st['price'] ?? 1.619);
+            $oldPrice = $isChanged ? ($rank === 1 ? round($currentPrice - 0.010, 3) : round($currentPrice + 0.010, 3)) : $currentPrice;
+            $diff = round($currentPrice - $oldPrice, 3);
+            $direction = $diff > 0 ? 'sube' : ($diff < 0 ? 'baja' : null);
+            $diffText = $diff > 0 ? ('+' . number_format($diff, 3)) : number_format($diff, 3);
+
+            $utreraStations[] = [
+                'id'         => $st['id'] ?? null,
+                'rank'       => $rank,
+                'name'       => $st['name'] ?? "Estacion {$rank}",
+                'address'    => $st['address'] ?? '',
+                'price'      => $currentPrice,
+                'old_price'  => $oldPrice,
+                'diff'       => $isChanged ? $diff : 0,
+                'diff_text'  => $isChanged ? $diffText : '',
+                'direction'  => $isChanged ? $direction : null,
+                'is_changed' => $isChanged,
+            ];
+        }
+    } else {
+        $utreraStations = [
+            ['rank' => 1, 'name' => 'E.S.VISTALEGRE', 'address' => 'CALLE ECIJA-JEREZ, 11', 'price' => 1.629, 'old_price' => 1.619, 'diff' => 0.010, 'diff_text' => '+0.010', 'direction' => 'sube', 'is_changed' => true],
+            ['rank' => 2, 'name' => 'FAMILY ENERGY', 'address' => 'CARRETERA C.CIAL ALMAZARA PLAZA', 'price' => 1.615, 'old_price' => 1.625, 'diff' => -0.010, 'diff_text' => '-0.010', 'direction' => 'baja', 'is_changed' => true],
+            ['rank' => 3, 'name' => 'BALLENOIL', 'address' => 'PLAZA DE LA TRIANILLA, S/N', 'price' => 1.619, 'old_price' => 1.619, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+            ['rank' => 4, 'name' => 'PETROUYA', 'address' => 'CARRETERA UTRERA SEVILLA KM. 1', 'price' => 1.639, 'old_price' => 1.639, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+            ['rank' => 5, 'name' => 'PLENERGY', 'address' => 'CALLE ALMAZARA, 2', 'price' => 1.649, 'old_price' => 1.649, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+        ];
+    }
+
     $service->recordPriceAlert([
         'id'                     => uniqid('price_alert_', true),
         'locality_key'           => 'utrera',
         'locality_name'          => 'Utrera',
         'fuel_type'              => 'diesel',
         'fuel_label'             => 'DIESEL',
-        'stations'               => [
-            [
-                'rank'       => 1,
-                'name'       => 'E.S. VISTALEGRE',
-                'address'    => 'CALLE ECIJA-JEREZ, 11',
-                'price'      => 1.629,
-                'old_price'  => 1.619,
-                'diff'       => 0.010,
-                'diff_text'  => '+0.010',
-                'direction'  => 'sube',
-                'is_changed' => true,
-            ],
-            [
-                'rank'       => 2,
-                'name'       => 'FAMILY ENERGY',
-                'address'    => 'CARRETERA C.CIAL ALMAZARA PLAZA',
-                'price'      => 1.615,
-                'old_price'  => 1.625,
-                'diff'       => -0.010,
-                'diff_text'  => '-0.010',
-                'direction'  => 'baja',
-                'is_changed' => true,
-            ],
-            [
-                'rank'       => 3,
-                'name'       => 'BALLENOIL',
-                'address'    => 'PLAZA DE LA TRIANILLA, S/N',
-                'price'      => 1.619,
-                'old_price'  => 1.619,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-            [
-                'rank'       => 4,
-                'name'       => 'PLENERGY',
-                'address'    => 'CALLE ALMAZARA, 2',
-                'price'      => 1.619,
-                'old_price'  => 1.619,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-            [
-                'rank'       => 5,
-                'name'       => 'PLENERGY',
-                'address'    => 'CALLE MIRLO, 1',
-                'price'      => 1.619,
-                'old_price'  => 1.619,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-        ],
+        'stations'               => $utreraStations,
         'changed_stations_count' => 2,
         'created_at'             => now()->timestamp,
         'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
     ]);
 
-    // Alerta 2: Sevilla (Gasolina 95) - 1 estacion cambiada
+    // Alerta 2: Sevilla (Gasolina 95) - Se toman las estaciones reales en cache
+    $sevillaData = $service->getLocalityData('sevilla');
+    $sevillaGas = $sevillaData['gas95'] ?? [];
+
+    $sevillaStations = [];
+    if (!empty($sevillaGas)) {
+        foreach ($sevillaGas as $idx => $st) {
+            $rank = $idx + 1;
+            $isChanged = $rank === 1; // 1 primera cambiada
+            $currentPrice = (float) ($st['price'] ?? 1.669);
+            $oldPrice = $isChanged ? round($currentPrice - 0.010, 3) : $currentPrice;
+            $diff = round($currentPrice - $oldPrice, 3);
+            $direction = $diff > 0 ? 'sube' : ($diff < 0 ? 'baja' : null);
+            $diffText = $diff > 0 ? ('+' . number_format($diff, 3)) : number_format($diff, 3);
+
+            $sevillaStations[] = [
+                'id'         => $st['id'] ?? null,
+                'rank'       => $rank,
+                'name'       => $st['name'] ?? "Estacion {$rank}",
+                'address'    => $st['address'] ?? '',
+                'price'      => $currentPrice,
+                'old_price'  => $oldPrice,
+                'diff'       => $isChanged ? $diff : 0,
+                'diff_text'  => $isChanged ? $diffText : '',
+                'direction'  => $isChanged ? $direction : null,
+                'is_changed' => $isChanged,
+            ];
+        }
+    } else {
+        $sevillaStations = [
+            ['rank' => 1, 'name' => 'RONDA NORTE', 'address' => 'AUTOVIA SE30 NUDO CALONGE KM....', 'price' => 1.669, 'old_price' => 1.679, 'diff' => -0.010, 'diff_text' => '-0.010', 'direction' => 'baja', 'is_changed' => true],
+            ['rank' => 2, 'name' => 'BALLENOIL', 'address' => 'AVENIDA SAN JERONIMO, S/N', 'price' => 1.669, 'old_price' => 1.669, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+            ['rank' => 3, 'name' => 'ALCAMPO S.A.', 'address' => 'CALLE RONDA DEL TAMARGUILLO, S...', 'price' => 1.675, 'old_price' => 1.675, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+            ['rank' => 4, 'name' => 'APJ', 'address' => 'CALLE COJINETE, SN', 'price' => 1.675, 'old_price' => 1.675, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+            ['rank' => 5, 'name' => 'MOOVE', 'address' => 'CALLE ASTRONOMIA, 3', 'price' => 1.678, 'old_price' => 1.678, 'diff' => 0, 'diff_text' => '', 'direction' => null, 'is_changed' => false],
+        ];
+    }
+
     $service->recordPriceAlert([
         'id'                     => uniqid('price_alert_', true),
         'locality_key'           => 'sevilla',
         'locality_name'          => 'Sevilla',
         'fuel_type'              => 'gas95',
         'fuel_label'             => 'GASOLINA 95',
-        'stations'               => [
-            [
-                'rank'       => 1,
-                'name'       => 'PETROPRIX SEVILLA',
-                'address'    => 'AVENIDA DE LA RAZA, 14',
-                'price'      => 1.589,
-                'old_price'  => 1.599,
-                'diff'       => -0.010,
-                'diff_text'  => '-0.010',
-                'direction'  => 'baja',
-                'is_changed' => true,
-            ],
-            [
-                'rank'       => 2,
-                'name'       => 'BALLENOIL SEVILLA',
-                'address'    => 'CALLE PINO CENTRAL, 4',
-                'price'      => 1.595,
-                'old_price'  => 1.595,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-            [
-                'rank'       => 3,
-                'name'       => 'PLENOIL SEVILLA',
-                'address'    => 'CARRETERA CARMONA, 10',
-                'price'      => 1.599,
-                'old_price'  => 1.599,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-            [
-                'rank'       => 4,
-                'name'       => 'REPSOL SEVILLA ESTE',
-                'address'    => 'AVENIDA DE LAS CIENCIAS',
-                'price'      => 1.639,
-                'old_price'  => 1.639,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-            [
-                'rank'       => 5,
-                'name'       => 'CEPSA SEVILLA',
-                'address'    => 'AVENIDA DE LA PAZ, 30',
-                'price'      => 1.649,
-                'old_price'  => 1.649,
-                'diff'       => 0,
-                'diff_text'  => '',
-                'direction'  => null,
-                'is_changed' => false,
-            ],
-        ],
+        'stations'               => $sevillaStations,
         'changed_stations_count' => 1,
         'created_at'             => now()->timestamp,
         'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),

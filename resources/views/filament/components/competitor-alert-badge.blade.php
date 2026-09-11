@@ -1,4 +1,4 @@
-@props([
+﻿@props([
     'alerts' => [],
     'localityName' => null,
     'isGlobal' => false,
@@ -229,13 +229,23 @@
                     </div>
                     
                     <!-- Pie del modal -->
-                    <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-wrap gap-2">
                         <span class="text-[11px] text-gray-500 dark:text-gray-400">
                             Esta alarma desaparecer&aacute; autom&aacute;ticamente tras 2 horas de la detecci&oacute;n de MITECO.
                         </span>
-                        <button type="button" @click="open = false" class="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition-all shadow-sm">
-                            Cerrar
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" 
+                                    @click="if (confirm('¿Deseas desactivar y ocultar todos los avisos de alerta actuales?')) { window.dismissCompetitorAlerts ? window.dismissCompetitorAlerts() : null; open = false; }" 
+                                    class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Desactivar alertas
+                            </button>
+                            <button type="button" @click="open = false" class="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition-all shadow-sm cursor-pointer">
+                                Cerrar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

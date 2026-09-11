@@ -237,6 +237,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('admin.competitor.data');
 
+    Route::post('/admin/api/dismiss-competitor-alerts', function () {
+        $service = app(\App\Services\MineturService::class);
+        $service->clearPriceAlerts();
+        return response()->json([
+            'success' => true,
+            'message' => 'Alertas de competencia desactivadas correctamente.',
+        ]);
+    })->name('admin.competitor.dismiss_alerts');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
