@@ -678,19 +678,22 @@
                     <div class="py-0.5 text-gray-400 dark:text-gray-500">dom</div>
                 </div>
 
-                <!-- Month Days Grid (7 columns x 5-6 rows) -->
-                <div class="flex-1 min-h-0 overflow-y-auto bg-gray-200 dark:bg-white/10 p-px" style="overflow-y: auto !important;">
-                    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));" class="gap-px bg-gray-200 dark:bg-white/10">
+                <!-- Month Days Grid (7 columns x 5-6 rows que aprovechan el 100% del alto) -->
+                @php
+                    $numFilas = max(5, ceil(count($this->calendario['days']) / 7));
+                @endphp
+                <div class="flex-1 min-h-0 bg-gray-200 dark:bg-white/10 p-px overflow-hidden">
+                    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat({{ $numFilas }}, minmax(0, 1fr)); gap: 1px; height: 100%;" class="bg-gray-200 dark:bg-white/10 h-full">
                         @foreach($this->calendario['days'] as $d)
                             @php
                                 $isCurrent = $d['isCurrentMonth'];
                                 $isToday = $d['isToday'];
-                                $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-50');
+                                $cellBg = $isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40' : ($isCurrent ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/80 dark:bg-gray-950/60 opacity-60');
                             @endphp
 
-                            <div style="min-height: 90px;" class="{{ $cellBg }} p-1 sm:p-1.5 flex flex-col justify-start transition-colors relative overflow-visible">
+                            <div class="{{ $cellBg }} p-1.5 sm:p-2 flex flex-col justify-start transition-colors relative overflow-hidden min-h-0 h-full">
                                 <!-- Day Number Header -->
-                                <div class="flex items-center justify-between mb-1 leading-none">
+                                <div class="flex items-center justify-between mb-1.5 leading-none shrink-0">
                                     <div></div>
                                     <span class="text-[10px] sm:text-[11px] font-bold {{ $isToday ? 'w-5 h-5 rounded-full flex items-center justify-center bg-indigo-600 text-white font-black shadow-xs' : ($isCurrent ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-600') }}">
                                         {{ $d['day'] }}
@@ -699,30 +702,27 @@
 
                                 <!-- Day Requests (Pills) -->
                                 @if(!empty($d['solicitudes']))
-                                    <div class="space-y-1 overflow-y-auto max-h-[75px] sm:max-h-[92px] pr-0.5">
+                                    <div class="flex-1 min-h-0 overflow-y-auto space-y-1 pr-0.5">
                                         @foreach($d['solicitudes'] as $sol)
                                             @php
                                                 $st = $sol['estado'];
                                                 if ($st === 'Aprobada') {
                                                     $pillStyle = 'background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;';
-                                                    $badgeStyle = 'background-color: #16a34a; color: #ffffff;';
                                                     $dotColor = '#16a34a';
                                                 } elseif ($st === 'Pendiente') {
                                                     $pillStyle = 'background-color: #fffbeb; border: 1px solid #fde68a; color: #92400e;';
-                                                    $badgeStyle = 'background-color: #d97706; color: #ffffff;';
                                                     $dotColor = '#d97706';
                                                 } else {
                                                     $pillStyle = 'background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b;';
-                                                    $badgeStyle = 'background-color: #dc2626; color: #ffffff;';
                                                     $dotColor = '#dc2626';
                                                 }
                                                 $tooltipText = "Empleado: {$sol['empleado']}\nEstado: {$sol['estado']}\nPeriodo: {$sol['fechas_completas']} ({$sol['dias']} días)";
                                             @endphp
 
                                             <div title="{{ $tooltipText }}">
-                                                <!-- Píldora visible con nombre completo del empleado (fuente fina 8px) -->
-                                                <div style="{{ $pillStyle }} font-size: 8px; font-weight: 600; line-height: 1; padding: 2px 5px; border-radius: 4px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 transition-all">
-                                                    <span class="truncate" style="font-size: 8px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['empleado'] }}</span>
+                                                <!-- Píldora visible con nombre completo del empleado -->
+                                                <div style="{{ $pillStyle }} font-size: 8.5px; font-weight: 600; line-height: 1.15; padding: 2.5px 6px; border-radius: 5px;" class="flex items-center justify-between gap-1 shadow-2xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all">
+                                                    <span class="truncate" style="font-size: 8.5px; font-weight: 700; letter-spacing: -0.2px;">{{ $sol['empleado'] }}</span>
                                                     <span style="width: 4px; height: 4px; border-radius: 50%; background-color: {{ $dotColor }}; flex-shrink: 0;"></span>
                                                 </div>
                                             </div>
