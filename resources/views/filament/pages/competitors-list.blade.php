@@ -12,6 +12,26 @@
         @php 
             $ldata = $localityData[$key] ?? ['diesel' => [], 'gas95' => [], 'updated_at' => null]; 
             $locAlerts = collect($competitorAlerts ?? [])->where('locality_key', $key)->values()->all();
+
+            $dieselAlert = collect($locAlerts)->firstWhere('fuel_type', 'diesel');
+            $changedDieselStations = [];
+            if ($dieselAlert) {
+                foreach ($dieselAlert['stations'] ?? [] as $st) {
+                    if (!empty($st['is_changed'])) {
+                        $changedDieselStations[$st['name']] = $st;
+                    }
+                }
+            }
+
+            $gasAlert = collect($locAlerts)->firstWhere('fuel_type', 'gas95');
+            $changedGasStations = [];
+            if ($gasAlert) {
+                foreach ($gasAlert['stations'] ?? [] as $st) {
+                    if (!empty($st['is_changed'])) {
+                        $changedGasStations[$st['name']] = $st;
+                    }
+                }
+            }
         @endphp
 
         <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden" style="border:1px solid rgba(0,0,0,0.07)">
@@ -58,9 +78,13 @@
                     <div id="rows-{{ $key }}-diesel" class="space-y-0.5">
                         @if(count($ldata['diesel']) > 0)
                             @foreach($ldata['diesel'] as $rank => $station)
-                                <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}">
+                                @php
+                                    $isAlert = isset($changedDieselStations[$station['name']]);
+                                    $alertSt = $changedDieselStations[$station['name']] ?? null;
+                                @endphp
+                                <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }} {{ $isAlert ? 'station-row-alert' : '' }}">
                                     <span class="rank-chip text-white"
-                                          style="background: {{ $rank === 0 ? '#111827' : ($rank === 1 ? '#374151' : ($rank === 2 ? '#4b5563' : '#6b7280')) }}">
+                                          style="background: {{ $isAlert ? '#dc2626' : ($rank === 0 ? '#111827' : ($rank === 1 ? '#374151' : ($rank === 2 ? '#4b5563' : '#6b7280'))) }}">
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
@@ -68,16 +92,23 @@
                                            target="_blank" 
                                            class="hover:underline block group"
                                            title="Ver en Google Maps">
-                                            <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
-                                                {{ Str::limit($station['name'], 24) }}
-                                            </p>
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
+                                                    {{ Str::limit($station['name'], 22) }}
+                                                </p>
+                                                @if($isAlert)
+                                                    <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
+                                                        {{ ($alertSt['direction'] ?? '') === 'sube' ? '▲' : '▼' }} {{ $alertSt['diff_text'] ?? '' }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <p class="truncate leading-none dark:text-gray-400 mt-0.5" style="font-size:9px;color:#6b7280">
                                                 {{ Str::limit($station['address'], 30) }}
                                             </p>
                                         </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
-                                          style="font-size:12px;color:{{ $rank === 0 ? '#111827' : '#374151' }}">
+                                          style="font-size:12px;color:{{ $isAlert ? '#dc2626' : ($rank === 0 ? '#111827' : '#374151') }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
                                 </div>
@@ -103,9 +134,13 @@
                     <div id="rows-{{ $key }}-gas95" class="space-y-0.5">
                         @if(count($ldata['gas95']) > 0)
                             @foreach($ldata['gas95'] as $rank => $station)
-                                <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }}" style="{{ $rank === 0 ? 'background:rgba(22,163,74,0.05)' : '' }}">
+                                @php
+                                    $isAlert = isset($changedGasStations[$station['name']]);
+                                    $alertSt = $changedGasStations[$station['name']] ?? null;
+                                @endphp
+                                <div class="station-row {{ $rank === 0 && !$isAlert ? 'rank-1' : '' }} {{ $isAlert ? 'station-row-alert' : '' }}" style="{{ $rank === 0 && !$isAlert ? 'background:rgba(22,163,74,0.05)' : '' }}">
                                     <span class="rank-chip text-white"
-                                          style="background: {{ $rank === 0 ? '#15803d' : ($rank === 1 ? '#16a34a' : ($rank === 2 ? '#22c55e' : '#4ade80')) }}">
+                                          style="background: {{ $isAlert ? '#dc2626' : ($rank === 0 ? '#15803d' : ($rank === 1 ? '#16a34a' : ($rank === 2 ? '#22c55e' : '#4ade80'))) }}">
                                         {{ $rank + 1 }}
                                     </span>
                                     <div class="flex-1 min-w-0">
@@ -113,16 +148,23 @@
                                            target="_blank" 
                                            class="hover:underline block group"
                                            title="Ver en Google Maps">
-                                            <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
-                                                {{ Str::limit($station['name'], 24) }}
-                                            </p>
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <p class="font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400" style="font-size:11px;color:#1f2937">
+                                                    {{ Str::limit($station['name'], 22) }}
+                                                </p>
+                                                @if($isAlert)
+                                                    <span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider {{ ($alertSt['direction'] ?? '') === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700' }}">
+                                                        {{ ($alertSt['direction'] ?? '') === 'sube' ? '▲' : '▼' }} {{ $alertSt['diff_text'] ?? '' }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <p class="truncate leading-none dark:text-gray-400 mt-0.5" style="font-size:9px;color:#6b7280">
                                                 {{ Str::limit($station['address'], 30) }}
                                             </p>
                                         </a>
                                     </div>
                                     <span class="font-black tabular-nums whitespace-nowrap local-price-blink"
-                                          style="font-size:12px;color:{{ $rank === 0 ? '#15803d' : '#16a34a' }}">
+                                          style="font-size:12px;color:{{ $isAlert ? '#dc2626' : ($rank === 0 ? '#15803d' : '#16a34a') }}">
                                         {{ number_format($station['price'], 3, ',', '.') }}&nbsp;€
                                     </span>
                                 </div>

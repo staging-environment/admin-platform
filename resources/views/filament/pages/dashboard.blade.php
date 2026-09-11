@@ -83,6 +83,21 @@
         .change-badge-null { color: #6b7280; }
 
         /* ── Filas de estaciones de competencia ─────────────────── */
+        @keyframes station-alert-pulse {
+            0%, 100% {
+                background-color: rgba(220, 38, 38, 0.16);
+                box-shadow: 0 0 0 1.5px rgba(220, 38, 38, 0.55), 0 2px 6px rgba(220, 38, 38, 0.2);
+            }
+            50% {
+                background-color: rgba(220, 38, 38, 0.04);
+                box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.2), 0 0 0 transparent;
+            }
+        }
+        .station-row-alert {
+            animation: station-alert-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+            border-radius: 6px !important;
+            position: relative !important;
+        }
         .station-row {
             display: flex;
             align-items: center;
@@ -555,17 +570,19 @@
         setInterval(fetchMarkets, POLL_INTERVAL);
 
         /* Helpers to build DOM elements programmatically (bypassing Trusted Types CSP restrictions) */
-        function createStationRow(rank, station, fuelType, localityName) {
+        function createStationRow(rank, station, fuelType, localityName, isAlert, alertDiff, alertDirection) {
             var row = document.createElement('div');
-            row.className = 'station-row' + (rank === 0 ? ' rank-1' : '');
-            if (fuelType === 'gas95' && rank === 0) {
+            row.className = 'station-row' + (rank === 0 && !isAlert ? ' rank-1' : '') + (isAlert ? ' station-row-alert' : '');
+            if (fuelType === 'gas95' && rank === 0 && !isAlert) {
                 row.style.background = 'rgba(22,163,74,0.05)';
             }
 
             var chip = document.createElement('span');
             chip.className = 'rank-chip text-white';
             var chipBg = '';
-            if (fuelType === 'diesel') {
+            if (isAlert) {
+                chipBg = '#dc2626';
+            } else if (fuelType === 'diesel') {
                 chipBg = rank === 0 ? '#111827' : (rank === 1 ? '#374151' : (rank === 2 ? '#4b5563' : '#6b7280'));
             } else {
                 chipBg = rank === 0 ? '#15803d' : (rank === 1 ? '#16a34a' : (rank === 2 ? '#22c55e' : '#4ade80'));
@@ -584,11 +601,23 @@
             link.className = 'hover:underline block group';
             link.title = 'Ver en Google Maps';
 
+            var nameWrapper = document.createElement('div');
+            nameWrapper.className = 'flex items-center gap-1.5 flex-wrap';
+
             var nameP = document.createElement('p');
             nameP.className = 'font-bold truncate leading-tight dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400';
             nameP.style.fontSize = '11px';
             nameP.style.color = '#1f2937';
-            nameP.textContent = station.name.length > 24 ? station.name.substring(0, 21) + '...' : station.name;
+            nameP.textContent = station.name.length > 22 ? station.name.substring(0, 19) + '...' : station.name;
+            nameWrapper.appendChild(nameP);
+
+            if (isAlert && alertDiff) {
+                var alertBadge = document.createElement('span');
+                alertBadge.className = 'inline-flex items-center gap-0.5 px-1 py-0.2 rounded text-[8px] font-black uppercase tracking-wider ' + 
+                    (alertDirection === 'sube' ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300 border border-green-300 dark:border-green-700');
+                alertBadge.textContent = (alertDirection === 'sube' ? '▲ ' : '▼ ') + alertDiff;
+                nameWrapper.appendChild(alertBadge);
+            }
 
             var addrP = document.createElement('p');
             addrP.className = 'truncate leading-none dark:text-gray-400 mt-0.5';
@@ -596,7 +625,7 @@
             addrP.style.color = '#6b7280';
             addrP.textContent = station.address.length > 30 ? station.address.substring(0, 27) + '...' : station.address;
 
-            link.appendChild(nameP);
+            link.appendChild(nameWrapper);
             link.appendChild(addrP);
             infoCol.appendChild(link);
             row.appendChild(infoCol);
@@ -605,7 +634,9 @@
             priceSpan.className = 'font-black tabular-nums whitespace-nowrap local-price-blink';
             priceSpan.style.fontSize = '12px';
             var priceColor = '';
-            if (fuelType === 'diesel') {
+            if (isAlert) {
+                priceColor = '#dc2626';
+            } else if (fuelType === 'diesel') {
                 priceColor = rank === 0 ? '#111827' : '#374151';
             } else {
                 priceColor = rank === 0 ? '#15803d' : '#16a34a';
@@ -686,13 +717,35 @@
                         timeEl.textContent = text;
                     }
                     
+                    // Find changed stations for this locality
+                    var locAlerts = (data.alerts || []).filter(function (a) { return a.locality_key === key; });
+                    var dieselAlert = locAlerts.find(function (a) { return a.fuel_type === 'diesel'; });
+                    var gasAlert = locAlerts.find(function (a) { return a.fuel_type === 'gas95'; });
+                    
+                    var changedDiesel = {};
+                    if (dieselAlert && dieselAlert.stations) {
+                        dieselAlert.stations.forEach(function (st) {
+                            if (st.is_changed) changedDiesel[st.name] = st;
+                        });
+                    }
+                    var changedGas = {};
+                    if (gasAlert && gasAlert.stations) {
+                        gasAlert.stations.forEach(function (st) {
+                            if (st.is_changed) changedGas[st.name] = st;
+                        });
+                    }
+
                     // Update diesel rows
                     var dieselContainer = document.getElementById('rows-' + key + '-diesel');
                     if (dieselContainer) {
                         dieselContainer.textContent = '';
                         if (locality.diesel && locality.diesel.length > 0) {
                             locality.diesel.forEach(function (station, rank) {
-                                dieselContainer.appendChild(createStationRow(rank, station, 'diesel', localityName));
+                                var alertInfo = changedDiesel[station.name];
+                                var isAlert = !!alertInfo;
+                                var diff = isAlert ? alertInfo.diff_text : null;
+                                var dir = isAlert ? alertInfo.direction : null;
+                                dieselContainer.appendChild(createStationRow(rank, station, 'diesel', localityName, isAlert, diff, dir));
                             });
                         } else {
                             dieselContainer.appendChild(createEmptyState());
@@ -705,7 +758,11 @@
                         gas95Container.textContent = '';
                         if (locality.gas95 && locality.gas95.length > 0) {
                             locality.gas95.forEach(function (station, rank) {
-                                gas95Container.appendChild(createStationRow(rank, station, 'gas95', localityName));
+                                var alertInfo = changedGas[station.name];
+                                var isAlert = !!alertInfo;
+                                var diff = isAlert ? alertInfo.diff_text : null;
+                                var dir = isAlert ? alertInfo.direction : null;
+                                gas95Container.appendChild(createStationRow(rank, station, 'gas95', localityName, isAlert, diff, dir));
                             });
                         } else {
                             gas95Container.appendChild(createEmptyState());

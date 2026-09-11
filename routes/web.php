@@ -230,8 +230,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('admin.fuel.markets');
 
     Route::get('/admin/api/competitor-data', function () {
-        $localityData = app(\App\Services\MineturService::class)->getAllLocalitiesData();
-        return response()->json(['localities' => $localityData]);
+        $service = app(\App\Services\MineturService::class);
+        return response()->json([
+            'localities' => $service->getAllLocalitiesData(),
+            'alerts'     => $service->getRecentPriceAlerts(),
+        ]);
     })->name('admin.competitor.data');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
