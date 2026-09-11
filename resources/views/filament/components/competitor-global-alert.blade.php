@@ -131,7 +131,7 @@
                                     <span class="text-xs font-normal text-gray-300">&bull; Todas las localidades</span>
                                 </h3>
                                 <p class="text-[10px] text-gray-400 mt-0.5">
-                                    Aviso sincronizado con Telegram &bull; Detecci&oacute;n autom&aacute;tica de MITECO &bull; Visible durante 2 horas
+                                    Aviso sincronizado con Telegram &bull; Detecci&oacute;n autom&aacute;tica de MITECO &bull; Visible durante 3 horas
                                 </p>
                             </div>
                         </div>
@@ -260,7 +260,7 @@
                     <!-- Pie del modal -->
                     <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-wrap gap-2">
                         <span class="text-[11px] text-gray-500 dark:text-gray-400">
-                            Esta alerta desaparecer&aacute; autom&aacute;ticamente tras 2 horas de la detecci&oacute;n de MITECO.
+                            Esta alerta desaparecer&aacute; autom&aacute;ticamente tras 3 horas de la detecci&oacute;n de MITECO.
                         </span>
                         <div class="flex items-center gap-2">
                             <button type="button" 

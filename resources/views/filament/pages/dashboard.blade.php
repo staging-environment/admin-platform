@@ -433,11 +433,11 @@
                         Datos oficiales &middot; Ministerio para la Transici&oacute;n Ecol&oacute;gica (MITECO)
                     </span>
                     <span class="text-gray-300 dark:text-gray-600 hidden md:inline">&bull;</span>
-                    <span class="text-[10px] text-gray-400 dark:text-gray-500 inline-flex items-center gap-1 font-medium bg-gray-100/80 dark:bg-gray-800/80 px-2 py-0.5 rounded-md border border-gray-200/60 dark:border-gray-700/60" title="Las alertas caducan a las 2 horas de su deteccion si no se registran nuevos cambios">
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 inline-flex items-center gap-1 font-medium bg-gray-100/80 dark:bg-gray-800/80 px-2 py-0.5 rounded-md border border-gray-200/60 dark:border-gray-700/60" title="Las alertas caducan a las 3 horas de su deteccion si no se registran nuevos cambios">
                         <svg class="w-2.5 h-2.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Alertas activas 2h si no hay nuevos cambios
+                        Alertas activas 3h si no hay nuevos cambios
                     </span>
                 </div>
             </div>

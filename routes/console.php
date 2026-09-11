@@ -150,5 +150,5 @@ Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', fu
         'formatted_time'         => now('Europe/Madrid')->format('d/m/Y H:i'),
     ]);
 
-    $this->info('Alertas de prueba registradas con exito (Utrera y Sevilla). Validas durante 2 horas.');
+    $this->info('Alertas de prueba registradas con exito (Utrera y Sevilla). Validas durante 3 horas.');
 })->purpose('Simular o limpiar alertas de cambio de precio de la competencia');

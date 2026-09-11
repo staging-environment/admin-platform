@@ -265,7 +265,7 @@ class MineturService
             $text .= "  {$num}. {$stationName}: {$priceText}{$highlight}\n";
         }
 
-        // Registrar evento de alerta en cache para la interfaz web (duracion 2 horas)
+        // Registrar evento de alerta en cache para la interfaz web (duracion 3 horas)
         $this->recordPriceAlert([
             'id'                     => uniqid('price_alert_', true),
             'locality_key'           => $localityKey,
@@ -290,15 +290,15 @@ class MineturService
     }
 
     /**
-     * Record a competitor price change alert in cache (valid for 2 hours).
+     * Record a competitor price change alert in cache (valid for 3 hours).
      */
     public function recordPriceAlert(array $alertItem): void
     {
         $alerts = Cache::get('competitor_price_change_alerts', []);
         $now = now()->timestamp;
         
-        // Mantener solo alertas de las ultimas 2 horas (7200 segundos)
-        $alerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 7200);
+        // Mantener solo alertas de las ultimas 3 horas (10800 segundos)
+        $alerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 10800);
 
         // Si ya hay una alerta reciente de la misma localidad y combustible en los ultimos 10 min, la reemplazamos
         $alerts = array_filter($alerts, function ($a) use ($alertItem, $now) {
@@ -310,21 +310,21 @@ class MineturService
         array_unshift($alerts, $alertItem);
         $alerts = array_slice($alerts, 0, 20);
 
-        Cache::put('competitor_price_change_alerts', array_values($alerts), now()->addHours(2));
+        Cache::put('competitor_price_change_alerts', array_values($alerts), now()->addHours(3));
     }
 
     /**
-     * Get all active competitor price alerts from the last 2 hours.
+     * Get all active competitor price alerts from the last 3 hours.
      */
     public function getRecentPriceAlerts(): array
     {
         $alerts = Cache::get('competitor_price_change_alerts', []);
         $now = now()->timestamp;
 
-        $validAlerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 7200);
+        $validAlerts = array_filter($alerts, fn ($a) => ($now - ($a['created_at'] ?? 0)) <= 10800);
 
         if (count($validAlerts) !== count($alerts)) {
-            Cache::put('competitor_price_change_alerts', array_values($validAlerts), now()->addHours(2));
+            Cache::put('competitor_price_change_alerts', array_values($validAlerts), now()->addHours(3));
         }
 
         return array_values($validAlerts);

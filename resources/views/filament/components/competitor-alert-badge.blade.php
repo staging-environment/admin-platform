@@ -46,7 +46,7 @@
                 style="position: relative !important; z-index: 10 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; {{ $isGlobalBadge ? 'padding: 0 10px !important; height: 21px !important;' : 'margin-left: 6px !important; padding: 0 7px !important; height: 18px !important;' }} border-radius: 9999px !important; background-color: #dc2626 !important; color: white !important; font-family: inherit !important; font-size: 9px !important; font-weight: 800 !important; border: none !important; cursor: pointer !important; line-height: 1 !important; transition: all 0.2s !important; box-shadow: 0 1px 4px rgba(220, 38, 38, 0.4) !important; flex-shrink: 0 !important; outline: none !important; animation: alert-pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;"
                 onmouseover="this.style.backgroundColor='#b91c1c'"
                 onmouseout="this.style.backgroundColor='#dc2626'"
-                title="Cambios de precio detectados por MITECO en las ultimas 2 horas">
+                title="Cambios de precio detectados por MITECO en las ultimas 3 horas">
             <svg style="width: 10px !important; height: 10px !important; fill: none !important; stroke: currentColor !important; stroke-width: 2.5 !important; flex-shrink: 0 !important;" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -102,7 +102,7 @@
                                     @endif
                                 </h3>
                                 <p class="text-[10px] text-gray-400 mt-0.5">
-                                    Aviso sincronizado con Telegram &bull; Detecci&oacute;n autom&aacute;tica de MITECO &bull; Visible durante 2 horas
+                                    Aviso sincronizado con Telegram &bull; Detecci&oacute;n autom&aacute;tica de MITECO &bull; Visible durante 3 horas
                                 </p>
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                     <!-- Pie del modal -->
                     <div class="px-5 py-3 bg-gray-100 dark:bg-gray-800/60 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-wrap gap-2">
                         <span class="text-[11px] text-gray-500 dark:text-gray-400">
-                            Esta alarma desaparecer&aacute; autom&aacute;ticamente tras 2 horas de la detecci&oacute;n de MITECO.
+                            Esta alarma desaparecer&aacute; autom&aacute;ticamente tras 3 horas de la detecci&oacute;n de MITECO.
                         </span>
                         <div class="flex items-center gap-2">
                             <button type="button" 

@@ -33,7 +33,7 @@ class Dashboard extends \Filament\Pages\Dashboard
     /** Estado del bot MITECO */
     public ?array $mitecoLastUpdate = null;
 
-    /** Alertas de cambios de precio de competencia (ultimas 2 horas) */
+    /** Alertas de cambios de precio de competencia (ultimas 3 horas) */
     public array $competitorAlerts = [];
 
     public function mount(): void
