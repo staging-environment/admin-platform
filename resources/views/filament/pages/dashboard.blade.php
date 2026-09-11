@@ -717,6 +717,11 @@
                         timeEl.textContent = text;
                     }
                     
+                    // Helper to normalize station names
+                    function cleanName(n) {
+                        return (n || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+                    }
+
                     // Find changed stations for this locality
                     var locAlerts = (data.alerts || []).filter(function (a) { return a.locality_key === key; });
                     var dieselAlert = locAlerts.find(function (a) { return a.fuel_type === 'diesel'; });
@@ -725,13 +730,21 @@
                     var changedDiesel = {};
                     if (dieselAlert && dieselAlert.stations) {
                         dieselAlert.stations.forEach(function (st) {
-                            if (st.is_changed) changedDiesel[st.name] = st;
+                            if (st.is_changed) {
+                                var k = cleanName(st.name);
+                                if (k) changedDiesel[k] = st;
+                                if (st.id) changedDiesel["id_" + st.id] = st;
+                            }
                         });
                     }
                     var changedGas = {};
                     if (gasAlert && gasAlert.stations) {
                         gasAlert.stations.forEach(function (st) {
-                            if (st.is_changed) changedGas[st.name] = st;
+                            if (st.is_changed) {
+                                var k = cleanName(st.name);
+                                if (k) changedGas[k] = st;
+                                if (st.id) changedGas["id_" + st.id] = st;
+                            }
                         });
                     }
 
@@ -741,7 +754,7 @@
                         dieselContainer.textContent = '';
                         if (locality.diesel && locality.diesel.length > 0) {
                             locality.diesel.forEach(function (station, rank) {
-                                var alertInfo = changedDiesel[station.name];
+                                var alertInfo = changedDiesel[cleanName(station.name)] || (station.id ? changedDiesel["id_" + station.id] : null);
                                 var isAlert = !!alertInfo;
                                 var diff = isAlert ? alertInfo.diff_text : null;
                                 var dir = isAlert ? alertInfo.direction : null;
@@ -758,7 +771,7 @@
                         gas95Container.textContent = '';
                         if (locality.gas95 && locality.gas95.length > 0) {
                             locality.gas95.forEach(function (station, rank) {
-                                var alertInfo = changedGas[station.name];
+                                var alertInfo = changedGas[cleanName(station.name)] || (station.id ? changedGas["id_" + station.id] : null);
                                 var isAlert = !!alertInfo;
                                 var diff = isAlert ? alertInfo.diff_text : null;
                                 var dir = isAlert ? alertInfo.direction : null;

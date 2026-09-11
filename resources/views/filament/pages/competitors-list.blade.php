@@ -18,7 +18,13 @@
             if ($dieselAlert) {
                 foreach ($dieselAlert['stations'] ?? [] as $st) {
                     if (!empty($st['is_changed'])) {
-                        $changedDieselStations[$st['name']] = $st;
+                        $norm = preg_replace('/[^A-Z0-9]/', '', mb_strtoupper($st['name'] ?? ''));
+                        if ($norm !== '') {
+                            $changedDieselStations[$norm] = $st;
+                        }
+                        if (!empty($st['id'])) {
+                            $changedDieselStations['id_' . $st['id']] = $st;
+                        }
                     }
                 }
             }
@@ -28,7 +34,13 @@
             if ($gasAlert) {
                 foreach ($gasAlert['stations'] ?? [] as $st) {
                     if (!empty($st['is_changed'])) {
-                        $changedGasStations[$st['name']] = $st;
+                        $norm = preg_replace('/[^A-Z0-9]/', '', mb_strtoupper($st['name'] ?? ''));
+                        if ($norm !== '') {
+                            $changedGasStations[$norm] = $st;
+                        }
+                        if (!empty($st['id'])) {
+                            $changedGasStations['id_' . $st['id']] = $st;
+                        }
                     }
                 }
             }
@@ -79,10 +91,12 @@
                         @if(count($ldata['diesel']) > 0)
                             @foreach($ldata['diesel'] as $rank => $station)
                                 @php
-                                    $isAlert = isset($changedDieselStations[$station['name']]);
-                                    $alertSt = $changedDieselStations[$station['name']] ?? null;
+                                    $stNorm = preg_replace('/[^A-Z0-9]/', '', mb_strtoupper($station['name'] ?? ''));
+                                    $stIdKey = !empty($station['id']) ? ('id_' . $station['id']) : null;
+                                    $alertSt = $changedDieselStations[$stNorm] ?? ($stIdKey ? ($changedDieselStations[$stIdKey] ?? null) : null);
+                                    $isAlert = !empty($alertSt);
                                 @endphp
-                                <div class="station-row {{ $rank === 0 ? 'rank-1' : '' }} {{ $isAlert ? 'station-row-alert' : '' }}">
+                                <div class="station-row {{ $rank === 0 && !$isAlert ? 'rank-1' : '' }} {{ $isAlert ? 'station-row-alert' : '' }}">
                                     <span class="rank-chip text-white"
                                           style="background: {{ $isAlert ? '#dc2626' : ($rank === 0 ? '#111827' : ($rank === 1 ? '#374151' : ($rank === 2 ? '#4b5563' : '#6b7280'))) }}">
                                         {{ $rank + 1 }}
@@ -135,8 +149,10 @@
                         @if(count($ldata['gas95']) > 0)
                             @foreach($ldata['gas95'] as $rank => $station)
                                 @php
-                                    $isAlert = isset($changedGasStations[$station['name']]);
-                                    $alertSt = $changedGasStations[$station['name']] ?? null;
+                                    $stNorm = preg_replace('/[^A-Z0-9]/', '', mb_strtoupper($station['name'] ?? ''));
+                                    $stIdKey = !empty($station['id']) ? ('id_' . $station['id']) : null;
+                                    $alertSt = $changedGasStations[$stNorm] ?? ($stIdKey ? ($changedGasStations[$stIdKey] ?? null) : null);
+                                    $isAlert = !empty($alertSt);
                                 @endphp
                                 <div class="station-row {{ $rank === 0 && !$isAlert ? 'rank-1' : '' }} {{ $isAlert ? 'station-row-alert' : '' }}" style="{{ $rank === 0 && !$isAlert ? 'background:rgba(22,163,74,0.05)' : '' }}">
                                     <span class="rank-chip text-white"
