@@ -30,6 +30,13 @@ class Empleado extends Model
         'gasolinera_codigo' => 'integer',
         'fecha_caducidad_dni' => 'date',
         'fecha_baja' => 'date',
+        'onboarding_completado' => 'boolean',
+        'onboarding_paso_actual' => 'integer',
+        'onboarding_fecha_completado' => 'datetime',
+        'politicas_aceptadas_at' => 'datetime',
+        'onboarding_verificado_por_admin' => 'boolean',
+        'onboarding_verificado_at' => 'datetime',
+        'onboarding_checklist' => 'array',
     ];
 
 
@@ -344,5 +351,48 @@ class Empleado extends Model
                 ]);
             }
         }
+    }
+
+    public function onboardingVerificadoPor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'onboarding_verificado_user_id');
+    }
+
+    public function isOnboardingPending(): bool
+    {
+        return !$this->onboarding_completado;
+    }
+
+    public function getOnboardingProgressPercentage(): int
+    {
+        if ($this->onboarding_completado) {
+            return 100;
+        }
+
+        $completedSteps = 0;
+        $totalSteps = 4;
+
+        // Paso 1: Password changed (if user doesn't have default 1234)
+        $user = $this->user;
+        if ($user && !\Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
+            $completedSteps++;
+        }
+
+        // Paso 2: Personal data & IBAN & NUSS
+        if (!empty($this->dni) && !str_starts_with($this->dni, 'PENDIENTE') && !empty($this->iban) && !empty($this->nuss)) {
+            $completedSteps++;
+        }
+
+        // Paso 3: Documents uploaded (DNI uploaded)
+        if ($this->documentos()->where('tipo', 'DNI')->exists()) {
+            $completedSteps++;
+        }
+
+        // Paso 4: Policies accepted
+        if ($this->politicas_aceptadas_at !== null) {
+            $completedSteps++;
+        }
+
+        return (int) round(($completedSteps / $totalSteps) * 100);
     }
 }

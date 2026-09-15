@@ -61,6 +61,11 @@ class EmpleadoResource extends Resource
         return $schema
             ->columns(1)
             ->schema([
+                // BLOQUE 0: Control de Onboarding y Checklist de RRHH
+                \Filament\Infolists\Components\ViewEntry::make('onboarding_checklist')
+                    ->columnSpanFull()
+                    ->view('filament.components.empleado-onboarding-section'),
+
                 // BLOQUE 1: Datos Personales del Trabajador
                 \Filament\Schemas\Components\Section::make()
                     ->heading(fn ($record) => new \Illuminate\Support\HtmlString(

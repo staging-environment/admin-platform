@@ -206,6 +206,7 @@ Route::post('/contacto', function (Request $request) {
 
 // --- SECCIÓN PRIVADA (BACKEND) ---
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/portal/onboarding', \App\Livewire\EmpleadoOnboardingWizard::class)->name('empleado.onboarding');
     Route::redirect('/admin/dashboard', '/admin');
     Route::get('/admin/ficha-empleado', function (\Illuminate\Http\Request $request) {
         return redirect('/admin/portal-empleado' . ($request->getQueryString() ? '?' . $request->getQueryString() : ''));
