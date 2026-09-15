@@ -98,13 +98,13 @@
                             @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de caducidad</label>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Caducidad</label>
                             <input type="date" wire:model="fecha_caducidad_dni" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                             @error('fecha_caducidad_dni') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <button type="button" wire:click="uploadDocument" class="w-full inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px]">
-                                <span wire:loading.remove wire:target="file">Subir</span>
+                            <button type="button" wire:click="uploadDocument" class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px] w-full">
+                                <span wire:loading.remove wire:target="file">Subir DNI</span>
                                 <span wire:loading wire:target="file" class="flex items-center gap-1">
                                     <svg class="animate-spin h-4.5 w-4.5 text-white" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -115,93 +115,95 @@
                         </div>
                     </div>
                 @elseif ($family === 'contratos')
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-end w-full">
-                        <div class="flex flex-col">
-                            <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
-                            <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
-                                Seleccionar archivo
-                                <input type="file" wire:model="file" class="hidden" />
-                            </label>
-                            @if ($file)
-                                <span class="text-[10px] text-green-600 dark:text-green-400 mt-1 truncate max-w-[150px] font-medium">✓ Archivo cargado</span>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Contrato</label>
+                                <select wire:model.live="tipo_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                    <option value="Indefinido">Fijo</option>
+                                    <option value="Eventual">Eventual</option>
+                                </select>
+                                @error('tipo_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Inicio</label>
+                                <input type="date" wire:model="fecha_inicio_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                @error('fecha_inicio_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
+
+                            @if ($tipo_contrato === 'Eventual')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Finalización</label>
+                                    <input type="date" wire:model="fecha_vencimiento_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                    @error('fecha_vencimiento_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                </div>
                             @endif
-                            @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Contrato</label>
-                            <select wire:model.live="tipo_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                                <option value="">Selecciona tipo...</option>
-                                <option value="Indefinido">Fijo</option>
-                                <option value="Eventual">Eventual</option>
-                            </select>
-                            @error('tipo_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Inicio <span class="text-red-500">*</span></label>
-                            <input type="date" wire:model="fecha_inicio_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                            @error('fecha_inicio_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        @if ($tipo_contrato === 'Eventual')
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Finalización <span class="text-red-500">*</span></label>
-                                <input type="date" wire:model="fecha_vencimiento_contrato" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('fecha_vencimiento_contrato') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Jornada</label>
+                                <select wire:model.live="tipo_jornada" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                    <option value="Jornada completa">Jornada completa</option>
+                                    <option value="Media Jornada">Media Jornada</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                                @error('tipo_jornada') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
-                        @endif
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Jornada</label>
-                            <select wire:model.live="tipo_jornada" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                                <option value="Jornada completa">Jornada completa</option>
-                                <option value="Media Jornada">Media Jornada</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                            @error('tipo_jornada') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            @if ($tipo_jornada === 'Otros')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Detalle de Jornada</label>
+                                    <input type="text" wire:model="tipo_jornada_otro" placeholder="Ej. 20 horas semanales" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                    @error('tipo_jornada_otro') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
                         </div>
 
-                        @if ($tipo_jornada === 'Otros')
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end pt-2 border-t border-gray-200 dark:border-white/10">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Información adicional</label>
-                                <input type="text" wire:model="tipo_jornada_otro" placeholder="Detalle de jornada" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('tipo_jornada_otro') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Ubicación de trabajo <span class="text-red-500">*</span></label>
+                                <select wire:model="gasolinera_codigo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
+                                    <option value="">Selecciona ubicación...</option>
+                                    @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
+                                        <option value="{{ $codigo }}">{{ $nombre }}</option>
+                                    @endforeach
+                                </select>
+                                @error('gasolinera_codigo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
-                        @endif
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Ubicación de trabajo <span class="text-red-500">*</span></label>
-                            <select wire:model="gasolinera_codigo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                                <option value="">Selecciona ubicación...</option>
-                                @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
-                                    <option value="{{ $codigo }}">{{ $nombre }}</option>
-                                @endforeach
-                            </select>
-                            @error('gasolinera_codigo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Puesto <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="puesto" placeholder="Ej: Expendedor, Encargado..." class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                @error('puesto') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Puesto <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="puesto" placeholder="Ej: Expendedor, Encargado..." class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                            @error('puesto') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <button type="button" wire:click="uploadDocument" class="w-full inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px]">
-                                <span wire:loading.remove wire:target="file">Subir</span>
-                                <span wire:loading wire:target="file" class="flex items-center gap-1">
-                                    <svg class="animate-spin h-4.5 w-4.5 text-white" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                </span>
-                            </button>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 flex flex-col">
+                                    <span class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Archivo</span>
+                                    <label class="inline-flex items-center justify-center px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10 h-[38px] w-full">
+                                        Seleccionar archivo
+                                        <input type="file" wire:model="file" class="hidden" />
+                                    </label>
+                                    @if ($file)
+                                        <span class="text-[10px] text-green-600 dark:text-green-400 mt-1 truncate max-w-[150px] font-medium">✓ Archivo cargado</span>
+                                    @endif
+                                    @error('file') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                </div>
+                                <button type="button" wire:click="uploadDocument" class="inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm h-[38px] min-w-[80px]">
+                                    <span wire:loading.remove wire:target="file">Subir</span>
+                                    <span wire:loading wire:target="file" class="flex items-center gap-1">
+                                        <svg class="animate-spin h-4.5 w-4.5 text-white" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @else
                     @if ($family === 'formacion')
-                        <div class="grid grid-cols-1 {{ $tipo === 'Otros' ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-4 items-end">
+                        <div class="grid grid-cols-1 {{ $tipo === 'Otros' ? 'md:grid-cols-5' : 'md:grid-cols-4' }} gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tipo de Curso</label>
                                 <select wire:model.live="tipo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
@@ -221,9 +223,15 @@
                             @endif
 
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Realización</label>
-                                <input type="date" wire:model="fecha_realizacion" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('fecha_realizacion') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Inicio</label>
+                                <input type="date" wire:model="fecha_inicio" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                @error('fecha_inicio') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Fecha de Fin</label>
+                                <input type="date" wire:model="fecha_fin" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                                @error('fecha_fin') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="flex items-center gap-3">
@@ -264,7 +272,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nombre del Documento</label>
                                 <input type="text" wire:model="nombre" placeholder="Ej. Certificado formación" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }} @enderror
+                                @error('nombre') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="flex items-center gap-3">
@@ -301,13 +309,17 @@
                 <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
                     <tr>
                         @if ($family !== 'contratos' && $family !== 'dni')
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap w-full">Nombre</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap {{ $family === 'formacion' ? '' : 'w-full' }}">Nombre</th>
                         @endif
                         @if ($family === 'contratos')
                             <th scope="col" style="width: 70px; max-width: 70px;" class="px-2 py-2.5 whitespace-nowrap">Tipo</th>
                             <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Inicio</th>
                             <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Finalización</th>
                             <th scope="col" class="px-2 py-2.5 whitespace-nowrap">Jornada</th>
+                        @elseif ($family === 'formacion')
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Fecha de Inicio</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Fecha de Fin</th>
                         @else
                             @if ($family !== 'dni')
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Tipo</th>
@@ -315,8 +327,6 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap {{ $family === 'dni' ? 'w-full' : '' }}">
                                 @if ($family === 'dni')
                                     Fecha de Caducidad
-                                @elseif ($family === 'formacion')
-                                    Fecha de Realización
                                 @else
                                     Fecha de Subida
                                 @endif
@@ -329,7 +339,7 @@
                     @forelse ($this->documentos as $doc)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-all">
                             @if ($family !== 'contratos' && $family !== 'dni')
-                                <td class="px-6 py-4 font-medium" style="width: 100%; min-width: 300px;">
+                                <td class="px-6 py-4 font-medium" style="{{ $family === 'formacion' ? 'min-width: 200px;' : 'width: 100%; min-width: 300px;' }}">
                                     <div class="flex items-center gap-3">
                                         {{-- Icono según tipo --}}
                                         <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400">
@@ -461,27 +471,64 @@
                                         </span>
                                     @endif
                                 </td>
+                            @elseif ($family === 'formacion')
+                                <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
+                                    @if ($editingDocumentId === $doc->id)
+                                        <select wire:model.live="edit_tipo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full font-medium">
+                                            @foreach ($options as $val => $lbl)
+                                                <option value="{{ $val }}">{{ $lbl }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('edit_tipo') <span class="text-[10px] text-red-500">{{ $message }}</span> @enderror
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-300">
+                                            {{ $doc->tipo }}
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap">
+                                    @if ($editingDocumentId === $doc->id)
+                                        <input type="date" wire:model="edit_fecha_inicio" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                        @error('edit_fecha_inicio') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                    @else
+                                        {{ $doc->fecha_inicio ? $doc->fecha_inicio->format('d/m/Y') : 'No especificada' }}
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap">
+                                    @if ($editingDocumentId === $doc->id)
+                                        <div class="flex flex-col space-y-2">
+                                            <div>
+                                                <input type="date" wire:model="edit_fecha_fin" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
+                                                @error('edit_fecha_fin') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Archivo actual: <span class="font-normal text-gray-500">{{ basename($doc->file_path) }}</span></label>
+                                                <label class="inline-flex items-center justify-center px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-[10px] font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10">
+                                                    Cambiar archivo (opcional)
+                                                    <input type="file" wire:model="edit_file" class="hidden" />
+                                                </label>
+                                                @if ($edit_file)
+                                                    <span class="text-[10px] text-green-600 dark:text-green-400 block mt-1">✓ Nuevo archivo seleccionado</span>
+                                                @endif
+                                                @error('edit_file') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                    @else
+                                        {{ $doc->fecha_fin ? $doc->fecha_fin->format('d/m/Y') : 'No especificada' }}
+                                    @endif
+                                </td>
                             @else
                                 @if ($family !== 'dni')
                                     <td class="px-6 py-4" style="width: auto !important; min-width: 90px;">
-                                        @if ($editingDocumentId === $doc->id && $family === 'formacion')
-                                            <select wire:model.live="edit_tipo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full font-medium">
-                                                @foreach ($options as $val => $lbl)
-                                                    <option value="{{ $val }}">{{ $lbl }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('edit_tipo') <span class="text-[10px] text-red-500">{{ $message }}</span> @enderror
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-300">
-                                                {{ $doc->tipo }}
-                                            </span>
-                                        @endif
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-300">
+                                            {{ $doc->tipo }}
+                                        </span>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs" style="{{ $family === 'dni' ? 'width: 100%;' : 'width: 140px !important; min-width: 140px !important;' }}">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                                     @if ($family === 'dni')
                                         @if ($editingDocumentId === $doc->id)
-                                            <div class="flex flex-col space-y-2.5">
+                                            <div class="flex flex-col space-y-2">
                                                 <div>
                                                     <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Fecha de Caducidad</label>
                                                     <input type="date" wire:model="edit_fecha_caducidad_dni" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
@@ -501,29 +548,6 @@
                                             </div>
                                         @else
                                             {{ $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('d/m/Y') : 'No especificada' }}
-                                        @endif
-                                    @elseif ($family === 'formacion')
-                                        @if ($editingDocumentId === $doc->id)
-                                            <div class="flex flex-col space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Fecha Realización</label>
-                                                    <input type="date" wire:model="edit_fecha_realizacion" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
-                                                    @error('edit_fecha_realizacion') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Archivo actual: <span class="font-normal text-gray-500">{{ basename($doc->file_path) }}</span></label>
-                                                    <label class="inline-flex items-center justify-center px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-lg text-[10px] font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-gray-300 dark:border-white/10">
-                                                        Cambiar archivo (opcional)
-                                                        <input type="file" wire:model="edit_file" class="hidden" />
-                                                    </label>
-                                                    @if ($edit_file)
-                                                        <span class="text-[10px] text-green-600 dark:text-green-400 block mt-1">✓ Nuevo archivo seleccionado</span>
-                                                    @endif
-                                                    @error('edit_file') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
-                                                </div>
-                                            </div>
-                                        @else
-                                            {{ $doc->fecha_realizacion ? $doc->fecha_realizacion->format('d/m/Y') : 'No especificada' }}
                                         @endif
                                     @else
                                         {{ $doc->created_at->timezone('Europe/Madrid')->format('d/m/Y H:i') }}
@@ -567,7 +591,7 @@
                                         </a>
 
                                         {{-- Editar --}}
-                                        @if ($family === 'contratos' || $family === 'dni')
+                                        @if ($family === 'contratos' || $family === 'dni' || $family === 'formacion')
                                             <button type="button" wire:click="editDocument({{ $doc->id }})" style="display: inline-flex; align-items: center; justify-content: center; color: #d97706; padding: 4px;" class="hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-md transition-all" title="Editar">
                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -587,7 +611,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $family === 'dni' ? 3 : 4 }}" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ $family === 'dni' ? 2 : ($family === 'contratos' || $family === 'formacion' ? 5 : 4) }}" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center justify-center space-y-2">
                                     <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5" />
@@ -601,5 +625,4 @@
             </table>
         </div>
     @endif
-</div>
 </div>

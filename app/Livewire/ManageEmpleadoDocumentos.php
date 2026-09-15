@@ -26,7 +26,8 @@ class ManageEmpleadoDocumentos extends Component
     public $fecha_vencimiento_contrato;
     public $tipo_jornada = 'Jornada completa';
     public $tipo_jornada_otro;
-    public $fecha_realizacion;
+    public $fecha_inicio;
+    public $fecha_fin;
     public $gasolinera_codigo;
     public $puesto;
 
@@ -39,7 +40,8 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_tipo_jornada;
     public $edit_tipo_jornada_otro;
     public $edit_file;
-    public $edit_fecha_realizacion;
+    public $edit_fecha_inicio;
+    public $edit_fecha_fin;
     public $edit_tipo;
     public $edit_nombre;
     public $edit_gasolinera_codigo;
@@ -54,11 +56,17 @@ class ManageEmpleadoDocumentos extends Component
     protected $messages = [
         'fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
         'edit_fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
+        'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+        'edit_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.'
     ];
 
     protected $validationAttributes = [
         'fecha_caducidad_dni' => 'fecha de caducidad',
         'edit_fecha_caducidad_dni' => 'fecha de caducidad',
+        'fecha_inicio' => 'fecha de inicio',
+        'fecha_fin' => 'fecha de fin',
+        'edit_fecha_inicio' => 'fecha de inicio',
+        'edit_fecha_fin' => 'fecha de fin',
     ];
 
     public function mount($empleadoId, $family = null)
@@ -79,7 +87,8 @@ class ManageEmpleadoDocumentos extends Component
             $this->puesto = $this->empleado->puesto;
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Prevención de riesgos laborales';
-            $this->fecha_realizacion = null;
+            $this->fecha_inicio = null;
+            $this->fecha_fin = null;
         } elseif ($this->family === 'discapacidad') {
             $this->tipo = 'Resolución Discapacidad';
         } elseif ($this->family === 'incapacidad') {
@@ -146,7 +155,8 @@ class ManageEmpleadoDocumentos extends Component
             $rules['puesto'] = 'required|string|max:255';
         }
         if ($this->family === 'formacion') {
-            $rules['fecha_realizacion'] = 'required|date';
+            $rules['fecha_inicio'] = 'required|date';
+            $rules['fecha_fin'] = 'required|date|after_or_equal:fecha_inicio';
             if ($this->tipo === 'Otros') {
                 $rules['nombre'] = 'required|string|max:255';
             } else {
@@ -175,7 +185,8 @@ class ManageEmpleadoDocumentos extends Component
             'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
             'gasolinera_codigo' => $this->family === 'contratos' ? ($this->gasolinera_codigo ?: null) : null,
             'puesto' => $this->family === 'contratos' ? ($this->puesto ?: null) : null,
-            'fecha_realizacion' => $this->family === 'formacion' ? $this->fecha_realizacion : null,
+            'fecha_inicio' => $this->family === 'formacion' ? $this->fecha_inicio : null,
+            'fecha_fin' => $this->family === 'formacion' ? $this->fecha_fin : null,
         ]);
 
         if ($this->family === 'contratos') {
@@ -190,7 +201,7 @@ class ManageEmpleadoDocumentos extends Component
         $this->empleado->actualizarAlertas();
 
         // Reset form fields
-        $this->reset(['nombre', 'file', 'tipo_jornada', 'tipo_jornada_otro', 'fecha_realizacion']);
+        $this->reset(['nombre', 'file', 'tipo_jornada', 'tipo_jornada_otro', 'fecha_inicio', 'fecha_fin']);
         if ($this->family === 'dni') {
             $this->tipo = 'DNI';
         } elseif ($this->family === 'contratos') {
@@ -302,7 +313,8 @@ class ManageEmpleadoDocumentos extends Component
         } elseif ($this->family === 'formacion') {
             $this->edit_tipo = $doc->tipo;
             $this->edit_nombre = $doc->nombre;
-            $this->edit_fecha_realizacion = $doc->fecha_realizacion ? $doc->fecha_realizacion->format('Y-m-d') : null;
+            $this->edit_fecha_inicio = $doc->fecha_inicio ? $doc->fecha_inicio->format('Y-m-d') : null;
+            $this->edit_fecha_fin = $doc->fecha_fin ? $doc->fecha_fin->format('Y-m-d') : null;
         }
     }
 
@@ -378,7 +390,8 @@ class ManageEmpleadoDocumentos extends Component
         } elseif ($this->family === 'formacion') {
             $rules = [
                 'edit_tipo' => 'required|in:DNI,Contratos,Certificados,Titulaciones,Carnets,Resolución Discapacidad,Dictamen Técnico,Certificado Discapacidad,Incapacidad,Incapacidad Física,Incapacidad Psíquica,Otros,Prevención de riesgos laborales,Manipulación de alimentos',
-                'edit_fecha_realizacion' => 'required|date',
+                'edit_fecha_inicio' => 'required|date',
+                'edit_fecha_fin' => 'required|date|after_or_equal:edit_fecha_inicio',
             ];
             if ($this->edit_tipo === 'Otros') {
                 $rules['edit_nombre'] = 'required|string|max:255';
@@ -402,7 +415,8 @@ class ManageEmpleadoDocumentos extends Component
                 'tipo' => $this->edit_tipo,
                 'nombre' => $this->edit_nombre,
                 'file_path' => $path,
-                'fecha_realizacion' => $this->edit_fecha_realizacion,
+                'fecha_inicio' => $this->edit_fecha_inicio,
+                'fecha_fin' => $this->edit_fecha_fin,
             ]);
         }
 

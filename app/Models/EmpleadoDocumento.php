@@ -11,7 +11,8 @@ class EmpleadoDocumento extends Model
     protected $casts = [
         'fecha_inicio_contrato' => 'date',
         'fecha_vencimiento_contrato' => 'date',
-        'fecha_realizacion' => 'date',
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
     ];
 
     public function empleado()
