@@ -12,18 +12,42 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('empleados', function (Blueprint $table) {
-            $table->boolean('onboarding_completado')->default(false)->after('documento_baja_path');
-            $table->unsignedTinyInteger('onboarding_paso_actual')->default(1)->after('onboarding_completado');
-            $table->timestamp('onboarding_fecha_completado')->nullable()->after('onboarding_paso_actual');
-            $table->string('nuss')->nullable()->after('dni');
-            $table->string('iban')->nullable()->after('nuss');
-            $table->string('contacto_emergencia_nombre')->nullable()->after('telefono_secundario');
-            $table->string('contacto_emergencia_telefono')->nullable()->after('contacto_emergencia_nombre');
-            $table->timestamp('politicas_aceptadas_at')->nullable()->after('onboarding_fecha_completado');
-            $table->boolean('onboarding_verificado_por_admin')->default(false)->after('politicas_aceptadas_at');
-            $table->timestamp('onboarding_verificado_at')->nullable()->after('onboarding_verificado_por_admin');
-            $table->foreignId('onboarding_verificado_user_id')->nullable()->constrained('users')->nullOnDelete()->after('onboarding_verificado_at');
-            $table->json('onboarding_checklist')->nullable()->after('onboarding_verificado_user_id');
+            if (!Schema::hasColumn('empleados', 'onboarding_completado')) {
+                $table->boolean('onboarding_completado')->default(false);
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_paso_actual')) {
+                $table->unsignedTinyInteger('onboarding_paso_actual')->default(1);
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_fecha_completado')) {
+                $table->timestamp('onboarding_fecha_completado')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'nuss')) {
+                $table->string('nuss')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'iban')) {
+                $table->string('iban')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'contacto_emergencia_nombre')) {
+                $table->string('contacto_emergencia_nombre')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'contacto_emergencia_telefono')) {
+                $table->string('contacto_emergencia_telefono')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'politicas_aceptadas_at')) {
+                $table->timestamp('politicas_aceptadas_at')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_verificado_por_admin')) {
+                $table->boolean('onboarding_verificado_por_admin')->default(false);
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_verificado_at')) {
+                $table->timestamp('onboarding_verificado_at')->nullable();
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_verificado_user_id')) {
+                $table->foreignId('onboarding_verificado_user_id')->nullable()->constrained('users')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('empleados', 'onboarding_checklist')) {
+                $table->json('onboarding_checklist')->nullable();
+            }
         });
 
         // Para los empleados existentes que ya están en alta, marcamos onboarding_completado como true para no bloquearles
@@ -40,8 +64,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('empleados', function (Blueprint $table) {
-            $table->dropForeign(['onboarding_verificado_user_id']);
-            $table->dropColumn([
+            if (Schema::hasColumn('empleados', 'onboarding_verificado_user_id')) {
+                $table->dropForeign(['onboarding_verificado_user_id']);
+            }
+            $cols = [
                 'onboarding_completado',
                 'onboarding_paso_actual',
                 'onboarding_fecha_completado',
@@ -54,7 +80,12 @@ return new class extends Migration
                 'onboarding_verificado_at',
                 'onboarding_verificado_user_id',
                 'onboarding_checklist',
-            ]);
+            ];
+            foreach ($cols as $col) {
+                if (Schema::hasColumn('empleados', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };
