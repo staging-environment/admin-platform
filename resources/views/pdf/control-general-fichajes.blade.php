@@ -140,6 +140,17 @@
             display: inline-block;
             margin-top: 2px;
         }
+        .badge-alerta {
+            display: inline-block;
+            font-size: 6.5pt;
+            font-weight: bold;
+            color: #b91c1c;
+            background-color: #fee2e2;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-top: 1px;
+            border: 0.5px solid #f87171;
+        }
         .badge-edit {
             background-color: #fef3c7;
             color: #b45309;
@@ -295,6 +306,9 @@
                         @endif
                         @if($fichaje->server_checkin_at)
                             <span class="real-time">Real: {{ $fichaje->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</span>
+                            @if($fichaje->isEntradaDescuadre())
+                                <br><span class="badge-alerta">⚠️ Descuadre &gt; 5m</span>
+                            @endif
                         @endif
                     </td>
                     <td>
@@ -302,6 +316,9 @@
                             <span class="badge-salida">{{ \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') }}</span>
                             @if($fichaje->server_checkout_at)
                                 <span class="real-time">Real: {{ $fichaje->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</span>
+                                @if($fichaje->isSalidaDescuadre())
+                                    <br><span class="badge-alerta">⚠️ Descuadre &gt; 5m</span>
+                                @endif
                             @endif
                         @else
                             <span class="badge-en-curso">En curso</span>
