@@ -651,6 +651,176 @@
                 </div>
             @endif
 
+            
+            <!-- Section: Mis Titulaciones y Formación Asignada -->
+            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm mt-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-2xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                Mis Titulaciones y Formación Asignada
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold border border-amber-500/20">
+                                    {{ (count($cursos) + count($documentosFormacion)) }} {{ (count($cursos) + count($documentosFormacion)) === 1 ? 'acreditación' : 'acreditaciones' }}
+                                </span>
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                Cursos de formación, títulos profesionales y acreditaciones oficiales asignadas a tu expediente para consultar y descargar.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                @if(count($cursos) === 0 && count($documentosFormacion) === 0)
+                    <div class="py-10 text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-400 flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300">No tienes formaciones ni titulaciones asignadas actualmente</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                            Cuando el departamento de administración o recursos humanos registre un curso, título o carnet en tu expediente, aparecerá aquí automáticamente para su consulta y descarga.
+                        </p>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Cursos de Formación Asignados -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/5">
+                                <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                    Cursos y Planes de Formación ({{ count($cursos) }})
+                                </h4>
+                            </div>
+
+                            @forelse($cursos as $c)
+                                <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-amber-500/30 transition-all space-y-2.5">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <h5 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">
+                                                {{ $c->nombre_curso }}
+                                            </h5>
+                                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                @if($c->fecha_inicio)
+                                                    <span>Inicio: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($c->fecha_inicio)->format('d/m/Y') }}</strong></span>
+                                                @endif
+                                                @if($c->fecha_fin)
+                                                    <span>• Fin: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($c->fecha_fin)->format('d/m/Y') }}</strong></span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0
+                                            {{ $c->estado === 'Realizado' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : '' }}
+                                            {{ $c->estado === 'En curso' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800' : '' }}
+                                            {{ $c->estado === 'Asignado' ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400 border border-sky-200 dark:border-sky-800' : '' }}
+                                        ">
+                                            {{ $c->estado ?? 'Asignado' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="pt-2 border-t border-gray-200/60 dark:border-white/5 flex items-center justify-between gap-2">
+                                        @if($c->certificado_path)
+                                            <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                Certificado disponible
+                                            </span>
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $c->certificado_path]) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-200/60 dark:bg-white/10 hover:bg-gray-200 transition-all">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Ver
+                                                </a>
+                                                <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $c->certificado_path]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                    Descargar
+                                                </a>
+                                            </div>
+                                        @else
+                                            <span class="text-[11px] text-gray-400 italic">
+                                                Certificado pendiente de emisión/subida
+                                            </span>
+                                            <span class="text-xs text-gray-400">—</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 text-center text-xs text-gray-400">
+                                    No hay cursos registrados en esta categoría.
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Titulaciones, Carnets y Certificados -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/5">
+                                <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    Titulaciones, PRL y Diplomas ({{ count($documentosFormacion) }})
+                                </h4>
+                            </div>
+
+                            @forelse($documentosFormacion as $doc)
+                                <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-amber-500/30 transition-all space-y-2.5">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div>
+                                            <span class="text-[10px] uppercase font-extrabold text-amber-600 dark:text-amber-400 block tracking-wider">
+                                                {{ $doc->tipo }}
+                                            </span>
+                                            <h5 class="text-sm font-bold text-gray-900 dark:text-white leading-tight mt-0.5">
+                                                {{ $doc->nombre }}
+                                            </h5>
+                                            @if($doc->fecha_inicio || $doc->fecha_fin)
+                                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    @if($doc->fecha_inicio)
+                                                        <span>Expedición: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_inicio)->format('d/m/Y') }}</strong></span>
+                                                    @endif
+                                                    @if($doc->fecha_fin)
+                                                        <span>• Caducidad: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_fin)->format('d/m/Y') }}</strong></span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-2 border-t border-gray-200/60 dark:border-white/5 flex items-center justify-between gap-2">
+                                        @if($doc->file_path)
+                                            <span class="text-[11px] text-gray-500 dark:text-gray-400 font-mono truncate max-w-[160px]" title="{{ basename($doc->file_path) }}">
+                                                {{ basename($doc->file_path) }}
+                                            </span>
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $doc->file_path]) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-200/60 dark:bg-white/10 hover:bg-gray-200 transition-all">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    Ver
+                                                </a>
+                                                <a href="{{ route('admin.recursos_humanos.descargar_archivo', ['path' => $doc->file_path]) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                    Descargar
+                                                </a>
+                                            </div>
+                                        @else
+                                            <span class="text-[11px] text-gray-400 italic">Sin documento adjunto</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 text-center text-xs text-gray-400">
+                                    No hay titulaciones adicionales registradas.
+                                </div>
+                            @endforelse
+                        </div>
+
+                    </div>
+                @endif
+            </div>
+
             <x-filament::modal id="edit-fichaje-modal" width="md">
                 <x-slot name="heading">
                     Editar Fichaje del {{ $editingFecha ? \Carbon\Carbon::parse($editingFecha)->format('d/m/Y') : '' }}

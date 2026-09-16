@@ -90,6 +90,10 @@ class FichaEmpleado extends Page
     public $alta_justificante;
     public $activeBajaId;
 
+    // Titulaciones, Cursos y Formación
+    public $cursos = [];
+    public $documentosFormacion = [];
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -169,6 +173,7 @@ class FichaEmpleado extends Page
         if ($this->empleado) {
             $this->loadVacaciones();
             $this->loadAusencias();
+            $this->loadFormacion();
         }
     }
 
