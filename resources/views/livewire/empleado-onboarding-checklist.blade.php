@@ -86,18 +86,14 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-2">
-            @if ($empleado?->onboarding_verificado_por_admin)
-                <button type="button" wire:click="reabrirOnboarding" wire:confirm="¿Seguro que deseas reabrir el proceso de onboarding para este empleado?" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition-all">
-                    Reabrir Onboarding
-                </button>
-            @else
+        @if (!$empleado?->onboarding_verificado_por_admin)
+            <div class="flex items-center gap-2">
                 <button type="button" wire:click="aprobarOnboarding" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     <span>Aprobar y Finalizar Onboarding</span>
                 </button>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
 
 </div>
