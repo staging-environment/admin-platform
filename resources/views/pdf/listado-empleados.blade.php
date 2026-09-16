@@ -225,13 +225,14 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 11%;">Estado</th>
-                <th style="width: 21%;">Apellidos</th>
-                <th style="width: 16%;">Nombre</th>
-                <th style="width: 11%;">DNI</th>
-                <th style="width: 11%;">Teléfono</th>
-                <th style="width: 15%;">Ubicación</th>
-                <th style="width: 15%;">Puesto</th>
+                <th style="width: 8%;">Estado</th>
+                <th style="width: 17%;">Apellidos</th>
+                <th style="width: 13%;">Nombre</th>
+                <th style="width: 9%;">DNI</th>
+                <th style="width: 10%;">Teléfono</th>
+                <th style="width: 19%;">E-mail</th>
+                <th style="width: 12%;">Ubicación</th>
+                <th style="width: 12%;">Puesto</th>
             </tr>
         </thead>
         <tbody>
@@ -261,6 +262,9 @@
                     <td style="font-family: monospace; color: #475569; white-space: nowrap;">
                         {{ $emp->telefono_principal ?: ($emp->telefono_secundario ?: '—') }}
                     </td>
+                    <td style="color: #334155; font-size: 7pt; word-break: break-all;">
+                        {{ $emp->email ?: '—' }}
+                    </td>
                     <td style="text-transform: uppercase; color: #475569;">
                         {{ $emp->gasolinera?->Nombre ?? '—' }}
                     </td>
@@ -270,7 +274,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; color: #64748b;">
+                    <td colspan="8" style="text-align: center; padding: 20px; color: #64748b;">
                         No se encontraron empleados con los filtros seleccionados.
                     </td>
                 </tr>
