@@ -34,7 +34,7 @@
             @else
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10">
                     <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    En Progreso por el Empleado (Paso {{ $empleado?->onboarding_paso_actual ?? 1 }} de 4)
+                    En Progreso por el Empleado (Paso {{ $empleado?->onboarding_paso_actual ?? 1 }} de 5)
                 </span>
             @endif
         </div>

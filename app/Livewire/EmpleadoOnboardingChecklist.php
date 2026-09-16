@@ -34,7 +34,7 @@ class EmpleadoOnboardingChecklist extends Component
                 'auto' => true,
             ],
             'datos_personales' => [
-                'label' => 'Datos personales, NUSS e IBAN revisados y completos',
+                'label' => 'Datos personales e IBAN revisados y completos',
                 'checked' => !empty($empleado->dni) && !str_starts_with($empleado->dni, 'PENDIENTE') && !empty($empleado->iban),
                 'auto' => false,
             ],
@@ -52,16 +52,6 @@ class EmpleadoOnboardingChecklist extends Component
                 'label' => 'Aceptación de normativas internas y RGPD formalizada',
                 'checked' => $empleado->politicas_aceptadas_at !== null,
                 'auto' => true,
-            ],
-            'alta_seguridad_social' => [
-                'label' => 'Alta en Seguridad Social tramitada y confirmada',
-                'checked' => false,
-                'auto' => false,
-            ],
-            'entrega_uniforme_material' => [
-                'label' => 'Entrega de uniforme, EPIs y accesos completada',
-                'checked' => false,
-                'auto' => false,
             ],
         ];
 
