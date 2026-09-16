@@ -16,6 +16,7 @@
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
+        <x-filament-impersonate::banner/>
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
 

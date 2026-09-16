@@ -29,6 +29,7 @@
     @include('partials.pwa-tags')
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased relative overflow-x-hidden" x-data="{ tab: 'inicio', showTerms: false, showLegal: false, showPrivacy: false }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+    <x-filament-impersonate::banner/>
 
     <!-- Glowing background orbs for modern depth -->
     <div class="absolute top-[40vh] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[120vh] pointer-events-none overflow-hidden z-0 opacity-40">

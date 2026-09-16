@@ -60,6 +60,7 @@
     @include('partials.pwa-tags')
 </head>
 <body class="bg-slate-50/50 text-slate-800 antialiased min-h-screen relative overflow-x-hidden" x-data="{ tab: (new URLSearchParams(window.location.search)).get('tab') === 'contacto' ? 'inicio' : ((new URLSearchParams(window.location.search)).get('tab') || 'inicio'), showTerms: false, showLegal: false, showPrivacy: false }" x-effect="if (tab === 'contacto') { setTimeout(() => { if (window.globalMapInstance) { window.globalMapInstance.invalidateSize(); } }, 200); }" @keydown.window.escape="showTerms = false; showLegal = false; showPrivacy = false;">
+    <x-filament-impersonate::banner/>
 
     <!-- Glowing background orbs for modern depth -->
     <div class="absolute top-[40vh] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[120vh] pointer-events-none overflow-hidden z-0 opacity-40">
