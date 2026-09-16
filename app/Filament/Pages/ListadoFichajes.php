@@ -135,6 +135,56 @@ class ListadoFichajes extends Page
         $fichajes = $this->getTodosLosFichajesQuery()->get();
         $gasolineraNombre = $this->filterGasolinera ? Gasolinera::where('Codigo', $this->filterGasolinera)->value('Nombre') : null;
 
+        // Calcular desglose por empleado y totales de horas para el informe PDF
+        $porEmpleado = [];
+        $totalMinutosGlobal = 0;
+        $totalFichajesCompletosGlobal = 0;
+        $totalFichajesEnCursoGlobal = 0;
+
+        foreach ($fichajes as $f) {
+            $empId = $f->empleado_id ?? ($f->empleado->id ?? 0);
+            if (!isset($porEmpleado[$empId])) {
+                $porEmpleado[$empId] = [
+                    'empleado' => $f->empleado ?? null,
+                    'apellidos' => $f->empleado->apellidos ?? '',
+                    'nombre' => $f->empleado->nombre ?? '',
+                    'dni' => $f->empleado->dni ?? '',
+                    'ubicacion' => $f->empleado?->gasolinera?->Nombre ?? '—',
+                    'total_minutos' => 0,
+                    'fichajes_completos' => 0,
+                    'fichajes_en_curso' => 0,
+                    'total_fichajes' => 0,
+                ];
+            }
+
+            $porEmpleado[$empId]['total_fichajes']++;
+
+            if ($f->hora_entrada && $f->hora_salida) {
+                $fechaStr = $f->fecha ? ($f->fecha instanceof Carbon ? $f->fecha->format('Y-m-d') : substr((string)$f->fecha, 0, 10)) : '2000-01-01';
+                $t1 = Carbon::parse($fechaStr . ' ' . substr((string)$f->hora_entrada, 0, 5));
+                $t2 = Carbon::parse($fechaStr . ' ' . substr((string)$f->hora_salida, 0, 5));
+                if ($t2->lessThan($t1)) {
+                    $t2->addDay();
+                }
+                $diffMins = $t1->diffInMinutes($t2);
+                $porEmpleado[$empId]['total_minutos'] += $diffMins;
+                $porEmpleado[$empId]['fichajes_completos']++;
+                $totalMinutosGlobal += $diffMins;
+                $totalFichajesCompletosGlobal++;
+            } else {
+                $porEmpleado[$empId]['fichajes_en_curso']++;
+                $totalFichajesEnCursoGlobal++;
+            }
+        }
+
+        uasort($porEmpleado, function($a, $b) {
+            $cmp = strcmp($a['apellidos'], $b['apellidos']);
+            return $cmp === 0 ? strcmp($a['nombre'], $b['nombre']) : $cmp;
+        });
+
+        $isSingleEmployee = count($porEmpleado) === 1;
+        $singleEmpleado = $isSingleEmployee ? reset($porEmpleado) : null;
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.control-general-fichajes', [
             'fichajes' => $fichajes,
             'filterDateFrom' => $this->filterDateFrom,
@@ -144,6 +194,12 @@ class ListadoFichajes extends Page
             'sortField' => $this->sortField,
             'sortDirection' => $this->sortDirection,
             'generatedAt' => Carbon::now()->timezone('Europe/Madrid')->format('d/m/Y H:i'),
+            'desglosePorEmpleado' => $porEmpleado,
+            'totalMinutosGlobal' => $totalMinutosGlobal,
+            'totalFichajesCompletosGlobal' => $totalFichajesCompletosGlobal,
+            'totalFichajesEnCursoGlobal' => $totalFichajesEnCursoGlobal,
+            'isSingleEmployee' => $isSingleEmployee,
+            'singleEmpleado' => $singleEmpleado,
         ])->setPaper('a4', 'landscape');
 
         $filename = 'Control_General_Fichajes_' . Carbon::now()->format('Ymd_His') . '.pdf';

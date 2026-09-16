@@ -18,23 +18,23 @@
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 2px solid #d97706;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
         .header-title {
-            font-size: 16pt;
+            font-size: 15pt;
             font-weight: bold;
             color: #0f172a;
             margin: 0;
         }
         .header-subtitle {
-            font-size: 9pt;
+            font-size: 8.5pt;
             color: #d97706;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .header-meta {
             text-align: right;
@@ -47,7 +47,7 @@
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             padding: 6px 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-size: 7.5pt;
         }
         .filters-table {
@@ -55,17 +55,36 @@
             border-collapse: collapse;
         }
         .filters-table td {
-            padding: 2px 6px;
+            padding: 2px 5px;
             vertical-align: top;
         }
         .filter-label {
             color: #64748b;
             font-weight: bold;
             text-transform: uppercase;
+            font-size: 6.5pt;
         }
         .filter-value {
             color: #0f172a;
             font-weight: 600;
+        }
+        .single-employee-box {
+            margin-top: 6px;
+            padding: 5px 8px;
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 5px;
+            font-size: 8pt;
+            color: #92400e;
+        }
+        .multi-employee-box {
+            margin-top: 6px;
+            padding: 4px 8px;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 7.5pt;
+            color: #334155;
         }
         table.data-table {
             width: 100%;
@@ -78,12 +97,12 @@
             font-size: 7.5pt;
             font-weight: bold;
             text-transform: uppercase;
-            padding: 6px 6px;
+            padding: 5px 6px;
             text-align: left;
             border: 1px solid #1e293b;
         }
         table.data-table td {
-            padding: 5px 6px;
+            padding: 4px 6px;
             border-bottom: 1px solid #e2e8f0;
             border-left: 1px solid #f1f5f9;
             border-right: 1px solid #f1f5f9;
@@ -99,7 +118,7 @@
             font-weight: bold;
             font-family: monospace;
             padding: 2px 4px;
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid #a7f3d0;
             display: inline-block;
         }
@@ -109,7 +128,7 @@
             font-weight: bold;
             font-family: monospace;
             padding: 2px 4px;
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid #fed7aa;
             display: inline-block;
         }
@@ -117,28 +136,22 @@
             background-color: #fef3c7;
             color: #b45309;
             font-weight: bold;
-            padding: 2px 5px;
-            border-radius: 4px;
-            border: 1px solid #fde68a;
+            padding: 2px 4px;
+            border-radius: 3px;
             display: inline-block;
-        }
-        .real-time {
-            color: #64748b;
             font-size: 6.5pt;
-            font-family: monospace;
-            display: block;
-            margin-top: 2px;
-            white-space: nowrap;
+            text-transform: uppercase;
         }
         .badge-retro {
             background-color: #eff6ff;
             color: #1d4ed8;
-            font-size: 6.5pt;
-            padding: 1px 3px;
-            border-radius: 3px;
             font-weight: bold;
+            padding: 1px 4px;
+            border-radius: 3px;
             display: inline-block;
-            margin-top: 2px;
+            font-size: 6.5pt;
+            text-transform: uppercase;
+            margin-top: 1px;
         }
         .badge-alerta {
             display: inline-block;
@@ -152,47 +165,78 @@
             border: 0.5px solid #f87171;
         }
         .badge-edit {
-            background-color: #fef3c7;
+            background-color: #fffbeb;
             color: #b45309;
-            font-size: 6.5pt;
-            padding: 1px 3px;
-            border-radius: 3px;
             font-weight: bold;
+            padding: 1px 4px;
+            border-radius: 3px;
             display: inline-block;
-            margin-top: 2px;
+            font-size: 6.5pt;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+        .real-time {
+            color: #64748b;
+            font-size: 6.5pt;
+            display: block;
+            margin-top: 1px;
         }
         .total-time {
             font-weight: bold;
             color: #0f172a;
         }
-        .footer {
-            position: fixed;
-            bottom: -10mm;
-            left: 0;
-            right: 0;
-            height: 6mm;
-            text-align: center;
-            font-size: 7pt;
-            color: #94a3b8;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 2px;
+        .section-title {
+            background-color: #f1f5f9;
+            border-left: 4px solid #d97706;
+            padding: 5px 8px;
+            font-weight: bold;
+            font-size: 8.5pt;
+            text-transform: uppercase;
+            color: #0f172a;
+            margin-top: 16px;
+            margin-bottom: 6px;
+        }
+        table.summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+        table.summary-table th {
+            background-color: #334155;
+            color: #ffffff;
+            font-size: 7.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 5px 8px;
+            text-align: left;
+            border: 1px solid #334155;
+        }
+        table.summary-table td {
+            padding: 5px 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 7.5pt;
+            vertical-align: middle;
+        }
+        table.summary-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        .summary-total-row td {
+            background-color: #fef3c7 !important;
+            border-top: 2px solid #d97706 !important;
+            font-weight: bold !important;
         }
     </style>
 </head>
 <body>
-    @php
-        $logoPath = public_path('ronda_norte_logo.png');
-        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
-    @endphp
-    <!-- Encabezado corporativo -->
+    <!-- Encabezado Principal -->
     <table class="header-table">
         <tr>
             <td style="vertical-align: middle; width: 68%;">
-                <table style="border-collapse: collapse; margin: 0; padding: 0;">
+                <table style="border-collapse: collapse;">
                     <tr>
-                        @if($logoBase64)
-                            <td style="vertical-align: middle; padding-right: 12px; width: 42px;">
-                                <img src="{{ $logoBase64 }}" alt="Utrecar" style="height: 38px; width: auto; display: block;" />
+                        @if(file_exists(public_path('images/utrecar.png')))
+                            <td style="padding-right: 12px; vertical-align: middle;">
+                                <img src="{{ public_path('images/utrecar.png') }}" style="max-height: 38px; width: auto;" alt="Logo Utrecar">
                             </td>
                         @endif
                         <td style="vertical-align: middle;">
@@ -256,12 +300,39 @@
                 </td>
                 <td style="width: 17%; text-align: right;">
                     <span class="filter-label">Total Exportado:</span><br>
-                    <span class="filter-value" style="color: #d97706; font-size: 9pt;">
-                        {{ count($fichajes) }} fichajes
+                    <span class="filter-value" style="color: #d97706; font-size: 8.5pt;">
+                        {{ count($fichajes) }} registros
                     </span>
                 </td>
             </tr>
         </table>
+
+        @if($isSingleEmployee && $singleEmpleado)
+            <!-- Bloque Destacado de Horas para Empleado Concreto -->
+            <div class="single-employee-box">
+                @php
+                    $hEmp = floor($totalMinutosGlobal / 60);
+                    $mEmp = $totalMinutosGlobal % 60;
+                    $decEmp = number_format($totalMinutosGlobal / 60, 2, ',', '.');
+                @endphp
+                <strong>Empleado:</strong> {{ mb_strtoupper($singleEmpleado['apellidos']) }}, {{ mb_strtoupper($singleEmpleado['nombre']) }} &nbsp;|&nbsp; 
+                <strong>Centro:</strong> {{ $singleEmpleado['ubicacion'] }} &nbsp;|&nbsp; 
+                <strong style="color: #b45309; font-size: 9pt;">Suma Total de Horas: {{ $hEmp }} h {{ $mEmp }} m ({{ $decEmp }} horas)</strong> &nbsp;|&nbsp; 
+                <strong>Jornadas:</strong> {{ $singleEmpleado['total_fichajes'] }} ({{ $singleEmpleado['fichajes_completos'] }} completadas, {{ $singleEmpleado['fichajes_en_curso'] }} en curso)
+            </div>
+        @else
+            <!-- Resumen Consolidado de Horas del Periodo -->
+            <div class="multi-employee-box">
+                @php
+                    $hTot = floor($totalMinutosGlobal / 60);
+                    $mTot = $totalMinutosGlobal % 60;
+                    $decTot = number_format($totalMinutosGlobal / 60, 2, ',', '.');
+                @endphp
+                <strong>Total Trabajadores en Informe:</strong> {{ count($desglosePorEmpleado) }} &nbsp;|&nbsp; 
+                <strong>Jornadas Totales:</strong> {{ count($fichajes) }} ({{ $totalFichajesCompletosGlobal }} completadas, {{ $totalFichajesEnCursoGlobal }} en curso) &nbsp;|&nbsp; 
+                <strong style="color: #b45309;">Suma Total de Horas Registradas: {{ $hTot }} h {{ $mTot }} m ({{ $decTot }} horas)</strong>
+            </div>
+        @endif
     </div>
 
     <!-- Tabla Principal de Fichajes -->
@@ -326,9 +397,13 @@
                     </td>
                     <td style="text-align: right;" class="total-time">
                         @php
-                            if ($fichaje->hora_salida) {
-                                $t1 = \Carbon\Carbon::parse($fichaje->hora_entrada);
-                                $t2 = \Carbon\Carbon::parse($fichaje->hora_salida);
+                            if ($fichaje->hora_entrada && $fichaje->hora_salida) {
+                                $fechaStr = $fichaje->fecha ? ($fichaje->fecha instanceof \Carbon\Carbon ? $fichaje->fecha->format('Y-m-d') : substr((string)$fichaje->fecha, 0, 10)) : '2000-01-01';
+                                $t1 = \Carbon\Carbon::parse($fechaStr . ' ' . substr((string)$fichaje->hora_entrada, 0, 5));
+                                $t2 = \Carbon\Carbon::parse($fechaStr . ' ' . substr((string)$fichaje->hora_salida, 0, 5));
+                                if ($t2->lessThan($t1)) {
+                                    $t2->addDay();
+                                }
                                 $diff = $t1->diff($t2);
                                 echo $diff->format('%hh %im');
                             } else {
@@ -345,7 +420,86 @@
                 </tr>
             @endforelse
         </tbody>
+        <tfoot>
+            <tr style="background-color: #f1f5f9; font-weight: bold; border-top: 2px solid #cbd5e1;">
+                <td colspan="6" style="text-align: right; text-transform: uppercase; font-size: 7.5pt; color: #475569; padding: 5px 8px;">
+                    Suma Total de Horas Computadas:
+                </td>
+                <td style="text-align: right; font-size: 8pt; color: #b45309; font-weight: bold; padding: 5px 8px;">
+                    @php
+                        $hG = floor($totalMinutosGlobal / 60);
+                        $mG = $totalMinutosGlobal % 60;
+                    @endphp
+                    {{ $hG }}h {{ $mG }}m
+                </td>
+            </tr>
+        </tfoot>
     </table>
+
+    @if(!$isSingleEmployee && count($desglosePorEmpleado) > 0)
+        <!-- Sección de Desglose de Horas por Empleado (al final del informe) -->
+        <div style="page-break-inside: avoid;">
+            <div class="section-title">
+                Resumen y Desglose de Horas por Empleado
+            </div>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th style="width: 32%;">Empleado (Apellidos, Nombre)</th>
+                        <th style="width: 14%;">DNI</th>
+                        <th style="width: 22%;">Ubicación de Trabajo</th>
+                        <th style="width: 14%; text-align: center;">Jornadas (Comp. / Curso)</th>
+                        <th style="width: 18%; text-align: right;">Total Horas Registradas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($desglosePorEmpleado as $item)
+                        <tr>
+                            <td style="font-weight: bold; text-transform: uppercase;">
+                                {{ mb_strtoupper($item['apellidos']) }}, {{ mb_strtoupper($item['nombre']) }}
+                            </td>
+                            <td style="font-family: monospace; color: #475569;">
+                                {{ $item['dni'] ?: '—' }}
+                            </td>
+                            <td style="text-transform: uppercase; color: #475569;">
+                                {{ $item['ubicacion'] }}
+                            </td>
+                            <td style="text-align: center;">
+                                <strong>{{ $item['total_fichajes'] }}</strong> 
+                                <span style="color: #64748b; font-size: 7pt;">({{ $item['fichajes_completos'] }} comp. @if($item['fichajes_en_curso'] > 0)<span style="color: #d97706;">+ {{ $item['fichajes_en_curso'] }} curso</span>@endif)</span>
+                            </td>
+                            <td style="text-align: right; font-weight: bold; color: #0f172a;">
+                                @php
+                                    $h = floor($item['total_minutos'] / 60);
+                                    $m = $item['total_minutos'] % 60;
+                                    $dec = number_format($item['total_minutos'] / 60, 2, ',', '.');
+                                @endphp
+                                {{ $h }}h {{ $m }}m <span style="font-size: 7pt; color: #64748b;">({{ $dec }}h)</span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr class="summary-total-row">
+                        <td colspan="3" style="font-weight: bold; text-transform: uppercase; font-size: 8pt;">
+                            TOTAL GENERAL CONSOLIDADO ({{ count($desglosePorEmpleado) }} EMPLEADOS)
+                        </td>
+                        <td style="text-align: center; font-weight: bold; font-size: 8pt;">
+                            {{ count($fichajes) }} jornadas
+                        </td>
+                        <td style="text-align: right; font-weight: bold; color: #b45309; font-size: 8.5pt;">
+                            @php
+                                $hGlobal = floor($totalMinutosGlobal / 60);
+                                $mGlobal = $totalMinutosGlobal % 60;
+                                $decGlobal = number_format($totalMinutosGlobal / 60, 2, ',', '.');
+                            @endphp
+                            {{ $hGlobal }}h {{ $mGlobal }}m ({{ $decGlobal }}h)
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    @endif
 
     <script type="text/php">
         if (isset($pdf)) {
