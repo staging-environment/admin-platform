@@ -217,7 +217,13 @@
                         @endif
                     </span>
                 </td>
-                <td style="width: 35%;">
+                <td style="width: 20%;">
+                    <span class="filter-label">Ubicación:</span><br>
+                    <span class="filter-value">
+                        {{ $filterGasolineraNombre ? $filterGasolineraNombre : 'Todas' }}
+                    </span>
+                </td>
+                <td style="width: 25%;">
                     <span class="filter-label">Filtro de Empleado:</span><br>
                     <span class="filter-value">
                         {{ $filterSearch ? $filterSearch : 'Todos los empleados' }}

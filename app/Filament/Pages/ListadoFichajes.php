@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use App\Models\EmpleadoFichaje;
+use App\Models\Gasolinera;
 use Carbon\Carbon;
 use Livewire\WithPagination;
 
@@ -31,6 +32,7 @@ class ListadoFichajes extends Page
     public $filterDateFrom = '';
     public $filterDateTo = '';
     public $filterSearch = '';
+    public $filterGasolinera = '';
     public $sortField = 'fecha';
     public $sortDirection = 'desc';
 
@@ -70,6 +72,11 @@ class ListadoFichajes extends Page
         $this->resetPage();
     }
 
+    public function updatingFilterGasolinera(): void
+    {
+        $this->resetPage();
+    }
+
     public function getTodosLosFichajesQuery()
     {
         $search = $this->filterSearch ? '%' . $this->filterSearch . '%' : null;
@@ -83,6 +90,9 @@ class ListadoFichajes extends Page
         }
         if ($this->filterDateTo) {
             $query->where('empleado_fichajes.fecha', '<=', $this->filterDateTo);
+        }
+        if ($this->filterGasolinera) {
+            $query->where('empleados.gasolinera_codigo', $this->filterGasolinera);
         }
 
         if ($search) {
@@ -116,18 +126,21 @@ class ListadoFichajes extends Page
     {
         return [
             'todosLosFichajes' => $this->getTodosLosFichajesQuery()->paginate(50),
+            'gasolineras' => Gasolinera::orderBy('Nombre')->pluck('Nombre', 'Codigo'),
         ];
     }
 
     public function exportPdf()
     {
         $fichajes = $this->getTodosLosFichajesQuery()->get();
+        $gasolineraNombre = $this->filterGasolinera ? Gasolinera::where('Codigo', $this->filterGasolinera)->value('Nombre') : null;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.control-general-fichajes', [
             'fichajes' => $fichajes,
             'filterDateFrom' => $this->filterDateFrom,
             'filterDateTo' => $this->filterDateTo,
             'filterSearch' => $this->filterSearch,
+            'filterGasolineraNombre' => $gasolineraNombre,
             'sortField' => $this->sortField,
             'sortDirection' => $this->sortDirection,
             'generatedAt' => Carbon::now()->timezone('Europe/Madrid')->format('d/m/Y H:i'),

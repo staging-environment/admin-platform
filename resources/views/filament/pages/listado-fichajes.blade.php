@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Filters Section -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
                     <!-- Date Filter "Desde" -->
                     <div>
                         <label for="filterDateFrom" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Desde</label>
@@ -52,6 +52,26 @@
                             <input type="date" id="filterDateTo" wire:model.live="filterDateTo" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3" />
                             @if($filterDateTo)
                                 <button type="button" wire:click="$set('filterDateTo', '')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Filter "Ubicación de Trabajo" -->
+                    <div>
+                        <label for="filterGasolinera" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ubicación de Trabajo</label>
+                        <div class="relative">
+                            <select id="filterGasolinera" wire:model.live="filterGasolinera" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 shadow-sm py-2 px-3">
+                                <option value="">Todas las ubicaciones</option>
+                                @foreach($gasolineras as $cod => $nombre)
+                                    <option value="{{ $cod }}">{{ $nombre }}</option>
+                                @endforeach
+                            </select>
+                            @if($filterGasolinera)
+                                <button type="button" wire:click="$set('filterGasolinera', '')" class="absolute inset-y-0 right-8 pr-1 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" title="Limpiar filtro">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
