@@ -51,28 +51,7 @@
                     </a>
                 </div>
             @endif
-            <!-- Header Profile Info -->
-            <div class="relative overflow-hidden p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-500/20 dark:border-amber-500/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="p-4 bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-2xl">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-black text-gray-900 dark:text-white">{{ $empleado->nombre }} {{ $empleado->apellidos }}</h2>
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            <span class="font-medium text-amber-600 dark:text-amber-400">{{ $empleado->puesto ?? 'Empleado' }}</span>
-                            <span class="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-gray-700"></span>
-                            <span>{{ $empleado->gasolinera?->Nombre ?? 'Sin gasolinera asignada' }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">Fecha de hoy</span>
-                    <h3 class="text-lg font-bold text-gray-950 dark:text-white">{{ \Carbon\Carbon::today()->translatedFormat('l, d \d\e F \d\e Y') }}</h3>
-                </div>
-            </div>
+
 
             @if($fichajePendienteAnterior)
                 <!-- Alert Banner: Shift from previous day is unclosed -->
