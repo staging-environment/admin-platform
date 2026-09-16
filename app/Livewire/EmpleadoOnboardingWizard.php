@@ -165,10 +165,9 @@ class EmpleadoOnboardingWizard extends Component
             'codigo_postal' => 'required|string|max:10',
             'localidad' => 'required|string|max:255',
             'provincia' => 'required|string|max:255',
-            'nuss' => 'required|string|max:30',
             'iban' => 'required|string|max:40',
-            'contacto_emergencia_nombre' => 'required|string|max:255',
-            'contacto_emergencia_telefono' => 'required|string|max:20',
+            'contacto_emergencia_nombre' => 'nullable|string|max:255',
+            'contacto_emergencia_telefono' => 'nullable|string|max:20',
         ], [
             'nombre.required' => 'El nombre es obligatorio.',
             'apellidos.required' => 'Los apellidos son obligatorios.',
@@ -179,10 +178,7 @@ class EmpleadoOnboardingWizard extends Component
             'codigo_postal.required' => 'El código postal es obligatorio.',
             'localidad.required' => 'La localidad es obligatoria.',
             'provincia.required' => 'La provincia es obligatoria.',
-            'nuss.required' => 'El número de la Seguridad Social (NUSS) es obligatorio.',
             'iban.required' => 'El código IBAN bancario es obligatorio para el pago de nóminas.',
-            'contacto_emergencia_nombre.required' => 'El nombre del contacto de emergencia es obligatorio.',
-            'contacto_emergencia_telefono.required' => 'El teléfono de emergencia es obligatorio.',
         ]);
 
         $this->empleado->update([
@@ -195,10 +191,9 @@ class EmpleadoOnboardingWizard extends Component
             'codigo_postal' => $this->codigo_postal,
             'localidad' => $this->localidad,
             'provincia' => $this->provincia,
-            'nuss' => strtoupper(trim($this->nuss)),
             'iban' => strtoupper(str_replace(' ', '', $this->iban)),
-            'contacto_emergencia_nombre' => $this->contacto_emergencia_nombre,
-            'contacto_emergencia_telefono' => $this->contacto_emergencia_telefono,
+            'contacto_emergencia_nombre' => $this->contacto_emergencia_nombre ?: null,
+            'contacto_emergencia_telefono' => $this->contacto_emergencia_telefono ?: null,
             'onboarding_paso_actual' => max(4, (int) $this->empleado->onboarding_paso_actual),
         ]);
 

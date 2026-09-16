@@ -379,7 +379,7 @@ class Empleado extends Model
         }
 
         // Paso 2: Personal data & IBAN & NUSS
-        if (!empty($this->dni) && !str_starts_with($this->dni, 'PENDIENTE') && !empty($this->iban) && !empty($this->nuss)) {
+        if (!empty($this->dni) && !str_starts_with($this->dni, 'PENDIENTE') && !empty($this->iban)) {
             $completedSteps++;
         }
 

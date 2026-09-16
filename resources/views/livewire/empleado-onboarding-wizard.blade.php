@@ -299,11 +299,7 @@
                             @error('telefono_principal') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Número Seguridad Social (NUSS) *</label>
-                            <input type="text" wire:model="nuss" placeholder="41/1234567890" class="w-full text-sm font-mono rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                            @error('nuss') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
+
 
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Cuenta Bancaria (IBAN para cobro de nómina) *</label>
@@ -336,13 +332,13 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre Contacto Emergencia *</label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre Contacto Emergencia <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span></label>
                             <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Familiar o persona de contacto" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
                             @error('contacto_emergencia_nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Teléfono Contacto Emergencia *</label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Teléfono Contacto Emergencia <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span></label>
                             <input type="text" wire:model="contacto_emergencia_telefono" placeholder="600000000" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
                             @error('contacto_emergencia_telefono') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                         </div>

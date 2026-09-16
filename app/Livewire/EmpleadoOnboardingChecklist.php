@@ -35,7 +35,7 @@ class EmpleadoOnboardingChecklist extends Component
             ],
             'datos_personales' => [
                 'label' => 'Datos personales, NUSS e IBAN revisados y completos',
-                'checked' => !empty($empleado->dni) && !str_starts_with($empleado->dni, 'PENDIENTE') && !empty($empleado->nuss) && !empty($empleado->iban),
+                'checked' => !empty($empleado->dni) && !str_starts_with($empleado->dni, 'PENDIENTE') && !empty($empleado->iban),
                 'auto' => false,
             ],
             'dni_verificado' => [
