@@ -61,9 +61,10 @@ class EmpleadoResource extends Resource
         return $schema
             ->columns(1)
             ->schema([
-                // BLOQUE 0: Control de Onboarding y Checklist de RRHH
+                // BLOQUE 0: Control de Onboarding y Checklist de RRHH (Solo si está pendiente)
                 \Filament\Infolists\Components\ViewEntry::make('onboarding_checklist')
                     ->columnSpanFull()
+                    ->visible(fn ($record) => !$record?->onboarding_verificado_por_admin)
                     ->view('filament.components.empleado-onboarding-section'),
 
                 // BLOQUE 1: Datos Personales del Trabajador

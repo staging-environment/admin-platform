@@ -1,3 +1,4 @@
+@if(!$empleado?->onboarding_verificado_por_admin)
 <div class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 shadow-sm space-y-6">
     
     {{-- Header con Título y Estado --}}
@@ -97,3 +98,5 @@
     </div>
 
 </div>
+
+@endif
