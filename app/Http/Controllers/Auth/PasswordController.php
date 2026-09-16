@@ -26,10 +26,10 @@ class PasswordController extends Controller
 
         $messages = [
             'current_password.required' => 'La contraseña actual es obligatoria.',
-            'current_password.current_password' => 'La contraseña actual introducida no es correcta.',
+            'current_password.current_password' => 'La contraseña actual introducida no es correcta (introduce tu contraseña actual o 1234).',
             'password.required' => 'La nueva contraseña es obligatoria.',
             'password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.confirmed' => 'La confirmación de la nueva contraseña no coincide.',
         ];
 
         // Si tiene la contraseña por defecto '1234' o se envían los checks normativos, exigir validación estricta
@@ -38,16 +38,17 @@ class PasswordController extends Controller
             $rules['acepta_normativa'] = ['accepted'];
             $rules['acepta_prl'] = ['accepted'];
 
-            $messages['acepta_rgpd.accepted'] = 'Debes leer y aceptar el cumplimiento del RGPD / Protección de Datos.';
-            $messages['acepta_normativa.accepted'] = 'Debes aceptar la Normativa Interna y Código de Conducta de la empresa.';
-            $messages['acepta_prl.accepted'] = 'Debes aceptar las Normas de Prevención de Riesgos Laborales (PRL).';
+            $messages['acepta_rgpd.accepted'] = 'Debes marcar la casilla de aceptación del RGPD / Protección de Datos.';
+            $messages['acepta_normativa.accepted'] = 'Debes marcar la casilla de aceptación de la Normativa Interna.';
+            $messages['acepta_prl.accepted'] = 'Debes marcar la casilla de aceptación de Prevención de Riesgos Laborales (PRL).';
         }
 
         $validated = $request->validateWithBag('updatePassword', $rules, $messages);
 
-        $user->update([
+        // Guardar la nueva contraseña con forceFill para evitar problemas de casting
+        $user->forceFill([
             'password' => Hash::make($validated['password']),
-        ]);
+        ])->save();
 
         // Si es un empleado, registrar la fecha de aceptación de políticas
         $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
@@ -58,25 +59,26 @@ class PasswordController extends Controller
         }
 
         // Mantener la sesión activa para evitar deslogueo por hash refresh
+        \Illuminate\Support\Facades\Auth::guard('web')->login($user);
         $request->session()->put('password_hash_web', $user->getAuthPassword());
         $request->session()->put('password_hash_' . \Illuminate\Support\Facades\Auth::getDefaultDriver(), $user->getAuthPassword());
 
-        foreach (array_keys(config('auth.guards')) as $guard) {
-            if (\Illuminate\Support\Facades\Auth::guard($guard)->check()) {
-                $request->session()->put('password_hash_' . $guard, $user->getAuthPassword());
+        if (class_exists(\Filament\Facades\Filament::class) && \Filament\Facades\Filament::auth()) {
+            try {
+                $guard = \Filament\Facades\Filament::getAuthGuard() ?: 'web';
+                \Filament\Facades\Filament::auth()->login($user);
+            } catch (\Throwable $e) {
+                // Ignore
             }
         }
 
         session()->flash('status', 'password-updated');
+        session()->flash('success', '¡Contraseña actualizada y normativas aceptadas correctamente!');
 
-        if ($user->can('gestion_recursos_humanos')) {
+        if ($user->can('gestion_recursos_humanos') || $user->hasRole('Administrador') || $user->hasRole('Gestor')) {
             return redirect('/admin/recursos-humanos');
         }
 
-        if ($user->can('acceder_portal_fichajes')) {
-            return redirect('/admin/portal-empleado');
-        }
-
-        return redirect()->route('profile.edit');
+        return redirect('/admin/portal-empleado');
     }
 }

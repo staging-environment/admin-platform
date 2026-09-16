@@ -1,20 +1,50 @@
 <section x-data="{
     pass: '',
     confirmPass: '',
+    currentPass: '',
     isDefaultPassword: {{ (auth()->check() && \Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password)) ? 'true' : 'false' }},
     aceptaRgpd: {{ old('acepta_rgpd') ? 'true' : 'false' }},
     aceptaNormativa: {{ old('acepta_normativa') ? 'true' : 'false' }},
     aceptaPrl: {{ old('acepta_prl') ? 'true' : 'false' }},
+    errorMessage: '',
     modalRgpd: false,
     modalNormativa: false,
     modalPrl: false,
-    get canSubmit() {
-        if (this.pass.length < 8 || this.confirmPass !== this.pass) {
+
+    marcarTodas() {
+        this.aceptaRgpd = true;
+        this.aceptaNormativa = true;
+        this.aceptaPrl = true;
+        this.errorMessage = '';
+    },
+
+    validarYEnviar(e) {
+        this.errorMessage = '';
+
+        if (!this.currentPass) {
+            this.errorMessage = 'Por favor, introduce tu contraseña actual (o 1234 si es tu primer acceso).';
+            e.preventDefault();
             return false;
         }
+
+        if (this.pass.length < 8) {
+            this.errorMessage = 'La nueva contraseña debe tener al menos 8 caracteres.';
+            e.preventDefault();
+            return false;
+        }
+
+        if (this.pass !== this.confirmPass) {
+            this.errorMessage = 'La confirmación de la contraseña no coincide con la nueva contraseña.';
+            e.preventDefault();
+            return false;
+        }
+
         if (this.isDefaultPassword && (!this.aceptaRgpd || !this.aceptaNormativa || !this.aceptaPrl)) {
+            this.errorMessage = '¡Atención! Para poder guardar la contraseña y acceder a la plataforma, debes marcar las 3 casillas de aceptación de normativas (RGPD, Normativa Interna y PRL).';
+            e.preventDefault();
             return false;
         }
+
         return true;
     }
 }">
@@ -31,20 +61,20 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('password.update') }}" @submit="validarYEnviar($event)" class="mt-6 space-y-6">
         @csrf
         @method('put')
         <input type="hidden" name="check_normativas_present" value="1">
 
         <div>
             <x-input-label for="update_password_current_password" value="Contraseña Actual" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="current-password" placeholder="Tu contraseña actual (o 1234 si es primer acceso)" />
+            <x-text-input id="update_password_current_password" x-model="currentPass" name="current_password" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="current-password" placeholder="Tu contraseña actual (o 1234 si es primer acceso)" required />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="update_password_password" value="Nueva Contraseña Personal" />
-            <x-text-input id="update_password_password" x-model="pass" name="password" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+            <x-text-input id="update_password_password" x-model="pass" name="password" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required />
             <p class="mt-1.5 text-xs font-semibold flex items-center gap-1 transition-colors duration-200"
                :class="pass.length >= 8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'">
                 <span x-text="pass.length >= 8 ? '✓' : '•'"></span>
@@ -55,7 +85,7 @@
 
         <div>
             <x-input-label for="update_password_password_confirmation" value="Confirmar Nueva Contraseña" />
-            <x-text-input id="update_password_password_confirmation" x-model="confirmPass" name="password_confirmation" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="new-password" placeholder="Repite la nueva contraseña" />
+            <x-text-input id="update_password_password_confirmation" x-model="confirmPass" name="password_confirmation" type="password" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" autocomplete="new-password" placeholder="Repite la nueva contraseña" required />
             <p class="mt-1.5 text-xs font-semibold flex items-center gap-1 transition-colors duration-200"
                :class="(confirmPass.length >= 8 && confirmPass === pass) ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'">
                 <span x-text="(confirmPass.length >= 8 && confirmPass === pass) ? '✓' : '•'"></span>
@@ -66,30 +96,44 @@
 
         {{-- ================= SECCIÓN DE ACEPTACIÓN DE RGPD Y NORMATIVAS ================= --}}
         <div class="pt-4 border-t border-gray-100 dark:border-white/10 space-y-4">
-            <div class="flex items-center gap-2">
-                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold">!</span>
-                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                    Cumplimiento de RGPD y Normativas de Empresa (Obligatorio)
-                </h3>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold">!</span>
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                        Cumplimiento de RGPD y Normativas de Empresa (Obligatorio)
+                    </h3>
+                </div>
+                <button type="button" @click="marcarTodas()" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 underline inline-flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Marcar y aceptar todas
+                </button>
             </div>
+            
             <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Para completar la activación de tu usuario y acceder a las herramientas de la plataforma, debes marcar las siguientes casillas de conformidad legal y laboral:
+                Haz clic en cada tarjeta para marcar la casilla o pulsa en los enlaces para leer el texto completo de cada normativa:
             </p>
 
-            {{-- 1. RGPD Checkbox --}}
-            <div class="p-3.5 rounded-xl border transition-all"
-                 :class="aceptaRgpd ? 'bg-emerald-50/50 border-emerald-300 dark:bg-emerald-950/20 dark:border-emerald-800/40' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10'">
+            {{-- 1. RGPD Card --}}
+            <div @click="aceptaRgpd = !aceptaRgpd; errorMessage = ''"
+                 class="p-4 rounded-xl border transition-all cursor-pointer select-none"
+                 :class="aceptaRgpd ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50 shadow-sm' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-300 dark:hover:border-amber-700/50'">
                 <div class="flex items-start gap-3">
-                    <input type="checkbox" id="acepta_rgpd" name="acepta_rgpd" x-model="aceptaRgpd" value="1" class="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800" required />
-                    <div class="text-xs space-y-1">
-                        <label for="acepta_rgpd" class="font-bold text-gray-900 dark:text-white cursor-pointer select-none">
-                            Protección de Datos Personales (RGPD / LOPDGDD)
-                        </label>
+                    <input type="checkbox" id="acepta_rgpd" name="acepta_rgpd" x-model="aceptaRgpd" value="1" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800 cursor-pointer" />
+                    <div class="text-xs space-y-1.5 flex-1">
+                        <div class="flex items-center justify-between">
+                            <label for="acepta_rgpd" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                1. Protección de Datos Personales (RGPD / LOPDGDD)
+                            </label>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                  :class="aceptaRgpd ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400'">
+                                <span x-text="aceptaRgpd ? '✓ Aceptado' : 'Pendiente'"></span>
+                            </span>
+                        </div>
                         <p class="text-gray-600 dark:text-gray-400">
                             He sido informado y consiento el tratamiento de mis datos personales para fines de gestión laboral, registro de jornada y nóminas por parte de UTRECAR / ACTIVE NETWORK.
                         </p>
                         <div>
-                            <button type="button" @click="modalRgpd = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                            <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 Leer normativa completa de Protección de Datos
                             </button>
@@ -99,20 +143,27 @@
                 <x-input-error :messages="$errors->updatePassword->get('acepta_rgpd')" class="mt-2" />
             </div>
 
-            {{-- 2. Normativa Interna Checkbox --}}
-            <div class="p-3.5 rounded-xl border transition-all"
-                 :class="aceptaNormativa ? 'bg-emerald-50/50 border-emerald-300 dark:bg-emerald-950/20 dark:border-emerald-800/40' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10'">
+            {{-- 2. Normativa Interna Card --}}
+            <div @click="aceptaNormativa = !aceptaNormativa; errorMessage = ''"
+                 class="p-4 rounded-xl border transition-all cursor-pointer select-none"
+                 :class="aceptaNormativa ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50 shadow-sm' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-300 dark:hover:border-amber-700/50'">
                 <div class="flex items-start gap-3">
-                    <input type="checkbox" id="acepta_normativa" name="acepta_normativa" x-model="aceptaNormativa" value="1" class="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800" required />
-                    <div class="text-xs space-y-1">
-                        <label for="acepta_normativa" class="font-bold text-gray-900 dark:text-white cursor-pointer select-none">
-                            Normativa Interna y Código de Conducta
-                        </label>
+                    <input type="checkbox" id="acepta_normativa" name="acepta_normativa" x-model="aceptaNormativa" value="1" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800 cursor-pointer" />
+                    <div class="text-xs space-y-1.5 flex-1">
+                        <div class="flex items-center justify-between">
+                            <label for="acepta_normativa" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                2. Normativa Interna y Código de Conducta
+                            </label>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                  :class="aceptaNormativa ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400'">
+                                <span x-text="aceptaNormativa ? '✓ Aceptado' : 'Pendiente'"></span>
+                            </span>
+                        </div>
                         <p class="text-gray-600 dark:text-gray-400">
                             Me comprometo a cumplir las directrices operativas, confidencialidad, horarios asignados y la obligación legal de registro horario de jornada en cada turno.
                         </p>
                         <div>
-                            <button type="button" @click="modalNormativa = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                            <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 Leer Normativa Interna de Empresa
                             </button>
@@ -122,20 +173,27 @@
                 <x-input-error :messages="$errors->updatePassword->get('acepta_normativa')" class="mt-2" />
             </div>
 
-            {{-- 3. PRL Checkbox --}}
-            <div class="p-3.5 rounded-xl border transition-all"
-                 :class="aceptaPrl ? 'bg-emerald-50/50 border-emerald-300 dark:bg-emerald-950/20 dark:border-emerald-800/40' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10'">
+            {{-- 3. PRL Card --}}
+            <div @click="aceptaPrl = !aceptaPrl; errorMessage = ''"
+                 class="p-4 rounded-xl border transition-all cursor-pointer select-none"
+                 :class="aceptaPrl ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50 shadow-sm' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-300 dark:hover:border-amber-700/50'">
                 <div class="flex items-start gap-3">
-                    <input type="checkbox" id="acepta_prl" name="acepta_prl" x-model="aceptaPrl" value="1" class="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800" required />
-                    <div class="text-xs space-y-1">
-                        <label for="acepta_prl" class="font-bold text-gray-900 dark:text-white cursor-pointer select-none">
-                            Prevención de Riesgos Laborales (PRL) y Seguridad
-                        </label>
+                    <input type="checkbox" id="acepta_prl" name="acepta_prl" x-model="aceptaPrl" value="1" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/20 dark:bg-gray-800 cursor-pointer" />
+                    <div class="text-xs space-y-1.5 flex-1">
+                        <div class="flex items-center justify-between">
+                            <label for="acepta_prl" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                3. Prevención de Riesgos Laborales (PRL) y Seguridad
+                            </label>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                  :class="aceptaPrl ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400'">
+                                <span x-text="aceptaPrl ? '✓ Aceptado' : 'Pendiente'"></span>
+                            </span>
+                        </div>
                         <p class="text-gray-600 dark:text-gray-400">
                             Confirmo haber recibido las instrucciones de seguridad laboral, uso obligatorio de EPIs y protocolos de emergencia en el puesto de trabajo.
                         </p>
                         <div>
-                            <button type="button" @click="modalPrl = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                            <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 Leer Protocolo de Prevención y Seguridad
                             </button>
@@ -146,19 +204,19 @@
             </div>
         </div>
 
-        <div class="pt-2">
-            <template x-if="!canSubmit && isDefaultPassword">
-                <p class="text-xs text-amber-700 dark:text-amber-400 font-medium mb-3 flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Debes indicar una nueva contraseña válida (mínimo 8 caracteres) y marcar los 3 checks de normativas para poder guardar y acceder.
-                </p>
-            </template>
+        {{-- Dynamic Error Alert --}}
+        <div x-show="errorMessage" x-cloak class="p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-300 dark:border-red-800/40 rounded-xl text-red-800 dark:text-red-300 text-xs flex items-start gap-2.5">
+            <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span x-text="errorMessage" class="font-bold leading-relaxed"></span>
+        </div>
 
+        <div class="pt-2">
             <div class="flex items-center gap-4">
                 <button
                     type="submit"
-                    :disabled="!canSubmit"
-                    class="inline-flex items-center justify-center px-6 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 gap-2"
+                    class="inline-flex items-center justify-center px-6 py-3 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 gap-2 cursor-pointer"
                 >
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -174,7 +232,7 @@
                         x-init="setTimeout(() => show = false, 4000)"
                         class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"
                     >
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         Contraseña actualizada correctamente.
@@ -241,7 +299,7 @@
                 
                 <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/10">
                     <span class="text-[11px] text-gray-400">UTRECAR - Gestión de Recursos Humanos</span>
-                    <button type="button" @click="modalRgpd = false; aceptaRgpd = true" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                    <button type="button" @click="modalRgpd = false; aceptaRgpd = true; errorMessage = ''" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
                         He leído y Acepto el RGPD
                     </button>
                 </div>
@@ -301,7 +359,7 @@
                 
                 <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/10">
                     <span class="text-[11px] text-gray-400">UTRECAR - Gestión de Recursos Humanos</span>
-                    <button type="button" @click="modalNormativa = false; aceptaNormativa = true" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                    <button type="button" @click="modalNormativa = false; aceptaNormativa = true; errorMessage = ''" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
                         He leído y Acepto la Normativa Interna
                     </button>
                 </div>
@@ -358,7 +416,7 @@
                 
                 <div class="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-white/10">
                     <span class="text-[11px] text-gray-400">UTRECAR - Prevención de Riesgos Laborales</span>
-                    <button type="button" @click="modalPrl = false; aceptaPrl = true" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                    <button type="button" @click="modalPrl = false; aceptaPrl = true; errorMessage = ''" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
                         He leído y Acepto las Normas de PRL
                     </button>
                 </div>
