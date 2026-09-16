@@ -309,6 +309,25 @@ class EmpleadoOnboardingWizard extends Component
 
         $this->empleado->actualizarAlertas();
 
+        // Notificar por correo a los administradores y gestores
+        try {
+            $destinatarios = \App\Models\User::all()->filter(function ($user) {
+                return $user->hasRole(['Administrador', 'admin', 'Admin', 'Gestor', 'gestor'])
+                    || $user->can('gestion_recursos_humanos')
+                    || $user->can('aprobacion_vacaciones_bajas')
+                    || $user->email === 'jarodriguezbonilla@gmail.com';
+            });
+
+            foreach ($destinatarios as $admin) {
+                if (!empty($admin->email)) {
+                    \Illuminate\Support\Facades\Mail::to($admin->email)
+                        ->send(new \App\Mail\OnboardingCompletadoAdminMail($this->empleado));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Error al enviar email de onboarding completado: " . $e->getMessage());
+        }
+
         session()->flash('message', '¡Enhorabuena! Has completado con éxito tu incorporación oficial. ¡Bienvenido/a a Utrecar - Active Network!');
 
         return redirect()->to('/admin/portal-empleado');
