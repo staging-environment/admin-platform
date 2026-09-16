@@ -1,415 +1,666 @@
-<div class="min-h-screen bg-slate-50 dark:bg-gray-950 py-10 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto space-y-8">
-        
-        {{-- Cabecera con Logo y Bienvenida --}}
-        <div class="text-center space-y-3">
-            <div class="inline-flex items-center justify-center p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20 text-amber-600 dark:text-amber-400 mb-1 shadow-sm">
-                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                Proceso de Onboarding e Incorporación
-            </h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
-                ¡Hola <span class="font-semibold text-amber-600 dark:text-amber-400">{{ $empleado->nombre }}</span>! Por favor, completa los siguientes 4 pasos para configurar tu cuenta y formalizar tu incorporación.
-            </p>
-        </div>
+<div class="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-6" x-data="{
+    modalRgpd: false,
+    modalNormativa: false,
+    modalPrl: false,
+}">
 
-        {{-- Stepper / Indicador de Pasos --}}
-        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200/80 dark:border-white/10">
-            <div class="grid grid-cols-4 gap-2 sm:gap-4 relative">
-                
-                {{-- Paso 1 --}}
-                <button type="button" wire:click="irPaso(1)" class="flex flex-col items-center text-center group cursor-pointer">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm transition-all {{ $paso === 1 ? 'bg-amber-600 text-white ring-4 ring-amber-500/20 shadow-md' : ($empleado->onboarding_paso_actual > 1 ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-white/5 text-gray-400') }}">
-                        @if($empleado->onboarding_paso_actual > 1 && $paso !== 1)
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        @else
-                            1
-                        @endif
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-semibold mt-2 {{ $paso === 1 ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Seguridad</span>
-                </button>
-
-                {{-- Paso 2 --}}
-                <button type="button" wire:click="irPaso(2)" class="flex flex-col items-center text-center group {{ $empleado->onboarding_paso_actual >= 2 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60' }}">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm transition-all {{ $paso === 2 ? 'bg-amber-600 text-white ring-4 ring-amber-500/20 shadow-md' : ($empleado->onboarding_paso_actual > 2 ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-white/5 text-gray-400') }}">
-                        @if($empleado->onboarding_paso_actual > 2 && $paso !== 2)
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        @else
-                            2
-                        @endif
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-semibold mt-2 {{ $paso === 2 ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Datos</span>
-                </button>
-
-                {{-- Paso 3 --}}
-                <button type="button" wire:click="irPaso(3)" class="flex flex-col items-center text-center group {{ $empleado->onboarding_paso_actual >= 3 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60' }}">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm transition-all {{ $paso === 3 ? 'bg-amber-600 text-white ring-4 ring-amber-500/20 shadow-md' : ($empleado->onboarding_paso_actual > 3 ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-white/5 text-gray-400') }}">
-                        @if($empleado->onboarding_paso_actual > 3 && $paso !== 3)
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        @else
-                            3
-                        @endif
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-semibold mt-2 {{ $paso === 3 ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Documentos</span>
-                </button>
-
-                {{-- Paso 4 --}}
-                <button type="button" wire:click="irPaso(4)" class="flex flex-col items-center text-center group {{ $empleado->onboarding_paso_actual >= 4 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60' }}">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm transition-all {{ $paso === 4 ? 'bg-amber-600 text-white ring-4 ring-amber-500/20 shadow-md' : 'bg-gray-100 dark:bg-white/5 text-gray-400' }}">
-                        4
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-semibold mt-2 {{ $paso === 4 ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Políticas</span>
-                </button>
+    <!-- Top Branding Header -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 p-6 rounded-3xl text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex items-center gap-4 z-10">
+            @if(file_exists(public_path('images/utrecar.png')))
+                <img src="{{ asset('images/utrecar.png') }}" alt="Logo Utrecar" class="h-12 w-auto bg-white/10 p-2 rounded-2xl backdrop-blur-sm border border-white/10">
+            @endif
+            <div>
+                <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Portal del Empleado</span>
+                <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                    Bienvenida e Inducción
+                    <span class="text-xs bg-amber-500/20 text-amber-300 font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">UTRECAR</span>
+                </h1>
             </div>
         </div>
+        <div class="text-right z-10 hidden sm:block">
+            <span class="text-xs text-slate-400 block font-medium">Empleado/a:</span>
+            <span class="text-sm font-bold text-slate-200">{{ auth()->user()->name }}</span>
+        </div>
+    </div>
 
-        {{-- Alertas y Mensajes --}}
-        @if (session()->has('success_step'))
-            <div class="p-4 rounded-xl bg-green-50 dark:bg-green-950/30 text-green-800 dark:text-green-300 text-sm border border-green-200 dark:border-green-800/40 shadow-sm flex items-center gap-3 animate-fade-in">
-                <svg class="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ session('success_step') }}</span>
-            </div>
-        @endif
-
-        {{-- CONTENIDO DEL WIZARD SEGÚN EL PASO --}}
-        <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-10 shadow-lg border border-gray-200/80 dark:border-white/10 transition-all">
+    <!-- Multi-step Navigation Bar -->
+    <div class="bg-white dark:bg-gray-900 rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-100 dark:border-white/5">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
             
-            {{-- ======================== PASO 1: CAMBIO DE CONTRASEÑA ======================== --}}
-            @if ($paso === 1)
-                <div class="space-y-6">
-                    <div class="border-b border-gray-100 dark:border-white/5 pb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">1</span>
-                            Seguridad: Establece tu Nueva Contraseña
-                        </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Por motivos de seguridad y confidencialidad, debes cambiar tu contraseña inicial por una contraseña personal y segura.
-                        </p>
-                    </div>
-
-                    <form wire:submit.prevent="guardarPaso1" class="space-y-5 max-w-lg">
-                        @if (!\Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password))
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Contraseña Actual</label>
-                                <input type="password" wire:model="current_password" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="Introduce tu contraseña actual" />
-                                @error('current_password') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Nueva Contraseña <span class="text-red-500">*</span></label>
-                            <input type="password" wire:model="new_password" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="Mínimo 8 caracteres" />
-                            @error('new_password') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Confirmar Nueva Contraseña <span class="text-red-500">*</span></label>
-                            <input type="password" wire:model="new_password_confirmation" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" placeholder="Repite la nueva contraseña" />
-                        </div>
-
-                        <div class="pt-4">
-                            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
-                                <span>Guardar Contraseña y Continuar</span>
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </div>
-                    </form>
+            <!-- Step 1 -->
+            <button type="button" wire:click="irPaso(1)" class="flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 1 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 1 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 1 ? 'bg-amber-500 text-white shadow-md' : ($paso > 1 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
+                    @if($paso > 1) ✓ @else 1 @endif
                 </div>
-            @endif
+                <span class="text-xs font-bold leading-tight">Quiénes Somos</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">Cultura & Red</span>
+            </button>
 
-            {{-- ======================== PASO 2: DATOS PERSONALES, NUSS E IBAN ======================== --}}
-            @if ($paso === 2)
-                <div class="space-y-6">
-                    <div class="border-b border-gray-100 dark:border-white/5 pb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">2</span>
-                            Datos Personales, Seguridad Social y Cuenta Bancaria
-                        </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Verifica y completa tu información para la gestión de contratos, afiliación a la Seguridad Social y pago de nóminas.
-                        </p>
-                    </div>
-
-                    <form wire:submit.prevent="guardarPaso2" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Nombre <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="nombre" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('nombre') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Apellidos <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="apellidos" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('apellidos') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">DNI / NIE <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="dni" placeholder="Ej: 12345678Z" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm uppercase" />
-                                @error('dni') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Fecha de Nacimiento <span class="text-red-500">*</span></label>
-                                <input type="date" wire:model="fecha_nacimiento" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('fecha_nacimiento') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Teléfono Principal <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="telefono_principal" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('telefono_principal') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Nº Afiliación Seguridad Social (NUSS) <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="nuss" placeholder="Ej: 411234567890" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('nuss') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Código Cuenta Bancaria (IBAN) <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="iban" placeholder="ES00 0000 0000 0000 0000 0000" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm uppercase font-mono tracking-wider" />
-                                @error('iban') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Dirección Completa <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="direccion" placeholder="Calle, número, piso, puerta..." class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('direccion') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Código Postal <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="codigo_postal" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('codigo_postal') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Localidad <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="localidad" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('localidad') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Provincia <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="provincia" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('provincia') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Nombre Contacto de Emergencia <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Familiar o persona de contacto" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('contacto_emergencia_nombre') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Teléfono Contacto de Emergencia <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="contacto_emergencia_telefono" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                @error('contacto_emergencia_telefono') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                            <button type="button" wire:click="irPaso(1)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
-                                ← Volver
-                            </button>
-                            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
-                                <span>Guardar y Continuar a Documentación</span>
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </div>
-                    </form>
+            <!-- Step 2 -->
+            <button type="button" wire:click="irPaso(2)" class="flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 2 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 2 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 2 ? 'bg-amber-500 text-white shadow-md' : ($paso > 2 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
+                    @if($paso > 2) ✓ @else 2 @endif
                 </div>
-            @endif
+                <span class="text-xs font-bold leading-tight">Seguridad</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">Nueva Clave</span>
+            </button>
 
-            {{-- ======================== PASO 3: DOCUMENTACIÓN ======================== --}}
-            @if ($paso === 3)
-                <div class="space-y-6">
-                    <div class="border-b border-gray-100 dark:border-white/5 pb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">3</span>
-                            Documentación Obligatoria y Archivos Adjuntos
-                        </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Adjunta copia legible de tus documentos para validar tu expediente laboral. Formatos aceptados: PDF, JPG, PNG (máx. 10MB).
-                        </p>
-                    </div>
-
-                    <form wire:submit.prevent="guardarPaso3" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
-                            {{-- DNI --}}
-                            <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.333 0 4 .667 4 2v1H9v-1c0-1.333 2.667-2 4-2z"/></svg>
-                                        DNI / NIE (Ambas Caras) <span class="text-red-500">*</span>
-                                    </span>
-                                    @if ($empleado->documentos()->where('tipo', 'DNI')->exists())
-                                        <span class="text-[10px] text-green-600 dark:text-green-400 font-semibold bg-green-100 dark:bg-green-950/30 px-2 py-0.5 rounded-full">✓ Ya adjuntado</span>
-                                    @endif
-                                </div>
-                                <label class="inline-flex items-center justify-center px-4 py-3 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-xl text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-amber-300 dark:border-amber-700/30 w-full text-center">
-                                    <span>Seleccionar archivo DNI...</span>
-                                    <input type="file" wire:model="file_dni" class="hidden" />
-                                </label>
-                                @if ($file_dni)
-                                    <span class="text-xs text-green-600 dark:text-green-400 block font-medium">✓ Archivo cargado: {{ $file_dni->getClientOriginalName() }}</span>
-                                @endif
-                                @error('file_dni') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-
-                                <div class="pt-2">
-                                    <label class="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Fecha de Caducidad del DNI <span class="text-red-500">*</span></label>
-                                    <input type="date" wire:model="fecha_caducidad_dni" class="w-full rounded-xl border-gray-300 dark:border-white/10 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                    @error('fecha_caducidad_dni') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
-                            {{-- Certificado Bancario --}}
-                            <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                                        Certificado Titularidad Bancaria / Justificante IBAN
-                                    </span>
-                                </div>
-                                <label class="inline-flex items-center justify-center px-4 py-3 bg-cyan-50 dark:bg-cyan-950/20 text-cyan-700 dark:text-cyan-400 rounded-xl text-xs font-semibold cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-900/40 transition-all border border-cyan-300 dark:border-cyan-700/30 w-full text-center">
-                                    <span>Seleccionar justificante bancario...</span>
-                                    <input type="file" wire:model="file_banco" class="hidden" />
-                                </label>
-                                @if ($file_banco)
-                                    <span class="text-xs text-green-600 dark:text-green-400 block font-medium">✓ Archivo cargado: {{ $file_banco->getClientOriginalName() }}</span>
-                                @endif
-                                @error('file_banco') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                                <p class="text-[10px] text-gray-400">Documento emitido por tu banco donde aparezca tu nombre completo e IBAN.</p>
-                            </div>
-
-                            {{-- Formación / PRL --}}
-                            <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                                <span class="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                    Cursos Previos de PRL / Formación (Opcional)
-                                </span>
-                                <label class="inline-flex items-center justify-center px-4 py-3 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-semibold cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all border border-indigo-300 dark:border-indigo-700/30 w-full text-center">
-                                    <span>Seleccionar títulos/diplomas...</span>
-                                    <input type="file" wire:model="file_prl" class="hidden" />
-                                </label>
-                                @if ($file_prl)
-                                    <span class="text-xs text-green-600 dark:text-green-400 block font-medium">✓ Archivo cargado: {{ $file_prl->getClientOriginalName() }}</span>
-                                @endif
-                                @error('file_prl') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-
-                            {{-- Discapacidad --}}
-                            <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                                <label class="flex items-center gap-2.5 text-xs font-bold text-gray-800 dark:text-gray-200 cursor-pointer">
-                                    <input type="checkbox" wire:model.live="tiene_discapacidad" class="rounded border-gray-300 dark:border-white/10 text-amber-600 focus:ring-amber-500 shadow-sm" />
-                                    <span>Tengo certificado de discapacidad reconocido</span>
-                                </label>
-                                @if ($tiene_discapacidad)
-                                    <div class="pt-2 space-y-2">
-                                        <label class="inline-flex items-center justify-center px-4 py-3 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 rounded-xl text-xs font-semibold cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all border border-amber-300 dark:border-amber-700/30 w-full text-center">
-                                            <span>Subir Certificado de Discapacidad...</span>
-                                            <input type="file" wire:model="file_discapacidad" class="hidden" />
-                                        </label>
-                                        @if ($file_discapacidad)
-                                            <span class="text-xs text-green-600 dark:text-green-400 block font-medium">✓ Archivo cargado</span>
-                                        @endif
-                                    </div>
-                                @endif
-                            </div>
-
-                        </div>
-
-                        <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                            <button type="button" wire:click="irPaso(2)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
-                                ← Volver
-                            </button>
-                            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
-                                <span>Guardar y Continuar a Políticas</span>
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </div>
-                    </form>
+            <!-- Step 3 -->
+            <button type="button" wire:click="irPaso(3)" class="flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 3 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 3 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 3 ? 'bg-amber-500 text-white shadow-md' : ($paso > 3 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
+                    @if($paso > 3) ✓ @else 3 @endif
                 </div>
-            @endif
+                <span class="text-xs font-bold leading-tight">Tus Datos</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">IBAN y Contacto</span>
+            </button>
 
-            {{-- ======================== PASO 4: POLÍTICAS Y CONFIRMACIÓN ======================== --}}
-            @if ($paso === 4)
-                <div class="space-y-6">
-                    <div class="border-b border-gray-100 dark:border-white/5 pb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">4</span>
-                            Políticas de Empresa, RGPD y Prevención
-                        </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Lee y confirma la aceptación de las normativas de la empresa para completar tu incorporación oficial.
-                        </p>
-                    </div>
+            <!-- Step 4 -->
+            <button type="button" wire:click="irPaso(4)" class="flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 4 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 4 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 4 ? 'bg-amber-500 text-white shadow-md' : ($paso > 4 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
+                    @if($paso > 4) ✓ @else 4 @endif
+                </div>
+                <span class="text-xs font-bold leading-tight">Documentación</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">DNI & PRL</span>
+            </button>
 
-                    <form wire:submit.prevent="finalizarOnboarding" class="space-y-6">
-                        <div class="space-y-4">
-                            
-                            {{-- Check RGPD --}}
-                            <div class="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-start gap-3.5">
-                                <input type="checkbox" wire:model="acepta_rgpd" id="acepta_rgpd" class="mt-1 rounded border-gray-300 dark:border-white/10 text-amber-600 focus:ring-amber-500 shadow-sm" />
-                                <label for="acepta_rgpd" class="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
-                                    <strong class="block text-gray-900 dark:text-white mb-0.5">Protección de Datos Personales (RGPD / LOPDGDD)</strong>
-                                    He sido informado y consiento el tratamiento de mis datos personales con fines exclusivamente laborales, de gestión de nóminas y seguridad social por parte de la empresa.
-                                </label>
+            <!-- Step 5 -->
+            <button type="button" wire:click="irPaso(5)" class="col-span-2 sm:col-span-1 flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 5 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 5 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 5 ? 'bg-amber-500 text-white shadow-md' : ($paso > 5 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
+                    @if($paso > 5) ✓ @else 5 @endif
+                </div>
+                <span class="text-xs font-bold leading-tight">Políticas</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">RGPD & Inicio</span>
+            </button>
+
+        </div>
+    </div>
+
+    @if (session('success_step'))
+        <div class="p-4 bg-emerald-500/10 border-2 border-emerald-500/30 rounded-2xl text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2.5 shadow-sm">
+            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span>{{ session('success_step') }}</span>
+        </div>
+    @endif
+
+    <!-- Wizard Card Content -->
+    <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-10 shadow-sm border border-gray-100 dark:border-white/5">
+
+        {{-- ========================================================================= --}}
+        {{-- PASO 1: QUIÉNES SOMOS Y CÓMO FUNCIONAMOS --}}
+        {{-- ========================================================================= --}}
+        @if ($paso === 1)
+            <div class="space-y-8 animate-fadeIn">
+                <!-- Welcome Title -->
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-extrabold uppercase tracking-wider">
+                        👋 ¡Bienvenido/a al Equipo!
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+                        Quiénes Somos y Cómo Funcionamos
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        En <strong class="text-gray-900 dark:text-white">Utrecar - Active Network</strong> nos mueve la excelencia, el servicio cercano y el compromiso con cada una de las personas que forman nuestro equipo.
+                    </p>
+                </div>
+
+                <!-- 4 Operational Pillars Grid -->
+                <div>
+                    <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">
+                        Tu Día a Día en la Empresa (4 Pilares Clave)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        
+                        <!-- Pillar 1: Fichajes -->
+                        <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-gray-800/60 dark:to-gray-800/30 border border-amber-200/60 dark:border-amber-500/20 space-y-2 hover:shadow-md transition-all">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
-                            @error('acepta_rgpd') <span class="text-xs text-red-500 block px-2">{{ $message }}</span> @enderror
-
-                            {{-- Check Normativa Interna --}}
-                            <div class="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-start gap-3.5">
-                                <input type="checkbox" wire:model="acepta_normativa" id="acepta_normativa" class="mt-1 rounded border-gray-300 dark:border-white/10 text-amber-600 focus:ring-amber-500 shadow-sm" />
-                                <label for="acepta_normativa" class="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
-                                    <strong class="block text-gray-900 dark:text-white mb-0.5">Normativa Interna y Código de Conducta</strong>
-                                    Me comprometo a respetar las directrices operativas, horarios asignados, registro de jornada y políticas internas de la organización.
-                                </label>
-                            </div>
-                            @error('acepta_normativa') <span class="text-xs text-red-500 block px-2">{{ $message }}</span> @enderror
-
-                            {{-- Check PRL --}}
-                            <div class="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-start gap-3.5">
-                                <input type="checkbox" wire:model="acepta_prl" id="acepta_prl" class="mt-1 rounded border-gray-300 dark:border-white/10 text-amber-600 focus:ring-amber-500 shadow-sm" />
-                                <label for="acepta_prl" class="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
-                                    <strong class="block text-gray-900 dark:text-white mb-0.5">Prevención de Riesgos Laborales (PRL) y Seguridad</strong>
-                                    Confirmo que he recibido las directrices sobre seguridad y salud en el puesto de trabajo, comprometiéndome al uso adecuado de EPIs y cumplimiento de protocolos de seguridad.
-                                </label>
-                            </div>
-                            @error('acepta_prl') <span class="text-xs text-red-500 block px-2">{{ $message }}</span> @enderror
-
-                        </div>
-
-                        <div class="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center space-y-2">
-                            <span class="text-sm font-bold text-amber-800 dark:text-amber-300 block">✨ Todo listo para empezar</span>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
-                                Al pulsar en finalizar, tu expediente quedará registrado para que el equipo de Recursos Humanos valide tu incorporación. Tendrás acceso inmediato al portal del empleado.
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">1. Registro de Jornada y Fichajes</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                Por normativa legal y organización interna, debes registrar puntualmente tu <strong>Entrada</strong> y <strong>Salida</strong> en cada turno desde el portal del empleado en tu móvil o terminal de la estación.
                             </p>
                         </div>
 
-                        <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                            <button type="button" wire:click="irPaso(3)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
-                                ← Volver
-                            </button>
-                            <button type="submit" class="inline-flex items-center justify-center px-8 py-3.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-xl gap-2">
-                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                <span>Finalizar Onboarding y Acceder al Portal</span>
-                            </button>
+                        <!-- Pillar 2: Vacaciones -->
+                        <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-gray-800/60 dark:to-gray-800/30 border border-emerald-200/60 dark:border-emerald-500/20 space-y-2 hover:shadow-md transition-all">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">2. Vacaciones y Solicitudes</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                Podrás solicitar tus días de vacaciones, permisos y ausencias directamente desde la plataforma con antelación, conociendo el estado de aprobación en tiempo real.
+                            </p>
                         </div>
-                    </form>
-                </div>
-            @endif
 
-        </div>
+                        <!-- Pillar 3: Nóminas -->
+                        <div class="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-gray-800/60 dark:to-gray-800/30 border border-blue-200/60 dark:border-blue-500/20 space-y-2 hover:shadow-md transition-all">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V9a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2zM9 7V5a2 2 0 012-2h2a2 2 0 012-2v2"/></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">3. Nóminas y Documentación</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                Tu contrato, recibos de nómina mensuales y certificados estarán siempre disponibles de forma digital y segura en tu expediente para descargarlos cuando lo necesites.
+                            </p>
+                        </div>
+
+                        <!-- Pillar 4: Seguridad y PRL -->
+                        <div class="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50/50 dark:from-gray-800/60 dark:to-gray-800/30 border border-purple-200/60 dark:border-purple-500/20 space-y-2 hover:shadow-md transition-all">
+                            <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">4. Seguridad, PRL y Soporte</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                Tu seguridad y salud son prioritarias. Dispones de protocolos claros, uso obligatorio de EPIs y comunicación directa con el equipo de Recursos Humanos.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Network Stations Grid -->
+                <div>
+                    <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">
+                        Nuestras Estaciones de Servicio y Centros de Operación
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white block">E.S. Vistalegre</span>
+                            <span class="text-[10px] text-gray-400">Utrera (Sevilla)</span>
+                        </div>
+                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white block">Ronda Norte</span>
+                            <span class="text-[10px] text-gray-400">Sevilla Capital</span>
+                        </div>
+                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white block">E.S. Rodalabota</span>
+                            <span class="text-[10px] text-gray-400">El Cuervo (Sevilla)</span>
+                        </div>
+                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                            <span class="text-xs font-bold text-gray-900 dark:text-white block">E.S. Atenas</span>
+                            <span class="text-[10px] text-gray-400">Lebrija (Sevilla)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-6 border-t border-gray-100 dark:border-white/5 flex justify-end">
+                    <button type="button" wire:click="completarPaso1Bienvenida" class="inline-flex items-center justify-center px-8 py-3.5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-sm font-bold transition-all shadow-lg hover:shadow-xl gap-2 cursor-pointer">
+                        <span>Comenzar Mi Incorporación</span>
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                </div>
+            </div>
+        @endif
+
+        {{-- ========================================================================= --}}
+        {{-- PASO 2: SEGURIDAD Y CAMBIO DE CONTRASEÑA --}}
+        {{-- ========================================================================= --}}
+        @if ($paso === 2)
+            <div class="space-y-6 animate-fadeIn">
+                <div class="border-b border-gray-100 dark:border-white/5 pb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">2</span>
+                        Seguridad: Cambiar Contraseña Inicial
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Para garantizar la privacidad de tu cuenta, sustituye la contraseña temporal por defecto (1234) por una clave personal de al menos 8 caracteres.
+                    </p>
+                </div>
+
+                <form wire:submit.prevent="guardarPaso2Password" class="space-y-6 max-w-xl">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Contraseña Actual</label>
+                        <input type="password" wire:model="current_password" placeholder="Tu contraseña temporal (1234)" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 py-2.5 px-3.5 shadow-sm" />
+                        @error('current_password') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nueva Contraseña Personal</label>
+                        <input type="password" wire:model.live="new_password" placeholder="Mínimo 8 caracteres" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 py-2.5 px-3.5 shadow-sm" />
+                        <span class="text-xs font-semibold block mt-1.5 {{ strlen($new_password) >= 8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400' }}">
+                            {{ strlen($new_password) >= 8 ? '✓ Cumple el requisito de 8 caracteres' : '• Mínimo 8 caracteres requeridos' }}
+                        </span>
+                        @error('new_password') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Confirmar Nueva Contraseña</label>
+                        <input type="password" wire:model.live="new_password_confirmation" placeholder="Repite la nueva contraseña" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-amber-500 focus:ring-amber-500 py-2.5 px-3.5 shadow-sm" />
+                        @if($new_password && $new_password_confirmation)
+                            <span class="text-xs font-semibold block mt-1.5 {{ $new_password === $new_password_confirmation ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500' }}">
+                                {{ $new_password === $new_password_confirmation ? '✓ Las contraseñas coinciden' : '✕ Las contraseñas no coinciden' }}
+                            </span>
+                        @endif
+                        @error('new_password_confirmation') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                        <button type="button" wire:click="irPaso(1)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
+                            ← Volver
+                        </button>
+                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
+                            <span>Guardar Clave y Continuar</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
+
+        {{-- ========================================================================= --}}
+        {{-- PASO 3: TUS DATOS PERSONALES, CONTACTO E IBAN --}}
+        {{-- ========================================================================= --}}
+        @if ($paso === 3)
+            <div class="space-y-6 animate-fadeIn">
+                <div class="border-b border-gray-100 dark:border-white/5 pb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">3</span>
+                        Verificación de Datos Personales, Contacto e IBAN
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Comprueba y completa tus datos para la confección del contrato, alta en Seguridad Social y abono de nóminas.
+                    </p>
+                </div>
+
+                <form wire:submit.prevent="guardarPaso3Datos" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre *</label>
+                            <input type="text" wire:model="nombre" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Apellidos *</label>
+                            <input type="text" wire:model="apellidos" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('apellidos') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">DNI / NIE *</label>
+                            <input type="text" wire:model="dni" placeholder="12345678Z" class="w-full text-sm font-mono uppercase rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fecha de Nacimiento *</label>
+                            <input type="date" wire:model="fecha_nacimiento" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('fecha_nacimiento') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Teléfono de Contacto *</label>
+                            <input type="text" wire:model="telefono_principal" placeholder="600000000" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('telefono_principal') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Número Seguridad Social (NUSS) *</label>
+                            <input type="text" wire:model="nuss" placeholder="41/1234567890" class="w-full text-sm font-mono rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('nuss') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Cuenta Bancaria (IBAN para cobro de nómina) *</label>
+                            <input type="text" wire:model="iban" placeholder="ES00 0000 0000 0000 0000 0000" class="w-full text-sm font-mono uppercase rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('iban') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Dirección Completa *</label>
+                            <input type="text" wire:model="direccion" placeholder="Calle, número, piso, puerta..." class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('direccion') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Código Postal *</label>
+                            <input type="text" wire:model="codigo_postal" placeholder="41710" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('codigo_postal') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Localidad / Municipio *</label>
+                            <input type="text" wire:model="localidad" placeholder="Utrera" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('localidad') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Provincia *</label>
+                            <input type="text" wire:model="provincia" placeholder="Sevilla" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('provincia') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre Contacto Emergencia *</label>
+                            <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Familiar o persona de contacto" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('contacto_emergencia_nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Teléfono Contacto Emergencia *</label>
+                            <input type="text" wire:model="contacto_emergencia_telefono" placeholder="600000000" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                            @error('contacto_emergencia_telefono') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                        <button type="button" wire:click="irPaso(2)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
+                            ← Volver
+                        </button>
+                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
+                            <span>Guardar Datos y Continuar</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
+
+        {{-- ========================================================================= --}}
+        {{-- PASO 4: DOCUMENTACIÓN DIGITAL --}}
+        {{-- ========================================================================= --}}
+        @if ($paso === 4)
+            <div class="space-y-6 animate-fadeIn">
+                <div class="border-b border-gray-100 dark:border-white/5 pb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">4</span>
+                        Documentación de Incorporación
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Sube los archivos oficiales requeridos en formato PDF o imagen nítida (JPG, PNG).
+                    </p>
+                </div>
+
+                <form wire:submit.prevent="guardarPaso4Documentos" class="space-y-6">
+                    <div class="space-y-5">
+                        
+                        <!-- DNI Caducidad y Archivo -->
+                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <span>🪪</span> DNI / NIE (Documento Obligatorio)
+                                </h3>
+                                @if($empleado->documentos()->where('tipo', 'DNI')->exists())
+                                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
+                                        ✓ Ya tienes un DNI adjuntado
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fecha de Caducidad del DNI *</label>
+                                    <input type="date" wire:model="fecha_caducidad_dni" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
+                                    @error('fecha_caducidad_dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Archivo DNI (PDF / Foto) *</label>
+                                    <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
+                                        <svg class="w-6 h-6 mb-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                        <span>Seleccionar archivo DNI...</span>
+                                        <input type="file" wire:model="file_dni" class="hidden" />
+                                    </label>
+                                    @if ($file_dni)
+                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_dni->getClientOriginalName() }}</span>
+                                    @endif
+                                    @error('file_dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Justificante Bancario -->
+                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span>🏦</span> Certificado de Titularidad Bancaria / Justificante de IBAN (Recomendado)
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Documento del banco o captura de la banca online donde aparezca tu nombre y el número de cuenta IBAN para garantizar los pagos de nómina.
+                            </p>
+                            <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
+                                <span>Seleccionar certificado bancario...</span>
+                                <input type="file" wire:model="file_banco" class="hidden" />
+                            </label>
+                            @if ($file_banco)
+                                <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_banco->getClientOriginalName() }}</span>
+                            @endif
+                        </div>
+
+                        <!-- Formación PRL -->
+                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span>🦺</span> Formación en Prevención de Riesgos Laborales (PRL)
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Si dispones de cursos previos de PRL (Convenio del sector, 20h, básico 60h, etc.), adjunta aquí tu titulación.
+                            </p>
+                            <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
+                                <span>Seleccionar certificado PRL...</span>
+                                <input type="file" wire:model="file_prl" class="hidden" />
+                            </label>
+                            @if ($file_prl)
+                                <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_prl->getClientOriginalName() }}</span>
+                            @endif
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                        <button type="button" wire:click="irPaso(3)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
+                            ← Volver
+                        </button>
+                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
+                            <span>Guardar Documentos y Continuar</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
+
+        {{-- ========================================================================= --}}
+        {{-- PASO 5: CUMPLIMIENTO NORMATIVO, RGPD Y FINALIZACIÓN --}}
+        {{-- ========================================================================= --}}
+        @if ($paso === 5)
+            <div class="space-y-6 animate-fadeIn">
+                <div class="border-b border-gray-100 dark:border-white/5 pb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">5</span>
+                        Cumplimiento Normativo, RGPD y Bienvenida Oficial
+                    </h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Lee y confirma la aceptación de las normativas obligatorias para activar definitivamente tu usuario.
+                    </p>
+                </div>
+
+                <form wire:submit.prevent="finalizarOnboarding" class="space-y-6">
+                    <div class="space-y-4">
+                        
+                        <!-- Check 1: RGPD -->
+                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_rgpd ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
+                             wire:click="$toggle('acepta_rgpd')">
+                            <div class="flex items-start gap-3.5">
+                                <input type="checkbox" wire:model.live="acepta_rgpd" id="onb_rgpd" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
+                                <div class="text-xs space-y-1 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <label for="onb_rgpd" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                            Protección de Datos Personales (RGPD / LOPDGDD)
+                                        </label>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_rgpd ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                                            {{ $acepta_rgpd ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Consiento el tratamiento de mis datos personales con fines exclusivamente laborales, de registro de jornada, nóminas y seguridad social por parte de UTRECAR / ACTIVE NETWORK.
+                                    </p>
+                                    <div>
+                                        <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                                            Leer normativa completa RGPD
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('acepta_rgpd') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Check 2: Normativa Interna -->
+                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_normativa ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
+                             wire:click="$toggle('acepta_normativa')">
+                            <div class="flex items-start gap-3.5">
+                                <input type="checkbox" wire:model.live="acepta_normativa" id="onb_normativa" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
+                                <div class="text-xs space-y-1 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <label for="onb_normativa" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                            Normativa Interna y Código de Conducta
+                                        </label>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_normativa ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                                            {{ $acepta_normativa ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Me comprometo a respetar las directrices operativas, horarios asignados, obligación de registro horario de jornada en cada turno y políticas de la empresa.
+                                    </p>
+                                    <div>
+                                        <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                                            Leer Normativa Interna
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('acepta_normativa') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Check 3: PRL -->
+                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_prl ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
+                             wire:click="$toggle('acepta_prl')">
+                            <div class="flex items-start gap-3.5">
+                                <input type="checkbox" wire:model.live="acepta_prl" id="onb_prl" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
+                                <div class="text-xs space-y-1 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <label for="onb_prl" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                            Prevención de Riesgos Laborales (PRL) y Seguridad
+                                        </label>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_prl ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                                            {{ $acepta_prl ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        Confirmo haber recibido las instrucciones de seguridad laboral, uso obligatorio de EPIs y cumplimiento de protocolos de prevención en mi centro de trabajo.
+                                    </p>
+                                    <div>
+                                        <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
+                                            Leer Protocolo PRL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('acepta_prl') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                    </div>
+
+                    <!-- Celebratory Banner -->
+                    <div class="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-emerald-500/10 border border-amber-500/30 text-center space-y-2">
+                        <span class="text-base font-black text-amber-800 dark:text-amber-300 block">✨ ¡Todo preparado para comenzar!</span>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+                            Al finalizar, tu expediente quedará guardado y tendrás acceso instantáneo a todas las funcionalidades de tu <strong>Portal del Empleado</strong> (fichajes, vacaciones, nóminas y solicitudes).
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                        <button type="button" wire:click="irPaso(4)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
+                            ← Volver
+                        </button>
+                        <button type="submit" class="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-sm font-black transition-all shadow-xl hover:shadow-2xl gap-2 cursor-pointer">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Finalizar Onboarding y Acceder al Portal</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
 
     </div>
+
+    {{-- ================= MODALES FLOTANTES DE LECTURA ================= --}}
+    <!-- Modal RGPD -->
+    <template x-teleport="body">
+        <div x-show="modalRgpd" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalRgpd = false" @keydown.escape.window="modalRgpd = false">
+            <div x-show="modalRgpd" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>🛡️</span> Protección de Datos Personales (RGPD / LOPDGDD)
+                    </h3>
+                    <button type="button" @click="modalRgpd = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                </div>
+                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p><strong>Responsable:</strong> UTRECAR S.L. / ACTIVE NETWORK</p>
+                    <p><strong>Finalidad:</strong> Gestión laboral, control horario de jornada (Art. 34.9 ET), prevención de riesgos laborales y confección de nóminas.</p>
+                    <p><strong>Legitimación:</strong> Cumplimiento de obligación legal y ejecución del contrato laboral.</p>
+                    <p>El trabajador puede ejercer sus derechos de acceso, rectificación, supresión y limitación comunicándolo al departamento de Recursos Humanos.</p>
+                </div>
+                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
+                    <button type="button" @click="modalRgpd = false; $wire.set('acepta_rgpd', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                        He leído y Acepto el RGPD
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modal Normativa -->
+    <template x-teleport="body">
+        <div x-show="modalNormativa" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalNormativa = false" @keydown.escape.window="modalNormativa = false">
+            <div x-show="modalNormativa" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>📋</span> Normativa Interna y Código de Conducta
+                    </h3>
+                    <button type="button" @click="modalNormativa = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                </div>
+                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p><strong>1. Registro de Jornada:</strong> Es obligatorio e intransferible registrar entrada y salida en cada turno.</p>
+                    <p><strong>2. Credenciales Personales:</strong> Las claves de acceso son individuales y no deben compartirse.</p>
+                    <p><strong>3. Instalaciones:</strong> Uso diligente de terminales, TPVs, surtidores y material de trabajo.</p>
+                    <p><strong>4. Comunicación:</strong> Notificar con la antelación debida cualquier incidencia o ausencia al responsable.</p>
+                </div>
+                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
+                    <button type="button" @click="modalNormativa = false; $wire.set('acepta_normativa', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                        He leído y Acepto la Normativa Interna
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modal PRL -->
+    <template x-teleport="body">
+        <div x-show="modalPrl" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalPrl = false" @keydown.escape.window="modalPrl = false">
+            <div x-show="modalPrl" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>🦺</span> Prevención de Riesgos Laborales (PRL) y Seguridad
+                    </h3>
+                    <button type="button" @click="modalPrl = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                </div>
+                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p><strong>1. EPIs Obligatorios:</strong> Uso adecuado de calzado de seguridad, guantes y ropa de trabajo reglamentaria.</p>
+                    <p><strong>2. Protocolos de Seguridad:</strong> Normas estrictas en manipulación de combustibles y prevención de incendios.</p>
+                    <p><strong>3. Notificación de Riesgos:</strong> Obligación de avisar inmediatamente ante cualquier anomalía o riesgo laboral.</p>
+                </div>
+                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
+                    <button type="button" @click="modalPrl = false; $wire.set('acepta_prl', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                        He leído y Acepto las Normas de PRL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
 </div>

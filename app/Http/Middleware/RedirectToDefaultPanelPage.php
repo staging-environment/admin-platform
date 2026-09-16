@@ -16,8 +16,18 @@ class RedirectToDefaultPanelPage
         $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
         if ($user) {
+            $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+
+            // Si es un empleado con onboarding pendiente, redirigir al asistente de inducción
+            if ($empleado && !$empleado->onboarding_completado) {
+                if (!$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                    return redirect()->route('empleado.onboarding');
+                }
+            }
+
+            // Si tiene la contraseña por defecto '1234'
             if (\Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
-                if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('portal/onboarding*') && !$request->is('livewire*')) {
                     \Illuminate\Support\Facades\Log::info("Redirecting employee with default password '1234' to profile page", [
                         'user_email' => $user->email
                     ]);
@@ -31,7 +41,6 @@ class RedirectToDefaultPanelPage
             $isAdmin = $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
             
             if (!$isAdmin) {
-                // Check if they already checked in today
                 $empleado = \App\Models\Empleado::where('email', $user->email)->first();
                 $hasCheckedInToday = false;
 

@@ -2,148 +2,158 @@
 
 namespace App\Livewire;
 
-use App\Models\Empleado;
-use App\Models\EmpleadoDocumento;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use App\Models\Empleado;
+use App\Models\EmpleadoDocumento;
+use Carbon\Carbon;
 
 class EmpleadoOnboardingWizard extends Component
 {
     use WithFileUploads;
 
-    public $paso = 1;
-    public $empleado;
+    public int $paso = 1;
+    public ?Empleado $empleado = null;
 
-    // Paso 1: Password
-    public $current_password;
-    public $new_password;
-    public $new_password_confirmation;
+    // Paso 2: Contraseña
+    public string $current_password = '';
+    public string $new_password = '';
+    public string $new_password_confirmation = '';
 
-    // Paso 2: Datos Personales, NUSS e IBAN
-    public $nombre;
-    public $apellidos;
-    public $dni;
-    public $fecha_nacimiento;
-    public $telefono_principal;
-    public $direccion;
-    public $codigo_postal;
-    public $localidad;
-    public $provincia;
-    public $nuss;
-    public $iban;
-    public $contacto_emergencia_nombre;
-    public $contacto_emergencia_telefono;
+    // Paso 3: Datos Personales
+    public string $nombre = '';
+    public string $apellidos = '';
+    public string $dni = '';
+    public string $fecha_nacimiento = '';
+    public string $telefono_principal = '';
+    public string $direccion = '';
+    public string $codigo_postal = '';
+    public string $localidad = '';
+    public string $provincia = '';
+    public string $nuss = '';
+    public string $iban = '';
+    public string $contacto_emergencia_nombre = '';
+    public string $contacto_emergencia_telefono = '';
 
-    // Paso 3: Documentación
-    public $file_dni;
-    public $fecha_caducidad_dni;
-    public $file_banco;
-    public $file_prl;
-    public $tiene_discapacidad = false;
-    public $file_discapacidad;
+    // Paso 4: Documentos
+    public ?string $fecha_caducidad_dni = '';
+    public bool $tiene_discapacidad = false;
+    public $file_dni = null;
+    public $file_banco = null;
+    public $file_prl = null;
+    public $file_discapacidad = null;
 
-    // Paso 4: Políticas
-    public $acepta_rgpd = false;
-    public $acepta_normativa = false;
-    public $acepta_prl = false;
+    // Paso 5: Políticas
+    public bool $acepta_rgpd = false;
+    public bool $acepta_normativa = false;
+    public bool $acepta_prl = false;
 
     public function mount()
     {
-        $user = Auth::user();
+        $user = auth()->user();
         if (!$user) {
-            return redirect()->route('login');
+            return redirect()->to('/login');
         }
 
         $this->empleado = Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
 
         if (!$this->empleado) {
-            // Crear registro provisional de empleado si aún no existe
             $parts = explode(' ', trim($user->name ?: 'Empleado'));
             $nombre = $parts[0];
-            $apellidos = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+            $apellidos = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : 'Apellidos';
 
             $this->empleado = Empleado::create([
                 'nombre' => $nombre,
                 'apellidos' => $apellidos,
+                'dni' => 'PENDIENTE-' . strtoupper(substr(md5($user->email), 0, 5)),
+                'fecha_nacimiento' => '1990-01-01',
+                'direccion' => 'Dirección pendiente',
+                'localidad' => 'Utrera',
+                'codigo_postal' => '41710',
+                'provincia' => 'Sevilla',
+                'telefono_principal' => $user->telefono ?: '600000000',
                 'email' => $user->email,
-                'telefono_principal' => $user->telefono ?: '',
                 'onboarding_completado' => false,
                 'onboarding_paso_actual' => 1,
             ]);
         }
 
-        // Si ya completó el onboarding, redirigir al portal
+        // Si ya completó onboarding, redirigir al portal
         if ($this->empleado->onboarding_completado) {
-            return redirect()->to('/admin');
+            return redirect()->to('/admin/portal-empleado');
         }
 
-        $this->paso = $this->empleado->onboarding_paso_actual ?: 1;
-
-        // Cargar datos previos
-        $this->nombre = $this->empleado->nombre;
-        $this->apellidos = $this->empleado->apellidos;
-        $this->dni = str_starts_with($this->empleado->dni ?? '', 'PENDIENTE') ? '' : $this->empleado->dni;
-        $this->fecha_nacimiento = $this->empleado->fecha_nacimiento ? $this->empleado->fecha_nacimiento->format('Y-m-d') : null;
-        $this->telefono_principal = $this->empleado->telefono_principal ?: $user->telefono;
-        $this->direccion = $this->empleado->direccion === 'Dirección pendiente' ? '' : $this->empleado->direccion;
-        $this->codigo_postal = $this->empleado->codigo_postal;
-        $this->localidad = $this->empleado->localidad ?: 'Utrera';
-        $this->provincia = $this->empleado->provincia ?: 'Sevilla';
-        $this->nuss = $this->empleado->nuss;
-        $this->iban = $this->empleado->iban;
-        $this->contacto_emergencia_nombre = $this->empleado->contacto_emergencia_nombre;
-        $this->contacto_emergencia_telefono = $this->empleado->contacto_emergencia_telefono;
-        $this->fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
+        // Cargar datos existentes
+        $this->nombre = (string) ($this->empleado->nombre ?? '');
+        $this->apellidos = (string) ($this->empleado->apellidos ?? '');
+        $this->dni = (string) (str_starts_with((string)$this->empleado->dni, 'PENDIENTE-') ? '' : $this->empleado->dni);
+        $this->fecha_nacimiento = $this->empleado->fecha_nacimiento ? Carbon::parse($this->empleado->fecha_nacimiento)->format('Y-m-d') : '';
+        $this->telefono_principal = (string) ($this->empleado->telefono_principal ?? '');
+        $this->direccion = (string) ($this->empleado->direccion === 'Dirección pendiente' ? '' : $this->empleado->direccion);
+        $this->codigo_postal = (string) ($this->empleado->codigo_postal ?? '');
+        $this->localidad = (string) ($this->empleado->localidad ?? '');
+        $this->provincia = (string) ($this->empleado->provincia ?? '');
+        $this->nuss = (string) ($this->empleado->nuss ?? '');
+        $this->iban = (string) ($this->empleado->iban ?? '');
+        $this->contacto_emergencia_nombre = (string) ($this->empleado->contacto_emergencia_nombre ?? '');
+        $this->contacto_emergencia_telefono = (string) ($this->empleado->contacto_emergencia_telefono ?? '');
+        $this->fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? Carbon::parse($this->empleado->fecha_caducidad_dni)->format('Y-m-d') : '';
         $this->tiene_discapacidad = (bool) $this->empleado->tiene_discapacidad;
+
+        $pasoActual = (int) ($this->empleado->onboarding_paso_actual ?: 1);
+        $this->paso = min(max(1, $pasoActual), 5);
     }
 
-    public function irPaso($numero)
+    public function irPaso(int $nuevoPaso)
     {
-        if ($numero <= $this->empleado->onboarding_paso_actual) {
-            $this->paso = $numero;
+        $maxPaso = max((int) $this->empleado->onboarding_paso_actual, $this->paso);
+        if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 5) {
+            $this->paso = $nuevoPaso;
         }
     }
 
-    public function guardarPaso1()
+    public function completarPaso1Bienvenida()
     {
-        $user = Auth::user();
-        $isDefaultPassword = Hash::check('1234', $user->password);
-
-        $rules = [
-            'new_password' => 'required|string|min:8|confirmed|different:current_password',
-        ];
-
-        if (!$isDefaultPassword) {
-            $rules['current_password'] = 'required|current_password';
-        }
-
-        $this->validate($rules, [
-            'new_password.required' => 'Debes introducir una nueva contraseña.',
-            'new_password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
-            'new_password.confirmed' => 'La confirmación de la contraseña no coincide.',
-            'new_password.different' => 'La nueva contraseña debe ser diferente a la anterior.',
-            'current_password.current_password' => 'La contraseña actual no es correcta.',
-        ]);
-
-        // Actualizar contraseña del usuario
-        $user->password = Hash::make($this->new_password);
-        $user->save();
-
         $this->paso = 2;
         $this->empleado->update([
             'onboarding_paso_actual' => max(2, (int) $this->empleado->onboarding_paso_actual),
         ]);
-
-        session()->flash('success_step', '¡Contraseña actualizada correctamente! Por favor, verifica tus datos personales.');
     }
 
-    public function guardarPaso2()
+    public function guardarPaso2Password()
+    {
+        $this->validate([
+            'current_password' => 'required|current_password',
+            'new_password' => ['required', Password::min(8), 'confirmed'],
+        ], [
+            'current_password.required' => 'La contraseña actual es obligatoria (1234 si es primer acceso).',
+            'current_password.current_password' => 'La contraseña actual no es correcta.',
+            'new_password.required' => 'Debes indicar una nueva contraseña.',
+            'new_password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
+            'new_password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ]);
+
+        $user = auth()->user();
+        $user->forceFill([
+            'password' => Hash::make($this->new_password),
+        ])->save();
+
+        // Mantener sesión autenticada
+        \Illuminate\Support\Facades\Auth::guard('web')->login($user);
+        session()->put('password_hash_web', $user->getAuthPassword());
+        session()->put('password_hash_' . \Illuminate\Support\Facades\Auth::getDefaultDriver(), $user->getAuthPassword());
+
+        $this->paso = 3;
+        $this->empleado->update([
+            'onboarding_paso_actual' => max(3, (int) $this->empleado->onboarding_paso_actual),
+        ]);
+
+        session()->flash('success_step', '¡Contraseña actualizada con éxito! Ahora verifica y completa tus datos personales.');
+    }
+
+    public function guardarPaso3Datos()
     {
         $this->validate([
             'nombre' => 'required|string|max:255',
@@ -170,8 +180,8 @@ class EmpleadoOnboardingWizard extends Component
             'localidad.required' => 'La localidad es obligatoria.',
             'provincia.required' => 'La provincia es obligatoria.',
             'nuss.required' => 'El número de la Seguridad Social (NUSS) es obligatorio.',
-            'iban.required' => 'El código IBAN bancario es obligatorio.',
-            'contacto_emergencia_nombre.required' => 'El contacto de emergencia es obligatorio.',
+            'iban.required' => 'El código IBAN bancario es obligatorio para el pago de nóminas.',
+            'contacto_emergencia_nombre.required' => 'El nombre del contacto de emergencia es obligatorio.',
             'contacto_emergencia_telefono.required' => 'El teléfono de emergencia es obligatorio.',
         ]);
 
@@ -189,14 +199,14 @@ class EmpleadoOnboardingWizard extends Component
             'iban' => strtoupper(str_replace(' ', '', $this->iban)),
             'contacto_emergencia_nombre' => $this->contacto_emergencia_nombre,
             'contacto_emergencia_telefono' => $this->contacto_emergencia_telefono,
-            'onboarding_paso_actual' => max(3, (int) $this->empleado->onboarding_paso_actual),
+            'onboarding_paso_actual' => max(4, (int) $this->empleado->onboarding_paso_actual),
         ]);
 
-        $this->paso = 3;
-        session()->flash('success_step', 'Datos personales guardados. Ahora sube tu documentación.');
+        $this->paso = 4;
+        session()->flash('success_step', 'Datos personales guardados correctamente. Ahora adjunta tu documentación digital.');
     }
 
-    public function guardarPaso3()
+    public function guardarPaso4Documentos()
     {
         $hasDniDoc = $this->empleado->documentos()->where('tipo', 'DNI')->exists();
 
@@ -223,12 +233,11 @@ class EmpleadoOnboardingWizard extends Component
         $this->validate($rules, [
             'fecha_caducidad_dni.required' => 'La fecha de caducidad del DNI es obligatoria.',
             'fecha_caducidad_dni.after' => 'La fecha de caducidad del DNI debe ser posterior a la de hoy.',
-            'file_dni.required' => 'Debes adjuntar el documento de tu DNI/NIE.',
+            'file_dni.required' => 'Debes adjuntar el documento escaneado o foto legible de tu DNI/NIE.',
             'file_dni.mimes' => 'El DNI debe ser un archivo PDF o imagen (JPG, PNG).',
             'file_dni.max' => 'El tamaño máximo permitido es 10 MB.',
         ]);
 
-        // Guardar DNI
         if ($this->file_dni) {
             $path = $this->file_dni->store('empleados_documentos', 'local');
             EmpleadoDocumento::create([
@@ -239,7 +248,6 @@ class EmpleadoOnboardingWizard extends Component
             ]);
         }
 
-        // Guardar Justificante Bancario
         if ($this->file_banco) {
             $pathBanco = $this->file_banco->store('empleados_documentos', 'local');
             EmpleadoDocumento::create([
@@ -250,7 +258,6 @@ class EmpleadoOnboardingWizard extends Component
             ]);
         }
 
-        // Guardar Formación PRL
         if ($this->file_prl) {
             $pathPrl = $this->file_prl->store('empleados_documentos', 'local');
             EmpleadoDocumento::create([
@@ -263,7 +270,6 @@ class EmpleadoOnboardingWizard extends Component
             ]);
         }
 
-        // Guardar Discapacidad
         if ($this->file_discapacidad) {
             $pathDisc = $this->file_discapacidad->store('empleados_documentos', 'local');
             EmpleadoDocumento::create([
@@ -278,13 +284,13 @@ class EmpleadoOnboardingWizard extends Component
             'fecha_caducidad_dni' => $this->fecha_caducidad_dni,
             'tiene_discapacidad' => $this->tiene_discapacidad,
             'no_tiene_discapacidad' => !$this->tiene_discapacidad,
-            'onboarding_paso_actual' => max(4, (int) $this->empleado->onboarding_paso_actual),
+            'onboarding_paso_actual' => max(5, (int) $this->empleado->onboarding_paso_actual),
         ]);
 
         $this->empleado->actualizarAlertas();
 
-        $this->paso = 4;
-        session()->flash('success_step', 'Documentación subida con éxito. Por favor, lee y acepta las políticas finales.');
+        $this->paso = 5;
+        session()->flash('success_step', 'Documentación adjuntada con éxito. Por favor, revisa y confirma las normativas de empresa.');
     }
 
     public function finalizarOnboarding()
@@ -294,28 +300,28 @@ class EmpleadoOnboardingWizard extends Component
             'acepta_normativa' => 'accepted',
             'acepta_prl' => 'accepted',
         ], [
-            'acepta_rgpd.accepted' => 'Debes aceptar la política de protección de datos.',
-            'acepta_normativa.accepted' => 'Debes aceptar las normativas internas de la empresa.',
-            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de prevención.',
+            'acepta_rgpd.accepted' => 'Debes aceptar la política de Protección de Datos (RGPD).',
+            'acepta_normativa.accepted' => 'Debes aceptar la Normativa Interna y Código de Conducta.',
+            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL).',
         ]);
 
         $this->empleado->update([
             'politicas_aceptadas_at' => now(),
             'onboarding_completado' => true,
             'onboarding_fecha_completado' => now(),
-            'onboarding_paso_actual' => 4,
+            'onboarding_paso_actual' => 5,
         ]);
 
         $this->empleado->actualizarAlertas();
 
-        session()->flash('message', '¡Enhorabuena! Has completado con éxito tu proceso de Onboarding. ¡Bienvenido/a al equipo!');
+        session()->flash('message', '¡Enhorabuena! Has completado con éxito tu incorporación oficial. ¡Bienvenido/a a Utrecar - Active Network!');
 
-        return redirect()->to('/admin');
+        return redirect()->to('/admin/portal-empleado');
     }
 
     public function render()
     {
         return view('livewire.empleado-onboarding-wizard')
-            ->layout('layouts.app', ['title' => 'Onboarding de Empleado - Utrecar']);
+            ->layout('layouts.app', ['title' => 'Bienvenida e Incorporación de Empleado - Utrecar']);
     }
 }
