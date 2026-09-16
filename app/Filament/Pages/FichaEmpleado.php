@@ -587,6 +587,34 @@ class FichaEmpleado extends Page
         }
     }
 
+    public function loadFormacion(): void
+    {
+        if ($this->empleado) {
+            // Cursos y planes de formacion asignados
+            $this->cursos = \App\Models\EmpleadoCurso::where('empleado_id', $this->empleado->id)
+                ->orderBy('fecha_inicio', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            // Titulaciones, certificados, carnets y PRL asignados
+            $this->documentosFormacion = \App\Models\EmpleadoDocumento::where('empleado_id', $this->empleado->id)
+                ->whereIn('tipo', [
+                    'Titulaciones',
+                    'Certificados',
+                    'Carnets',
+                    'Prevención de riesgos laborales',
+                    'Manipulación de alimentos',
+                    'Otros'
+                ])
+                ->orderBy('fecha_inicio', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+        } else {
+            $this->cursos = [];
+            $this->documentosFormacion = [];
+        }
+    }
+
     public function solicitarVacacion(): void
     {
         if ($this->vacacion_tipo === 'Vacaciones') {
