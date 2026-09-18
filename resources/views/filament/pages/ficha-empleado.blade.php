@@ -10,10 +10,10 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-base text-emerald-800 dark:text-emerald-300">
-                        ¡Contraseña actualizada correctamente!
+                        Â¡ContraseÃ±a actualizada correctamente!
                     </h3>
                     <p class="text-sm mt-1 text-emerald-800/90 dark:text-emerald-200/90 leading-relaxed">
-                        {{ session('success') ?? 'Tu contraseña ha sido cambiada con éxito. Ya puedes navegar libremente por la plataforma.' }}
+                        {{ session('success') ?? 'Tu contraseÃ±a ha sido cambiada con Ã©xito. Ya puedes navegar libremente por la plataforma.' }}
                     </p>
                 </div>
             </div>
@@ -27,8 +27,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold text-red-900 dark:text-red-200">Asociación de empleado no encontrada</h3>
-                    <p class="text-sm text-red-700 dark:text-red-300 mt-1">Tu usuario actual ({{ auth()->user()->email }}) no está asociado a ningún registro de empleado en la base de datos de Recursos Humanos. Contacta con tu administrador para que vincule tu correo electrónico.</p>
+                    <h3 class="text-lg font-bold text-red-900 dark:text-red-200">AsociaciÃ³n de empleado no encontrada</h3>
+                    <p class="text-sm text-red-700 dark:text-red-300 mt-1">Tu usuario actual ({{ auth()->user()->email }}) no estÃ¡ asociado a ningÃºn registro de empleado en la base de datos de Recursos Humanos. Contacta con tu administrador para que vincule tu correo electrÃ³nico.</p>
                 </div>
             </div>
         @else
@@ -43,8 +43,8 @@
                             </svg>
                         </span>
                         <div>
-                            <span class="text-sm font-semibold text-indigo-900 dark:text-indigo-200">Modo de Visualización de Administrador</span>
-                            <p class="text-xs text-indigo-700 dark:text-indigo-400">Estás viendo y gestionando el portal del empleado <strong>{{ $empleado->nombre }} {{ $empleado->apellidos }}</strong>.</p>
+                            <span class="text-sm font-semibold text-indigo-900 dark:text-indigo-200">Modo de VisualizaciÃ³n de Administrador</span>
+                            <p class="text-xs text-indigo-700 dark:text-indigo-400">EstÃ¡s viendo y gestionando el portal del empleado <strong>{{ $empleado->nombre }} {{ $empleado->apellidos }}</strong>.</p>
                         </div>
                     </div>
                     <a href="/admin/fichajes" style="background-color: #4f46e5; color: #ffffff;" class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-indigo-700">
@@ -67,14 +67,14 @@
                             <div class="space-y-1">
                                 <div class="flex items-center gap-2">
                                     <span class="px-2.5 py-0.5 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 font-bold text-xs rounded-full uppercase tracking-wider">
-                                        Atención: Turno Pendiente de Cierre
+                                        AtenciÃ³n: Turno Pendiente de Cierre
                                     </span>
                                 </div>
                                 <h3 class="text-lg font-black text-gray-900 dark:text-white">
                                     Tienes un turno anterior sin cerrar ({{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->translatedFormat('l, d \d\e F \d\e Y') }})
                                 </h3>
                                 <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    Registraste entrada a las <strong class="font-bold text-gray-900 dark:text-white font-mono">{{ \Carbon\Carbon::parse($fichajePendienteAnterior->hora_entrada)->format('H:i') }}</strong> pero no se registró la salida. 
+                                    Registraste entrada a las <strong class="font-bold text-gray-900 dark:text-white font-mono">{{ \Carbon\Carbon::parse($fichajePendienteAnterior->hora_entrada)->format('H:i') }}</strong> pero no se registrÃ³ la salida. 
                                     <span class="text-red-600 dark:text-red-400 font-bold">Debes cerrar el turno anterior indicando la hora de salida para poder realizar una nueva entrada hoy.</span>
                                 </p>
                             </div>
@@ -122,7 +122,7 @@
             @endif
 
             
-            {{-- NAVEGACIÓN POR PESTAÑAS DEDICADAS DEL PORTAL DEL EMPLEADO --}}
+            {{-- NAVEGACIÃ“N POR PESTAÃ‘AS DEDICADAS DEL PORTAL DEL EMPLEADO --}}
             <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
                 <button type="button" 
                         wire:click="$set('activeTab', 'fichajes')" 
@@ -142,23 +142,21 @@
                         wire:click="$set('activeTab', 'bajas')" 
                         class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'bajas' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                    <span>Bajas Médicas</span>
+                    <span>Bajas MÃ©dicas</span>
                 </button>
 
                 <button type="button" 
                         wire:click="$set('activeTab', 'formacion')" 
                         class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'formacion' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                    <span>Mis Titulaciones y Formación</span>
+                    <span>Mis Titulaciones y FormaciÃ³n</span>
                 </button>
             </div>
 
-            {{-- PESTAÑA 1: FICHAJES Y REGISTRO HORARIO --}}
+            {-- PESTAÑA 1: FICHAJES Y REGISTRO HORARIO --}
             @if($activeTab === 'fichajes')
                 <div class="space-y-6">
-                    <!-- Fichaje Dashboard -->
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Check-in Card -->
                 <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
@@ -228,7 +226,7 @@
                                      <button @click="doCheckIn" x-bind:disabled="loading" style="background-color: #16a34a; color: #ffffff;" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                          <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
                                          <span x-show="!loading">Registrar Entrada</span>
-                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
+                                         <span x-show="loading" style="display: none;">Obteniendo ubicaciÃ³n...</span>
                                      </button>
                                  </div>
                             @endif
@@ -300,7 +298,7 @@
                                     <button @click="doCerrarTurno" x-bind:disabled="loadingCierre" style="background-color: #dc2626; color: #ffffff;" class="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-600/10 hover:shadow-red-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                         <span x-show="loadingCierre" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
                                         <span x-show="!loadingCierre">Cerrar Turno Anterior</span>
-                                        <span x-show="loadingCierre" style="display: none;">Obteniendo ubicación...</span>
+                                        <span x-show="loadingCierre" style="display: none;">Obteniendo ubicaciÃ³n...</span>
                                     </button>
                                 </div>
                             @elseif(!$fichajeDelDia || !$fichajeDelDia->hora_entrada)
@@ -344,7 +342,7 @@
                                      <button @click="doCheckOut" x-bind:disabled="loading" style="background-color: #ea580c; color: #ffffff;" class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-600/10 hover:shadow-orange-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                          <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
                                          <span x-show="!loading">Registrar Salida</span>
-                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
+                                         <span x-show="loading" style="display: none;">Obteniendo ubicaciÃ³n...</span>
                                      </button>
                                  </div>
                             @endif
@@ -362,7 +360,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </span>
-                        Historial de Fichajes (Últimos 30 días)
+                        Historial de Fichajes (Ãšltimos 30 dÃ­as)
                     </h3>
                     <button type="button" wire:click="abrirFichajeRetroactivoNuevaFecha" style="background-color: #d97706; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-amber-750 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,7 +408,7 @@
                                                     {{ $fichaje->hora_entrada ? \Carbon\Carbon::parse($fichaje->hora_entrada)->format('H:i') : '-' }}
                                                 </span>
                                                 @if($isAdmin && $fichaje->checkin_latitude && $fichaje->checkin_longitude)
-                                                    <a href="https://www.google.com/maps?q={{ $fichaje->checkin_latitude }},{{ $fichaje->checkin_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[11px] transition-colors" title="Ver ubicación en Google Maps (Lat: {{ $fichaje->checkin_latitude }}, Lng: {{ $fichaje->checkin_longitude }})">
+                                                    <a href="https://www.google.com/maps?q={{ $fichaje->checkin_latitude }},{{ $fichaje->checkin_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[11px] transition-colors" title="Ver ubicaciÃ³n en Google Maps (Lat: {{ $fichaje->checkin_latitude }}, Lng: {{ $fichaje->checkin_longitude }})">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                                         Mapa
                                                     </a>
@@ -432,7 +430,7 @@
                                                         {{ \Carbon\Carbon::parse($fichaje->hora_salida)->format('H:i') }}
                                                     </span>
                                                     @if($isAdmin && $fichaje->checkout_latitude && $fichaje->checkout_longitude)
-                                                        <a href="https://www.google.com/maps?q={{ $fichaje->checkout_latitude }},{{ $fichaje->checkout_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[11px] transition-colors" title="Ver ubicación en Google Maps (Lat: {{ $fichaje->checkout_latitude }}, Lng: {{ $fichaje->checkout_longitude }})">
+                                                        <a href="https://www.google.com/maps?q={{ $fichaje->checkout_latitude }},{{ $fichaje->checkout_longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 font-semibold text-[11px] transition-colors" title="Ver ubicaciÃ³n en Google Maps (Lat: {{ $fichaje->checkout_latitude }}, Lng: {{ $fichaje->checkout_longitude }})">
                                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                                             Mapa
                                                         </a>
@@ -483,7 +481,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                        Aún no has registrado ningún fichaje.
+                                        AÃºn no has registrado ningÃºn fichaje.
                                     </td>
                                 </tr>
                             @endforelse
@@ -491,19 +489,14 @@
                     </table>
                 </div>
             </div>
-
-            
                 </div>
             @endif
 
-            {{-- PESTAÑA 2: VACACIONES Y PERMISOS --}}
+            {-- PESTAÑA 2: VACACIONES Y PERMISOS --}
             @if($activeTab === 'vacaciones')
                 <div class="space-y-6">
                     <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <!-- Vacations card -->
-                    @if(auth()->user()->can('solicitar_ver_vacaciones'))
+                        @if(auth()->user()->can('solicitar_ver_vacaciones'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
@@ -544,7 +537,7 @@
                                                 @endif
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'dÃ­a' : 'dÃ­as' }}</span>
                                                 <button type="button" wire:click="verDetallesSolicitud({{ $v->id }}, 'vacacion')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -552,7 +545,7 @@
                                                     </svg>
                                                 </button>
                                                 @if($v->estado === 'Pendiente')
-                                                    <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
+                                                    <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="Â¿EstÃ¡s seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                         </svg>
@@ -569,18 +562,15 @@
                             </div>
                         </div>
                     @endif
-
-                    
                     </div>
                 </div>
             @endif
 
-            {{-- PESTAÑA 3: BAJAS MÉDICAS --}}
+            {-- PESTAÑA 3: BAJAS MÉDICAS --}
             @if($activeTab === 'bajas')
                 <div class="space-y-6">
                     <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
-<!-- Absences/Sick leave card -->
-                    @if(auth()->user()->can('solicitud_baja_enfermedad'))
+                        @if(auth()->user()->can('solicitud_baja_enfermedad'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
@@ -590,10 +580,10 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                             </svg>
                                         </span>
-                                        Bajas Médicas
+                                        Bajas MÃ©dicas
                                     </h3>
                                     @php
-                                        $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas médicas' && empty($a->fecha_fin));
+                                        $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas mÃ©dicas' && empty($a->fecha_fin));
                                     @endphp
                                     @if($activeBaja)
                                         <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
@@ -664,7 +654,7 @@
                                                     </svg>
                                                 </button>
                                                 @if(($a->estado ?? 'Pendiente') === 'Pendiente')
-                                                    <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de baja médica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
+                                                    <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="Â¿EstÃ¡s seguro de que deseas cancelar esta solicitud de baja mÃ©dica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                         </svg>
@@ -674,28 +664,21 @@
                                         </div>
                                     @empty
                                         <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                                            No tienes solicitudes de baja médica registradas.
+                                            No tienes solicitudes de baja mÃ©dica registradas.
                                         </div>
                                     @endforelse
                                 </div>
                             </div>
                         </div>
                     @endif
-                </div>
-            @endif
-
-            
-            
                     </div>
                 </div>
             @endif
 
-            {{-- PESTAÑA 4: TITULACIONES Y FORMACIÓN --}}
+            {-- PESTAÑA 4: TITULACIONES Y FORMACIÓN --}
             @if($activeTab === 'formacion')
                 <div class="space-y-6">
-                    <!-- Section: Mis Titulaciones y Formación Asignada -->
-
-            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm mt-6 space-y-6">
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm mt-6 space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
                     <div class="flex items-center gap-3">
                         <span class="p-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-2xl">
@@ -707,13 +690,13 @@
                         </span>
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                Mis Titulaciones y Formación Asignada
+                                Mis Titulaciones y FormaciÃ³n Asignada
                                 <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold border border-amber-500/20">
-                                    {{ (count($cursos) + count($documentosFormacion)) }} {{ (count($cursos) + count($documentosFormacion)) === 1 ? 'acreditación' : 'acreditaciones' }}
+                                    {{ (count($cursos) + count($documentosFormacion)) }} {{ (count($cursos) + count($documentosFormacion)) === 1 ? 'acreditaciÃ³n' : 'acreditaciones' }}
                                 </span>
                             </h3>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                Cursos de formación, títulos profesionales y acreditaciones oficiales asignadas a tu expediente para consultar y descargar.
+                                Cursos de formaciÃ³n, tÃ­tulos profesionales y acreditaciones oficiales asignadas a tu expediente para consultar y descargar.
                             </p>
                         </div>
                     </div>
@@ -728,18 +711,18 @@
                         </div>
                         <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300">No tienes formaciones ni titulaciones asignadas actualmente</h4>
                         <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                            Cuando el departamento de administración o recursos humanos registre un curso, título o carnet en tu expediente, aparecerá aquí automáticamente para su consulta y descarga.
+                            Cuando el departamento de administraciÃ³n o recursos humanos registre un curso, tÃ­tulo o carnet en tu expediente, aparecerÃ¡ aquÃ­ automÃ¡ticamente para su consulta y descarga.
                         </p>
                     </div>
                 @else
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         
-                        <!-- Cursos de Formación Asignados -->
+                        <!-- Cursos de FormaciÃ³n Asignados -->
                         <div class="space-y-3">
                             <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/5">
                                 <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                                     <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                    Cursos y Planes de Formación ({{ count($cursos) }})
+                                    Cursos y Planes de FormaciÃ³n ({{ count($cursos) }})
                                 </h4>
                             </div>
 
@@ -755,7 +738,7 @@
                                                     <span>Inicio: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($c->fecha_inicio)->format('d/m/Y') }}</strong></span>
                                                 @endif
                                                 @if($c->fecha_fin)
-                                                    <span>• Fin: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($c->fecha_fin)->format('d/m/Y') }}</strong></span>
+                                                    <span>â€¢ Fin: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($c->fecha_fin)->format('d/m/Y') }}</strong></span>
                                                 @endif
                                             </div>
                                         </div>
@@ -787,15 +770,15 @@
                                             </div>
                                         @else
                                             <span class="text-[11px] text-gray-400 italic">
-                                                Certificado pendiente de emisión/subida
+                                                Certificado pendiente de emisiÃ³n/subida
                                             </span>
-                                            <span class="text-xs text-gray-400">—</span>
+                                            <span class="text-xs text-gray-400">â€”</span>
                                         @endif
                                     </div>
                                 </div>
                             @empty
                                 <div class="p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 text-center text-xs text-gray-400">
-                                    No hay cursos registrados en esta categoría.
+                                    No hay cursos registrados en esta categorÃ­a.
                                 </div>
                             @endforelse
                         </div>
@@ -822,10 +805,10 @@
                                             @if($doc->fecha_inicio || $doc->fecha_fin)
                                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                     @if($doc->fecha_inicio)
-                                                        <span>Expedición: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_inicio)->format('d/m/Y') }}</strong></span>
+                                                        <span>ExpediciÃ³n: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_inicio)->format('d/m/Y') }}</strong></span>
                                                     @endif
                                                     @if($doc->fecha_fin)
-                                                        <span>• Caducidad: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_fin)->format('d/m/Y') }}</strong></span>
+                                                        <span>â€¢ Caducidad: <strong class="font-mono text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($doc->fecha_fin)->format('d/m/Y') }}</strong></span>
                                                     @endif
                                                 </div>
                                             @endif
@@ -862,7 +845,10 @@
                     </div>
                 @endif
             </div>
+                </div>
+            @endif
 
+            <!-- MODALS -->
             <x-filament::modal id="edit-fichaje-modal" width="md">
                 <x-slot name="heading">
                     Editar Fichaje del {{ $editingFecha ? \Carbon\Carbon::parse($editingFecha)->format('d/m/Y') : '' }}
@@ -894,12 +880,12 @@
 
             <x-filament::modal id="delete-fichaje-modal" width="md">
                 <x-slot name="heading">
-                    ¿Eliminar registro de fichaje?
+                    Â¿Eliminar registro de fichaje?
                 </x-slot>
 
                 <div class="py-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                        ¿Estás seguro de que deseas eliminar este registro de fichaje? Esta acción no se puede deshacer y borrará el historial de entrada y salida del día correspondiente.
+                        Â¿EstÃ¡s seguro de que deseas eliminar este registro de fichaje? Esta acciÃ³n no se puede deshacer y borrarÃ¡ el historial de entrada y salida del dÃ­a correspondiente.
                     </p>
                 </div>
 
@@ -915,10 +901,6 @@
                 </x-slot>
             </x-filament::modal>
 
-            
-                </div>
-            @endif
-<!-- solicitar-vacacion-modal -->
             <x-filament::modal id="solicitar-vacacion-modal" width="md">
                 <x-slot name="heading">
                     Solicitar Vacaciones / Permiso
@@ -956,7 +938,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Año</label>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">AÃ±o</label>
                                 <select wire:model="vacacion_ano" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
                                     @php $currentYear = (int) \Carbon\Carbon::now()->year; @endphp
                                     <option value="{{ $currentYear }}">{{ $currentYear }}</option>
@@ -990,7 +972,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo del Permiso Retribuido</label>
-                            <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquí..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
+                            <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquÃ­..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
                             @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                         </div>
 
@@ -1013,9 +995,10 @@
             </x-filament::modal>
 
             <!-- solicitar-baja-modal -->
+
             <x-filament::modal id="solicitar-baja-modal" width="md">
                 <x-slot name="heading">
-                    Registrar Baja Médica
+                    Registrar Baja MÃ©dica
                 </x-slot>
 
                 <form wire:submit.prevent="solicitarBaja" class="space-y-4 py-4">
@@ -1026,13 +1009,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Finalización Estimada (Opcional)</label>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de FinalizaciÃ³n Estimada (Opcional)</label>
                         <input type="date" wire:model="baja_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-rose-500 focus:ring-rose-500 shadow-sm" />
                         @error('baja_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante Médico (PDF, Imagen)</label>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante MÃ©dico (PDF, Imagen)</label>
                         <input type="file" wire:model="baja_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100" />
                         @error('baja_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -1049,20 +1032,21 @@
             </x-filament::modal>
 
             <!-- registrar-alta-modal -->
+
             <x-filament::modal id="registrar-alta-modal" width="md">
                 <x-slot name="heading">
-                    Registrar Alta Médica (Fin de Baja)
+                    Registrar Alta MÃ©dica (Fin de Baja)
                 </x-slot>
 
                 <form wire:submit.prevent="registrarAlta" class="space-y-4 py-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Finalización de la Baja (Alta)</label>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de FinalizaciÃ³n de la Baja (Alta)</label>
                         <input type="date" wire:model="alta_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-emerald-500 focus:ring-emerald-500 shadow-sm" />
                         @error('alta_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante Médico de Alta (PDF, Imagen)</label>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante MÃ©dico de Alta (PDF, Imagen)</label>
                         <input type="file" wire:model="alta_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
                         @error('alta_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -1078,7 +1062,7 @@
                 </form>
             </x-filament::modal>
 
-        <!-- Floating Modal for Solicitud Details (for employees) -->
+            <!-- Floating Modal for Solicitud Details (for employees) -->
         @if($selectedSolicitud)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" wire:click.self="cerrarDetallesSolicitud">
             <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full max-w-xl overflow-hidden transform transition-all border border-gray-100 dark:border-white/5">
@@ -1124,7 +1108,7 @@
                         <div>
                             <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tipo de Solicitud</span>
                             <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                                {{ $selectedSolicitudType === 'vacacion' ? 'Vacaciones (' . ($selectedSolicitud->tipo ?? 'Normal') . ')' : 'Baja Médica / Ausencia' }}
+                                {{ $selectedSolicitudType === 'vacacion' ? 'Vacaciones (' . ($selectedSolicitud->tipo ?? 'Normal') . ')' : 'Baja MÃ©dica / Ausencia' }}
                             </p>
                         </div>
                         <div>
@@ -1141,14 +1125,14 @@
                         </div>
                         @if($selectedSolicitudType === 'vacacion')
                             <div>
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Días Solicitados</span>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">DÃ­as Solicitados</span>
                                 <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400 font-mono">
                                     {{ $selectedSolicitud->dias_solicitados }}
                                 </p>
                             </div>
                         @endif
                         <div>
-                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Última Actualización</span>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ãšltima ActualizaciÃ³n</span>
                             <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                                 {{ \Carbon\Carbon::parse($selectedSolicitud->updated_at)->translatedFormat('d/m/Y H:i') }}
                             </p>
@@ -1157,7 +1141,7 @@
 
                     @if($selectedSolicitud->comentario_empleado)
                         <div class="p-3 bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-white/5 rounded-2xl">
-                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tu Explicación</span>
+                            <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tu ExplicaciÃ³n</span>
                             <p class="text-sm text-gray-700 dark:text-gray-300">
                                 {{ $selectedSolicitud->comentario_empleado }}
                             </p>
@@ -1166,7 +1150,7 @@
 
                     @if($selectedSolicitud->comentario_aprobador)
                         <div class="p-3 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
-                            <span class="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Motivo / Razón de la Resolución</span>
+                            <span class="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Motivo / RazÃ³n de la ResoluciÃ³n</span>
                             <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">
                                 {{ $selectedSolicitud->comentario_aprobador }}
                             </p>
@@ -1196,7 +1180,7 @@
         </div>
         @endif
 
-        <!-- Retroactive Check-in Modal -->
+            <!-- Retroactive Check-in Modal -->
         @if($selectedRetroactiveDate)
         <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm transition-opacity">
             <div class="relative w-full max-w-md bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
@@ -1239,7 +1223,7 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Hora de Salida</label>
                             <input type="time" wire:model="retroactive_hora_salida" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                            <p class="text-[10px] text-gray-400 mt-1">Puedes dejar la salida en blanco si la jornada sigue abierta, aunque para días pasados se recomienda indicar ambas horas.</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Puedes dejar la salida en blanco si la jornada sigue abierta, aunque para dÃ­as pasados se recomienda indicar ambas horas.</p>
                         </div>
                     </div>
                 </div>
@@ -1258,6 +1242,8 @@
                 </div>
             </div>
         </div>
+        @endif
+
         @endif
     </div>
 </x-filament-panels::page>
