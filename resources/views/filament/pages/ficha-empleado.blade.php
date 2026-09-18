@@ -122,7 +122,6 @@
             @endif
 
 
-            {}
 
             <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
                 <button type="button"
