@@ -122,7 +122,8 @@
             @endif
 
 
-            {{-- NAVEGACIÓN POR PESTAÑAS DEDICADAS DEL PORTAL DEL EMPLEADO --}}
+            {}
+
             <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
                 <button type="button"
                         wire:click="$set('activeTab', 'fichajes')"
@@ -153,11 +154,11 @@
                 </button>
             </div>
 
-            {-- PESTAÑA 1: FICHAJES Y REGISTRO HORARIO --}
             @if($activeTab === 'fichajes')
                 <div class="space-y-6">
-                <!-- Check-in Card -->
-                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Check-in Card -->
+                <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -171,7 +172,7 @@
                             <span class="text-xs text-gray-400">Registro de entrada</span>
                         </div>
 
-                        <div class="py-6 flex flex-col items-center justify-center min-h-[160px]">
+                        <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
                             @if($fichajePendienteAnterior)
                                 <div class="text-center space-y-3 max-w-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-5 rounded-2xl border border-amber-200 dark:border-amber-900/40">
                                     <svg class="w-10 h-10 mx-auto stroke-current text-amber-500" fill="none" viewBox="0 0 24 24">
@@ -188,7 +189,7 @@
                                         <span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
                                         Entrada Registrada
                                     </div>
-                                    <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
+                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkin_at ? $fichajeDelDia->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_entrada)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @else
@@ -233,8 +234,8 @@
                     </div>
                 </div>
 
-                <!-- Check-out Card -->
-                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                        <!-- Check-out Card -->
+                <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -248,14 +249,14 @@
                             <span class="text-xs text-gray-400">Registro de salida</span>
                         </div>
 
-                        <div class="py-6 flex flex-col items-center justify-center min-h-[160px]">
+                        <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
                             @if($fichajeDelDia && $fichajeDelDia->hora_salida)
                                 <div class="text-center space-y-2">
                                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold rounded-full text-sm border border-amber-200 dark:border-amber-900">
                                         <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
                                         Salida Registrada
                                     </div>
-                                    <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
+                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at ? $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @elseif($fichajePendienteAnterior)
@@ -350,8 +351,8 @@
                 </div>
             </div>
 
-            <!-- Fichajes History -->
-            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+        <!-- Fichajes History -->
+            <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                 <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span class="p-2 bg-amber-500/10 text-amber-600 rounded-lg">
@@ -488,9 +489,9 @@
                     </table>
                 </div>
                 </div>
+                </div>
             @endif
 
-            {-- PESTAÑA 2: VACACIONES Y PERMISOS --}
             @if($activeTab === 'vacaciones')
                 <div class="space-y-6">
                     <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
@@ -568,7 +569,7 @@
                 </div>
             @endif
 
-            {-- PESTAÑA 3: BAJAS MÉDICAS --}
+            
             @if($activeTab === 'bajas')
                 <div class="space-y-6">
                     <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
@@ -680,7 +681,7 @@
                 </div>
             @endif
 
-            {-- PESTAÑA 4: TITULACIONES Y FORMACIÓN --}
+            
             @if($activeTab === 'formacion')
                 <div class="space-y-6">
             <!-- Section: Mis Titulaciones y Formación Asignada -->
