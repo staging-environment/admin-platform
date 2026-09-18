@@ -1,4 +1,5 @@
 <x-filament-panels::page>
+    @php $activeTab = $activeTab ?? 'fichajes'; @endphp
     <div class="space-y-6">
         @if (session('status') === 'password-updated' || session('success'))
             <div class="p-4 sm:p-6 bg-emerald-500/10 border-2 border-emerald-500/40 rounded-2xl text-emerald-900 dark:text-emerald-200 flex items-start gap-4 shadow-sm">

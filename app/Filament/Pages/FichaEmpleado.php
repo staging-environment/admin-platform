@@ -38,6 +38,7 @@ class FichaEmpleado extends Page
     public $fichajePendienteAnterior = null;
     public $hora_salida_pendiente = null;
     public $recentFichajes;
+    public string $activeTab = 'fichajes';
 
     public $isViewingAdminList = false;
     public bool $isAdmin = false;
