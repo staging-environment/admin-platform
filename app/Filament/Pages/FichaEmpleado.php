@@ -100,7 +100,12 @@ class FichaEmpleado extends Page
         if (!$user) return false;
         
         return $user->can('acceder_portal_fichajes') 
+            || $user->can('ver_ficha_empleado')
+            || $user->can('gestion_recursos_humanos')
+            || $user->can('ver_listado_fichajes')
+            || $user->hasRole(['Administrador', 'admin', 'Admin', 'Gestor', 'gestor', 'CEO'])
             || $user->email === 'jarodriguezbonilla@gmail.com' 
+            || $user->email === 'utrecar@gmail.com'
             || $user->id === 1;
     }
 
@@ -133,8 +138,15 @@ class FichaEmpleado extends Page
     public function mount(): void
     {
         $user = auth()->user();
-        $isAdmin = $user->can('ver_ficha_empleado') || $user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
+        $isAdmin = $user->can('ver_ficha_empleado') 
+            || $user->can('gestion_recursos_humanos') 
+            || $user->can('ver_listado_fichajes')
+            || $user->hasRole(['Administrador', 'admin', 'Admin', 'Gestor', 'gestor', 'CEO'])
+            || $user->email === 'jarodriguezbonilla@gmail.com' 
+            || $user->email === 'utrecar@gmail.com'
+            || $user->id === 1;
         $this->isAdmin = $isAdmin;
+        $this->activeTab = request()->query('tab', 'fichajes');
 
         $empleadoId = request()->query('empleado_id');
 
@@ -142,6 +154,9 @@ class FichaEmpleado extends Page
             $this->empleado = Empleado::find($empleadoId);
         } else {
             $this->empleado = Empleado::where('email', $user->email)->first();
+            if (!$this->empleado && $isAdmin) {
+                $this->empleado = Empleado::find($empleadoId) ?: Empleado::first();
+            }
         }
 
         // Auto-create mock employee for admin users who also have the Empleado role (or are testing)

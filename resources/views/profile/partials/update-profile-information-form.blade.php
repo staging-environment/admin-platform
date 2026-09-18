@@ -1,98 +1,81 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+@php
+    $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+@endphp
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+<section>
+    <header class="mb-6">
+        <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Modificar Datos del Perfil
+        </h2>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Actualiza tu información personal, teléfono y contacto de emergencia.
         </p>
     </header>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
         @csrf
         @method('patch')
 
         @if (session('status') === 'profile-updated')
-            <div class="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-md text-sm font-medium">
-                ✅ La información de tu perfil se ha guardado correctamente.
+            <div class="p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-2">
+                <span>✅</span> La información de tu perfil se ha guardado correctamente.
             </div>
         @endif
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <x-input-label for="name" value="Nombre y Apellidos" />
+                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('name', $user->name)" required autocomplete="name" />
+                <x-input-error class="mt-1" :messages="$errors->get('name')" />
+            </div>
+
+            <div>
+                <x-input-label for="email" value="Correo Electrónico" />
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 bg-gray-50 dark:bg-gray-800/60" :value="old('email', $user->email)" required readonly />
+                <x-input-error class="mt-1" :messages="$errors->get('email')" />
+            </div>
+
+            <div>
+                <x-input-label for="telefono" value="Teléfono Móvil Principal" />
+                <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('telefono', $user->telefono ?: ($empleado->telefono_principal ?? ''))" autocomplete="tel" placeholder="Ej: 600123456" />
+                <x-input-error class="mt-1" :messages="$errors->get('telefono')" />
+            </div>
+
+            <div>
+                <x-input-label for="direccion" value="Dirección" />
+                <x-text-input id="direccion" name="direccion" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('direccion', $empleado->direccion ?? '')" placeholder="Calle, número, piso" />
+            </div>
+
+            <div>
+                <x-input-label for="localidad" value="Localidad" />
+                <x-text-input id="localidad" name="localidad" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('localidad', $empleado->localidad ?? '')" placeholder="Ej: Utrera" />
+            </div>
+
+            <div>
+                <x-input-label for="provincia" value="Provincia" />
+                <x-text-input id="provincia" name="provincia" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('provincia', $empleado->provincia ?? '')" placeholder="Ej: Sevilla" />
+            </div>
+
+            <div>
+                <x-input-label for="contacto_emergencia_nombre" value="Contacto de Emergencia (Nombre)" />
+                <x-text-input id="contacto_emergencia_nombre" name="contacto_emergencia_nombre" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('contacto_emergencia_nombre', $empleado->contacto_emergencia_nombre ?? '')" placeholder="Familiar o persona de contacto" />
+            </div>
+
+            <div>
+                <x-input-label for="contacto_emergencia_telefono" value="Contacto de Emergencia (Teléfono)" />
+                <x-text-input id="contacto_emergencia_telefono" name="contacto_emergencia_telefono" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('contacto_emergencia_telefono', $empleado->contacto_emergencia_telefono ?? '')" placeholder="Teléfono de emergencia" />
+            </div>
         </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
-        </div>
-
-        <div>
-            <x-input-label for="telefono" :value="__('Teléfono')" />
-            <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $user->telefono)" autocomplete="tel" />
-            <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
-
-            @can('recibir_notificaciones_competencia')
-                <div class="mt-4 mb-4">
-                    <x-input-label for="telegram_chat_id" :value="__('ID de Telegram')" />
-                    <x-text-input id="telegram_chat_id" name="telegram_chat_id" type="text" class="mt-1 block w-full bg-gray-100 text-gray-500 cursor-not-allowed" :value="$user->telegram_chat_id ?? 'No asociado'" disabled readonly />
-                </div>
-
-                <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm text-blue-900 space-y-2">
-                    <p class="font-semibold flex items-center gap-1">
-                        📢 Tienes activo el permiso para recibir alertas de competencia. Sigue estos pasos para configurar las alertas en tu móvil:
-                    </p>
-                    <ol class="list-decimal list-inside space-y-2 text-blue-800">
-                        <li><b>Instala la aplicación de Telegram</b> en tu móvil desde Google Play Store (Android) o App Store (iPhone) si aún no la tienes instalada.</li>
-                        <li>Escribe tu número de teléfono móvil en el campo superior y pulsa el botón <b>Save</b> (Guardar).</li>
-                        <li>Abre Telegram y busca el bot <b>@utrecar_alertas_bot</b> o pulsa directamente este enlace: <a href="https://t.me/utrecar_alertas_bot" target="_blank" class="underline font-semibold hover:text-blue-950">t.me/utrecar_alertas_bot</a>.</li>
-                        <li>Pulsa el botón <b>Iniciar</b> (Start) dentro del bot.</li>
-                        <li>Pulsa el botón <b>📱 Compartir Teléfono</b> que aparecerá abajo para verificar tu número.</li>
-                    </ol>
-                    <p class="text-xs text-blue-700 font-medium">
-                        El sistema validará tu contacto y asociará tu cuenta automáticamente para enviarte las alertas al instante.
-                    </p>
-            @endcan
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
+        {{-- BOTÓN DE GUARDAR ABAJO DEL TODO --}}
+        <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 dark:border-white/10">
+            <button type="button" @click="editMode = false" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-xl transition-all">
+                Cancelar
+            </button>
+            <button type="submit" class="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md shadow-amber-600/20 transition-all focus:outline-none">
+                Guardar Cambios
+            </button>
         </div>
     </form>
 </section>

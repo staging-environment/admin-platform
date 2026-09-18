@@ -120,10 +120,46 @@
                 </div>
             @endif
 
-            <!-- Fichaje Dashboard -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {{-- NAVEGACIÓN POR PESTAÑAS DEDICADAS DEL PORTAL DEL EMPLEADO --}}
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
+                <button type="button" 
+                        wire:click="$set('activeTab', 'fichajes')" 
+                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'fichajes' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Registro Horario y Fichajes</span>
+                </button>
+
+                <button type="button" 
+                        wire:click="$set('activeTab', 'vacaciones')" 
+                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'vacaciones' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/></svg>
+                    <span>Vacaciones y Permisos</span>
+                </button>
+
+                <button type="button" 
+                        wire:click="$set('activeTab', 'bajas')" 
+                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'bajas' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <span>Bajas Médicas</span>
+                </button>
+
+                <button type="button" 
+                        wire:click="$set('activeTab', 'formacion')" 
+                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'formacion' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                    <span>Mis Titulaciones y Formación</span>
+                </button>
+            </div>
+
+            {{-- PESTAÑA 1: FICHAJES Y REGISTRO HORARIO --}}
+            @if($activeTab === 'fichajes')
+                <div class="space-y-6">
+                    <!-- Fichaje Dashboard -->
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Check-in Card -->
-                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -137,7 +173,7 @@
                             <span class="text-xs text-gray-400">Registro de entrada</span>
                         </div>
 
-                        <div class="py-6 flex flex-col items-center justify-center min-h-[160px]">
+                        <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
                             @if($fichajePendienteAnterior)
                                 <div class="text-center space-y-3 max-w-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-5 rounded-2xl border border-amber-200 dark:border-amber-900/40">
                                     <svg class="w-10 h-10 mx-auto stroke-current text-amber-500" fill="none" viewBox="0 0 24 24">
@@ -154,7 +190,7 @@
                                         <span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
                                         Entrada Registrada
                                     </div>
-                                    <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
+                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkin_at ? $fichajeDelDia->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_entrada)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @else
@@ -200,7 +236,7 @@
                 </div>
 
                 <!-- Check-out Card -->
-                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
+                <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -214,14 +250,14 @@
                             <span class="text-xs text-gray-400">Registro de salida</span>
                         </div>
 
-                        <div class="py-6 flex flex-col items-center justify-center min-h-[160px]">
+                        <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
                             @if($fichajeDelDia && $fichajeDelDia->hora_salida)
                                 <div class="text-center space-y-2">
                                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold rounded-full text-sm border border-amber-200 dark:border-amber-900">
                                         <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
                                         Salida Registrada
                                     </div>
-                                    <h2 class="text-4xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
+                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at ? $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
                                 </div>
                             @elseif($fichajePendienteAnterior)
@@ -317,7 +353,7 @@
             </div>
 
             <!-- Fichajes History -->
-            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+            <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                 <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5 mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span class="p-2 bg-amber-500/10 text-amber-600 rounded-lg">
@@ -455,7 +491,15 @@
                 </div>
             </div>
 
-            @if(auth()->user()->can('solicitar_ver_vacaciones') || auth()->user()->can('solicitud_baja_enfermedad'))
+            
+                </div>
+            @endif
+
+            {{-- PESTAÑA 2: VACACIONES Y PERMISOS --}}
+            @if($activeTab === 'vacaciones')
+                <div class="space-y-6">
+                    <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <!-- Vacations card -->
                     @if(auth()->user()->can('solicitar_ver_vacaciones'))
@@ -525,7 +569,16 @@
                         </div>
                     @endif
 
-                    <!-- Absences/Sick leave card -->
+                    
+                    </div>
+                </div>
+            @endif
+
+            {{-- PESTAÑA 3: BAJAS MÉDICAS --}}
+            @if($activeTab === 'bajas')
+                <div class="space-y-6">
+                    <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
+<!-- Absences/Sick leave card -->
                     @if(auth()->user()->can('solicitud_baja_enfermedad'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                             <div>
@@ -631,7 +684,16 @@
             @endif
 
             
-            <!-- Section: Mis Titulaciones y Formación Asignada -->
+            
+                    </div>
+                </div>
+            @endif
+
+            {{-- PESTAÑA 4: TITULACIONES Y FORMACIÓN --}}
+            @if($activeTab === 'formacion')
+                <div class="space-y-6">
+                    <!-- Section: Mis Titulaciones y Formación Asignada -->
+
             <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm mt-6 space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
                     <div class="flex items-center gap-3">
@@ -852,7 +914,10 @@
                 </x-slot>
             </x-filament::modal>
 
-            <!-- solicitar-vacacion-modal -->
+            
+                </div>
+            @endif
+<!-- solicitar-vacacion-modal -->
             <x-filament::modal id="solicitar-vacacion-modal" width="md">
                 <x-slot name="heading">
                     Solicitar Vacaciones / Permiso

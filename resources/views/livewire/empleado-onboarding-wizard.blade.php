@@ -2,6 +2,16 @@
     modalRgpd: false,
     modalNormativa: false,
     modalPrl: false,
+    readRgpd: false,
+    readNormativa: false,
+    readPrl: false,
+    checkScroll(el, type) {
+        if (el.scrollHeight - el.scrollTop <= el.clientHeight + 25) {
+            if (type === 'rgpd') this.readRgpd = true;
+            if (type === 'normativa') this.readNormativa = true;
+            if (type === 'prl') this.readPrl = true;
+        }
+    }
 }">
 
     <!-- Top Branding Header -->
@@ -595,14 +605,37 @@
                     </h3>
                     <button type="button" @click="modalRgpd = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                    <p><strong>Responsable:</strong> UTRECAR S.L. / ACTIVE NETWORK</p>
-                    <p><strong>Finalidad:</strong> Gestión laboral, control horario de jornada (Art. 34.9 ET), prevención de riesgos laborales y confección de nóminas.</p>
-                    <p><strong>Legitimación:</strong> Cumplimiento de obligación legal y ejecución del contrato laboral.</p>
-                    <p>El trabajador puede ejercer sus derechos de acceso, rectificación, supresión y limitación comunicándolo al departamento de Recursos Humanos.</p>
+                <div @scroll="checkScroll($el, 'rgpd')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readRgpd = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                    <p><strong>Responsable del Tratamiento:</strong> UTRECAR S.L. / ACTIVE NETWORK (C.I.F. B-41710000), con domicilio social en Ctra. Écija-Jerez, Km 11, Utrera (Sevilla).</p>
+                    <p><strong>Finalidad del Tratamiento:</strong> En cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que sus datos serán tratados exclusivamente para:
+                    <ul class="list-disc pl-5 space-y-1 mt-1">
+                        <li>Gestión y mantenimiento de la relación laboral y contractual.</li>
+                        <li>Registro diario obligatorio de la jornada de trabajo y control horario (Art. 34.9 Estatuto de los Trabajadores).</li>
+                        <li>Confección y abono de nóminas, cotizaciones a la Seguridad Social y retenciones tributarias.</li>
+                        <li>Gestión de la prevención de riesgos laborales y vigilancia de la salud laboral.</li>
+                    </ul>
+                    </p>
+                    <p><strong>Legitimación:</strong> Cumplimiento de obligaciones legales aplicables, ejecución del contrato de trabajo e interés legítimo empresarial.</p>
+                    <p><strong>Destinatarios:</strong> Sus datos únicamente se comunicarán a organismos públicos oficiales (Seguridad Social, Agencia Tributaria, Ministerio de Trabajo) y entidades bancarias para el abono de salarios.</p>
+                    <p><strong>Derechos del Trabajador:</strong> Puede ejercitar sus derechos de acceso, rectificación, supresión, limitación del tratamiento y portabilidad dirigiéndose por escrito al departamento de Recursos Humanos o a través del canal oficial de la empresa.</p>
+                    <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
+                        📜 Fin del documento de Protección de Datos. Al hacer clic en aceptar, confirma haber leído y comprendido íntegramente estas cláusulas.
+                    </div>
                 </div>
-                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
-                    <button type="button" @click="modalRgpd = false; $wire.set('acepta_rgpd', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                        <span x-show="!readRgpd" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                        </span>
+                        <span x-show="readRgpd" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
+                            ✓ Documento completado
+                        </span>
+                    </div>
+                    <button type="button" 
+                            x-bind:disabled="!readRgpd"
+                            @click="modalRgpd = false; $wire.set('acepta_rgpd', true)" 
+                            x-bind:class="readRgpd ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
                         He leído y Acepto el RGPD
                     </button>
                 </div>
@@ -620,14 +653,30 @@
                     </h3>
                     <button type="button" @click="modalNormativa = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                    <p><strong>1. Registro de Jornada:</strong> Es obligatorio e intransferible registrar entrada y salida en cada turno.</p>
-                    <p><strong>2. Credenciales Personales:</strong> Las claves de acceso son individuales y no deben compartirse.</p>
-                    <p><strong>3. Instalaciones:</strong> Uso diligente de terminales, TPVs, surtidores y material de trabajo.</p>
-                    <p><strong>4. Comunicación:</strong> Notificar con la antelación debida cualquier incidencia o ausencia al responsable.</p>
+                <div @scroll="checkScroll($el, 'normativa')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readNormativa = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                    <p><strong>1. Obligatoriedad del Registro de Jornada:</strong> Cada empleado es responsable único e intransferible de realizar el fichaje de entrada y de salida puntual en cada turno laboral a través de los canales autorizados (Portal Web corporativo o terminales en estación).</p>
+                    <p><strong>2. Credenciales y Acceso:</strong> Las credenciales y contraseñas de acceso al sistema informático son de uso estrictamente personal. Queda terminantemente prohibido ceder o compartir las claves de usuario con otros compañeros o terceras personas.</p>
+                    <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
+                    <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
+                    <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
+                    <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
+                        📜 Fin del Código de Conducta. Al hacer clic en aceptar, confirma haber leído y aceptado las normas laborales de la empresa.
+                    </div>
                 </div>
-                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
-                    <button type="button" @click="modalNormativa = false; $wire.set('acepta_normativa', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                        <span x-show="!readNormativa" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                        </span>
+                        <span x-show="readNormativa" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
+                            ✓ Documento completado
+                        </span>
+                    </div>
+                    <button type="button" 
+                            x-bind:disabled="!readNormativa"
+                            @click="modalNormativa = false; $wire.set('acepta_normativa', true)" 
+                            x-bind:class="readNormativa ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
                         He leído y Acepto la Normativa Interna
                     </button>
                 </div>
@@ -645,13 +694,29 @@
                     </h3>
                     <button type="button" @click="modalPrl = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                    <p><strong>1. EPIs Obligatorios:</strong> Uso adecuado de calzado de seguridad, guantes y ropa de trabajo reglamentaria.</p>
-                    <p><strong>2. Protocolos de Seguridad:</strong> Normas estrictas en manipulación de combustibles y prevención de incendios.</p>
-                    <p><strong>3. Notificación de Riesgos:</strong> Obligación de avisar inmediatamente ante cualquier anomalía o riesgo laboral.</p>
+                <div @scroll="checkScroll($el, 'prl')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readPrl = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                    <p><strong>1. Equipos de Protección Individual (EPIs):</strong> Es obligatorio el uso continuo de los EPIs reglamentarios suministrados por la empresa según el puesto (calzado de seguridad con puntera reforzada y suela antideslizante, chaleco reflectante de alta visibilidad, guantes de nitrilo para repostaje/limpieza y gafas protectoras).</p>
+                    <p><strong>2. Manipulación Segura de Combustibles:</strong> Cumplir rigurosamente con la prohibición absoluta de fumar, encender fuego o utilizar dispositivos móviles en la zona de pistas y surtidores (zonas ATEX clasificadas con riesgo de atmósfera explosiva).</p>
+                    <p><strong>3. Protocolo en caso de Emergencia o Derrame:</strong> Conocer la ubicación de los extintores, paradas de emergencia de los surtidores (setas de corte de corriente) y kit de absorción de derrames de hidrocarburos.</p>
+                    <p><strong>4. Ergonomía y Manejo Manual de Cargas:</strong> Aplicar las técnicas ergonómicas adecuadas para la elevación de cargas pesadas en tienda y almacén (flexionar rodillas y mantener la espalda recta).</p>
+                    <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
+                        📜 Fin del Protocolo de Seguridad y PRL. Al hacer clic en aceptar, certifica haber recibido y comprendido las normas de prevención.
+                    </div>
                 </div>
-                <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
-                    <button type="button" @click="modalPrl = false; $wire.set('acepta_prl', true)" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                        <span x-show="!readPrl" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                        </span>
+                        <span x-show="readPrl" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
+                            ✓ Documento completado
+                        </span>
+                    </div>
+                    <button type="button" 
+                            x-bind:disabled="!readPrl"
+                            @click="modalPrl = false; $wire.set('acepta_prl', true)" 
+                            x-bind:class="readPrl ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
                         He leído y Acepto las Normas de PRL
                     </button>
                 </div>

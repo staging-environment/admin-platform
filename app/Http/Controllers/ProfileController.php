@@ -35,8 +35,21 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Si es un empleado y aún tiene el proceso de onboarding pendiente, redirigir al asistente
+        // Sincronizar datos con el modelo Empleado si existe
         $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        if ($empleado) {
+            $empleado->update([
+                'telefono_principal' => $request->input('telefono', $empleado->telefono_principal),
+                'direccion' => $request->input('direccion', $empleado->direccion),
+                'localidad' => $request->input('localidad', $empleado->localidad),
+                'provincia' => $request->input('provincia', $empleado->provincia),
+                'codigo_postal' => $request->input('codigo_postal', $empleado->codigo_postal),
+                'contacto_emergencia_nombre' => $request->input('contacto_emergencia_nombre', $empleado->contacto_emergencia_nombre),
+                'contacto_emergencia_telefono' => $request->input('contacto_emergencia_telefono', $empleado->contacto_emergencia_telefono),
+            ]);
+        }
+
+        // Si es un empleado y aún tiene el proceso de onboarding pendiente, redirigir al asistente
         if ($empleado && !$empleado->onboarding_completado) {
             session()->flash('info', 'Perfil actualizado. Por favor, continúa con tu proceso de incorporación (onboarding).');
             return redirect()->route('empleado.onboarding');

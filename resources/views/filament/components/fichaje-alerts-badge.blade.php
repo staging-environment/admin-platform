@@ -67,9 +67,14 @@
                         @foreach ($alertas as $alerta)
                             <div class="p-3.5 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30 rounded-xl text-sm">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
-                                        {{ $alerta->titulo }}
-                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
+                                            {{ $alerta->titulo }}
+                                        </span>
+                                        <span class="text-xs font-bold text-gray-600 dark:text-gray-300 bg-white/80 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-200 dark:border-gray-700">
+                                            📅 {{ \Carbon\Carbon::parse($alerta->fecha ?? $fichaje->fecha)->format('d/m/Y') }}
+                                        </span>
+                                    </div>
                                     <span class="text-xs font-extrabold text-red-600 dark:text-red-400">
                                         +{{ $alerta->diferencia_minutos }} min diferencia
                                     </span>
@@ -84,9 +89,6 @@
                                         <span class="font-mono font-bold text-red-600 dark:text-red-400 text-sm">{{ $alerta->hora_servidor }}</span>
                                     </div>
                                 </div>
-                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-2 italic">
-                                    Existe una diferencia de más de 5 minutos entre lo introducido por el empleado y el registro automático en el servidor.
-                                </p>
                             </div>
                         @endforeach
                     </div>

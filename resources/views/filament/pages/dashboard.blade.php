@@ -139,7 +139,7 @@
     <div class="space-y-3.5" wire:poll.30s="loadData">
 
         {{-- BLOQUE BOT MITECO: Oculto temporalmente a petición del usuario. Para restaurar, retirar 'false && ' --}}
-        @if(false && auth()->user() && (auth()->user()->can('ver_dashboard') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
+        @if(auth()->user() && (auth()->user()->can('ver_dashboard') || auth()->user()->id === 1 || auth()->user()->email === 'jarodriguezbonilla@gmail.com'))
             <section class="rounded-xl px-4 py-2.5 shadow-md border" 
                      style="background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%); border-color: rgba(99, 102, 241, 0.15); position: relative; overflow: hidden;">
                 
