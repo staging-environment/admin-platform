@@ -271,9 +271,9 @@ class FichaEmpleado extends Page
             ->first();
 
         $this->recentFichajes = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+            ->where('fecha', '>=', Carbon::today()->subDays(6)->format('Y-m-d'))
             ->orderBy('fecha', 'desc')
             ->orderBy('hora_entrada', 'desc')
-            ->limit(30)
             ->get();
 
         $this->checkMissingCheckIns();

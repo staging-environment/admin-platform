@@ -121,9 +121,6 @@
                 </div>
             @endif
 
-            <!-- Fichaje Dashboard -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Check-in Card -->
 
             {{-- NAVEGACIÓN POR PESTAÑAS DEDICADAS DEL PORTAL DEL EMPLEADO --}}
             <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
@@ -159,6 +156,7 @@
             {-- PESTAÑA 1: FICHAJES Y REGISTRO HORARIO --}
             @if($activeTab === 'fichajes')
                 <div class="space-y-6">
+                <!-- Check-in Card -->
                 <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
@@ -361,7 +359,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </span>
-                        Historial de Fichajes (Últimos 30 días)
+                        Historial de Fichajes (Últimos 7 días)
                     </h3>
                     <button type="button" wire:click="abrirFichajeRetroactivoNuevaFecha" style="background-color: #d97706; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-amber-750 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,15 +480,13 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                        Aún no has registrado ningún fichaje.
+                                        Aún no has registrado ningún fichaje en los últimos 7 días.
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-            </div>
-
                 </div>
             @endif
 
@@ -568,7 +564,6 @@
                         </div>
                     @endif
 
-                    <!-- Absences/Sick leave card -->
                     </div>
                 </div>
             @endif
@@ -681,7 +676,6 @@
                 </div>
             @endif
 
-            
                     </div>
                 </div>
             @endif
