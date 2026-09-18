@@ -21,15 +21,18 @@ class FichaEmpleado extends Page
     protected static ?string $navigationLabel = 'Portal de Empleado';
     protected static ?string $title = 'Portal de Empleado';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Recursos humanos';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     public function getBreadcrumbs(): array
     {
         return [
-            'Recursos humanos',
             'Portal de Empleado',
         ];
     }
+
+    protected $queryString = [
+        'activeTab' => ['except' => 'fichajes', 'as' => 'tab'],
+    ];
 
     protected string $view = 'filament.pages.ficha-empleado';
 

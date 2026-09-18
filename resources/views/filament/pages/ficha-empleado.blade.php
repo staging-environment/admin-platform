@@ -131,19 +131,23 @@
                     <span>Registro Horario y Fichajes</span>
                 </button>
 
+                @if(auth()->user()?->can('solicitar_ver_vacaciones') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
                 <button type="button"
                         wire:click="$set('activeTab', 'vacaciones')"
                         class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'vacaciones' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/></svg>
                     <span>Vacaciones y Permisos</span>
                 </button>
+                @endif
 
+                @if(auth()->user()?->can('solicitud_baja_enfermedad') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
                 <button type="button"
                         wire:click="$set('activeTab', 'bajas')"
                         class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'bajas' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                     <span>Bajas Médicas</span>
                 </button>
+                @endif
 
                 <button type="button"
                         wire:click="$set('activeTab', 'formacion')"

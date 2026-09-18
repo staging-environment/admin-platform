@@ -47,7 +47,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()?->canAny(['gestion_recursos_humanos', 'acceder_portal_fichajes']))
+                    @if(auth()->user()?->can('gestion_recursos_humanos'))
                         <div class="inline-flex items-center h-full">
                             <x-dropdown align="left" width="w-64">
                                 <x-slot name="trigger">
@@ -117,6 +117,26 @@
                                 </x-slot>
                             </x-dropdown>
                         </div>
+                    @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+                        <x-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
+                            {{ __('Registro de entradas y fichajes') }}
+                        </x-nav-link>
+
+                        @if(auth()->user()?->can('solicitar_ver_vacaciones'))
+                        <x-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
+                            {{ __('Vacaciones y Permisos') }}
+                        </x-nav-link>
+                        @endif
+
+                        @if(auth()->user()?->can('solicitud_baja_enfermedad'))
+                        <x-nav-link href="/admin/portal-empleado?tab=bajas" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'bajas'">
+                            {{ __('Bajas Médicas') }}
+                        </x-nav-link>
+                        @endif
+
+                        <x-nav-link href="/admin/portal-empleado?tab=formacion" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'formacion'">
+                            {{ __('Mis Titulaciones y Formación') }}
+                        </x-nav-link>
                     @endif
 
                     @if(auth()->user()?->can('utilizar_explorador'))
@@ -250,7 +270,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()?->canAny(['gestion_recursos_humanos', 'acceder_portal_fichajes']))
+            @if(auth()->user()?->can('gestion_recursos_humanos'))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Recursos humanos') }}
@@ -298,6 +318,33 @@
                             </div>
                         </div>
                         @endif
+                    </div>
+                </div>
+            @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+                <div class="pt-4 pb-2 border-t border-gray-200">
+                    <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
+                        {{ __('Portal del Empleado') }}
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <x-responsive-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
+                            {{ __('Registro de entradas y fichajes') }}
+                        </x-responsive-nav-link>
+
+                        @if(auth()->user()?->can('solicitar_ver_vacaciones'))
+                        <x-responsive-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
+                            {{ __('Vacaciones y Permisos') }}
+                        </x-responsive-nav-link>
+                        @endif
+
+                        @if(auth()->user()?->can('solicitud_baja_enfermedad'))
+                        <x-responsive-nav-link href="/admin/portal-empleado?tab=bajas" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'bajas'">
+                            {{ __('Bajas Médicas') }}
+                        </x-responsive-nav-link>
+                        @endif
+
+                        <x-responsive-nav-link href="/admin/portal-empleado?tab=formacion" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'formacion'">
+                            {{ __('Mis Titulaciones y Formación') }}
+                        </x-responsive-nav-link>
                     </div>
                 </div>
             @endif
