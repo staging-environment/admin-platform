@@ -1076,7 +1076,6 @@
                     </div>
                 </form>
             </x-filament::modal>
-        @endif
 
         <!-- Floating Modal for Solicitud Details (for employees) -->
         @if($selectedSolicitud)
