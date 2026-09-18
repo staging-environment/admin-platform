@@ -123,39 +123,7 @@
 
 
 
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200/80 dark:border-white/10 select-none no-scrollbar">
-                <button type="button"
-                        wire:click="$set('activeTab', 'fichajes')"
-                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'fichajes' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Registro Horario y Fichajes</span>
-                </button>
 
-                @if(auth()->user()?->can('solicitar_ver_vacaciones') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
-                <button type="button"
-                        wire:click="$set('activeTab', 'vacaciones')"
-                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'vacaciones' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/></svg>
-                    <span>Vacaciones y Permisos</span>
-                </button>
-                @endif
-
-                @if(auth()->user()?->can('solicitud_baja_enfermedad') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
-                <button type="button"
-                        wire:click="$set('activeTab', 'bajas')"
-                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'bajas' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                    <span>Bajas Médicas</span>
-                </button>
-                @endif
-
-                <button type="button"
-                        wire:click="$set('activeTab', 'formacion')"
-                        class="px-4 py-2.5 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 {{ $activeTab === 'formacion' ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-white/5' }}">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                    <span>Mis Titulaciones y Formación</span>
-                </button>
-            </div>
 
             @if($activeTab === 'fichajes')
                 <div class="space-y-6">
