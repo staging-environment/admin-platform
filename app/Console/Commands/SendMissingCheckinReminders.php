@@ -74,6 +74,18 @@ class SendMissingCheckinReminders extends Command
                 continue;
             }
 
+            // 0a. Check if employee is in BAJA
+            if (isset($empleado->estado) && strcasecmp($empleado->estado, 'Baja') === 0) {
+                $this->info("Employee {$empleado->nombre} {$empleado->apellidos} is in BAJA. Skipping.");
+                continue;
+            }
+
+            // 0b. Check if employee has not completed or verified onboarding
+            if (!$empleado->onboarding_completado || !$empleado->onboarding_verificado_por_admin) {
+                $this->info("Employee {$empleado->nombre} {$empleado->apellidos} has pending/unverified onboarding. Skipping.");
+                continue;
+            }
+
             // 1. Check if approved vacation covers this date
             $hasVacacion = EmpleadoVacacion::where('empleado_id', $empleado->id)
                 ->where('estado', 'Aceptada')
