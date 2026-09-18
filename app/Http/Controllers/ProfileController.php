@@ -26,13 +26,21 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        // Si es un empleado y aún tiene el proceso de onboarding pendiente, redirigir al asistente
+        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        if ($empleado && !$empleado->onboarding_completado) {
+            session()->flash('info', 'Perfil actualizado. Por favor, continúa con tu proceso de incorporación (onboarding).');
+            return redirect()->route('empleado.onboarding');
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

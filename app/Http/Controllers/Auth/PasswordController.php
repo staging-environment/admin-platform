@@ -79,6 +79,12 @@ class PasswordController extends Controller
             return redirect('/admin/recursos-humanos');
         }
 
+        // Si es un empleado con onboarding pendiente, redirigir al proceso de onboarding
+        if ($empleado && !$empleado->onboarding_completado) {
+            session()->flash('info', 'Contraseña actualizada. Por favor, continúa con los pasos de tu incorporación.');
+            return redirect()->route('empleado.onboarding');
+        }
+
         return redirect('/admin/portal-empleado');
     }
 }

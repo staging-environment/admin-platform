@@ -127,6 +127,9 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
                         'provincia' => 'Sevilla',
                         'telefono_principal' => $user->telefono ?: '600000000',
                         'email' => $user->email,
+                        'onboarding_completado' => false,
+                        'onboarding_verificado_por_admin' => false,
+                        'onboarding_paso_actual' => 1,
                     ]);
                 } else if ($empleado->trashed()) {
                     $empleado->restore();
