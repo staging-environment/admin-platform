@@ -142,10 +142,12 @@ class SendMissingCheckinReminders extends Command
                             $formattedDate
                         ));
                         $this->info("Notified admin {$admin->email} about incomplete check-in for {$empleado->nombre}.");
+                        usleep(300000); // 300ms pause to respect SMTP rate limits
                     } catch (\Exception $e) {
                         $this->error("Failed to send email to admin {$admin->email}: " . $e->getMessage());
                     }
                 }
+                usleep(300000);
             } else {
                 $this->info("Employee {$empleado->nombre} has fully completed check-in control.");
             }
