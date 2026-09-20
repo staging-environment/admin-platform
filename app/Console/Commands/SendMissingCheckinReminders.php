@@ -33,6 +33,8 @@ class SendMissingCheckinReminders extends Command
      */
     public function handle()
     {
+        $this->info("El envio automatico de correos de fichajes incompletos ha sido desactivado.");
+        return 0;
         $this->info("Starting checks for missing check-ins...");
 
         // Determine the target date: last weekday

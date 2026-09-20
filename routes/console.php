@@ -25,7 +25,8 @@ Schedule::job(new \App\Jobs\UploadPricesToMitecoJob)->everyFiveMinutes();
 
 // ── Alerta de Fichajes Faltantes (Comprobación diaria) ────────────────────────
 // Envía un correo a los empleados que no completaron sus registros de entrada/salida.
-Schedule::command('fichajes:send-missing-reminders')->dailyAt('21:00');
+// Desactivado por peticion de Alfonso / Direccion
+// Schedule::command('fichajes:send-missing-reminders')->dailyAt('21:00');
 
 
 
