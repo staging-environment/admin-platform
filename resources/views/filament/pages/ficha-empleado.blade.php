@@ -465,189 +465,175 @@
 
             @if($activeTab === 'vacaciones')
                 <div class="space-y-6">
-                    <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
-            @if(auth()->user()->can('solicitar_ver_vacaciones') || auth()->user()->can('solicitud_baja_enfermedad'))
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <!-- Vacations card -->
                     @if(auth()->user()->can('solicitar_ver_vacaciones'))
-                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
-                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <span class="p-2 bg-sky-500/10 text-sky-600 rounded-lg">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                        </span>
-                                        Vacaciones / Permisos
-                                    </h3>
-                                    <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-vacacion-modal' })" style="background-color: #0284c7; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-sky-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                        Solicitar
-                                    </button>
-                                </div>
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <span class="p-2 bg-sky-500/10 text-sky-600 rounded-lg">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </span>
+                                    Vacaciones / Permisos
+                                </h3>
+                                <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-vacacion-modal' })" style="background-color: #0284c7; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-sky-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                    Solicitar
+                                </button>
+                            </div>
 
-                                <div class="py-4 max-h-[250px] overflow-y-auto space-y-3">
-                                    @forelse($vacaciones as $v)
-                                        <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-                                            <div>
-                                                <div class="flex items-center gap-2">
-                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $v->tipo }}</span>
-                                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
-                                                        {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
-                                                        {{ in_array($v->estado, ['Rechazada', 'Denegada']) ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
-                                                        {{ $v->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
-                                                    ">
-                                                        {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente') }}
-                                                    </span>
-                                                </div>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
-                                                </p>
-                                                @if(in_array($v->estado, ['Rechazada', 'Denegada']) && $v->comentario_aprobador)
-                                                    <p class="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium italic">
-                                                        Motivo: {{ $v->comentario_aprobador }}
-                                                    </p>
-                                                @endif
-                                            </div>
+                            <div class="py-4 space-y-3">
+                                @forelse($vacaciones as $v)
+                                    <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                        <div>
                                             <div class="flex items-center gap-2">
-                                                <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
-                                                <button type="button" wire:click="verDetallesSolicitud({{ $v->id }}, 'vacacion')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                                <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $v->tipo }}</span>
+                                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                                                    {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
+                                                    {{ in_array($v->estado, ['Rechazada', 'Denegada']) ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
+                                                    {{ $v->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
+                                                ">
+                                                    {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'Aprobada' : (in_array($v->estado, ['Rechazada', 'Denegada']) ? 'Denegada' : 'Pendiente') }}
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
+                                            </p>
+                                            @if(in_array($v->estado, ['Rechazada', 'Denegada']) && $v->comentario_aprobador)
+                                                <p class="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium italic">
+                                                    Motivo: {{ $v->comentario_aprobador }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black text-sky-600 dark:text-sky-400 mr-2">{{ $v->dias_solicitados }} {{ $v->dias_solicitados == 1 ? 'día' : 'días' }}</span>
+                                            <button type="button" wire:click="verDetallesSolicitud({{ $v->id }}, 'vacacion')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                            </button>
+                                            @if($v->estado === 'Pendiente')
+                                                <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
                                                 </button>
-                                                @if($v->estado === 'Pendiente')
-                                                    <button type="button" wire:click="deleteVacacion({{ $v->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de vacaciones?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Solicitud">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                            </div>
+                                            @endif
                                         </div>
-                                    @empty
-                                        <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                                            No tienes solicitudes de vacaciones registradas.
-                                        </div>
-                                    @endforelse
-                                </div>
+                                    </div>
+                                @empty
+                                    <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
+                                        No tienes solicitudes de vacaciones registradas.
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
                     @endif
-
-                    </div>
-                </div>
-            @endif
                 </div>
             @endif
 
             
             @if($activeTab === 'bajas')
                 <div class="space-y-6">
-                    <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                     @if(auth()->user()->can('solicitud_baja_enfermedad'))
-                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
-                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <span class="p-2 bg-rose-500/10 text-rose-600 rounded-lg">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                            </svg>
-                                        </span>
-                                        Bajas Médicas
-                                    </h3>
-                                    @php
-                                        $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas médicas' && empty($a->fecha_fin));
-                                    @endphp
-                                    @if($activeBaja)
-                                        <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                            Registrar Alta
-                                        </button>
-                                    @else
-                                        <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-baja-modal' })" style="background-color: #e11d48; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            Registrar Baja
-                                        </button>
-                                    @endif
-                                </div>
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <span class="p-2 bg-rose-500/10 text-rose-600 rounded-lg">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                        </svg>
+                                    </span>
+                                    Bajas Médicas
+                                </h3>
+                                @php
+                                    $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas médicas' && empty($a->fecha_fin));
+                                @endphp
+                                @if($activeBaja)
+                                    <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Registrar Alta
+                                    </button>
+                                @else
+                                    <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-baja-modal' })" style="background-color: #e11d48; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-rose-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Registrar Baja
+                                    </button>
+                                @endif
+                            </div>
 
-                                <div class="py-4 max-h-[250px] overflow-y-auto space-y-3">
-                                    @forelse($ausencias as $a)
-                                        <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-                                            <div>
-                                                <div class="flex items-center gap-2">
-                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $a->tipo }}</span>
-                                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
-                                                        {{ $a->estado === 'Aceptada' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
-                                                        {{ $a->estado === 'Rechazada' ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
-                                                        {{ $a->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
-                                                    ">
-                                                        {{ $a->estado ?? 'Pendiente' }}
-                                                    </span>
-                                                </div>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    Inicio: {{ \Carbon\Carbon::parse($a->fecha_inicio)->format('d/m/Y') }}
-                                                    @if($a->fecha_fin)
-                                                        | Fin: {{ \Carbon\Carbon::parse($a->fecha_fin)->format('d/m/Y') }}
-                                                    @else
-                                                        | <span class="text-rose-600 dark:text-rose-400 font-bold">Activa</span>
-                                                    @endif
-                                                </p>
+                            <div class="py-4 space-y-3">
+                                @forelse($ausencias as $a)
+                                    <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $a->tipo }}</span>
+                                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
+                                                    {{ $a->estado === 'Aceptada' ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
+                                                    {{ $a->estado === 'Rechazada' ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
+                                                    {{ $a->estado === 'Pendiente' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400' : '' }}
+                                                ">
+                                                    {{ $a->estado ?? 'Pendiente' }}
+                                                </span>
                                             </div>
-                                            <div class="flex items-center gap-3">
-                                                @if($a->justificante_path)
-                                                    <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                                        </svg>
-                                                        Justificante Baja
-                                                    </a>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Inicio: {{ \Carbon\Carbon::parse($a->fecha_inicio)->format('d/m/Y') }}
+                                                @if($a->fecha_fin)
+                                                    | Fin: {{ \Carbon\Carbon::parse($a->fecha_fin)->format('d/m/Y') }}
+                                                @else
+                                                    | <span class="text-rose-600 dark:text-rose-400 font-bold">Activa</span>
                                                 @endif
-                                                @if($a->justificante_alta_path)
-                                                    <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_alta_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                                        </svg>
-                                                        Justificante Alta
-                                                    </a>
-                                                @endif
-                                                @if(empty($a->fecha_fin))
-                                                    <button type="button" wire:click="abrirRegistrarAlta({{ $a->id }})" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                                        Registrar Alta
-                                                    </button>
-                                                @endif
-                                                <button type="button" wire:click="verDetallesSolicitud({{ $a->id }}, 'baja')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            @if($a->justificante_path)
+                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    Justificante Baja
+                                                </a>
+                                            @endif
+                                            @if($a->justificante_alta_path)
+                                                <a href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $a->justificante_alta_path]) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                                    </svg>
+                                                    Justificante Alta
+                                                </a>
+                                            @endif
+                                            @if(empty($a->fecha_fin))
+                                                <button type="button" wire:click="abrirRegistrarAlta({{ $a->id }})" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
+                                                    Registrar Alta
+                                                </button>
+                                            @endif
+                                            <button type="button" wire:click="verDetallesSolicitud({{ $a->id }}, 'baja')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                            </button>
+                                            @if(($a->estado ?? 'Pendiente') === 'Pendiente')
+                                                <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de baja médica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
                                                 </button>
-                                                @if(($a->estado ?? 'Pendiente') === 'Pendiente')
-                                                    <button type="button" wire:click="deleteAusencia({{ $a->id }})" wire:confirm="¿Estás seguro de que deseas cancelar esta solicitud de baja médica?" class="text-red-500 hover:text-red-700 transition-colors p-1" title="Cancelar Baja">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                            </div>
+                                            @endif
                                         </div>
-                                    @empty
-                                        <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
-                                            No tienes solicitudes de baja médica registradas.
-                                        </div>
-                                    @endforelse
-                                </div>
+                                    </div>
+                                @empty
+                                    <div class="py-8 text-center text-xs text-gray-500 dark:text-gray-400">
+                                        No tienes solicitudes de baja médica registradas.
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
                     @endif
-                </div>
                 </div>
             @endif
 
@@ -655,7 +641,7 @@
             @if($activeTab === 'formacion')
                 <div class="space-y-6">
             <!-- Section: Mis Titulaciones y Formación Asignada -->
-            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm mt-6 space-y-6">
+            <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
                     <div class="flex items-center gap-3">
                         <span class="p-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-2xl">
