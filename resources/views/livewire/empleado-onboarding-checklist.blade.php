@@ -1,3 +1,4 @@
+<div>
 @php
     $user = auth()->user();
     $isAdmin = $user && ($user->id === 1 || $user->email === 'jarodriguezbonilla@gmail.com' || $user->hasRole(['Admin', 'admin', 'Administrador', 'Superadmin']) || $user->can('gestion_recursos_humanos'));
@@ -85,3 +86,5 @@
 
 </div>
 @endif
+
+</div>

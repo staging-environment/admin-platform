@@ -53,18 +53,6 @@
                 </div>
             @endif
 
-            @php
-                $user = auth()->user();
-                $isAdmin = $user && ($user->id === 1 || $user->email === 'jarodriguezbonilla@gmail.com' || $user->hasRole(['Admin', 'admin', 'Administrador', 'Superadmin']) || $user->can('gestion_recursos_humanos'));
-                $isEmpleado = $user && $user->hasRole('Empleado');
-            @endphp
-
-            @if($empleado && !$isAdmin && $isEmpleado && !$empleado->onboarding_completado)
-                <div class="mb-6">
-                    @livewire('empleado-onboarding-checklist', ['empleadoId' => $empleado->id], key('onboarding-checklist-portal-'.$empleado->id))
-                </div>
-            @endif
-
 
             @if($fichajePendienteAnterior)
                 <!-- Alert Banner: Shift from previous day is unclosed -->
