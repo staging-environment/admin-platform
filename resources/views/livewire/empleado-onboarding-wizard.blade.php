@@ -29,9 +29,19 @@
                 </h1>
             </div>
         </div>
-        <div class="text-right z-10 hidden sm:block">
-            <span class="text-xs text-slate-400 block font-medium">Empleado/a:</span>
-            <span class="text-sm font-bold text-slate-200">{{ auth()->user()->name }}</span>
+        <div class="text-right z-10 flex flex-col sm:items-end gap-1">
+            <div class="hidden sm:block">
+                <span class="text-xs text-slate-400 block font-medium">Empleado/a:</span>
+                <span class="text-sm font-bold text-slate-200">{{ auth()->user()->name }}</span>
+            </div>
+            @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
+                <a href="{{ route('filament-impersonate.leave') }}" class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Desenmascarar</span>
+                </a>
+            @endif
         </div>
     </div>
 

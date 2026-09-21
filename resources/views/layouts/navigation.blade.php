@@ -209,6 +209,15 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
+                @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
+                    <a href="{{ route('filament-impersonate.leave') }}" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-lg shadow transition-all flex items-center gap-1.5 border border-amber-400 animate-pulse">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span>Desenmascarar</span>
+                    </a>
+                @endif
+
                 <a href="/" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow transition-all flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -230,6 +239,12 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
+                            <x-dropdown-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50 dark:bg-amber-950/20">
+                                {{ __('⚡ Salir de la suplantación') }}
+                            </x-dropdown-link>
+                        @endif
+
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -413,6 +428,12 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
+                    <x-responsive-nav-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50">
+                        {{ __('⚡ Salir de la suplantación') }}
+                    </x-responsive-nav-link>
+                @endif
+
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>

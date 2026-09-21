@@ -140,10 +140,28 @@ class EmpleadoOnboardingWizard extends Component
             'password' => Hash::make($this->new_password),
         ])->save();
 
+        // Preservar estado de suplantación si existe antes de re-autenticar
+        $impersonatorId = session('impersonated_by');
+        $impersonatorGuard = session('impersonator_guard');
+        $impersonatorGuardUsing = session('impersonator_guard_using');
+        $impersonateBackTo = session('impersonate.back_to');
+        $impersonateGuard = session('impersonate.guard');
+
         // Mantener sesión autenticada
         \Illuminate\Support\Facades\Auth::guard('web')->login($user);
         session()->put('password_hash_web', $user->getAuthPassword());
         session()->put('password_hash_' . \Illuminate\Support\Facades\Auth::getDefaultDriver(), $user->getAuthPassword());
+
+        // Restaurar estado de suplantación tras login()
+        if ($impersonatorId) {
+            session()->put('impersonated_by', $impersonatorId);
+            session()->put('impersonator_guard', $impersonatorGuard ?: 'web');
+            session()->put('impersonator_guard_using', $impersonatorGuardUsing ?: 'web');
+            session()->put('impersonate.back_to', $impersonateBackTo ?: '/admin/recursos-humanos');
+            if ($impersonateGuard) {
+                session()->put('impersonate.guard', $impersonateGuard);
+            }
+        }
 
         $this->paso = 3;
         $this->empleado->update([

@@ -58,6 +58,13 @@ class PasswordController extends Controller
             ]);
         }
 
+        // Preservar estado de suplantación si existe
+        $impersonatorId = $request->session()->get('impersonated_by');
+        $impersonatorGuard = $request->session()->get('impersonator_guard');
+        $impersonatorGuardUsing = $request->session()->get('impersonator_guard_using');
+        $impersonateBackTo = $request->session()->get('impersonate.back_to');
+        $impersonateGuard = $request->session()->get('impersonate.guard');
+
         // Mantener la sesión activa para evitar deslogueo por hash refresh
         \Illuminate\Support\Facades\Auth::guard('web')->login($user);
         $request->session()->put('password_hash_web', $user->getAuthPassword());
@@ -69,6 +76,17 @@ class PasswordController extends Controller
                 \Filament\Facades\Filament::auth()->login($user);
             } catch (\Throwable $e) {
                 // Ignore
+            }
+        }
+
+        // Restaurar estado de suplantación si estaba presente
+        if ($impersonatorId) {
+            $request->session()->put('impersonated_by', $impersonatorId);
+            $request->session()->put('impersonator_guard', $impersonatorGuard ?: 'web');
+            $request->session()->put('impersonator_guard_using', $impersonatorGuardUsing ?: 'web');
+            $request->session()->put('impersonate.back_to', $impersonateBackTo ?: '/admin/recursos-humanos');
+            if ($impersonateGuard) {
+                $request->session()->put('impersonate.guard', $impersonateGuard);
             }
         }
 
