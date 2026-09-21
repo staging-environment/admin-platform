@@ -12,9 +12,11 @@
   1. `git add` y `git commit` en la rama `pre`.
   2. `git push origin pre`.
   3. Despliegue automático en Preproducción (`pre.utrecar.com`):
-     `ssh developer@164.68.101.69 "cd /home/developer/Projects/pre-admin-platform && git pull origin pre && ddev exec php artisan migrate --force && ddev exec npm run build && ddev exec php artisan optimize:clear"`
+     `ssh utrecar-dev "cd /home/developer/Projects/pre-admin-platform && git pull origin pre && ddev exec php artisan migrate --force && ddev exec npm run build && ddev exec php artisan optimize:clear"`
 - **Solo cuando el usuario solicite explícitamente pasar a producción**:
-  1. Merge de `pre` hacia `main` y push a `origin main`.
-  2. Despliegue en Producción (`utrecar.com`):
-     `ssh developer@164.68.101.69 "cd /home/developer/Projects/admin-platform && git pull origin main && ddev exec php artisan migrate --force && ddev exec npm run build && ddev exec php artisan optimize:clear"`
-  3. Regresar a la rama `pre`.
+  1. **En la máquina virtual de producción** (`utrecar-dev` / `164.68.101.69`, carpeta `/home/developer/Projects/admin-platform`):
+     - Si hay cambios pendientes en producción, commitearlos en `main`.
+     - Mergear la rama `origin/pre` en `main`.
+     - Subir a `origin main`: `git push origin main`.
+     - Actualizar producción: `ddev exec php artisan migrate --force && ddev exec npm run build && ddev exec php artisan optimize:clear`.
+  2. Sincronizar repositorio local y ramas `main` y `pre`.
