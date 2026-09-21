@@ -539,6 +539,8 @@
                     </div>
                 </div>
             @endif
+                </div>
+            @endif
 
             
             @if($activeTab === 'bajas')
@@ -646,9 +648,6 @@
                         </div>
                     @endif
                 </div>
-            @endif
-
-                    </div>
                 </div>
             @endif
 
