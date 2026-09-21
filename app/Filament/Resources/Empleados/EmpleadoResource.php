@@ -61,10 +61,19 @@ class EmpleadoResource extends Resource
         return $schema
             ->columns(1)
             ->schema([
-                // BLOQUE 0: Control de Onboarding y Checklist de RRHH (Solo si está pendiente)
+                // BLOQUE 0: Control de Onboarding y Checklist (Solo visible para el usuario con rol empleado si no ha finalizado, nunca para admin)
                 \Filament\Infolists\Components\ViewEntry::make('onboarding_checklist')
                     ->columnSpanFull()
-                    ->visible(fn ($record) => !$record?->onboarding_verificado_por_admin)
+                    ->visible(function ($record) {
+                        $user = auth()->user();
+                        if (!$user) return false;
+                        // El usuario con rol admin / gestor de RRHH NO debe ver este checking
+                        if ($user->id === 1 || $user->email === 'jarodriguezbonilla@gmail.com' || $user->hasRole(['Admin', 'admin', 'Administrador', 'Superadmin']) || $user->can('gestion_recursos_humanos')) {
+                            return false;
+                        }
+                        // Solo debe verlo el usuario con rol empleado si no ha finalizado
+                        return $user->hasRole('Empleado') && !$record?->onboarding_completado;
+                    })
                     ->view('filament.components.empleado-onboarding-section'),
 
                 // BLOQUE 1: Datos Personales del Trabajador
