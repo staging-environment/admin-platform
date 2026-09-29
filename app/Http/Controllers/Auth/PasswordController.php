@@ -18,6 +18,9 @@ class PasswordController extends Controller
     {
         $user = $request->user();
         $isDefaultPassword = Hash::check('1234', $user->password);
+        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        $hasAcceptedPolicies = (bool) ($empleado && $empleado->politicas_aceptadas_at);
+        $necesitaNormativas = ($isDefaultPassword && !$hasAcceptedPolicies) || $request->has('check_normativas_present');
 
         $rules = [
             'current_password' => ['required', 'current_password'],
@@ -32,8 +35,8 @@ class PasswordController extends Controller
             'password.confirmed' => 'La confirmación de la nueva contraseña no coincide.',
         ];
 
-        // Si tiene la contraseña por defecto '1234' o se envían los checks normativos, exigir validación estricta
-        if ($isDefaultPassword || $request->has('check_normativas_present')) {
+        // Si necesita aceptar las normativas
+        if ($necesitaNormativas) {
             $rules['acepta_rgpd'] = ['accepted'];
             $rules['acepta_normativa'] = ['accepted'];
             $rules['acepta_prl'] = ['accepted'];
@@ -51,10 +54,10 @@ class PasswordController extends Controller
         ])->save();
 
         // Si es un empleado, registrar la fecha de aceptación de políticas
-        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
         if ($empleado) {
             $empleado->update([
                 'politicas_aceptadas_at' => Carbon::now(),
+                'onboarding_paso_actual' => max(3, (int) $empleado->onboarding_paso_actual),
             ]);
         }
 
@@ -93,16 +96,20 @@ class PasswordController extends Controller
         session()->flash('status', 'password-updated');
         session()->flash('success', '¡Contraseña actualizada y normativas aceptadas correctamente!');
 
-        if ($user->can('gestion_recursos_humanos') || $user->hasRole('Administrador') || $user->hasRole('Gestor')) {
-            return redirect('/admin/recursos-humanos');
+        if ($isDefaultPassword) {
+            if ($user->can('gestion_recursos_humanos') || $user->hasRole('Administrador') || $user->hasRole('Gestor')) {
+                return redirect('/admin/recursos-humanos');
+            }
+
+            // Si es un empleado con onboarding pendiente, redirigir al proceso de onboarding
+            if ($empleado && !$empleado->onboarding_completado) {
+                session()->flash('info', 'Contraseña actualizada y normativas aceptadas. Por favor, continúa con los pasos de tu incorporación.');
+                return redirect()->route('empleado.onboarding');
+            }
+
+            return redirect('/admin/portal-empleado');
         }
 
-        // Si es un empleado con onboarding pendiente, redirigir al proceso de onboarding
-        if ($empleado && !$empleado->onboarding_completado) {
-            session()->flash('info', 'Contraseña actualizada. Por favor, continúa con los pasos de tu incorporación.');
-            return redirect()->route('empleado.onboarding');
-        }
-
-        return redirect('/admin/portal-empleado');
+        return redirect('/profile');
     }
 }

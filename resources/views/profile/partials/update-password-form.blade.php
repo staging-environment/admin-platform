@@ -1,6 +1,6 @@
 @php
     $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower(auth()->user()->email)])->first();
-    $hasAcceptedPolicies = ($empleado && $empleado->politicas_aceptadas_at) || ($empleado && $empleado->onboarding_completado);
+    $hasAcceptedPolicies = (bool) ($empleado && $empleado->politicas_aceptadas_at);
     $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password);
     $necesitaNormativas = $isDefaultPassword && !$hasAcceptedPolicies;
 @endphp
@@ -114,6 +114,9 @@
                         Cumplimiento de RGPD y Normativas de Empresa (Obligatorio)
                     </h3>
                 </div>
+                <button type="button" @click="marcarTodas()" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 underline text-left sm:text-right cursor-pointer">
+                    Marcar todas las casillas
+                </button>
             </div>
 
             <div class="space-y-3">
