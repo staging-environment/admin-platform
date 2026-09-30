@@ -36,6 +36,7 @@ class EmpleadoResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
+            ->with(['alertas', 'ausencias', 'gasolinera'])
             ->whereHas('user', function ($query) {
                 $query->role('Empleado');
             });

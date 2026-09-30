@@ -28,7 +28,7 @@ class EmpleadosTable
                     ->disabledClick()
                     ->grow(false)
                     ->extraAttributes([
-                        'style' => 'width: 220px; max-width: 230px;',
+                        'style' => 'min-width: 170px; width: auto;',
                         'onclick' => 'event.stopPropagation()',
                     ])
                     ->searchable()
@@ -39,9 +39,39 @@ class EmpleadosTable
                     ->formatStateUsing(fn ($state) => mb_strtoupper(trim($state ?? '')))
                     ->weight(\Filament\Support\Enums\FontWeight::Bold)
                     ->grow(false)
-                    ->extraAttributes(['style' => 'width: 150px; max-width: 160px;'])
+                    ->extraAttributes(['style' => 'min-width: 130px; width: 140px;'])
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('estado_laboral')
+                    ->label('Estado')
+                    ->badge()
+                    ->state(function (\App\Models\Empleado $record): string {
+                        if ($record->estado === 'Baja') {
+                            return 'Baja en la empresa';
+                        }
+                        if ($record->isOnBajaMedica()) {
+                            return 'Baja médica';
+                        }
+                        return 'Alta';
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'Alta' => 'success',
+                        'Baja médica' => 'warning',
+                        'Baja en la empresa' => 'gray',
+                        default => 'gray',
+                    })
+                    ->icon(fn (string $state): string => match ($state) {
+                        'Alta' => 'heroicon-m-check-circle',
+                        'Baja médica' => 'heroicon-m-heart',
+                        'Baja en la empresa' => 'heroicon-m-no-symbol',
+                        default => null,
+                    })
+                    ->grow(false)
+                    ->extraAttributes(['style' => 'width: 160px; white-space: nowrap;'])
+                    ->sortable(query: function (\Illuminate\Database\Eloquent\Builder $query, string $direction): \Illuminate\Database\Eloquent\Builder {
+                        return $query->orderBy('estado', $direction);
+                    }),
 
                 TextColumn::make('telefono_principal')
                     ->label('Teléfono')
@@ -56,7 +86,7 @@ class EmpleadosTable
                     ->size('xs')
                     ->color('gray')
                     ->grow(false)
-                    ->extraAttributes(['style' => 'width: 150px; max-width: 160px;'])
+                    ->extraAttributes(['style' => 'width: 140px; max-width: 160px;'])
                     ->default('—'),
 
                 TextColumn::make('puesto')
@@ -64,7 +94,7 @@ class EmpleadosTable
                     ->size('xs')
                     ->color('gray')
                     ->grow(true)
-                    ->extraAttributes(['style' => 'min-width: 140px;'])
+                    ->extraAttributes(['style' => 'min-width: 130px;'])
                     ->default('—'),
             ])
             ->striped()

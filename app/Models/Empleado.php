@@ -217,6 +217,15 @@ class Empleado extends Model
         return false;
     }
 
+    public function isOnBajaMedica(): bool
+    {
+        if ($this->relationLoaded('ausencias')) {
+            return $this->ausencias->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->isNotEmpty();
+        }
+
+        return $this->ausencias()->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->exists();
+    }
+
     public function alertas()
     {
         return $this->hasMany(EmpleadoAlerta::class);
