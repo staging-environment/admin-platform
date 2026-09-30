@@ -15,7 +15,16 @@ class RolesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nombre')
+                    ->label('Nombre del rol')
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('email')
+                    ->label('Correo de notificación')
+                    ->icon('heroicon-m-envelope')
+                    ->copyable()
+                    ->placeholder('Sin correo asignado')
                     ->searchable()
                     ->sortable(),
             ])
@@ -23,7 +32,9 @@ class RolesTable
                 //
             ])
             ->actions([
+                EditAction::make()->iconButton(),
                 \Filament\Actions\DeleteAction::make()
+                    ->iconButton()
                     ->before(function (\Filament\Actions\DeleteAction $action, $record) {
                         $hasUsers = $record->users()->exists();
                         if ($hasUsers) {
@@ -33,7 +44,7 @@ class RolesTable
                                 ->body('Existen usuarios asignados a este rol. Debe cambiar el rol o eliminar a esos usuarios antes de poder borrar el rol.')
                                 ->send();
 
-                            $action->cancel();
+                            $ction->cancel();
                         }
                     })
             ])

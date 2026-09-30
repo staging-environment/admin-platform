@@ -18,6 +18,13 @@ class RoleForm
                     ->label('Nombre del rol')
                     ->required()
                     ->maxLength(255),
+
+                TextInput::make('email')
+                    ->label('Correo electrónico de notificación')
+                    ->email()
+                    ->placeholder('ejemplo@utrecar.com')
+                    ->helperText('Los avisos y notificaciones dirigidos a este rol se enviarán a esta dirección.')
+                    ->maxLength(255),
             ]);
     }
 }
