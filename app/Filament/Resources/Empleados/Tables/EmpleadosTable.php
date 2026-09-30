@@ -21,16 +21,22 @@ class EmpleadosTable
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([10, 20, 50, 100])
             ->columns([
-                \Filament\Tables\Columns\ViewColumn::make('apellidos')
-                    ->label('Apellidos')
-                    ->view('filament.tables.columns.nombre-con-alerta')
-                    ->alignStart()
+                \Filament\Tables\Columns\ViewColumn::make('alertas')
+                    ->label('Alertas')
+                    ->view('filament.tables.columns.alertas-column')
+                    ->alignCenter()
                     ->disabledClick()
                     ->grow(false)
                     ->extraAttributes([
-                        'style' => 'min-width: 180px;',
+                        'style' => 'width: 44px; min-width: 44px; text-align: center;',
                         'onclick' => 'event.stopPropagation()',
-                    ])
+                    ]),
+
+                TextColumn::make('apellidos')
+                    ->label('Apellidos')
+                    ->formatStateUsing(fn ($state) => mb_strtoupper(trim($state ?? '')))
+                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                    ->grow(false)
                     ->searchable()
                     ->sortable(),
 
@@ -39,7 +45,6 @@ class EmpleadosTable
                     ->formatStateUsing(fn ($state) => mb_strtoupper(trim($state ?? '')))
                     ->weight(\Filament\Support\Enums\FontWeight::Bold)
                     ->grow(false)
-                    ->extraAttributes(['style' => 'min-width: 130px;'])
                     ->searchable()
                     ->sortable(),
 
@@ -68,7 +73,7 @@ class EmpleadosTable
                         default => null,
                     })
                     ->grow(false)
-                    ->extraAttributes(['style' => 'min-width: 130px; white-space: nowrap;'])
+                    ->extraAttributes(['style' => 'white-space: nowrap;'])
                     ->sortable(query: function (\Illuminate\Database\Eloquent\Builder $query, string $direction): \Illuminate\Database\Eloquent\Builder {
                         return $query->orderBy('estado', $direction);
                     }),
@@ -78,7 +83,6 @@ class EmpleadosTable
                     ->size('xs')
                     ->color('gray')
                     ->grow(false)
-                    ->extraAttributes(['style' => 'width: 100px; min-width: 95px; white-space: nowrap;'])
                     ->default('—'),
 
                  TextColumn::make('gasolinera.Nombre')
@@ -86,7 +90,6 @@ class EmpleadosTable
                     ->size('xs')
                     ->color('gray')
                     ->grow(false)
-                    ->extraAttributes(['style' => 'min-width: 130px; max-width: 160px;'])
                     ->default('—'),
 
                 TextColumn::make('puesto')
@@ -94,7 +97,6 @@ class EmpleadosTable
                     ->size('xs')
                     ->color('gray')
                     ->grow(false)
-                    ->extraAttributes(['style' => 'min-width: 160px; padding-right: 1.5rem;'])
                     ->default('—'),
             ])
             ->striped()

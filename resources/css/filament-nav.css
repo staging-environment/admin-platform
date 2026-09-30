@@ -457,61 +457,73 @@ button.fi-topbar-trigger {
     width: 100% !important;
 }
 
-/* Columna 1: Apellidos (compacta, sin espacio en blanco excesivo) */
+/* Columna 1: Alertas (badge/icono centrado) */
 .fi-resource-recursos-humanos th:nth-child(1),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(1) {
-    width: 22% !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    width: 5% !important;
+    min-width: 44px !important;
+    text-align: center !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
 }
 
-/* Columna 2: Nombre */
+/* Columna 2: Apellidos (alineados perfectamente a la izquierda) */
 .fi-resource-recursos-humanos th:nth-child(2),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(2) {
-    width: 14% !important;
+    width: 20% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    text-align: left !important;
 }
 
-/* Columna 3: Estado */
+/* Columna 3: Nombre */
 .fi-resource-recursos-humanos th:nth-child(3),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(3) {
     width: 13% !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-align: left !important;
 }
 
-/* Columna 4: Teléfono (compacta) */
+/* Columna 4: Estado */
 .fi-resource-recursos-humanos th:nth-child(4),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(4) {
+    width: 12% !important;
+    white-space: nowrap !important;
+}
+
+/* Columna 5: Teléfono (compacta) */
+.fi-resource-recursos-humanos th:nth-child(5),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
     width: 10% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 5: Ubicación de trabajo */
-.fi-resource-recursos-humanos th:nth-child(5),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(5) {
-    width: 17% !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* Columna 6: Puesto (amplia para que quepa todo el texto holgadamente) */
+/* Columna 6: Ubicación de trabajo */
 .fi-resource-recursos-humanos th:nth-child(6),
 .fi-resource-recursos-humanos td.fi-ta-cell:nth-child(6) {
+    width: 16% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Columna 7: Puesto (amplia para que quepa todo el texto holgadamente) */
+.fi-resource-recursos-humanos th:nth-child(7),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(7) {
     width: 17% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Columna 7: Acciones (Editar/Borrar separada a la derecha) */
-.fi-resource-recursos-humanos th:nth-child(7),
-.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(7),
+/* Columna 8: Acciones (Editar/Borrar separada a la derecha) */
+.fi-resource-recursos-humanos th:nth-child(8),
+.fi-resource-recursos-humanos td.fi-ta-cell:nth-child(8),
 .fi-resource-recursos-humanos th.fi-ta-actions-header-cell,
 .fi-resource-recursos-humanos td.fi-ta-actions-cell {
     width: 7% !important;
