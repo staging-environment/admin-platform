@@ -463,8 +463,61 @@
                 </div>
             @endif
 
-            @if($activeTab === 'vacaciones')
+                        @if($activeTab === 'vacaciones')
                 <div class="space-y-6">
+                    <!-- Guía e Información del Procedimiento de Vacaciones y Permisos -->
+                    <div class="p-6 bg-gradient-to-r from-sky-50/70 via-blue-50/40 to-indigo-50/60 dark:from-sky-950/20 dark:via-blue-950/10 dark:to-indigo-950/20 border border-sky-100 dark:border-sky-900/40 rounded-3xl shadow-sm">
+                        <div class="flex items-start gap-3.5">
+                            <div class="p-2.5 bg-sky-600 text-white rounded-2xl shadow-sm flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-3 flex-1">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        Procedimiento y Gestión de Vacaciones y Permisos
+                                        <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300 rounded-full">Requiere Aprobación</span>
+                                    </h4>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                                        Para garantizar el correcto funcionamiento del servicio y la organización de los equipos, el disfrute de periodos de descanso y permisos sigue el siguiente protocolo:
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-sky-700 dark:text-sky-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-900/60 text-[11px] font-black">1</span>
+                                            Solicitud Anticipada
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Pulsa en <strong>"Solicitar"</strong> para seleccionar las fechas deseadas y el tipo de permiso. Planifica tu solicitud con la debida antelación.
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-[11px] font-black">2</span>
+                                            Validación de Responsable
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Tu solicitud queda en estado <span class="font-bold text-amber-600 dark:text-amber-400">Pendiente</span> hasta que el responsable o administrador revise la cobertura y la valide.
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-[11px] font-black">3</span>
+                                            Aprobación Confirmada
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Una vez <span class="font-bold text-emerald-600 dark:text-emerald-400">Aprobada</span>, los días quedarán formalmente concedidos en tu calendario. No disfrutes vacaciones sin aprobación previa.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @if(auth()->user()->can('solicitar_ver_vacaciones'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                             <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
@@ -533,8 +586,61 @@
             @endif
 
             
-            @if($activeTab === 'bajas')
+                        @if($activeTab === 'bajas')
                 <div class="space-y-6">
+                    <!-- Guía e Información de Bajas Médicas e Incapacidad Temporal -->
+                    <div class="p-6 bg-gradient-to-r from-rose-50/70 via-orange-50/40 to-amber-50/60 dark:from-rose-950/20 dark:via-orange-950/10 dark:to-amber-950/20 border border-rose-100 dark:border-rose-900/40 rounded-3xl shadow-sm">
+                        <div class="flex items-start gap-3.5">
+                            <div class="p-2.5 bg-rose-600 text-white rounded-2xl shadow-sm flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-3 flex-1">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        Protocolo e Información sobre Bajas Médicas e Incapacidad Temporal
+                                        <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300 rounded-full">Comunicación Obligatoria</span>
+                                    </h4>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                                        Las bajas médicas por enfermedad común, profesional o accidente no precisan aprobación previa de la empresa, pero es indispensable seguir este proceso para la gestión laboral y de Seguridad Social:
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-rose-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-rose-700 dark:text-rose-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-900/60 text-[11px] font-black">1</span>
+                                            Comunicación y Parte de Baja
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Informa a tu responsable y pulsa <strong>"Registrar Baja"</strong> adjuntando el parte oficial emitido por el facultativo del SPS o Mutua de accidentes.
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-rose-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-[11px] font-black">2</span>
+                                            Seguimiento y Partes Sucesivos
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Si la situación de incapacidad se prolonga, mantén al día a la empresa aportando los correspondientes partes médicos de confirmación.
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-rose-100/80 dark:border-white/5 space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-[11px] font-black">3</span>
+                                            Registro del Alta Médica
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Al reincorporarte al puesto de trabajo, debes pulsar en <strong>"Registrar Alta"</strong> y adjuntar el parte oficial de alta para reactivar tus fichajes ordinarios.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @if(auth()->user()->can('solicitud_baja_enfermedad'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                             <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
