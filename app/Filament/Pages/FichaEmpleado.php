@@ -97,6 +97,12 @@ class FichaEmpleado extends Page
     // Titulaciones, Cursos y Formación
     public $cursos = [];
     public $documentosFormacion = [];
+    public $nuevo_doc_nombre = '';
+    public $nuevo_doc_tipo = 'Titulaciones';
+    public $nuevo_doc_fecha_inicio = null;
+    public $nuevo_doc_fecha_fin = null;
+    public $nuevo_doc_archivo = null;
+    public bool $isAddingTitulacion = false;
 
     public static function canAccess(): bool
     {
@@ -632,6 +638,48 @@ class FichaEmpleado extends Page
             $this->cursos = [];
             $this->documentosFormacion = [];
         }
+    }
+
+    public function guardarTitulacion(): void
+    {
+        $this->validate([
+            'nuevo_doc_nombre' => 'required|string|max:255',
+            'nuevo_doc_tipo' => 'required|string|in:Titulaciones,Certificados,Carnets,Prevención de riesgos laborales,Manipulación de alimentos,Otros',
+            'nuevo_doc_fecha_inicio' => 'nullable|date',
+            'nuevo_doc_fecha_fin' => 'nullable|date',
+            'nuevo_doc_archivo' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png',
+        ], [
+            'nuevo_doc_nombre.required' => 'El título o nombre del documento es obligatorio.',
+            'nuevo_doc_tipo.required' => 'Selecciona un tipo de titulación/documento.',
+            'nuevo_doc_archivo.required' => 'Debes adjuntar el archivo (PDF o Imagen).',
+            'nuevo_doc_archivo.mimes' => 'El archivo debe ser un documento PDF o imagen (JPG, PNG).',
+            'nuevo_doc_archivo.max' => 'El archivo no puede superar los 10MB.',
+        ]);
+
+        if (!$this->empleado) {
+            Notification::make()->danger()->title('No se encontró el empleado asociado')->send();
+            return;
+        }
+
+        $filePath = $this->nuevo_doc_archivo->store('empleados/documentos', 'local');
+
+        \App\Models\EmpleadoDocumento::create([
+            'empleado_id' => $this->empleado->id,
+            'nombre' => trim($this->nuevo_doc_nombre),
+            'tipo' => $this->nuevo_doc_tipo,
+            'fecha_inicio' => $this->nuevo_doc_fecha_inicio ?: null,
+            'fecha_fin' => $this->nuevo_doc_fecha_fin ?: null,
+            'file_path' => $filePath,
+        ]);
+
+        $this->reset(['nuevo_doc_nombre', 'nuevo_doc_tipo', 'nuevo_doc_fecha_inicio', 'nuevo_doc_fecha_fin', 'nuevo_doc_archivo', 'isAddingTitulacion']);
+        $this->loadFormacion();
+
+        Notification::make()
+            ->success()
+            ->title('Titulación o diploma guardado con éxito')
+            ->body('Tu documento se ha incorporado a tu expediente.')
+            ->send();
     }
 
     public function solicitarVacacion(): void

@@ -119,12 +119,12 @@
                         </div>
                     @elseif(auth()->user()?->can('acceder_portal_fichajes'))
                         <x-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
-                            {{ __('Registro de entradas y fichajes') }}
+                            {{ __('Fichajes') }}
                         </x-nav-link>
 
                         @if(auth()->user()?->can('solicitar_ver_vacaciones'))
                         <x-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
-                            {{ __('Vacaciones y Permisos') }}
+                            {{ __('Vacaciones') }}
                         </x-nav-link>
                         @endif
 
@@ -134,9 +134,30 @@
                         </x-nav-link>
                         @endif
 
-                        <x-nav-link href="/admin/portal-empleado?tab=formacion" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'formacion'">
-                            {{ __('Mis Titulaciones y Formación') }}
-                        </x-nav-link>
+                        @php
+                            $isFormacionActive = (request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'mis_titulaciones' || request()->query('tab') === 'formacion');
+                        @endphp
+                        <div class="inline-flex items-center h-full">
+                            <x-dropdown align="left" width="56">
+                                <x-slot name="trigger">
+                                    <button type="button" class="h-16 inline-flex items-center px-1 pt-1 border-b-2 {{ $isFormacionActive ? 'border-indigo-500 text-indigo-600 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium' }} text-xs leading-5 focus:outline-none transition duration-150 ease-in-out whitespace-nowrap">
+                                        <span>{{ __('Formación') }}</span>
+                                        <svg class="ms-1.5 h-4 w-4 fill-current {{ $isFormacionActive ? 'text-indigo-600' : 'text-gray-400' }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </x-slot>
+
+                                <x-slot name="content">
+                                    <x-dropdown-link href="/admin/portal-empleado?tab=formacion_empresa" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')">
+                                        {{ __('Formación Asignada') }}
+                                    </x-dropdown-link>
+                                    <x-dropdown-link href="/admin/portal-empleado?tab=mis_titulaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'mis_titulaciones'">
+                                        {{ __('Mis Titulaciones y Diplomas') }}
+                                    </x-dropdown-link>
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
                     @endif
 
                     @if(auth()->user()?->can('utilizar_explorador'))
@@ -342,12 +363,12 @@
                     </div>
                     <div class="mt-2 space-y-1">
                         <x-responsive-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
-                            {{ __('Registro de entradas y fichajes') }}
+                            {{ __('Fichajes') }}
                         </x-responsive-nav-link>
 
                         @if(auth()->user()?->can('solicitar_ver_vacaciones'))
                         <x-responsive-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
-                            {{ __('Vacaciones y Permisos') }}
+                            {{ __('Vacaciones') }}
                         </x-responsive-nav-link>
                         @endif
 
@@ -357,9 +378,22 @@
                         </x-responsive-nav-link>
                         @endif
 
-                        <x-responsive-nav-link href="/admin/portal-empleado?tab=formacion" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'formacion'">
-                            {{ __('Mis Titulaciones y Formación') }}
-                        </x-responsive-nav-link>
+                        <div x-data="{ openSub: {{ (request()->is('admin/portal-empleado*') && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'mis_titulaciones' || request()->query('tab') === 'formacion')) ? 'true' : 'false' }} }">
+                            <button @click="openSub = !openSub" class="w-full flex items-center justify-between ps-3 pe-4 py-2 border-l-4 {{ (request()->is('admin/portal-empleado*') && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'mis_titulaciones' || request()->query('tab') === 'formacion')) ? 'border-indigo-400 text-indigo-700 bg-indigo-50 font-bold' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 font-medium' }} text-base leading-5 focus:outline-none transition duration-150 ease-in-out text-left">
+                                <span>{{ __('Formación') }}</span>
+                                <svg class="h-4 w-4 transform transition-transform duration-200" :class="{ 'rotate-90': openSub }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                            <div x-show="openSub" style="display: none;" class="ps-6 space-y-1 bg-gray-50 py-1">
+                                <a href="/admin/portal-empleado?tab=formacion_empresa" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')) ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
+                                    └─ {{ __('Formación Asignada') }}
+                                </a>
+                                <a href="/admin/portal-empleado?tab=mis_titulaciones" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && request()->query('tab') === 'mis_titulaciones') ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
+                                    └─ {{ __('Mis Titulaciones y Diplomas') }}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif
