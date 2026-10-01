@@ -143,9 +143,15 @@
                                 </div>
                                 <div>
                                     <span class="text-gray-500 dark:text-gray-400 block font-medium">Normativas y RGPD:</span>
-                                    <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                                        ✓ Formalizadas y Aceptadas
-                                    </span>
+                                    @if($empleado && $empleado->politicas_aceptadas_at)
+                                        <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
+                                            ✓ Formalizadas ({{ \Carbon\Carbon::parse($empleado->politicas_aceptadas_at)->format('d/m/Y') }})
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
+                                            ⚠️ Pendiente de aceptación
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

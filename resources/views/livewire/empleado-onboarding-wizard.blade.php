@@ -515,9 +515,12 @@
                                     <p class="text-gray-600 dark:text-gray-400">
                                         Consiento el tratamiento de mis datos personales con fines exclusivamente laborales, de registro de jornada, nóminas y seguridad social por parte de UTRECAR / ACTIVE NETWORK.
                                     </p>
-                                    <div>
-                                        <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
-                                            Leer normativa completa RGPD
+                                    <div class="pt-1">
+                                        <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                            </svg>
+                                            <span>Leer normativa completa RGPD</span>
                                         </button>
                                     </div>
                                 </div>
@@ -542,9 +545,12 @@
                                     <p class="text-gray-600 dark:text-gray-400">
                                         Me comprometo a respetar las directrices operativas, horarios asignados, obligación de registro horario de jornada en cada turno y políticas de la empresa.
                                     </p>
-                                    <div>
-                                        <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
-                                            Leer Normativa Interna
+                                    <div class="pt-1">
+                                        <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                            </svg>
+                                            <span>Leer Normativa Interna y Código de Conducta</span>
                                         </button>
                                     </div>
                                 </div>
@@ -569,9 +575,12 @@
                                     <p class="text-gray-600 dark:text-gray-400">
                                         Confirmo haber recibido las instrucciones de seguridad laboral, uso obligatorio de EPIs y cumplimiento de protocolos de prevención en mi centro de trabajo.
                                     </p>
-                                    <div>
-                                        <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline">
-                                            Leer Protocolo PRL
+                                    <div class="pt-1">
+                                        <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                            </svg>
+                                            <span>Leer Protocolo de Prevención y Seguridad (PRL)</span>
                                         </button>
                                     </div>
                                 </div>
