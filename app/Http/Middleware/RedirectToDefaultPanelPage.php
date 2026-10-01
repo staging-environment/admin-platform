@@ -18,21 +18,27 @@ class RedirectToDefaultPanelPage
         if ($user) {
             $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
 
-            // Si es un empleado con onboarding pendiente, redirigir al asistente de inducción
-            if ($empleado && !$empleado->onboarding_completado) {
-                if (!$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('logout') && !$request->is('admin/logout')) {
-                    return redirect()->route('empleado.onboarding');
-                }
-            }
+            $isEmpleado = $user->hasRole('Empleado') || ($empleado && !$user->hasRole(['Admin', 'admin', 'Administrador', 'CEO', 'Gestor']));
+            $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', $user->password);
 
-            // Si tiene la contraseña por defecto '1234'
-            if (\Illuminate\Support\Facades\Hash::check('1234', $user->password)) {
-                if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('portal/onboarding*') && !$request->is('livewire*')) {
-                    \Illuminate\Support\Facades\Log::info("Redirecting employee with default password '1234' to profile page", [
-                        'user_email' => $user->email
-                    ]);
-                    session()->flash('warning', 'Por motivos de seguridad, debes cambiar tu contraseña por defecto (1234) antes de continuar.');
-                    return redirect()->route('profile.edit');
+            // Si es rol empleado y tiene contraseña por defecto '1234' o tiene onboarding incompleto -> Redirigir siempre a onboarding
+            if ($isEmpleado) {
+                if ($isDefaultPassword || ($empleado && !$empleado->onboarding_completado)) {
+                    if (!$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                        \Illuminate\Support\Facades\Log::info("Redirecting employee with default password or pending onboarding to onboarding wizard", [
+                            'user_email' => $user->email,
+                            'default_password' => $isDefaultPassword,
+                        ]);
+                        return redirect()->route('empleado.onboarding');
+                    }
+                }
+            } else {
+                // Para administradores u otros roles con contraseña por defecto '1234', exigir cambio de contraseña en perfil
+                if ($isDefaultPassword) {
+                    if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('portal/onboarding*') && !$request->is('livewire*')) {
+                        session()->flash('warning', 'Por motivos de seguridad, debes cambiar tu contraseña por defecto (1234) antes de continuar.');
+                        return redirect()->route('profile.edit');
+                    }
                 }
             }
         }

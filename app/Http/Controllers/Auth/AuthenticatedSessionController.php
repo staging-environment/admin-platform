@@ -28,6 +28,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user) {
+            $empleado = \App\Models\Empleado::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($user->email))])->first();
+            $isEmpleado = $user->hasRole('Empleado') || ($empleado && !$user->hasRole(['Admin', 'admin', 'Administrador', 'CEO', 'Gestor']));
+
+            if ($isEmpleado && (\Illuminate\Support\Facades\Hash::check('1234', $user->password) || ($empleado && !$empleado->onboarding_completado))) {
+                return redirect()->route('empleado.onboarding');
+            }
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

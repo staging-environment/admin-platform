@@ -119,9 +119,20 @@ class EmpleadoOnboardingWizard extends Component
             ]);
         }
 
-        // Si ya completó onboarding, redirigir al portal
-        if ($this->empleado->onboarding_completado) {
-            return redirect()->to('/admin/portal-empleado');
+        $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', $user->password);
+
+        if ($isDefaultPassword) {
+            if ($this->empleado->onboarding_completado) {
+                $this->empleado->update([
+                    'onboarding_completado' => false,
+                    'onboarding_paso_actual' => 2,
+                ]);
+            }
+        } else {
+            // Si ya completó onboarding y no tiene contraseña por defecto, redirigir al portal
+            if ($this->empleado->onboarding_completado) {
+                return redirect()->to('/admin/portal-empleado');
+            }
         }
 
         // Cargar datos existentes
@@ -142,11 +153,22 @@ class EmpleadoOnboardingWizard extends Component
         $this->tiene_discapacidad = (bool) $this->empleado->tiene_discapacidad;
 
         $pasoActual = (int) ($this->empleado->onboarding_paso_actual ?: 1);
-        $this->paso = min(max(1, $pasoActual), 4);
+        if ($isDefaultPassword) {
+            $this->paso = min(max(1, $pasoActual), 2);
+        } else {
+            $this->paso = min(max(1, $pasoActual), 4);
+        }
     }
 
     public function irPaso(int $nuevoPaso)
     {
+        $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password);
+        if ($isDefaultPassword && $nuevoPaso > 2) {
+            session()->flash('warning_step', 'Debes cambiar tu contraseña por defecto en el Paso 2 antes de continuar.');
+            $this->paso = 2;
+            return;
+        }
+
         $maxPaso = max((int) $this->empleado->onboarding_paso_actual, $this->paso);
         if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 4) {
             $this->paso = $nuevoPaso;
