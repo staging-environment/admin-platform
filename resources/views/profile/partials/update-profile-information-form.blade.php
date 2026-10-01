@@ -1,5 +1,9 @@
 @php
     $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+    $isAdmin = auth()->user()->hasRole(['Administrador', 'admin', 'Admin', 'Gestor', 'gestor', 'CEO']) 
+        || auth()->user()->can('gestion_recursos_humanos')
+        || auth()->user()->id === 1
+        || auth()->user()->email === 'jarodriguezbonilla@gmail.com';
 @endphp
 
 <section>
@@ -9,7 +13,7 @@
             Modificar Datos del Perfil
         </h2>
         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            Actualiza tu información personal, teléfono y contacto de emergencia.
+            Actualiza tu e-mail, cuenta bancaria, teléfono, domicilio y contactos de emergencia. Por normativa legal, el Nombre y el DNI solo pueden ser modificados por Recursos Humanos.
         </p>
     </header>
 
@@ -24,39 +28,77 @@
         @endif
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {{-- Nombre y Apellidos: Editable SOLO para Admin/Gestor --}}
             <div>
-                <x-input-label for="name" value="Nombre y Apellidos" />
-                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('name', $user->name)" required autocomplete="name" />
-                <x-input-error class="mt-1" :messages="$errors->get('name')" />
+                <x-input-label for="name" :value="$isAdmin ? 'Nombre y Apellidos' : 'Nombre y Apellidos (No modificable)'" />
+                @if($isAdmin)
+                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('name', $user->name)" required autocomplete="name" />
+                    <x-input-error class="mt-1" :messages="$errors->get('name')" />
+                @else
+                    <x-text-input id="name_disabled" type="text" class="mt-1 block w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 cursor-not-allowed select-none" :value="$user->name" readonly disabled />
+                    <p class="mt-1 text-[11px] text-gray-400">Dato oficial. Para corregir tu nombre contacta con RRHH.</p>
+                @endif
             </div>
 
+            {{-- DNI / NIE: No modificable por empleado --}}
             <div>
-                <x-input-label for="email" value="Correo Electrónico" />
+                <x-input-label for="dni" value="DNI / NIE (No modificable)" />
+                <x-text-input id="dni" type="text" class="mt-1 block w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono cursor-not-allowed select-none" :value="$empleado->dni ?? 'No registrado'" readonly disabled />
+                <p class="mt-1 text-[11px] text-gray-400">Identificador legal no modificable por el empleado.</p>
+            </div>
+
+            {{-- Correo Electrónico: Editable por el empleado --}}
+            <div>
+                <x-input-label for="email" value="Correo Electrónico (E-mail)" />
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('email', $user->email)" required autocomplete="email" />
                 <x-input-error class="mt-1" :messages="$errors->get('email')" />
             </div>
 
+            {{-- Teléfono Móvil --}}
             <div>
                 <x-input-label for="telefono" value="Teléfono Móvil Principal" />
                 <x-text-input id="telefono" name="telefono" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('telefono', $user->telefono ?: ($empleado->telefono_principal ?? ''))" autocomplete="tel" placeholder="Ej: 600123456" />
                 <x-input-error class="mt-1" :messages="$errors->get('telefono')" />
             </div>
 
+            {{-- Cuenta Bancaria (IBAN) --}}
             <div>
-                <x-input-label for="direccion" value="Dirección" />
+                <x-input-label for="iban" value="Cuenta Bancaria (IBAN para Nómina)" />
+                <x-text-input id="iban" name="iban" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 font-mono uppercase" :value="old('iban', $empleado->iban ?? '')" placeholder="ES00 0000 0000 0000 0000 0000" />
+                <x-input-error class="mt-1" :messages="$errors->get('iban')" />
+            </div>
+
+            {{-- Fecha de Nacimiento: Informativa / No modificable --}}
+            <div>
+                <x-input-label for="fecha_nacimiento" value="Fecha de Nacimiento (No modificable)" />
+                <x-text-input id="fecha_nacimiento" type="text" class="mt-1 block w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 cursor-not-allowed select-none" :value="$empleado && $empleado->fecha_nacimiento ? \Carbon\Carbon::parse($empleado->fecha_nacimiento)->format('d/m/Y') : 'No registrada'" readonly disabled />
+            </div>
+
+            {{-- Dirección --}}
+            <div>
+                <x-input-label for="direccion" value="Dirección / Domicilio" />
                 <x-text-input id="direccion" name="direccion" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('direccion', $empleado->direccion ?? '')" placeholder="Calle, número, piso" />
             </div>
 
+            {{-- Localidad --}}
             <div>
                 <x-input-label for="localidad" value="Localidad" />
                 <x-text-input id="localidad" name="localidad" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('localidad', $empleado->localidad ?? '')" placeholder="Ej: Utrera" />
             </div>
 
+            {{-- Provincia --}}
             <div>
                 <x-input-label for="provincia" value="Provincia" />
                 <x-text-input id="provincia" name="provincia" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('provincia', $empleado->provincia ?? '')" placeholder="Ej: Sevilla" />
             </div>
 
+            {{-- Código Postal --}}
+            <div>
+                <x-input-label for="codigo_postal" value="Código Postal" />
+                <x-text-input id="codigo_postal" name="codigo_postal" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('codigo_postal', $empleado->codigo_postal ?? '')" placeholder="Ej: 41710" />
+            </div>
+
+            {{-- Contacto de Emergencia --}}
             <div>
                 <x-input-label for="contacto_emergencia_nombre" value="Contacto de Emergencia (Nombre)" />
                 <x-text-input id="contacto_emergencia_nombre" name="contacto_emergencia_nombre" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('contacto_emergencia_nombre', $empleado->contacto_emergencia_nombre ?? '')" placeholder="Familiar o persona de contacto" />
