@@ -465,6 +465,55 @@
                             @endif
                         </div>
 
+                        <!-- Discapacidad / Incapacidad Reconocida -->
+                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <span>♿</span> Discapacidad / Incapacidad Reconocida
+                                </h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model.live="tiene_discapacidad" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-600"></div>
+                                    <span class="ml-2.5 text-xs font-bold text-gray-700 dark:text-gray-300">{{ $tiene_discapacidad ? 'Sí tengo' : 'No tengo' }}</span>
+                                </label>
+                            </div>
+
+                            <!-- Aviso Legal Obligatorio según Normativa Interna -->
+                            <div class="p-3.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 text-xs space-y-1">
+                                <p class="font-bold flex items-center gap-1.5 text-red-800 dark:text-red-300">
+                                    <span>⚠️</span> Cláusula Obligatoria de la Normativa Interna y Código de Conducta:
+                                </p>
+                                <p class="text-[11px] leading-relaxed">
+                                    Es obligatorio por parte del empleado notificar formal e inmediatamente a la empresa cualquier cambio relativo a su incapacidad o discapacidad. <strong>El ocultamiento de dicha información, tanto de forma voluntaria como involuntaria, así como la retirada de la incapacidad por parte de la Administración Pública o la bajada del grado de discapacidad a un porcentaje inferior al 33%, podrá ser motivo de despido disciplinario.</strong>
+                                </p>
+                            </div>
+
+                            @if($tiene_discapacidad)
+                                <div class="space-y-3 pt-2 border-t border-gray-200 dark:border-white/10">
+                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Adjuntar Certificado o Resolución Oficial de Discapacidad / Incapacidad *
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Adjunta el dictamen o certificado emitido por el Centro Base / Seguridad Social donde figure el grado reconocido.
+                                    </p>
+                                    <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-amber-300 dark:border-amber-600/50 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
+                                        <svg class="w-6 h-6 mb-1 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                        <span>Seleccionar documento de discapacidad / incapacidad...</span>
+                                        <input type="file" wire:model="file_discapacidad" class="hidden" />
+                                    </label>
+                                    @if ($file_discapacidad)
+                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_discapacidad->getClientOriginalName() }}</span>
+                                    @endif
+                                    @if($empleado->documentos()->whereIn('tipo', ['Certificado Discapacidad', 'Resolución Discapacidad'])->exists())
+                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold block">
+                                            ✓ Ya consta un certificado o resolución adjuntado en tu expediente.
+                                        </span>
+                                    @endif
+                                    @error('file_discapacidad') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
+                        </div>
+
                     </div>
 
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
@@ -569,7 +618,7 @@
                                         </span>
                                     </div>
                                     <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                                        Me comprometo a respetar las directrices operativas, horarios asignados, obligación de registro horario de jornada en cada turno y políticas de la empresa.
+                                        Me comprometo a respetar las directrices operativas, registro horario, y la <strong>obligación inexcusable de notificar de inmediato cualquier cambio, retirada de incapacidad o bajada de discapacidad (<33%)</strong> bajo apercibimiento de despido.
                                     </p>
                                     <div class="pt-1 flex items-center gap-2">
                                         @if($acepta_normativa && $leido_normativa)
@@ -742,6 +791,17 @@
                     <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
                     <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
                     <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
+                    <p><strong>6. Notificación Obligatoria de Incapacidad y Discapacidad (Régimen Disciplinario):</strong> Es de obligado e inexcusable cumplimiento por parte del empleado comunicar inmediatamente a la empresa (departamento de Recursos Humanos) cualquier resolución, variación o circunstancia relativa a su incapacidad o discapacidad.</p>
+                    <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 space-y-1.5 text-[11px] leading-relaxed">
+                        <p class="font-bold">⚠️ Causa Expresa de Despido Disciplinario:</p>
+                        <p>El ocultamiento o falta de notificación fehaciente a la empresa de dicha información, <strong>tanto de forma voluntaria como involuntaria</strong>, será considerado falta laboral muy grave que <strong>podrá ser motivo de despido disciplinario</strong> y rescisión del contrato de trabajo.</p>
+                        <p class="font-semibold pt-1">Constituye causa imperativa de notificación inmediata:</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li><strong>La retirada o extinción de la incapacidad</strong> (o incapacidad permanente) por parte de la Administración Pública / Seguridad Social.</li>
+                            <li><strong>La bajada o reducción del grado de discapacidad a un porcentaje inferior al 33%</strong> legalmente reconocido.</li>
+                            <li>Cualquier revisión, resolución o variación médica o administrativa que altere las limitaciones funcionales o bonificaciones asociadas al puesto.</li>
+                        </ul>
+                    </div>
                     <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
                         📜 Fin del Código de Conducta. Has llegado al final del documento.
                     </div>

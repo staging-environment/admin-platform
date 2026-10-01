@@ -256,7 +256,9 @@ class EmpleadoOnboardingWizard extends Component
             $rules['file_prl'] = 'file|mimes:pdf,jpg,jpeg,png|max:10240';
         }
 
-        if ($this->file_discapacidad) {
+        if ($this->tiene_discapacidad && !$this->empleado->documentos()->whereIn('tipo', ['Certificado Discapacidad', 'Resolución Discapacidad'])->exists()) {
+            $rules['file_discapacidad'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:10240';
+        } elseif ($this->file_discapacidad) {
             $rules['file_discapacidad'] = 'file|mimes:pdf,jpg,jpeg,png|max:10240';
         }
 
@@ -266,6 +268,7 @@ class EmpleadoOnboardingWizard extends Component
             'file_dni.required' => 'Debes adjuntar el documento escaneado o foto legible de tu DNI/NIE.',
             'file_dni.mimes' => 'El DNI debe ser un archivo PDF o imagen (JPG, PNG).',
             'file_dni.max' => 'El tamaño máximo permitido es 10 MB.',
+            'file_discapacidad.required' => 'Si indicas que tienes discapacidad reconocida, es obligatorio adjuntar el certificado o resolución oficial.',
         ]);
 
         if ($this->file_dni) {

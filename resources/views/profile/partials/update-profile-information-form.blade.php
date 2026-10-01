@@ -110,6 +110,28 @@
             </div>
         </div>
 
+        {{-- Sección Informativa y Obligatoria: Discapacidad e Incapacidad --}}
+        <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">♿</span>
+                    <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                        Situación de Incapacidad y Discapacidad (Normativa Interna)
+                    </h4>
+                </div>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $empleado && $empleado->tiene_discapacidad ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' : 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                    {{ $empleado && $empleado->tiene_discapacidad ? 'Discapacidad Registrada' : 'Sin Discapacidad Declarada' }}
+                </span>
+            </div>
+            <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-900 dark:text-red-300 text-[11px] leading-relaxed space-y-1">
+                <p><strong>⚠️ Cláusula Obligatoria de la Normativa Interna y Código de Conducta:</strong></p>
+                <p>Es preceptivo y obligatorio por parte del empleado notificar a la empresa de forma inmediata cualquier cambio referente a su incapacidad o discapacidad, pudiendo ser <u>motivo de despido disciplinario</u> el ocultamiento tanto de forma voluntaria como involuntaria. Asimismo, es preceptiva la comunicación inmediata de la <strong>retirada de la incapacidad</strong> por parte de la Administración Pública o la <strong>bajada del grado de discapacidad a un porcentaje inferior al 33%</strong>.</p>
+            </div>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                Si tu grado de discapacidad ha variado o has recibido una resolución de la Seguridad Social, debes remitir inmediatamente la documentación oficial a Recursos Humanos (<a href="mailto:utrecar@gmail.com" class="text-amber-600 dark:text-amber-400 font-bold hover:underline">utrecar@gmail.com</a>).
+            </p>
+        </div>
+
         {{-- BOTÓN DE GUARDAR ABAJO DEL TODO --}}
         <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 dark:border-white/10">
             <button type="button" @click="editMode = false" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-xl transition-all">

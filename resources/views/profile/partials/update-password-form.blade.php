@@ -180,7 +180,7 @@
                                 </span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                                Me comprometo a cumplir las directrices operativas, confidencialidad, horarios asignados y la obligación legal de registro horario de jornada en cada turno.
+                                Me comprometo a cumplir las directrices operativas, registro de jornada y la <strong>obligación legal de notificar inmediatamente cualquier cambio, retirada de incapacidad o bajada de discapacidad (<33%)</strong> bajo apercibimiento de despido.
                             </p>
                             <div class="pt-1">
                                 <button type="button" @click="modalNormativa = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
@@ -306,6 +306,17 @@
                     <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
                     <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
                     <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
+                    <p><strong>6. Notificación Obligatoria de Incapacidad y Discapacidad (Régimen Disciplinario):</strong> Es de obligado e inexcusable cumplimiento por parte del empleado comunicar inmediatamente a la empresa (departamento de Recursos Humanos) cualquier resolución, variación o circunstancia relativa a su incapacidad o discapacidad.</p>
+                    <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 space-y-1.5 text-[11px] leading-relaxed">
+                        <p class="font-bold">⚠️ Causa Expresa de Despido Disciplinario:</p>
+                        <p>El ocultamiento o falta de notificación fehaciente a la empresa de dicha información, <strong>tanto de forma voluntaria como involuntaria</strong>, será considerado falta laboral muy grave que <strong>podrá ser motivo de despido disciplinario</strong> y rescisión del contrato de trabajo.</p>
+                        <p class="font-semibold pt-1">Constituye causa imperativa de notificación inmediata:</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li><strong>La retirada o extinción de la incapacidad</strong> (o incapacidad permanente) por parte de la Administración Pública / Seguridad Social.</li>
+                            <li><strong>La bajada o reducción del grado de discapacidad a un porcentaje inferior al 33%</strong> legalmente reconocido.</li>
+                            <li>Cualquier revisión, resolución o variación médica o administrativa que altere las limitaciones funcionales o bonificaciones asociadas al puesto.</li>
+                        </ul>
+                    </div>
                     <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
                         📜 Fin del Código de Conducta. Al hacer clic en aceptar, confirma haber leído y aceptado las normas laborales de la empresa.
                     </div>
