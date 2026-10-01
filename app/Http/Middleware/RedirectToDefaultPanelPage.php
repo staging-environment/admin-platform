@@ -13,6 +13,11 @@ class RedirectToDefaultPanelPage
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Permitir siempre salir de la suplantación y logout
+        if ($request->is('filament-impersonate*') || $request->is('*impersonate*') || $request->is('logout') || $request->is('admin/logout')) {
+            return $next($request);
+        }
+
         $user = auth()->user() ?: \Filament\Facades\Filament::auth()->user();
 
         if ($user) {
@@ -24,7 +29,7 @@ class RedirectToDefaultPanelPage
             // Si es rol empleado y tiene contraseña por defecto '1234' o tiene onboarding incompleto -> Redirigir siempre a onboarding
             if ($isEmpleado) {
                 if ($isDefaultPassword || ($empleado && !$empleado->onboarding_completado)) {
-                    if (!$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('logout') && !$request->is('admin/logout')) {
+                    if (!$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('filament-impersonate*') && !$request->is('*impersonate*')) {
                         \Illuminate\Support\Facades\Log::info("Redirecting employee with default password or pending onboarding to onboarding wizard", [
                             'user_email' => $user->email,
                             'default_password' => $isDefaultPassword,
@@ -35,7 +40,7 @@ class RedirectToDefaultPanelPage
             } else {
                 // Para administradores u otros roles con contraseña por defecto '1234', exigir cambio de contraseña en perfil
                 if ($isDefaultPassword) {
-                    if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('portal/onboarding*') && !$request->is('livewire*')) {
+                    if (!$request->is('profile*') && !$request->is('password*') && !$request->is('logout') && !$request->is('admin/logout') && !$request->is('portal/onboarding*') && !$request->is('livewire*') && !$request->is('filament-impersonate*') && !$request->is('*impersonate*')) {
                         session()->flash('warning', 'Por motivos de seguridad, debes cambiar tu contraseña por defecto (1234) antes de continuar.');
                         return redirect()->route('profile.edit');
                     }

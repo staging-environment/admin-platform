@@ -459,3 +459,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Salir de la suplantación con retorno seguro
+Route::get('filament-impersonate/leave', function () {
+    $backTo = session()->pull('impersonate.back_to');
+
+    if (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class)) {
+        if (\STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()) {
+            \STS\FilamentImpersonate\Facades\Impersonation::leave();
+        }
+    }
+
+    if (!$backTo || $backTo === '/' || str_contains($backTo, 'portal/onboarding') || str_contains($backTo, 'filament-impersonate')) {
+        $backTo = '/admin/recursos-humanos';
+    }
+
+    return redirect()->to($backTo);
+})->name('filament-impersonate.leave');
