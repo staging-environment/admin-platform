@@ -791,6 +791,22 @@
                     <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
                     <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
                     <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
+
+                    {{-- Situación declarada del empleado en su expediente --}}
+                    <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                                <span>♿</span> Tu Situación Declarada de Incapacidad / Discapacidad
+                            </span>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $tiene_discapacidad ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-300 dark:border-amber-700' : 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                                {{ $tiene_discapacidad ? 'Discapacidad Registrada' : 'Sin Discapacidad Declarada' }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
+                            <strong>Estado en tu expediente:</strong> {{ $tiene_discapacidad ? 'Constas con discapacidad o incapacidad reconocida declarada en la empresa.' : 'No constas con discapacidad o incapacidad reconocida registrada.' }}
+                        </p>
+                    </div>
+
                     <p><strong>6. Notificación Obligatoria de Incapacidad y Discapacidad (Régimen Disciplinario):</strong> Es de obligado e inexcusable cumplimiento por parte del empleado comunicar inmediatamente a la empresa (departamento de Recursos Humanos) cualquier resolución, variación o circunstancia relativa a su incapacidad o discapacidad.</p>
                     <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 space-y-1.5 text-[11px] leading-relaxed">
                         <p class="font-bold">⚠️ Causa Expresa de Despido Disciplinario:</p>

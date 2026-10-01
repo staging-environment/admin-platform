@@ -45,7 +45,7 @@
             @endif
 
             {{-- FICHA DE DATOS DEL EMPLEADO / USUARIO (Apariencia como vista de Administración) --}}
-            <div class="bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-white/5 rounded-3xl p-6 sm:p-8" x-data="{ editMode: false }">
+            <div class="bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-white/5 rounded-3xl p-6 sm:p-8" x-data="{ editMode: false, modalNormativa: false }">
                 
                 {{-- Cabecera con Avatar, Datos Principales y Botón Modificar --}}
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-white/5">
@@ -143,15 +143,21 @@
                                 </div>
                                 <div>
                                     <span class="text-gray-500 dark:text-gray-400 block font-medium">Normativas y RGPD:</span>
-                                    @if($empleado && $empleado->politicas_aceptadas_at)
-                                        <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                                            ✓ Formalizadas ({{ \Carbon\Carbon::parse($empleado->politicas_aceptadas_at)->format('d/m/Y') }})
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
-                                            ⚠️ Pendiente de aceptación
-                                        </span>
-                                    @endif
+                                    <div class="flex items-center justify-between gap-2 mt-0.5">
+                                        @if($empleado && $empleado->politicas_aceptadas_at)
+                                            <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
+                                                ✓ Formalizadas ({{ \Carbon\Carbon::parse($empleado->politicas_aceptadas_at)->format('d/m/Y') }})
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
+                                                ⚠️ Pendiente de aceptación
+                                            </span>
+                                        @endif
+                                        <button type="button" @click="modalNormativa = true" class="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline inline-flex items-center gap-1 cursor-pointer">
+                                            <span>Ver Normativa</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -163,6 +169,68 @@
                 <div x-show="editMode" class="mt-6" style="display: none;">
                     @include('profile.partials.update-profile-information-form')
                 </div>
+
+                {{-- Ventana Flotante de Normativa Interna de Conducta y Discapacidad --}}
+                <template x-teleport="body">
+                    <div x-show="modalNormativa" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalNormativa = false" @keydown.escape.window="modalNormativa = false">
+                        <div x-show="modalNormativa" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
+                            <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
+                                <div>
+                                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <span>📋</span> Normativa Interna y Código de Conducta
+                                    </h3>
+                                    <span class="text-[11px] text-gray-500 dark:text-gray-400">UTRECAR, S.L. · Normativa laboral y operativa</span>
+                                </div>
+                                <button type="button" @click="modalNormativa = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                            </div>
+                            <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                                <p><strong>1. Obligatoriedad del Registro de Jornada:</strong> Cada empleado es responsable único e intransferible de realizar el fichaje de entrada y de salida puntual en cada turno laboral a través de los canales autorizados (Portal Web corporativo o terminales en estación).</p>
+                                <p><strong>2. Credenciales y Acceso:</strong> Las credenciales y contraseñas de acceso al sistema informático son de uso estrictamente personal. Queda terminantemente prohibido ceder o compartir las claves de usuario con otros compañeros o terceras personas.</p>
+                                <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
+                                <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
+                                <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
+
+                                {{-- Situación declarada del empleado en su expediente --}}
+                                @php
+                                    $empDiscapacidad = $empleado && $empleado->tiene_discapacidad;
+                                @endphp
+                                <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-gray-900 dark:text-white flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                                            <span>♿</span> Tu Situación Declarada de Incapacidad / Discapacidad
+                                        </span>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $empDiscapacidad ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-300 dark:border-amber-700' : 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
+                                            {{ $empDiscapacidad ? 'Discapacidad Registrada' : 'Sin Discapacidad Declarada' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
+                                        <strong>Estado en tu expediente:</strong> {{ $empDiscapacidad ? 'Constas con discapacidad o incapacidad reconocida declarada en la empresa.' : 'No constas con discapacidad o incapacidad reconocida registrada en el sistema.' }}
+                                    </p>
+                                </div>
+
+                                <p><strong>6. Notificación Obligatoria de Incapacidad y Discapacidad (Régimen Disciplinario):</strong> Es de obligado e inexcusable cumplimiento por parte del empleado comunicar inmediatamente a la empresa (departamento de Recursos Humanos) cualquier resolución, variación o circunstancia relativa a su incapacidad o discapacidad.</p>
+                                <div class="p-3.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 space-y-1.5 text-[11px] leading-relaxed">
+                                    <p class="font-bold">⚠️ Causa Expresa de Despido Disciplinario:</p>
+                                    <p>El ocultamiento o falta de notificación fehaciente a la empresa de dicha información, <strong>tanto de forma voluntaria como involuntaria</strong>, será considerado falta laboral muy grave que <strong>podrá ser motivo de despido disciplinario</strong> y rescisión del contrato de trabajo.</p>
+                                    <p class="font-semibold pt-1">Constituye causa imperativa de notificación inmediata:</p>
+                                    <ul class="list-disc pl-4 space-y-1">
+                                        <li><strong>La retirada o extinción de la incapacidad</strong> (o incapacidad permanente) por parte de la Administración Pública / Seguridad Social.</li>
+                                        <li><strong>La bajada o reducción del grado de discapacidad a un porcentaje inferior al 33%</strong> legalmente reconocido.</li>
+                                        <li>Cualquier revisión, resolución o variación médica o administrativa que altere las limitaciones funcionales o bonificaciones asociadas al puesto.</li>
+                                    </ul>
+                                </div>
+                                <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
+                                    📜 Fin de la Normativa Interna y Código de Conducta.
+                                </div>
+                            </div>
+                            <div class="flex justify-end pt-3 border-t border-gray-100 dark:border-white/10">
+                                <button type="button" @click="modalNormativa = false" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-xl transition-all">
+                                    Entendido / Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
 
             </div>
 
