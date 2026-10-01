@@ -74,7 +74,29 @@ class EmpleadoOnboardingWizard extends Component
             return redirect()->to('/login');
         }
 
-        $this->empleado = Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        // 1. Buscar empleado por email
+        $this->empleado = Empleado::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($user->email))])->first();
+
+        // 2. Si no se encontró o si es un registro temporal generado por el sistema ('PENDIENTE-'),
+        // comprobar si la empresa ya registró un empleado con este mismo nombre y apellidos con DNI oficial
+        if (!$this->empleado || str_starts_with($this->empleado->dni ?? '', 'PENDIENTE-')) {
+            $candidate = null;
+            if ($user->name) {
+                $candidate = Empleado::whereRaw('LOWER(TRIM(CONCAT(nombre, " ", apellidos))) = ?', [strtolower(trim($user->name))])
+                    ->where('dni', 'not like', 'PENDIENTE-%')
+                    ->first();
+            }
+
+            if ($candidate) {
+                // Si existía un registro duplicado pendiente, lo eliminamos
+                if ($this->empleado && $this->empleado->id !== $candidate->id && str_starts_with($this->empleado->dni ?? '', 'PENDIENTE-')) {
+                    $this->empleado->forceDelete();
+                }
+                $this->empleado = $candidate;
+                $this->empleado->email = $user->email;
+                $this->empleado->save();
+            }
+        }
 
         if (!$this->empleado) {
             $parts = explode(' ', trim($user->name ?: 'Empleado'));
@@ -224,7 +246,7 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->paso = 4;
-        session()->flash('success_step', 'Datos personales guardados correctamente. Ahora adjunta tu documentación digital.');
+        session()->flash('success_step', 'Datos personales validados correctamente. Ahora adjunta tu documentación digital.');
     }
 
     public function guardarPaso4Documentos()

@@ -108,34 +108,56 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
 
         static::saved(function ($user) {
             $user->load('roles');
-            $empleado = \App\Models\Empleado::withTrashed()->where('email', $user->email)->first();
-            
-            if ($user->can('acceder_portal_fichajes') || $user->hasRole('Empleado')) {
-                if (!$empleado) {
-                    $parts = explode(' ', trim($user->name ?: 'Empleado'));
-                    $nombre = $parts[0];
-                    $apellidos = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : 'Apellidos';
-                    
-                    \App\Models\Empleado::create([
-                        'nombre' => $nombre,
-                        'apellidos' => $apellidos,
-                        'dni' => 'PENDIENTE-' . strtoupper(substr(md5($user->email), 0, 5)),
-                        'fecha_nacimiento' => '1990-01-01',
-                        'direccion' => 'Dirección pendiente',
-                        'localidad' => 'Utrera',
-                        'codigo_postal' => '41710',
-                        'provincia' => 'Sevilla',
-                        'telefono_principal' => $user->telefono ?: '600000000',
-                        'email' => $user->email,
-                        'onboarding_completado' => false,
-                        'onboarding_verificado_por_admin' => false,
-                        'onboarding_paso_actual' => 1,
-                    ]);
-                } else if ($empleado->trashed()) {
-                    $empleado->restore();
-                }
+            $oldEmail = $user->getOriginal('email');
+
+            // Buscar empleado existente por email actual o email anterior si cambió
+            $empleado = \App\Models\Empleado::withTrashed()
+                ->where('email', $user->email)
+                ->when($oldEmail && strtolower($oldEmail) !== strtolower($user->email), function ($q) use ($oldEmail) {
+                    $q->orWhere('email', $oldEmail);
+                })
+                ->first();
+
+            // Si aún no se encuentra, comprobar si la empresa ya registró un empleado con este mismo nombre y apellidos
+            if (!$empleado && $user->name) {
+                $empleado = \App\Models\Empleado::withTrashed()
+                    ->whereRaw('LOWER(TRIM(CONCAT(nombre, " ", apellidos))) = ?', [strtolower(trim($user->name))])
+                    ->where('dni', 'not like', 'PENDIENTE-%')
+                    ->first();
             }
 
+            if ($empleado) {
+                if ($empleado->email !== $user->email) {
+                    $empleado->email = $user->email;
+                    $empleado->save();
+                }
+
+                if ($user->can('acceder_portal_fichajes') || $user->hasRole('Empleado')) {
+                    if ($empleado->trashed()) {
+                        $empleado->restore();
+                    }
+                }
+            } else if ($user->can('acceder_portal_fichajes') || $user->hasRole('Empleado')) {
+                $parts = explode(' ', trim($user->name ?: 'Empleado'));
+                $nombre = $parts[0];
+                $apellidos = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : 'Apellidos';
+                
+                \App\Models\Empleado::create([
+                    'nombre' => $nombre,
+                    'apellidos' => $apellidos,
+                    'dni' => 'PENDIENTE-' . strtoupper(substr(md5($user->email), 0, 5)),
+                    'fecha_nacimiento' => '1990-01-01',
+                    'direccion' => 'Dirección pendiente',
+                    'localidad' => 'Utrera',
+                    'codigo_postal' => '41710',
+                    'provincia' => 'Sevilla',
+                    'telefono_principal' => $user->telefono ?: '600000000',
+                    'email' => $user->email,
+                    'onboarding_completado' => false,
+                    'onboarding_verificado_por_admin' => false,
+                    'onboarding_paso_actual' => 1,
+                ]);
+            }
             if ($empleado && isset($user->usuario_activo)) {
                 $isActive = filter_var($user->usuario_activo, FILTER_VALIDATE_BOOLEAN);
                 if ($isActive) {

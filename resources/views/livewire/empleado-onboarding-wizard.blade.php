@@ -279,7 +279,7 @@
                 <div class="border-b border-gray-100 dark:border-white/5 pb-4">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                         <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">3</span>
-                        Verificación de Datos Personales, Contacto e IBAN
+                        Validación de Datos Personales, Contacto e IBAN
                     </h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Comprueba y completa tus datos para la confección del contrato, alta en Seguridad Social y abono de nóminas.
@@ -302,9 +302,22 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">DNI / NIE (No modificable)</label>
-                            <input type="text" value="{{ str_starts_with($dni, 'PENDIENTE-') ? 'Pendiente de asignación oficial por RRHH' : $dni }}" readonly disabled class="w-full text-sm font-mono uppercase rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                            <p class="mt-1 text-[11px] text-gray-400">Identificador legal no modificable por el empleado.</p>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                <span>DNI / NIE (No modificable)</span>
+                                @if(!empty($dni) && !str_starts_with($dni, 'PENDIENTE-'))
+                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Registrado por la empresa
+                                    </span>
+                                @endif
+                            </label>
+                            @if(!empty($dni) && !str_starts_with($dni, 'PENDIENTE-'))
+                                <input type="text" value="{{ $dni }}" readonly disabled class="w-full text-sm font-mono font-bold uppercase rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                                <p class="mt-1 text-[11px] text-gray-400">DNI/NIE legal dado de alta previamente por la empresa en tu expediente.</p>
+                            @else
+                                <input type="text" value="Pendiente de asignación oficial por RRHH" readonly disabled class="w-full text-sm italic rounded-xl border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                                <p class="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Pendiente de comprobación y asignación oficial con la documentación de tu DNI adjunta.</p>
+                            @endif
                         </div>
 
                         <div>
@@ -370,7 +383,7 @@
                             ← Volver
                         </button>
                         <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
-                            <span>Guardar Datos y Continuar</span>
+                            <span>Validar Datos y Continuar</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
