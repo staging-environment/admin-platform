@@ -370,10 +370,10 @@ class EmpleadoOnboardingWizard extends Component
         ], [
             'acepta_rgpd.accepted' => 'Debes aceptar la política de Protección de Datos (RGPD).',
             'acepta_normativa.accepted' => 'Debes aceptar la Normativa Interna y Código de Conducta.',
-            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL).',
+            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL) y la obligación de uso de EPIs puestos a tu disposición.',
             'leido_rgpd.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de las cláusulas de Protección de Datos (RGPD).',
             'leido_normativa.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de la Normativa Interna.',
-            'leido_prl.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura del Protocolo de PRL.',
+            'leido_prl.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura del Protocolo de PRL y la obligación de uso de EPIs puestos a tu disposición.',
         ]);
 
         $this->empleado->update([

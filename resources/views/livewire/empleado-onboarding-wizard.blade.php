@@ -551,7 +551,7 @@
                                         </span>
                                     </div>
                                     <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                                        Confirmo haber recibido las instrucciones de seguridad laboral, uso obligatorio de EPIs y cumplimiento de protocolos de prevención en mi centro de trabajo.
+                                        Reconozco y acepto mi <strong>obligación legal inexcusable de utilizar los EPIs puestos a mi disposición</strong> por la empresa en función de las tareas asignadas (Art. 29 LPRL y RD 773/1997), asumiendo el estricto cumplimiento de las normas de prevención de riesgos y seguridad laboral.
                                     </p>
                                     <div class="pt-1 flex items-center gap-2">
                                         @if($acepta_prl && $leido_prl)
@@ -799,7 +799,16 @@
                 </div>
 
                 <div @scroll="checkScroll($el, 'prl')" class="space-y-3 max-h-[48vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
-                    <p><strong>1. Equipos de Protección Individual (EPIs):</strong> Es obligatorio el uso continuo de los EPIs reglamentarios suministrados por la empresa según el puesto (calzado de seguridad con puntera reforzada y suela antideslizante, chaleco reflectante de alta visibilidad, guantes de nitrilo para repostaje/limpieza y gafas protectoras).</p>
+                    <p><strong>1. Puesta a Disposición y Obligación Legal de Uso de Equipos de Protección Individual (EPIs) (Art. 29 Ley 31/1995 y RD 773/1997):</strong> La empresa pone a disposición del trabajador los Equipos de Protección Individual (EPIs) reglamentarios y debidamente homologados (marcado CE), determinados en función de la evaluación de riesgos del puesto y de las tareas específicas asignadas en cada momento (tales como calzado de seguridad antiestático y con suela antideslizante, prendas o chalecos de alta visibilidad para zonas de tránsito rodado en pistas, guantes de nitrilo/neopreno de protección química y mecánica para repostajes o limpieza, gafas de protección ocular frente a proyecciones o salpicaduras, y demás elementos preceptivos).
+                    <br><br>
+                    <strong>Constituye una obligación legal inexcusable y estricta del trabajador utilizar en todo momento los EPIs puestos a su disposición durante la realización de aquellas tareas que así lo requieran o cuando se encuentre en áreas de uso preceptivo</strong>. Asimismo, el trabajador tiene el deber legal de velar por su adecuado mantenimiento y conservación, almacenarlos correctamente en los lugares indicados para ello e informar de inmediato a la empresa de cualquier deterioro, defecto, daño o pérdida de eficacia protectora para su inmediata reposición o sustitución.</p>
+
+                    <div class="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 space-y-1.5 text-[11px] leading-relaxed">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <span>⚠️</span> Incumplimiento Laboral y Régimen Sancionador (Art. 29.3 LPRL y Art. 58 Estatuto de los Trabajadores):
+                        </p>
+                        <p>La negativa, falta de utilización, desuso injustificado o uso inadecuado de los EPIs puestos a disposición por la empresa tiene la consideración legal de <strong>incumplimiento laboral culpable</strong>. Dicha conducta está tipificada como falta grave o muy grave en el régimen disciplinario, pudiendo conllevar la imposición de sanciones disciplinarias, incluyendo la suspensión de empleo y sueldo o el <strong>despido disciplinario</strong>, sin perjuicio de las responsabilidades personales directas que pudieran derivarse en caso de accidente.</p>
+                    </div>
                     <p><strong>2. Manipulación Segura de Combustibles:</strong> Cumplir rigurosamente con la prohibición absoluta de fumar, encender fuego o utilizar dispositivos móviles en la zona de pistas y surtidores (zonas ATEX clasificadas con riesgo de atmósfera explosiva).</p>
                     <p><strong>3. Protocolo en caso de Emergencia o Derrame:</strong> Conocer la ubicación de los extintores, paradas de emergencia de los surtidores (setas de corte de corriente) y kit de absorción de derrames de hidrocarburos.</p>
                     <p><strong>4. Ergonomía y Manejo Manual de Cargas:</strong> Aplicar las técnicas ergonómicas adecuadas para la elevación de cargas pesadas en tienda y almacén (flexionar rodillas y mantener la espalda recta).</p>
