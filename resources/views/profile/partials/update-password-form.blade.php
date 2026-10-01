@@ -125,9 +125,7 @@
                         Cumplimiento de RGPD y Normativas de Empresa (Obligatorio)
                     </h3>
                 </div>
-                <button type="button" @click="marcarTodas()" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 underline text-left sm:text-right cursor-pointer">
-                    Marcar todas las casillas
-                </button>
+
             </div>
 
             <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -255,7 +253,7 @@
                     <button type="button" @click="modalRgpd = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
                 <div @scroll="checkScroll($el, 'rgpd')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readRgpd = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
-                    <p><strong>Responsable del Tratamiento:</strong> UTRECAR S.L. / ACTIVE NETWORK (C.I.F. B-41710000), con domicilio social en Ctra. Écija-Jerez, Km 11, Utrera (Sevilla).</p>
+                    <p><strong>Responsable del Tratamiento:</strong> UTRECAR, S.L. (C.I.F. B-41527250), con domicilio social en C/ Écija-Jerez, Nº 11, 41710, Utrera (Sevilla).</p>
                     <p><strong>Finalidad del Tratamiento:</strong> En cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que sus datos serán tratados exclusivamente para:
                     <ul class="list-disc pl-5 space-y-1 mt-1">
                         <li>Gestión y mantenimiento de la relación laboral y contractual.</li>

@@ -2,11 +2,11 @@
     modalRgpd: false,
     modalNormativa: false,
     modalPrl: false,
-    readRgpd: false,
-    readNormativa: false,
-    readPrl: false,
+    readRgpd: {{ $leido_rgpd ? 'true' : 'false' }},
+    readNormativa: {{ $leido_normativa ? 'true' : 'false' }},
+    readPrl: {{ $leido_prl ? 'true' : 'false' }},
     checkScroll(el, type) {
-        if (el.scrollHeight - el.scrollTop <= el.clientHeight + 25) {
+        if (el.scrollHeight - el.scrollTop <= el.clientHeight + 35) {
             if (type === 'rgpd') this.readRgpd = true;
             if (type === 'normativa') this.readNormativa = true;
             if (type === 'prl') this.readPrl = true;
@@ -491,7 +491,7 @@
                         Cumplimiento Normativo, RGPD y Bienvenida Oficial
                     </h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Lee y confirma la aceptación de las normativas obligatorias para activar definitivamente tu usuario.
+                        Para garantizar la validez legal de tu incorporación, es <strong>obligatorio abrir y leer íntegramente cada uno de los 3 documentos</strong> hasta el final antes de poder aceptarlos.
                     </p>
                 </div>
 
@@ -499,93 +499,141 @@
                     <div class="space-y-4">
                         
                         <!-- Check 1: RGPD -->
-                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_rgpd ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
-                             wire:click="$toggle('acepta_rgpd')">
+                        <div @click="modalRgpd = true"
+                             class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_rgpd && $leido_rgpd ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/50 hover:bg-amber-500/5' }}">
                             <div class="flex items-start gap-3.5">
-                                <input type="checkbox" wire:model.live="acepta_rgpd" id="onb_rgpd" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
-                                <div class="text-xs space-y-1 flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <label for="onb_rgpd" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                <div class="mt-0.5 shrink-0">
+                                    @if($acepta_rgpd && $leido_rgpd)
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        </div>
+                                    @else
+                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs">
+                                            📖
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="text-xs space-y-1.5 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-bold text-sm text-gray-900 dark:text-white">
                                             Protección de Datos Personales (RGPD / LOPDGDD)
-                                        </label>
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_rgpd ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
-                                            {{ $acepta_rgpd ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $acepta_rgpd && $leido_rgpd ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' }}">
+                                            {{ $acepta_rgpd && $leido_rgpd ? '✓ Leído y Aceptado' : '⚠️ Lectura requerida' }}
                                         </span>
                                     </div>
-                                    <p class="text-gray-600 dark:text-gray-400">
-                                        Consiento el tratamiento de mis datos personales con fines exclusivamente laborales, de registro de jornada, nóminas y seguridad social por parte de UTRECAR / ACTIVE NETWORK.
+                                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                        Consiento el tratamiento de mis datos personales con fines exclusivamente laborales, de registro de jornada, nóminas y seguridad social por parte de UTRECAR, S.L.
                                     </p>
-                                    <div class="pt-1">
-                                        <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                            </svg>
-                                            <span>Leer normativa completa RGPD</span>
-                                        </button>
+                                    <div class="pt-1 flex items-center gap-2">
+                                        @if($acepta_rgpd && $leido_rgpd)
+                                            <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer">
+                                                <span>Revisar documento legal</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </button>
+                                        @else
+                                            <button type="button" @click.stop="modalRgpd = true" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                                                <span>📖 Abrir y leer documento para aceptar</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            @error('acepta_rgpd') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                            @error('acepta_rgpd') <span class="text-xs text-red-500 font-semibold block px-2 mt-2">{{ $message }}</span> @enderror
+                            @error('leido_rgpd') <span class="text-xs text-red-500 font-semibold block px-2 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Check 2: Normativa Interna -->
-                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_normativa ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
-                             wire:click="$toggle('acepta_normativa')">
+                        <div @click="modalNormativa = true"
+                             class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_normativa && $leido_normativa ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/50 hover:bg-amber-500/5' }}">
                             <div class="flex items-start gap-3.5">
-                                <input type="checkbox" wire:model.live="acepta_normativa" id="onb_normativa" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
-                                <div class="text-xs space-y-1 flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <label for="onb_normativa" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                <div class="mt-0.5 shrink-0">
+                                    @if($acepta_normativa && $leido_normativa)
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        </div>
+                                    @else
+                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs">
+                                            📖
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="text-xs space-y-1.5 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-bold text-sm text-gray-900 dark:text-white">
                                             Normativa Interna y Código de Conducta
-                                        </label>
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_normativa ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
-                                            {{ $acepta_normativa ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $acepta_normativa && $leido_normativa ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' }}">
+                                            {{ $acepta_normativa && $leido_normativa ? '✓ Leído y Aceptado' : '⚠️ Lectura requerida' }}
                                         </span>
                                     </div>
-                                    <p class="text-gray-600 dark:text-gray-400">
+                                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
                                         Me comprometo a respetar las directrices operativas, horarios asignados, obligación de registro horario de jornada en cada turno y políticas de la empresa.
                                     </p>
-                                    <div class="pt-1">
-                                        <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                            </svg>
-                                            <span>Leer Normativa Interna y Código de Conducta</span>
-                                        </button>
+                                    <div class="pt-1 flex items-center gap-2">
+                                        @if($acepta_normativa && $leido_normativa)
+                                            <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer">
+                                                <span>Revisar normativa</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </button>
+                                        @else
+                                            <button type="button" @click.stop="modalNormativa = true" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                                                <span>📖 Abrir y leer documento para aceptar</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            @error('acepta_normativa') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                            @error('acepta_normativa') <span class="text-xs text-red-500 font-semibold block px-2 mt-2">{{ $message }}</span> @enderror
+                            @error('leido_normativa') <span class="text-xs text-red-500 font-semibold block px-2 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Check 3: PRL -->
-                        <div class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_prl ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10' }}"
-                             wire:click="$toggle('acepta_prl')">
+                        <div @click="modalPrl = true"
+                             class="p-4 rounded-2xl border transition-all cursor-pointer select-none {{ $acepta_prl && $leido_prl ? 'bg-emerald-50/70 border-emerald-400 dark:bg-emerald-950/30 dark:border-emerald-700/50' : 'bg-gray-50 border-gray-200 dark:bg-white/5 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-500/50 hover:bg-amber-500/5' }}">
                             <div class="flex items-start gap-3.5">
-                                <input type="checkbox" wire:model.live="acepta_prl" id="onb_prl" @click.stop class="mt-1 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-white/10" />
-                                <div class="text-xs space-y-1 flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <label for="onb_prl" class="font-bold text-gray-900 dark:text-white cursor-pointer">
+                                <div class="mt-0.5 shrink-0">
+                                    @if($acepta_prl && $leido_prl)
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        </div>
+                                    @else
+                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs">
+                                            📖
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="text-xs space-y-1.5 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-bold text-sm text-gray-900 dark:text-white">
                                             Prevención de Riesgos Laborales (PRL) y Seguridad
-                                        </label>
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $acepta_prl ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400' }}">
-                                            {{ $acepta_prl ? '✓ Aceptado' : 'Pendiente' }}
+                                        </span>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full {{ $acepta_prl && $leido_prl ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' }}">
+                                            {{ $acepta_prl && $leido_prl ? '✓ Leído y Aceptado' : '⚠️ Lectura requerida' }}
                                         </span>
                                     </div>
-                                    <p class="text-gray-600 dark:text-gray-400">
+                                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
                                         Confirmo haber recibido las instrucciones de seguridad laboral, uso obligatorio de EPIs y cumplimiento de protocolos de prevención en mi centro de trabajo.
                                     </p>
-                                    <div class="pt-1">
-                                        <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                            </svg>
-                                            <span>Leer Protocolo de Prevención y Seguridad (PRL)</span>
-                                        </button>
+                                    <div class="pt-1 flex items-center gap-2">
+                                        @if($acepta_prl && $leido_prl)
+                                            <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer">
+                                                <span>Revisar protocolo PRL</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </button>
+                                        @else
+                                            <button type="button" @click.stop="modalPrl = true" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                                                <span>📖 Abrir y leer documento para aceptar</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            @error('acepta_prl') <span class="text-xs text-red-500 block px-2 mt-1">{{ $message }}</span> @enderror
+                            @error('acepta_prl') <span class="text-xs text-red-500 font-semibold block px-2 mt-2">{{ $message }}</span> @enderror
+                            @error('leido_prl') <span class="text-xs text-red-500 font-semibold block px-2 mt-1">{{ $message }}</span> @enderror
                         </div>
 
                     </div>
@@ -598,13 +646,22 @@
                         </p>
                     </div>
 
+                    @php
+                        $todosAceptados = $acepta_rgpd && $acepta_normativa && $acepta_prl && $leido_rgpd && $leido_normativa && $leido_prl;
+                    @endphp
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
                         <button type="button" wire:click="irPaso(4)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
                             ← Volver
                         </button>
-                        <button type="submit" class="inline-flex items-center justify-center px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-sm font-black transition-all shadow-xl hover:shadow-2xl gap-2 cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            <span>Finalizar Onboarding y Acceder al Portal</span>
+                        <button type="submit" 
+                                class="inline-flex items-center justify-center px-8 py-4 rounded-2xl text-sm font-black transition-all gap-2.5 {{ $todosAceptados ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl hover:shadow-2xl cursor-pointer' : 'bg-gray-200 dark:bg-white/10 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-80' }}">
+                            @if($todosAceptados)
+                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                <span>Finalizar Onboarding y Acceder al Portal</span>
+                            @else
+                                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <span>Lee y confirma las 3 cláusulas para finalizar</span>
+                            @endif
                         </button>
                     </div>
                 </form>
@@ -619,13 +676,16 @@
         <div x-show="modalRgpd" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalRgpd = false" @keydown.escape.window="modalRgpd = false">
             <div x-show="modalRgpd" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
                 <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <span>🛡️</span> Protección de Datos Personales (RGPD / LOPDGDD)
-                    </h3>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>🛡️</span> Protección de Datos Personales (RGPD / LOPDGDD)
+                        </h3>
+                        <span class="text-[11px] text-gray-500 dark:text-gray-400">UTRECAR, S.L. · C.I.F. B-41527250</span>
+                    </div>
                     <button type="button" @click="modalRgpd = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'rgpd')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readRgpd = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
-                    <p><strong>Responsable del Tratamiento:</strong> UTRECAR S.L. / ACTIVE NETWORK (C.I.F. B-41710000), con domicilio social en Ctra. Écija-Jerez, Km 11, Utrera (Sevilla).</p>
+                <div @scroll="checkScroll($el, 'rgpd')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readRgpd = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                    <p><strong>Responsable del Tratamiento:</strong> UTRECAR, S.L. (C.I.F. B-41527250), con domicilio social en C/ Écija-Jerez, Nº 11, 41710, Utrera (Sevilla).</p>
                     <p><strong>Finalidad del Tratamiento:</strong> En cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que sus datos serán tratados exclusivamente para:
                     <ul class="list-disc pl-5 space-y-1 mt-1">
                         <li>Gestión y mantenimiento de la relación laboral y contractual.</li>
@@ -636,9 +696,9 @@
                     </p>
                     <p><strong>Legitimación:</strong> Cumplimiento de obligaciones legales aplicables, ejecución del contrato de trabajo e interés legítimo empresarial.</p>
                     <p><strong>Destinatarios:</strong> Sus datos únicamente se comunicarán a organismos públicos oficiales (Seguridad Social, Agencia Tributaria, Ministerio de Trabajo) y entidades bancarias para el abono de salarios.</p>
-                    <p><strong>Derechos del Trabajador:</strong> Puede ejercitar sus derechos de acceso, rectificación, supresión, limitación del tratamiento y portabilidad dirigiéndose por escrito al departamento de Recursos Humanos o a través del canal oficial de la empresa.</p>
+                    <p><strong>Derechos del Trabajador:</strong> Puede ejercitar sus derechos de acceso, rectificación, supresión, limitación del tratamiento y portabilidad dirigiéndose por escrito al departamento de Recursos Humanos o a través del canal oficial de la empresa (utrecar@gmail.com).</p>
                     <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
-                        📜 Fin del documento de Protección de Datos. Al hacer clic en aceptar, confirma haber leído y comprendido íntegramente estas cláusulas.
+                        📜 Fin del documento de Protección de Datos. Has llegado al final de las cláusulas.
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
@@ -652,10 +712,11 @@
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readRgpd"
-                            @click="modalRgpd = false; $wire.set('acepta_rgpd', true)" 
-                            x-bind:class="readRgpd ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
-                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
-                        He leído y Acepto el RGPD
+                            @click="modalRgpd = false; $wire.aceptarClausula('rgpd')" 
+                            x-bind:class="readRgpd ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
+                        <svg x-show="readRgpd" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>He leído íntegramente y Acepto el RGPD</span>
                     </button>
                 </div>
             </div>
@@ -667,19 +728,22 @@
         <div x-show="modalNormativa" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalNormativa = false" @keydown.escape.window="modalNormativa = false">
             <div x-show="modalNormativa" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
                 <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <span>📋</span> Normativa Interna y Código de Conducta
-                    </h3>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>📋</span> Normativa Interna y Código de Conducta
+                        </h3>
+                        <span class="text-[11px] text-gray-500 dark:text-gray-400">UTRECAR, S.L. · Normativa laboral y operativa</span>
+                    </div>
                     <button type="button" @click="modalNormativa = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'normativa')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readNormativa = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                <div @scroll="checkScroll($el, 'normativa')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readNormativa = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
                     <p><strong>1. Obligatoriedad del Registro de Jornada:</strong> Cada empleado es responsable único e intransferible de realizar el fichaje de entrada y de salida puntual en cada turno laboral a través de los canales autorizados (Portal Web corporativo o terminales en estación).</p>
                     <p><strong>2. Credenciales y Acceso:</strong> Las credenciales y contraseñas de acceso al sistema informático son de uso estrictamente personal. Queda terminantemente prohibido ceder o compartir las claves de usuario con otros compañeros o terceras personas.</p>
                     <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
                     <p><strong>4. Comunicación de Incidencias y Solicitudes:</strong> Cualquier baja médica, permiso retribuido o solicitud de vacaciones deberá tramitarse con la debida antelación a través del portal de Recursos Humanos, aportando los justificantes reglamentarios.</p>
                     <p><strong>5. Atención al Cliente e Imagen Corporativa:</strong> En los puestos de cara al público, se mantendrá un trato cordial, respetuoso y profesional, portando el uniforme reglamentario en perfectas condiciones de higiene y seguridad.</p>
                     <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
-                        📜 Fin del Código de Conducta. Al hacer clic en aceptar, confirma haber leído y aceptado las normas laborales de la empresa.
+                        📜 Fin del Código de Conducta. Has llegado al final del documento.
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
@@ -693,10 +757,11 @@
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readNormativa"
-                            @click="modalNormativa = false; $wire.set('acepta_normativa', true)" 
-                            x-bind:class="readNormativa ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
-                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
-                        He leído y Acepto la Normativa Interna
+                            @click="modalNormativa = false; $wire.aceptarClausula('normativa')" 
+                            x-bind:class="readNormativa ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
+                        <svg x-show="readNormativa" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>He leído íntegramente y Acepto la Normativa</span>
                     </button>
                 </div>
             </div>
@@ -708,18 +773,21 @@
         <div x-show="modalPrl" class="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-sm" style="display: none;" @click="modalPrl = false" @keydown.escape.window="modalPrl = false">
             <div x-show="modalPrl" class="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl space-y-4 text-left" @click.stop>
                 <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/10">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <span>🦺</span> Prevención de Riesgos Laborales (PRL) y Seguridad
-                    </h3>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span>🦺</span> Prevención de Riesgos Laborales (PRL) y Seguridad
+                        </h3>
+                        <span class="text-[11px] text-gray-500 dark:text-gray-400">UTRECAR, S.L. · Seguridad y salud en el trabajo</span>
+                    </div>
                     <button type="button" @click="modalPrl = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'prl')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 10) readPrl = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+                <div @scroll="checkScroll($el, 'prl')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readPrl = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
                     <p><strong>1. Equipos de Protección Individual (EPIs):</strong> Es obligatorio el uso continuo de los EPIs reglamentarios suministrados por la empresa según el puesto (calzado de seguridad con puntera reforzada y suela antideslizante, chaleco reflectante de alta visibilidad, guantes de nitrilo para repostaje/limpieza y gafas protectoras).</p>
                     <p><strong>2. Manipulación Segura de Combustibles:</strong> Cumplir rigurosamente con la prohibición absoluta de fumar, encender fuego o utilizar dispositivos móviles en la zona de pistas y surtidores (zonas ATEX clasificadas con riesgo de atmósfera explosiva).</p>
                     <p><strong>3. Protocolo en caso de Emergencia o Derrame:</strong> Conocer la ubicación de los extintores, paradas de emergencia de los surtidores (setas de corte de corriente) y kit de absorción de derrames de hidrocarburos.</p>
                     <p><strong>4. Ergonomía y Manejo Manual de Cargas:</strong> Aplicar las técnicas ergonómicas adecuadas para la elevación de cargas pesadas en tienda y almacén (flexionar rodillas y mantener la espalda recta).</p>
                     <div class="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 font-medium">
-                        📜 Fin del Protocolo de Seguridad y PRL. Al hacer clic en aceptar, certifica haber recibido y comprendido las normas de prevención.
+                        📜 Fin del Protocolo de Seguridad y PRL. Has llegado al final del documento.
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
@@ -733,10 +801,11 @@
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readPrl"
-                            @click="modalPrl = false; $wire.set('acepta_prl', true)" 
-                            x-bind:class="readPrl ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed'"
-                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all">
-                        He leído y Acepto las Normas de PRL
+                            @click="modalPrl = false; $wire.aceptarClausula('prl')" 
+                            x-bind:class="readPrl ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
+                        <svg x-show="readPrl" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>He leído íntegramente y Acepto las Normas de PRL</span>
                     </button>
                 </div>
             </div>

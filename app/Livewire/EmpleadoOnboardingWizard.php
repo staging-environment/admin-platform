@@ -45,10 +45,27 @@ class EmpleadoOnboardingWizard extends Component
     public $file_prl = null;
     public $file_discapacidad = null;
 
-    // Paso 5: Políticas
+    // Paso 5: Políticas y Verificación de Lectura
     public bool $acepta_rgpd = false;
     public bool $acepta_normativa = false;
     public bool $acepta_prl = false;
+    public bool $leido_rgpd = false;
+    public bool $leido_normativa = false;
+    public bool $leido_prl = false;
+
+    public function aceptarClausula(string $tipo)
+    {
+        if ($tipo === 'rgpd') {
+            $this->leido_rgpd = true;
+            $this->acepta_rgpd = true;
+        } elseif ($tipo === 'normativa') {
+            $this->leido_normativa = true;
+            $this->acepta_normativa = true;
+        } elseif ($tipo === 'prl') {
+            $this->leido_prl = true;
+            $this->acepta_prl = true;
+        }
+    }
 
     public function mount()
     {
@@ -312,10 +329,16 @@ class EmpleadoOnboardingWizard extends Component
             'acepta_rgpd' => 'accepted',
             'acepta_normativa' => 'accepted',
             'acepta_prl' => 'accepted',
+            'leido_rgpd' => 'accepted',
+            'leido_normativa' => 'accepted',
+            'leido_prl' => 'accepted',
         ], [
             'acepta_rgpd.accepted' => 'Debes aceptar la política de Protección de Datos (RGPD).',
             'acepta_normativa.accepted' => 'Debes aceptar la Normativa Interna y Código de Conducta.',
             'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL).',
+            'leido_rgpd.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de las cláusulas de Protección de Datos (RGPD).',
+            'leido_normativa.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de la Normativa Interna.',
+            'leido_prl.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura del Protocolo de PRL.',
         ]);
 
         $this->empleado->update([
