@@ -5,11 +5,32 @@
     readRgpd: {{ $leido_rgpd ? 'true' : 'false' }},
     readNormativa: {{ $leido_normativa ? 'true' : 'false' }},
     readPrl: {{ $leido_prl ? 'true' : 'false' }},
+    scrollPercentRgpd: {{ $leido_rgpd ? '100' : '0' }},
+    scrollPercentNormativa: {{ $leido_normativa ? '100' : '0' }},
+    scrollPercentPrl: {{ $leido_prl ? '100' : '0' }},
     checkScroll(el, type) {
-        if (el.scrollHeight - el.scrollTop <= el.clientHeight + 35) {
-            if (type === 'rgpd') this.readRgpd = true;
-            if (type === 'normativa') this.readNormativa = true;
-            if (type === 'prl') this.readPrl = true;
+        if (!el || el.clientHeight <= 0) return;
+        const scrollable = el.scrollHeight - el.clientHeight;
+        if (scrollable <= 0) return;
+        const percent = Math.min(100, Math.max(0, Math.round((el.scrollTop / scrollable) * 100)));
+        if (type === 'rgpd') {
+            this.scrollPercentRgpd = percent;
+            if (percent >= 98 || (el.scrollHeight - el.scrollTop <= el.clientHeight + 25)) {
+                this.readRgpd = true;
+                this.scrollPercentRgpd = 100;
+            }
+        } else if (type === 'normativa') {
+            this.scrollPercentNormativa = percent;
+            if (percent >= 98 || (el.scrollHeight - el.scrollTop <= el.clientHeight + 25)) {
+                this.readNormativa = true;
+                this.scrollPercentNormativa = 100;
+            }
+        } else if (type === 'prl') {
+            this.scrollPercentPrl = percent;
+            if (percent >= 98 || (el.scrollHeight - el.scrollTop <= el.clientHeight + 25)) {
+                this.readPrl = true;
+                this.scrollPercentPrl = 100;
+            }
         }
     }
 }">
@@ -599,7 +620,21 @@
                     </div>
                     <button type="button" @click="modalRgpd = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'rgpd')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readRgpd = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+
+                <!-- Barra de progreso de lectura -->
+                <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-white/5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-medium text-gray-600 dark:text-gray-400">Progreso de lectura obligatoria:</span>
+                        <span class="font-bold font-mono" :class="readRgpd ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'" x-text="scrollPercentRgpd + '%'"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-white/10 h-2 rounded-full overflow-hidden">
+                        <div class="h-full transition-all duration-150" 
+                             :class="readRgpd ? 'bg-emerald-500' : 'bg-gradient-to-r from-amber-500 to-amber-600'" 
+                             :style="'width: ' + scrollPercentRgpd + '%'"></div>
+                    </div>
+                </div>
+
+                <div @scroll="checkScroll($el, 'rgpd')" class="space-y-3 max-h-[48vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
                     <p><strong>Responsable del Tratamiento:</strong> UTRECAR, S.L. (C.I.F. B-41527250), con domicilio social en C/ Écija-Jerez, Nº 11, 41710, Utrera (Sevilla).</p>
                     <p><strong>Finalidad del Tratamiento:</strong> En cumplimiento del Reglamento General de Protección de Datos (RGPD UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que sus datos serán tratados exclusivamente para:
                     <ul class="list-disc pl-5 space-y-1 mt-1">
@@ -617,18 +652,24 @@
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
-                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                        <span x-show="!readRgpd" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
-                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                    <div class="text-[11px]">
+                        <span x-show="!readRgpd" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 animate-bounce shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                            Desplázate hasta el final para leer el documento completo y poder aceptar
                         </span>
-                        <span x-show="readRgpd" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
-                            ✓ Documento completado
+                        <span x-show="readRgpd" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5" style="display: none;">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Documento leído al 100%
                         </span>
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readRgpd"
                             @click="modalRgpd = false; $wire.aceptarClausula('rgpd')" 
-                            x-bind:class="readRgpd ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            x-bind:class="readRgpd ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md transform hover:scale-[1.02]' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none'"
                             class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
                         <svg x-show="readRgpd" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         <span>He leído íntegramente y Acepto el RGPD</span>
@@ -651,7 +692,21 @@
                     </div>
                     <button type="button" @click="modalNormativa = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'normativa')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readNormativa = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+
+                <!-- Barra de progreso de lectura -->
+                <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-white/5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-medium text-gray-600 dark:text-gray-400">Progreso de lectura obligatoria:</span>
+                        <span class="font-bold font-mono" :class="readNormativa ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'" x-text="scrollPercentNormativa + '%'"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-white/10 h-2 rounded-full overflow-hidden">
+                        <div class="h-full transition-all duration-150" 
+                             :class="readNormativa ? 'bg-emerald-500' : 'bg-gradient-to-r from-amber-500 to-amber-600'" 
+                             :style="'width: ' + scrollPercentNormativa + '%'"></div>
+                    </div>
+                </div>
+
+                <div @scroll="checkScroll($el, 'normativa')" class="space-y-3 max-h-[48vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
                     <p><strong>1. Obligatoriedad del Registro de Jornada:</strong> Cada empleado es responsable único e intransferible de realizar el fichaje de entrada y de salida puntual en cada turno laboral a través de los canales autorizados (Portal Web corporativo o terminales en estación).</p>
                     <p><strong>2. Credenciales y Acceso:</strong> Las credenciales y contraseñas de acceso al sistema informático son de uso estrictamente personal. Queda terminantemente prohibido ceder o compartir las claves de usuario con otros compañeros o terceras personas.</p>
                     <p><strong>3. Uso de Instalaciones y Equipos:</strong> El trabajador se compromete a hacer un uso diligente, responsable y seguro de los surtidores, terminales TPV, sistemas de cobro y demás medios proporcionados por la empresa.</p>
@@ -689,18 +744,24 @@
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
-                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                        <span x-show="!readNormativa" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
-                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                    <div class="text-[11px]">
+                        <span x-show="!readNormativa" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 animate-bounce shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                            Desplázate hasta el final para leer el documento completo y poder aceptar
                         </span>
-                        <span x-show="readNormativa" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
-                            ✓ Documento completado
+                        <span x-show="readNormativa" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5" style="display: none;">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Documento leído al 100%
                         </span>
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readNormativa"
                             @click="modalNormativa = false; $wire.aceptarClausula('normativa')" 
-                            x-bind:class="readNormativa ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            x-bind:class="readNormativa ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md transform hover:scale-[1.02]' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none'"
                             class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
                         <svg x-show="readNormativa" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         <span>He leído íntegramente y Acepto la Normativa</span>
@@ -723,7 +784,21 @@
                     </div>
                     <button type="button" @click="modalPrl = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                 </div>
-                <div @scroll="checkScroll($el, 'prl')" x-init="$nextTick(() => { if ($el.scrollHeight <= $el.clientHeight + 25) readPrl = true; })" class="space-y-3 max-h-[50vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
+
+                <!-- Barra de progreso de lectura -->
+                <div class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-white/5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-medium text-gray-600 dark:text-gray-400">Progreso de lectura obligatoria:</span>
+                        <span class="font-bold font-mono" :class="readPrl ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'" x-text="scrollPercentPrl + '%'"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-white/10 h-2 rounded-full overflow-hidden">
+                        <div class="h-full transition-all duration-150" 
+                             :class="readPrl ? 'bg-emerald-500' : 'bg-gradient-to-r from-amber-500 to-amber-600'" 
+                             :style="'width: ' + scrollPercentPrl + '%'"></div>
+                    </div>
+                </div>
+
+                <div @scroll="checkScroll($el, 'prl')" class="space-y-3 max-h-[48vh] overflow-y-auto pr-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border border-gray-100 dark:border-white/5 p-4 rounded-2xl bg-gray-50/50 dark:bg-gray-950/30">
                     <p><strong>1. Equipos de Protección Individual (EPIs):</strong> Es obligatorio el uso continuo de los EPIs reglamentarios suministrados por la empresa según el puesto (calzado de seguridad con puntera reforzada y suela antideslizante, chaleco reflectante de alta visibilidad, guantes de nitrilo para repostaje/limpieza y gafas protectoras).</p>
                     <p><strong>2. Manipulación Segura de Combustibles:</strong> Cumplir rigurosamente con la prohibición absoluta de fumar, encender fuego o utilizar dispositivos móviles en la zona de pistas y surtidores (zonas ATEX clasificadas con riesgo de atmósfera explosiva).</p>
                     <p><strong>3. Protocolo en caso de Emergencia o Derrame:</strong> Conocer la ubicación de los extintores, paradas de emergencia de los surtidores (setas de corte de corriente) y kit de absorción de derrames de hidrocarburos.</p>
@@ -733,18 +808,24 @@
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-100 dark:border-white/10">
-                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                        <span x-show="!readPrl" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
-                            ⚠️ Desplázate hasta el final del texto para habilitar la aceptación
+                    <div class="text-[11px]">
+                        <span x-show="!readPrl" class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 animate-bounce shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                            Desplázate hasta el final para leer el documento completo y poder aceptar
                         </span>
-                        <span x-show="readPrl" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1" style="display: none;">
-                            ✓ Documento completado
+                        <span x-show="readPrl" class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5" style="display: none;">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Documento leído al 100%
                         </span>
                     </div>
                     <button type="button" 
                             x-bind:disabled="!readPrl"
                             @click="modalPrl = false; $wire.aceptarClausula('prl')" 
-                            x-bind:class="readPrl ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60'"
+                            x-bind:class="readPrl ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-md transform hover:scale-[1.02]' : 'bg-gray-200 dark:bg-white/10 text-gray-400 cursor-not-allowed opacity-60 pointer-events-none'"
                             class="px-5 py-2.5 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2">
                         <svg x-show="readPrl" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         <span>He leído íntegramente y Acepto las Normas de PRL</span>
