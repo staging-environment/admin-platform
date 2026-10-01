@@ -105,7 +105,7 @@ class EmpleadoOnboardingWizard extends Component
         // Cargar datos existentes
         $this->nombre = (string) ($this->empleado->nombre ?? '');
         $this->apellidos = (string) ($this->empleado->apellidos ?? '');
-        $this->dni = (string) (str_starts_with((string)$this->empleado->dni, 'PENDIENTE-') ? '' : $this->empleado->dni);
+        $this->dni = (string) ($this->empleado->dni ?? '');
         $this->fecha_nacimiento = $this->empleado->fecha_nacimiento ? Carbon::parse($this->empleado->fecha_nacimiento)->format('Y-m-d') : '';
         $this->telefono_principal = (string) ($this->empleado->telefono_principal ?? '');
         $this->direccion = (string) ($this->empleado->direccion === 'Dirección pendiente' ? '' : $this->empleado->direccion);
@@ -191,9 +191,6 @@ class EmpleadoOnboardingWizard extends Component
     public function guardarPaso3Datos()
     {
         $this->validate([
-            'nombre' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|max:20',
             'fecha_nacimiento' => 'required|date|before:today',
             'telefono_principal' => 'required|string|max:20',
             'direccion' => 'required|string|max:255',
@@ -204,9 +201,6 @@ class EmpleadoOnboardingWizard extends Component
             'contacto_emergencia_nombre' => 'nullable|string|max:255',
             'contacto_emergencia_telefono' => 'nullable|string|max:20',
         ], [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'apellidos.required' => 'Los apellidos son obligatorios.',
-            'dni.required' => 'El DNI/NIE es obligatorio.',
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'telefono_principal.required' => 'El teléfono de contacto es obligatorio.',
             'direccion.required' => 'La dirección es obligatoria.',
@@ -217,9 +211,6 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->empleado->update([
-            'nombre' => $this->nombre,
-            'apellidos' => $this->apellidos,
-            'dni' => strtoupper(trim($this->dni)),
             'fecha_nacimiento' => $this->fecha_nacimiento,
             'telefono_principal' => $this->telefono_principal,
             'direccion' => $this->direccion,

@@ -290,21 +290,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre *</label>
-                            <input type="text" wire:model="nombre" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                            @error('nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre (No modificable)</label>
+                            <input type="text" value="{{ $nombre }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para corregir tu nombre contacta con RRHH.</p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Apellidos *</label>
-                            <input type="text" wire:model="apellidos" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                            @error('apellidos') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Apellidos (No modificable)</label>
+                            <input type="text" value="{{ $apellidos }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para corregir tus apellidos contacta con RRHH.</p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">DNI / NIE *</label>
-                            <input type="text" wire:model="dni" placeholder="12345678Z" class="w-full text-sm font-mono uppercase rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                            @error('dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">DNI / NIE (No modificable)</label>
+                            <input type="text" value="{{ str_starts_with($dni, 'PENDIENTE-') ? 'Pendiente de asignación oficial por RRHH' : $dni }}" readonly disabled class="w-full text-sm font-mono uppercase rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                            <p class="mt-1 text-[11px] text-gray-400">Identificador legal no modificable por el empleado.</p>
                         </div>
 
                         <div>
