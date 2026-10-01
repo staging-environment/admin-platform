@@ -142,13 +142,13 @@ class EmpleadoOnboardingWizard extends Component
         $this->tiene_discapacidad = (bool) $this->empleado->tiene_discapacidad;
 
         $pasoActual = (int) ($this->empleado->onboarding_paso_actual ?: 1);
-        $this->paso = min(max(1, $pasoActual), 5);
+        $this->paso = min(max(1, $pasoActual), 4);
     }
 
     public function irPaso(int $nuevoPaso)
     {
         $maxPaso = max((int) $this->empleado->onboarding_paso_actual, $this->paso);
-        if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 5) {
+        if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 4) {
             $this->paso = $nuevoPaso;
         }
     }
@@ -246,7 +246,7 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->paso = 4;
-        session()->flash('success_step', 'Datos personales validados correctamente. Ahora adjunta tu documentación digital.');
+        session()->flash('success_step', 'Datos personales validados correctamente. Por favor, revisa y confirma las normativas de empresa.');
     }
 
     public function guardarPaso4Documentos()
@@ -361,7 +361,7 @@ class EmpleadoOnboardingWizard extends Component
             'politicas_aceptadas_at' => now(),
             'onboarding_completado' => true,
             'onboarding_fecha_completado' => now(),
-            'onboarding_paso_actual' => 5,
+            'onboarding_paso_actual' => 4,
         ]);
 
         $this->empleado->actualizarAlertas();

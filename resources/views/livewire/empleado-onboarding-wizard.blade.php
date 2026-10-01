@@ -47,7 +47,7 @@
 
     <!-- Multi-step Navigation Bar -->
     <div class="bg-white dark:bg-gray-900 rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-100 dark:border-white/5">
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             
             <!-- Step 1 -->
             <button type="button" wire:click="irPaso(1)" class="flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 1 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 1 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
@@ -81,17 +81,8 @@
                 <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 4 ? 'bg-amber-500 text-white shadow-md' : ($paso > 4 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
                     @if($paso > 4) ✓ @else 4 @endif
                 </div>
-                <span class="text-xs font-bold leading-tight">Documentación</span>
-                <span class="text-[10px] text-gray-400 hidden sm:block">DNI & PRL</span>
-            </button>
-
-            <!-- Step 5 -->
-            <button type="button" wire:click="irPaso(5)" class="col-span-2 sm:col-span-1 flex flex-col items-center text-center p-3 rounded-2xl transition-all {{ $paso === 5 ? 'bg-amber-500/10 border-2 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm' : ($paso > 5 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-pointer hover:bg-emerald-500/20' : 'bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 opacity-60 cursor-not-allowed') }}">
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs mb-1.5 {{ $paso === 5 ? 'bg-amber-500 text-white shadow-md' : ($paso > 5 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-white/10 text-gray-500') }}">
-                    @if($paso > 5) ✓ @else 5 @endif
-                </div>
                 <span class="text-xs font-bold leading-tight">Políticas</span>
-                <span class="text-[10px] text-gray-400 hidden sm:block">RGPD & Inicio</span>
+                <span class="text-[10px] text-gray-400 hidden sm:block">RGPD & Normativa</span>
             </button>
 
         </div>
@@ -392,164 +383,13 @@
         @endif
 
         {{-- ========================================================================= --}}
-        {{-- PASO 4: DOCUMENTACIÓN DIGITAL --}}
+        {{-- PASO 4: CUMPLIMIENTO NORMATIVO, RGPD Y FINALIZACIÓN --}}
         {{-- ========================================================================= --}}
         @if ($paso === 4)
             <div class="space-y-6 animate-fadeIn">
                 <div class="border-b border-gray-100 dark:border-white/5 pb-4">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                         <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">4</span>
-                        Documentación de Incorporación
-                    </h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Sube los archivos oficiales requeridos en formato PDF o imagen nítida (JPG, PNG).
-                    </p>
-                </div>
-
-                <form wire:submit.prevent="guardarPaso4Documentos" class="space-y-6">
-                    <div class="space-y-5">
-                        
-                        <!-- DNI Caducidad y Archivo -->
-                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span>🪪</span> DNI / NIE (Documento Obligatorio)
-                                </h3>
-                                @if($empleado->documentos()->where('tipo', 'DNI')->exists())
-                                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
-                                        ✓ Ya tienes un DNI adjuntado
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fecha de Caducidad del DNI *</label>
-                                    <input type="date" wire:model="fecha_caducidad_dni" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                                    @error('fecha_caducidad_dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Archivo DNI (PDF / Foto) *</label>
-                                    <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
-                                        <svg class="w-6 h-6 mb-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                        <span>Seleccionar archivo DNI...</span>
-                                        <input type="file" wire:model="file_dni" class="hidden" />
-                                    </label>
-                                    @if ($file_dni)
-                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_dni->getClientOriginalName() }}</span>
-                                    @endif
-                                    @error('file_dni') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Justificante Bancario -->
-                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <span>🏦</span> Certificado de Titularidad Bancaria / Justificante de IBAN (Recomendado)
-                            </h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Documento del banco o captura de la banca online donde aparezca tu nombre y el número de cuenta IBAN para garantizar los pagos de nómina.
-                            </p>
-                            <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
-                                <span>Seleccionar certificado bancario...</span>
-                                <input type="file" wire:model="file_banco" class="hidden" />
-                            </label>
-                            @if ($file_banco)
-                                <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_banco->getClientOriginalName() }}</span>
-                            @endif
-                        </div>
-
-                        <!-- Formación PRL -->
-                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-3">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <span>🦺</span> Formación en Prevención de Riesgos Laborales (PRL)
-                            </h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Si dispones de cursos previos de PRL (Convenio del sector, 20h, básico 60h, etc.), adjunta aquí tu titulación.
-                            </p>
-                            <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
-                                <span>Seleccionar certificado PRL...</span>
-                                <input type="file" wire:model="file_prl" class="hidden" />
-                            </label>
-                            @if ($file_prl)
-                                <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_prl->getClientOriginalName() }}</span>
-                            @endif
-                        </div>
-
-                        <!-- Discapacidad / Incapacidad Reconocida -->
-                        <div class="p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span>♿</span> Discapacidad / Incapacidad Reconocida
-                                </h3>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" wire:model.live="tiene_discapacidad" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-600"></div>
-                                    <span class="ml-2.5 text-xs font-bold text-gray-700 dark:text-gray-300">{{ $tiene_discapacidad ? 'Sí tengo' : 'No tengo' }}</span>
-                                </label>
-                            </div>
-
-                            <!-- Aviso Legal Obligatorio según Normativa Interna -->
-                            <div class="p-3.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl text-red-900 dark:text-red-200 text-xs space-y-1">
-                                <p class="font-bold flex items-center gap-1.5 text-red-800 dark:text-red-300">
-                                    <span>⚠️</span> Cláusula Obligatoria de la Normativa Interna y Código de Conducta:
-                                </p>
-                                <p class="text-[11px] leading-relaxed">
-                                    Es obligatorio por parte del empleado notificar formal e inmediatamente a la empresa cualquier cambio relativo a su incapacidad o discapacidad. <strong>El ocultamiento de dicha información, tanto de forma voluntaria como involuntaria, así como la retirada de la incapacidad por parte de la Administración Pública o la bajada del grado de discapacidad a un porcentaje inferior al 33%, podrá ser motivo de despido disciplinario.</strong>
-                                </p>
-                            </div>
-
-                            @if($tiene_discapacidad)
-                                <div class="space-y-3 pt-2 border-t border-gray-200 dark:border-white/10">
-                                    <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        Adjuntar Certificado o Resolución Oficial de Discapacidad / Incapacidad *
-                                    </label>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Adjunta el dictamen o certificado emitido por el Centro Base / Seguridad Social donde figure el grado reconocido.
-                                    </p>
-                                    <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-amber-300 dark:border-amber-600/50 hover:border-amber-500 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-all text-xs text-gray-500 hover:text-amber-600">
-                                        <svg class="w-6 h-6 mb-1 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                        <span>Seleccionar documento de discapacidad / incapacidad...</span>
-                                        <input type="file" wire:model="file_discapacidad" class="hidden" />
-                                    </label>
-                                    @if ($file_discapacidad)
-                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold block mt-1">✓ Archivo seleccionado: {{ $file_discapacidad->getClientOriginalName() }}</span>
-                                    @endif
-                                    @if($empleado->documentos()->whereIn('tipo', ['Certificado Discapacidad', 'Resolución Discapacidad'])->exists())
-                                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold block">
-                                            ✓ Ya consta un certificado o resolución adjuntado en tu expediente.
-                                        </span>
-                                    @endif
-                                    @error('file_discapacidad') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            @endif
-                        </div>
-
-                    </div>
-
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                        <button type="button" wire:click="irPaso(3)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
-                            ← Volver
-                        </button>
-                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
-                            <span>Guardar Documentos y Continuar</span>
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        @endif
-
-        {{-- ========================================================================= --}}
-        {{-- PASO 5: CUMPLIMIENTO NORMATIVO, RGPD Y FINALIZACIÓN --}}
-        {{-- ========================================================================= --}}
-        @if ($paso === 5)
-            <div class="space-y-6 animate-fadeIn">
-                <div class="border-b border-gray-100 dark:border-white/5 pb-4">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">5</span>
                         Cumplimiento Normativo, RGPD y Bienvenida Oficial
                     </h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -712,7 +552,7 @@
                         $todosAceptados = $acepta_rgpd && $acepta_normativa && $acepta_prl && $leido_rgpd && $leido_normativa && $leido_prl;
                     @endphp
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
-                        <button type="button" wire:click="irPaso(4)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
+                        <button type="button" wire:click="irPaso(3)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
                             ← Volver
                         </button>
                         <button type="submit" 
