@@ -27,6 +27,8 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
+        $oldEmail = $user->getOriginal('email');
+
         $user->fill($request->validated());
 
         if ($user->isDirty('email')) {
@@ -35,10 +37,14 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Sincronizar datos con el modelo Empleado si existe
-        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        // Sincronizar datos con el modelo Empleado si existe (buscando por el email anterior o nuevo)
+        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($oldEmail)])
+            ->orWhereRaw('LOWER(email) = ?', [strtolower($user->email)])
+            ->first();
+
         if ($empleado) {
             $empleado->update([
+                'email' => $user->email,
                 'telefono_principal' => $request->input('telefono', $empleado->telefono_principal),
                 'direccion' => $request->input('direccion', $empleado->direccion),
                 'localidad' => $request->input('localidad', $empleado->localidad),

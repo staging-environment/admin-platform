@@ -156,7 +156,11 @@ class FichaEmpleado extends Page
             || $user->email === 'utrecar@gmail.com'
             || $user->id === 1;
         $this->isAdmin = $isAdmin;
-        $this->activeTab = request()->query('tab', 'fichajes');
+                $defaultTab = 'fichajes';
+        if ($this->empleado && $this->empleado->isOnBajaMedica() && !request()->has('tab')) {
+            $defaultTab = 'bajas';
+        }
+        $this->activeTab = request()->query('tab', $defaultTab);
 
         $empleadoId = request()->query('empleado_id');
 
@@ -337,6 +341,16 @@ class FichaEmpleado extends Page
                 ->title('Error')
                 ->body('Tu usuario no está asociado a ningún registro de empleado.')
                 ->danger()
+                ->send();
+            return;
+        }
+
+        if ($this->empleado->isOnBajaMedica()) {
+            Notification::make()
+                ->title('Empleado en situación de baja médica')
+                ->body('No puedes registrar fichajes mientras te encuentres en periodo de baja médica. Debes tramitar primero tu alta médica.')
+                ->danger()
+                ->persistent()
                 ->send();
             return;
         }

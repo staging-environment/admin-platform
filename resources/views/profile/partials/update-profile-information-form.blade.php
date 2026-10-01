@@ -32,7 +32,7 @@
 
             <div>
                 <x-input-label for="email" value="Correo Electrónico" />
-                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 bg-gray-50 dark:bg-gray-800/60" :value="old('email', $user->email)" required readonly />
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800" :value="old('email', $user->email)" required autocomplete="email" />
                 <x-input-error class="mt-1" :messages="$errors->get('email')" />
             </div>
 
