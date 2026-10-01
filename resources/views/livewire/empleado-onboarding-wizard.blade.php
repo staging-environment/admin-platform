@@ -312,9 +312,22 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fecha de Nacimiento *</label>
-                            <input type="date" wire:model="fecha_nacimiento" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm" />
-                            @error('fecha_nacimiento') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                <span>Fecha de Nacimiento (No modificable)</span>
+                                @if(!empty($fecha_nacimiento))
+                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Registrada por la empresa
+                                    </span>
+                                @endif
+                            </label>
+                            @if(!empty($fecha_nacimiento))
+                                <input type="text" value="{{ \Carbon\Carbon::parse($fecha_nacimiento)->format('d/m/Y') }}" readonly disabled class="w-full text-sm font-semibold rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                                <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu expediente. Para corregir tu fecha de nacimiento contacta con RRHH.</p>
+                            @else
+                                <input type="text" value="Pendiente de asignación oficial por RRHH" readonly disabled class="w-full text-sm italic rounded-xl border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                                <p class="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Pendiente de comprobación y asignación oficial por el departamento de RRHH.</p>
+                            @endif
                         </div>
 
                         <div>

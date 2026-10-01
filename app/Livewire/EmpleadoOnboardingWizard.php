@@ -235,7 +235,6 @@ class EmpleadoOnboardingWizard extends Component
     public function guardarPaso3Datos()
     {
         $this->validate([
-            'fecha_nacimiento' => 'required|date|before:today',
             'telefono_principal' => 'required|string|max:20',
             'direccion' => 'required|string|max:255',
             'codigo_postal' => 'required|string|max:10',
@@ -245,7 +244,6 @@ class EmpleadoOnboardingWizard extends Component
             'contacto_emergencia_nombre' => 'nullable|string|max:255',
             'contacto_emergencia_telefono' => 'nullable|string|max:20',
         ], [
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'telefono_principal.required' => 'El teléfono de contacto es obligatorio.',
             'direccion.required' => 'La dirección es obligatoria.',
             'codigo_postal.required' => 'El código postal es obligatorio.',
@@ -255,7 +253,6 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->empleado->update([
-            'fecha_nacimiento' => $this->fecha_nacimiento,
             'telefono_principal' => $this->telefono_principal,
             'direccion' => $this->direccion,
             'codigo_postal' => $this->codigo_postal,
