@@ -1,4 +1,4 @@
-﻿<x-filament-panels::page>
+<x-filament-panels::page>
 
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
@@ -267,16 +267,6 @@
             </div>
         @endif
 
-        {{-- ALERTA GLOBAL DE VARIACIÓN DE PRECIOS EN COMPETENCIA (MITECO) --}}
-        <div id="competitor-global-alert-wrapper">
-            @if(!empty($competitorAlerts))
-                @include('filament.components.competitor-global-alert', [
-                    'alerts' => $competitorAlerts,
-                    'gasoilData' => $gasoilData,
-                    'rbobData' => $rbobData,
-                ])
-            @endif
-        </div>
 
         {{-- ═══════════════════════════════════════════════════════════════ --}}
         {{-- ZONA SUPERIOR: MERCADOS ENERGÉTICOS INTERNACIONALES            --}}
