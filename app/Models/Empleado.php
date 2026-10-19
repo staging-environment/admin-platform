@@ -260,7 +260,7 @@ class Empleado extends Model
 
         $tipoContrato = $latestContract?->tipo_contrato ?: $this->tipo_contrato;
         $fechaVencimiento = $latestContract?->fecha_vencimiento_contrato ?: $this->fecha_vencimiento_contrato;
-        $hasContract = ($latestContract !== null) || !empty($tipoContrato);
+        $hasContract = ($latestContract !== null);
 
         // 2. Alerta: Sin Contrato
         if (!$hasContract) {
