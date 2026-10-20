@@ -153,3 +153,32 @@ Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', fu
 
     $this->info('Alertas de prueba registradas con exito (Utrera y Sevilla). Validas durante 3 horas.');
 })->purpose('Simular o limpiar alertas de cambio de precio de la competencia');
+
+// ── Comando de Sincronización Manual de Precios con MITECO ───────────────────
+Artisan::command('miteco:sync {--force : Forzar envío a MITECO aunque los precios no hayan variado}', function () {
+    $force = (bool) $this->option('force');
+    $this->info($force ? 'Forzando sincronización de precios con MITECO...' : 'Comprobando y sincronizando precios con MITECO...');
+    $service = app(\App\Services\MitecoService::class);
+    $result = $service->uploadPrices($force);
+
+    if (!empty($result['skipped'])) {
+        $this->comment('Omitido: ' . ($result['message'] ?? 'Sin cambios de precio'));
+        return;
+    }
+
+    if ($result['success'] ?? false) {
+        $this->info('✓ Sincronización con MITECO completada con éxito.');
+        if (isset($result['data']['numRegistro'])) {
+            $this->line("  • Núm. Registro: <fg=cyan>{$result['data']['numRegistro']}</>");
+        }
+        if (isset($result['data']['idEnvio'])) {
+            $this->line("  • ID Envío: <fg=cyan>{$result['data']['idEnvio']}</>");
+        }
+        if (isset($result['data']['urlComprobante'])) {
+            $this->line("  • Comprobante: {$result['data']['urlComprobante']}");
+        }
+    } else {
+        $this->error('✗ Error al sincronizar con MITECO: ' . ($result['message'] ?? 'Fallo de conexión o respuesta'));
+    }
+})->purpose('Sincronizar manualmente los precios actuales de las 4 gasolineras con MITECO');
+

@@ -152,7 +152,20 @@
                         </div>
                         
                         @if($mitecoLastUpdate)
-                            @if(($mitecoLastUpdate['status'] ?? '') === 'success')
+                            @php
+                                $lastTimestamp = isset($mitecoLastUpdate['timestamp']) 
+                                    ? \Carbon\Carbon::parse($mitecoLastUpdate['timestamp'])->timezone('Europe/Madrid') 
+                                    : null;
+                                $isCronStale = $lastTimestamp ? $lastTimestamp->diffInMinutes(now('Europe/Madrid')) > 20 : true;
+                            @endphp
+
+                            @if($isCronStale)
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider animate-pulse" 
+                                      style="background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5);"
+                                      title="El programador de tareas en segundo plano no se ha ejecutado en los últimos 20 minutos">
+                                    ⚠️ PROGRAMADOR INACTIVO
+                                </span>
+                            @elseif(($mitecoLastUpdate['status'] ?? '') === 'success')
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" 
                                       style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
                                     ● ÉXITO
@@ -177,7 +190,10 @@
                             @endif
                             
                             <span class="text-gray-400 text-[11px]">
-                                Última ejecución: <strong class="text-gray-200">{{ \Carbon\Carbon::parse($mitecoLastUpdate['timestamp'])->timezone('Europe/Madrid')->format('d/m/Y H:i:s') }}</strong>
+                                Última comprobación: <strong class="{{ $isCronStale ? 'text-red-400 font-bold' : 'text-gray-200' }}">{{ $lastTimestamp ? $lastTimestamp->format('d/m/Y H:i:s') : '—' }}</strong>
+                                @if($isCronStale && $lastTimestamp)
+                                    <span class="text-red-400 text-[10px]">(hace {{ $lastTimestamp->diffForHumans() }})</span>
+                                @endif
                             </span>
                         @else
                             <span class="text-gray-400">Sin registros de ejecución previos.</span>
