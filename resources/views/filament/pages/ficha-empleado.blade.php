@@ -54,6 +54,50 @@
             @endif
 
 
+            @php
+                $activeBaja = collect($ausencias)->first(fn($a) => $a->tipo === 'Bajas médicas' && empty($a->fecha_fin));
+            @endphp
+
+            @if($activeBaja)
+                <!-- Banner Prioritario: Empleado en situación de Baja Médica -->
+                <div class="p-6 bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-emerald-500/15 dark:from-rose-950/40 dark:via-amber-950/20 dark:to-emerald-950/20 border-2 border-rose-500/50 dark:border-rose-500/30 rounded-3xl shadow-md animate-fadeIn">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3.5 bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-2xl shrink-0 mt-0.5 animate-pulse shadow-sm">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-2.5 py-0.5 bg-rose-600 text-white font-black text-xs rounded-full uppercase tracking-wider shadow-sm">
+                                        ● Situación Actual: Baja Médica (Incapacidad Temporal)
+                                    </span>
+                                    <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-white/70 dark:bg-white/10 px-2.5 py-0.5 rounded-full">
+                                        Fecha de Inicio: {{ \Carbon\Carbon::parse($activeBaja->fecha_inicio)->format('d/m/Y') }}
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">
+                                    Actualmente te encuentras en situación de baja laboral
+                                </h3>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl">
+                                    Tus fichajes ordinarios de entrada y salida permanecen pausados mientras continúe este periodo. En cuanto te reincorpores al trabajo, debes pulsar en el botón de la derecha para registrar tu fecha de finalización de baja y adjuntar el parte médico oficial de alta.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="shrink-0 flex items-center">
+                            <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-600/30 hover:shadow-xl transition-all cursor-pointer">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Registrar Alta Médica (Reincorporarme)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if($fichajePendienteAnterior)
                 <!-- Alert Banner: Shift from previous day is unclosed -->
                 <div class="p-6 bg-gradient-to-r from-red-500/10 via-amber-500/10 to-orange-500/10 dark:from-red-950/30 dark:via-amber-950/20 dark:to-orange-950/20 border-2 border-red-500/40 dark:border-red-500/30 rounded-3xl shadow-sm">
@@ -144,7 +188,21 @@
                         </div>
 
                         <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
-                            @if($fichajePendienteAnterior)
+                            @if($activeBaja)
+                                <div class="text-center space-y-3 max-w-sm text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 p-5 rounded-2xl border border-rose-200 dark:border-rose-900/40">
+                                    <svg class="w-8 h-8 mx-auto stroke-current text-rose-500" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                    <div>
+                                        <h4 class="font-bold text-xs uppercase tracking-wider text-gray-900 dark:text-white">Fichajes Inactivos por Baja Médica</h4>
+                                        <p class="text-[11px] text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">No puedes registrar entradas mientras dure tu incapacidad temporal. Registra tu alta médica para reactivarlos.</p>
+                                    </div>
+                                    <button type="button" wire:click="abrirRegistrarAlta({{ $activeBaja->id }})" style="background-color: #10b981; color: #ffffff;" class="inline-flex items-center gap-1.5 px-4 py-2 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Registrar Alta Médica
+                                    </button>
+                                </div>
+                            @elseif($fichajePendienteAnterior)
                                 <div class="text-center space-y-3 max-w-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-5 rounded-2xl border border-amber-200 dark:border-amber-900/40">
                                     <svg class="w-10 h-10 mx-auto stroke-current text-amber-500" fill="none" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -221,7 +279,14 @@
                         </div>
 
                         <div class="py-3 flex flex-col items-center justify-center min-h-[90px]">
-                            @if($fichajeDelDia && $fichajeDelDia->hora_salida)
+                            @if($activeBaja)
+                                <div class="text-center space-y-2 max-w-xs text-gray-400 py-3">
+                                    <svg class="w-8 h-8 mx-auto stroke-current text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                    <p class="text-xs font-medium">No hay jornada activa que cerrar durante la baja médica.</p>
+                                </div>
+                            @elseif($fichajeDelDia && $fichajeDelDia->hora_salida)
                                 <div class="text-center space-y-2">
                                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold rounded-full text-sm border border-amber-200 dark:border-amber-900">
                                         <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
@@ -713,9 +778,9 @@
                                                 </a>
                                             @endif
                                             @if(empty($a->fecha_fin))
-                                                <button type="button" wire:click="abrirRegistrarAlta({{ $a->id }})" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                                    Registrar Alta
-                                                </button>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 font-bold rounded-lg text-[11px] border border-rose-200 dark:border-rose-900/50">
+                                                    ● En curso
+                                                </span>
                                             @endif
                                             <button type="button" wire:click="verDetallesSolicitud({{ $a->id }}, 'baja')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors p-1" title="Ver Detalles de la Solicitud">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

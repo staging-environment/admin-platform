@@ -45,10 +45,27 @@ class EmpleadoOnboardingWizard extends Component
     public $file_prl = null;
     public $file_discapacidad = null;
 
-    // Paso 5: Políticas
+    // Paso 5: Políticas y Verificación de Lectura
     public bool $acepta_rgpd = false;
     public bool $acepta_normativa = false;
     public bool $acepta_prl = false;
+    public bool $leido_rgpd = false;
+    public bool $leido_normativa = false;
+    public bool $leido_prl = false;
+
+    public function aceptarClausula(string $tipo)
+    {
+        if ($tipo === 'rgpd') {
+            $this->leido_rgpd = true;
+            $this->acepta_rgpd = true;
+        } elseif ($tipo === 'normativa') {
+            $this->leido_normativa = true;
+            $this->acepta_normativa = true;
+        } elseif ($tipo === 'prl') {
+            $this->leido_prl = true;
+            $this->acepta_prl = true;
+        }
+    }
 
     public function mount()
     {
@@ -57,7 +74,29 @@ class EmpleadoOnboardingWizard extends Component
             return redirect()->to('/login');
         }
 
-        $this->empleado = Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        // 1. Buscar empleado por email
+        $this->empleado = Empleado::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($user->email))])->first();
+
+        // 2. Si no se encontró o si es un registro temporal generado por el sistema ('PENDIENTE-'),
+        // comprobar si la empresa ya registró un empleado con este mismo nombre y apellidos con DNI oficial
+        if (!$this->empleado || str_starts_with($this->empleado->dni ?? '', 'PENDIENTE-')) {
+            $candidate = null;
+            if ($user->name) {
+                $candidate = Empleado::whereRaw('LOWER(TRIM(CONCAT(nombre, " ", apellidos))) = ?', [strtolower(trim($user->name))])
+                    ->where('dni', 'not like', 'PENDIENTE-%')
+                    ->first();
+            }
+
+            if ($candidate) {
+                // Si existía un registro duplicado pendiente, lo eliminamos
+                if ($this->empleado && $this->empleado->id !== $candidate->id && str_starts_with($this->empleado->dni ?? '', 'PENDIENTE-')) {
+                    $this->empleado->forceDelete();
+                }
+                $this->empleado = $candidate;
+                $this->empleado->email = $user->email;
+                $this->empleado->save();
+            }
+        }
 
         if (!$this->empleado) {
             $parts = explode(' ', trim($user->name ?: 'Empleado'));
@@ -80,15 +119,26 @@ class EmpleadoOnboardingWizard extends Component
             ]);
         }
 
-        // Si ya completó onboarding, redirigir al portal
-        if ($this->empleado->onboarding_completado) {
-            return redirect()->to('/admin/portal-empleado');
+        $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', $user->password);
+
+        if ($isDefaultPassword) {
+            if ($this->empleado->onboarding_completado) {
+                $this->empleado->update([
+                    'onboarding_completado' => false,
+                    'onboarding_paso_actual' => 2,
+                ]);
+            }
+        } else {
+            // Si ya completó onboarding y no tiene contraseña por defecto, redirigir al portal
+            if ($this->empleado->onboarding_completado) {
+                return redirect()->to('/admin/portal-empleado');
+            }
         }
 
         // Cargar datos existentes
         $this->nombre = (string) ($this->empleado->nombre ?? '');
         $this->apellidos = (string) ($this->empleado->apellidos ?? '');
-        $this->dni = (string) (str_starts_with((string)$this->empleado->dni, 'PENDIENTE-') ? '' : $this->empleado->dni);
+        $this->dni = (string) ($this->empleado->dni ?? '');
         $this->fecha_nacimiento = $this->empleado->fecha_nacimiento ? Carbon::parse($this->empleado->fecha_nacimiento)->format('Y-m-d') : '';
         $this->telefono_principal = (string) ($this->empleado->telefono_principal ?? '');
         $this->direccion = (string) ($this->empleado->direccion === 'Dirección pendiente' ? '' : $this->empleado->direccion);
@@ -103,13 +153,24 @@ class EmpleadoOnboardingWizard extends Component
         $this->tiene_discapacidad = (bool) $this->empleado->tiene_discapacidad;
 
         $pasoActual = (int) ($this->empleado->onboarding_paso_actual ?: 1);
-        $this->paso = min(max(1, $pasoActual), 5);
+        if ($isDefaultPassword) {
+            $this->paso = min(max(1, $pasoActual), 2);
+        } else {
+            $this->paso = min(max(1, $pasoActual), 4);
+        }
     }
 
     public function irPaso(int $nuevoPaso)
     {
+        $isDefaultPassword = \Illuminate\Support\Facades\Hash::check('1234', auth()->user()->password);
+        if ($isDefaultPassword && $nuevoPaso > 2) {
+            session()->flash('warning_step', 'Debes cambiar tu contraseña por defecto en el Paso 2 antes de continuar.');
+            $this->paso = 2;
+            return;
+        }
+
         $maxPaso = max((int) $this->empleado->onboarding_paso_actual, $this->paso);
-        if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 5) {
+        if ($nuevoPaso <= $maxPaso && $nuevoPaso >= 1 && $nuevoPaso <= 4) {
             $this->paso = $nuevoPaso;
         }
     }
@@ -174,10 +235,6 @@ class EmpleadoOnboardingWizard extends Component
     public function guardarPaso3Datos()
     {
         $this->validate([
-            'nombre' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|max:20',
-            'fecha_nacimiento' => 'required|date|before:today',
             'telefono_principal' => 'required|string|max:20',
             'direccion' => 'required|string|max:255',
             'codigo_postal' => 'required|string|max:10',
@@ -187,10 +244,6 @@ class EmpleadoOnboardingWizard extends Component
             'contacto_emergencia_nombre' => 'nullable|string|max:255',
             'contacto_emergencia_telefono' => 'nullable|string|max:20',
         ], [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'apellidos.required' => 'Los apellidos son obligatorios.',
-            'dni.required' => 'El DNI/NIE es obligatorio.',
-            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'telefono_principal.required' => 'El teléfono de contacto es obligatorio.',
             'direccion.required' => 'La dirección es obligatoria.',
             'codigo_postal.required' => 'El código postal es obligatorio.',
@@ -200,10 +253,6 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->empleado->update([
-            'nombre' => $this->nombre,
-            'apellidos' => $this->apellidos,
-            'dni' => strtoupper(trim($this->dni)),
-            'fecha_nacimiento' => $this->fecha_nacimiento,
             'telefono_principal' => $this->telefono_principal,
             'direccion' => $this->direccion,
             'codigo_postal' => $this->codigo_postal,
@@ -216,7 +265,7 @@ class EmpleadoOnboardingWizard extends Component
         ]);
 
         $this->paso = 4;
-        session()->flash('success_step', 'Datos personales guardados correctamente. Ahora adjunta tu documentación digital.');
+        session()->flash('success_step', 'Datos personales validados correctamente. Por favor, revisa y confirma las normativas de empresa.');
     }
 
     public function guardarPaso4Documentos()
@@ -239,7 +288,9 @@ class EmpleadoOnboardingWizard extends Component
             $rules['file_prl'] = 'file|mimes:pdf,jpg,jpeg,png|max:10240';
         }
 
-        if ($this->file_discapacidad) {
+        if ($this->tiene_discapacidad && !$this->empleado->documentos()->whereIn('tipo', ['Certificado Discapacidad', 'Resolución Discapacidad'])->exists()) {
+            $rules['file_discapacidad'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:10240';
+        } elseif ($this->file_discapacidad) {
             $rules['file_discapacidad'] = 'file|mimes:pdf,jpg,jpeg,png|max:10240';
         }
 
@@ -249,6 +300,7 @@ class EmpleadoOnboardingWizard extends Component
             'file_dni.required' => 'Debes adjuntar el documento escaneado o foto legible de tu DNI/NIE.',
             'file_dni.mimes' => 'El DNI debe ser un archivo PDF o imagen (JPG, PNG).',
             'file_dni.max' => 'El tamaño máximo permitido es 10 MB.',
+            'file_discapacidad.required' => 'Si indicas que tienes discapacidad reconocida, es obligatorio adjuntar el certificado o resolución oficial.',
         ]);
 
         if ($this->file_dni) {
@@ -312,17 +364,23 @@ class EmpleadoOnboardingWizard extends Component
             'acepta_rgpd' => 'accepted',
             'acepta_normativa' => 'accepted',
             'acepta_prl' => 'accepted',
+            'leido_rgpd' => 'accepted',
+            'leido_normativa' => 'accepted',
+            'leido_prl' => 'accepted',
         ], [
             'acepta_rgpd.accepted' => 'Debes aceptar la política de Protección de Datos (RGPD).',
             'acepta_normativa.accepted' => 'Debes aceptar la Normativa Interna y Código de Conducta.',
-            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL).',
+            'acepta_prl.accepted' => 'Debes confirmar la recepción y aceptación de las directrices de Prevención (PRL) y la obligación de uso de EPIs puestos a tu disposición.',
+            'leido_rgpd.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de las cláusulas de Protección de Datos (RGPD).',
+            'leido_normativa.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura de la Normativa Interna.',
+            'leido_prl.accepted' => 'Es obligatorio abrir, leer hasta el final y confirmar la lectura del Protocolo de PRL y la obligación de uso de EPIs puestos a tu disposición.',
         ]);
 
         $this->empleado->update([
             'politicas_aceptadas_at' => now(),
             'onboarding_completado' => true,
             'onboarding_fecha_completado' => now(),
-            'onboarding_paso_actual' => 5,
+            'onboarding_paso_actual' => 4,
         ]);
 
         $this->empleado->actualizarAlertas();

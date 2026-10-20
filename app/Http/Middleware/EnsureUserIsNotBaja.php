@@ -14,6 +14,11 @@ class EnsureUserIsNotBaja
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Permitir siempre salir de la suplantación y logout
+        if ($request->is('filament-impersonate*') || $request->is('*impersonate*') || $request->is('logout') || $request->is('admin/logout')) {
+            return $next($request);
+        }
+
         $user = Auth::user();
 
         if ($user) {

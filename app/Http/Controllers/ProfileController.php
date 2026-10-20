@@ -27,7 +27,21 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $user->fill($request->validated());
+        $isAdmin = $user->hasRole(['Administrador', 'admin', 'Admin', 'Gestor', 'gestor', 'CEO'])
+            || $user->can('gestion_recursos_humanos')
+            || $user->id === 1
+            || $user->email === 'jarodriguezbonilla@gmail.com';
+
+        $validated = $request->validated();
+
+        // El rol empleado no puede modificar su nombre ni DNI
+        if (!$isAdmin) {
+            unset($validated['name']);
+        }
+
+        $oldEmail = $user->getOriginal('email');
+
+        $user->fill($validated);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -35,10 +49,14 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Sincronizar datos con el modelo Empleado si existe
-        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($user->email)])->first();
+        // Sincronizar datos con el modelo Empleado si existe (buscando por el email anterior o nuevo)
+        $empleado = \App\Models\Empleado::whereRaw('LOWER(email) = ?', [strtolower($oldEmail)])
+            ->orWhereRaw('LOWER(email) = ?', [strtolower($user->email)])
+            ->first();
+
         if ($empleado) {
-            $empleado->update([
+            $empleadoData = [
+                'email' => $user->email,
                 'telefono_principal' => $request->input('telefono', $empleado->telefono_principal),
                 'direccion' => $request->input('direccion', $empleado->direccion),
                 'localidad' => $request->input('localidad', $empleado->localidad),
@@ -46,7 +64,22 @@ class ProfileController extends Controller
                 'codigo_postal' => $request->input('codigo_postal', $empleado->codigo_postal),
                 'contacto_emergencia_nombre' => $request->input('contacto_emergencia_nombre', $empleado->contacto_emergencia_nombre),
                 'contacto_emergencia_telefono' => $request->input('contacto_emergencia_telefono', $empleado->contacto_emergencia_telefono),
-            ]);
+            ];
+
+            if ($request->filled('iban')) {
+                $empleadoData['iban'] = strtoupper(str_replace(' ', '', $request->input('iban')));
+            }
+
+            // Solo administradores pueden cambiar nombre en empleado
+            if ($isAdmin && isset($validated['name']) && !empty($validated['name'])) {
+                $parts = explode(' ', trim($validated['name']));
+                $empleadoData['nombre'] = $parts[0];
+                if (count($parts) > 1) {
+                    $empleadoData['apellidos'] = implode(' ', array_slice($parts, 1));
+                }
+            }
+
+            $empleado->update($empleadoData);
         }
 
         // Si es un empleado y aún tiene el proceso de onboarding pendiente, redirigir al asistente
