@@ -235,28 +235,18 @@ class EmpleadoOnboardingWizard extends Component
     public function guardarPaso3Datos()
     {
         $this->validate([
-            'telefono_principal' => 'required|string|max:20',
             'contacto_emergencia_nombre' => 'nullable|string|max:255',
             'contacto_emergencia_telefono' => 'nullable|string|max:20',
-        ], [
-            'telefono_principal.required' => 'El teléfono de contacto es obligatorio.',
         ]);
 
         $this->empleado->update([
-            'telefono_principal' => $this->telefono_principal,
             'contacto_emergencia_nombre' => $this->contacto_emergencia_nombre ?: null,
             'contacto_emergencia_telefono' => $this->contacto_emergencia_telefono ?: null,
             'onboarding_paso_actual' => max(4, (int) $this->empleado->onboarding_paso_actual),
         ]);
 
-        // Sincronizar el teléfono con el usuario autenticado
-        $user = auth()->user();
-        if ($user && $user->telefono !== $this->telefono_principal) {
-            $user->update(['telefono' => $this->telefono_principal]);
-        }
-
         $this->paso = 4;
-        session()->flash('success_step', 'Datos de contacto validados correctamente. Por favor, revisa y confirma las normativas de empresa.');
+        session()->flash('success_step', 'Datos de contacto de emergencia guardados correctamente. Por favor, revisa y confirma las normativas de empresa.');
     }
 
     public function guardarPaso4Documentos()

@@ -284,17 +284,17 @@
         @endif
 
         {{-- ========================================================================= --}}
-        {{-- PASO 3: TUS DATOS PERSONALES, CONTACTO E IBAN --}}
+        {{-- PASO 3: VALIDACIÓN DE DATOS Y CONTACTO DE EMERGENCIA --}}
         {{-- ========================================================================= --}}
         @if ($paso === 3)
             <div class="space-y-6 animate-fadeIn">
                 <div class="border-b border-gray-100 dark:border-white/5 pb-4">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
                         <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm font-extrabold">3</span>
-                        Validación de Datos Personales y de Contacto
+                        Validación de Datos y Contacto de Emergencia
                     </h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Comprueba tus datos registrados en la empresa y actualiza tu teléfono de contacto y persona de emergencia.
+                        Comprueba los datos registrados en tu expediente e introduce el nombre y teléfono de tu persona de contacto en caso de emergencia.
                     </p>
                 </div>
 
@@ -304,28 +304,20 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Nombre (No modificable)</label>
                             <input type="text" value="{{ $nombre }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para corregir tu nombre contacta con RRHH.</p>
+                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para solicitar cambios contacta con RRHH.</p>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Apellidos (No modificable)</label>
                             <input type="text" value="{{ $apellidos }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para corregir tus apellidos contacta con RRHH.</p>
+                            <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu contrato. Para solicitar cambios contacta con RRHH.</p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>DNI / NIE (No modificable)</span>
-                                @if(!empty($dni) && !str_starts_with($dni, 'PENDIENTE-'))
-                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        Registrado por la empresa
-                                    </span>
-                                @endif
-                            </label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">DNI / NIE (No modificable)</label>
                             @if(!empty($dni) && !str_starts_with($dni, 'PENDIENTE-'))
                                 <input type="text" value="{{ $dni }}" readonly disabled class="w-full text-sm font-mono font-bold uppercase rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                                <p class="mt-1 text-[11px] text-gray-400">DNI/NIE legal dado de alta previamente por la empresa en tu expediente.</p>
+                                <p class="mt-1 text-[11px] text-gray-400">DNI/NIE registrado en tu expediente.</p>
                             @else
                                 <input type="text" value="Pendiente de asignación oficial por RRHH" readonly disabled class="w-full text-sm italic rounded-xl border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
                                 <p class="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Pendiente de comprobación y asignación oficial con la documentación de tu DNI adjunta.</p>
@@ -333,18 +325,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Fecha de Nacimiento (No modificable)</span>
-                                @if(!empty($fecha_nacimiento))
-                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        Registrada por la empresa
-                                    </span>
-                                @endif
-                            </label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Fecha de Nacimiento (No modificable)</label>
                             @if(!empty($fecha_nacimiento))
                                 <input type="text" value="{{ \Carbon\Carbon::parse($fecha_nacimiento)->format('d/m/Y') }}" readonly disabled class="w-full text-sm font-semibold rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                                <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu expediente. Para corregir tu fecha de nacimiento contacta con RRHH.</p>
+                                <p class="mt-1 text-[11px] text-gray-400">Dato oficial registrado en tu expediente.</p>
                             @else
                                 <input type="text" value="Pendiente de asignación oficial por RRHH" readonly disabled class="w-full text-sm italic rounded-xl border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
                                 <p class="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Pendiente de comprobación y asignación oficial por el departamento de RRHH.</p>
@@ -353,45 +337,17 @@
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                                Teléfono de Contacto *
+                                Teléfono de Contacto (No modificable)
                             </label>
-                            <input type="text" wire:model="telefono_principal" placeholder="600000000" class="w-full text-sm font-semibold rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
-                            @error('telefono_principal') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                            <p class="mt-1 text-[11px] text-gray-400">Tu número de teléfono principal para comunicaciones de la empresa.</p>
+                            <input type="text" value="{{ $telefono_principal ?: '—' }}" readonly disabled class="w-full text-sm font-semibold rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
+                            <p class="mt-1 text-[11px] text-gray-400">Número de teléfono registrado en tu expediente. Para modificarlo contacta con RRHH.</p>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Persona de Contacto de Emergencia</span>
-                                <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span>
-                            </label>
-                            <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Nombre de la persona de contacto (ej. María)" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
-                            @error('contacto_emergencia_nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                            <p class="mt-1 text-[11px] text-gray-400">Familiar o persona de referencia para casos de emergencia laboral.</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Teléfono Contacto Emergencia</span>
-                                <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span>
-                            </label>
-                            <input type="text" wire:model="contacto_emergencia_telefono" placeholder="600000000" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
-                            @error('contacto_emergencia_telefono') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Cuenta Bancaria (IBAN no modificable)</span>
-                                @if(!empty($iban))
-                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        Registrada por la empresa
-                                    </span>
-                                @endif
-                            </label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Cuenta Bancaria (IBAN no modificable)</label>
                             @if(!empty($iban))
                                 <input type="text" value="{{ $iban }}" readonly disabled class="w-full text-sm font-mono font-bold uppercase rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                                <p class="mt-1 text-[11px] text-gray-400">Cuenta bancaria registrada en tu expediente para el abono de nóminas. Para modificar el número de cuenta bancaria debes solicitarlo a Recursos Humanos / Administración.</p>
+                                <p class="mt-1 text-[11px] text-gray-400">Para modificar el número de cuenta bancaria debes solicitarlo a Recursos Humanos / Administración.</p>
                             @else
                                 <input type="text" value="Pendiente de asignación oficial por Administración / RRHH" readonly disabled class="w-full text-sm italic rounded-xl border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
                                 <p class="mt-1 text-[11px] text-amber-600 dark:text-amber-400">Cuenta bancaria pendiente de asignación oficial por el departamento de Administración.</p>
@@ -399,17 +355,9 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Dirección Completa (No modificable)</span>
-                                @if(!empty($direccion) && $direccion !== 'Dirección pendiente')
-                                    <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        Registrada por la empresa
-                                    </span>
-                                @endif
-                            </label>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Dirección Completa (No modificable)</label>
                             <input type="text" value="{{ (!empty($direccion) && $direccion !== 'Dirección pendiente') ? $direccion : 'Pendiente de asignación oficial por RRHH' }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
-                            <p class="mt-1 text-[11px] text-gray-400">Domicilio legal registrado en contrato. Para solicitar un cambio de domicilio contacta con RRHH.</p>
+                            <p class="mt-1 text-[11px] text-gray-400">Domicilio legal registrado en contrato. Para solicitar un cambio contacta con RRHH.</p>
                         </div>
 
                         <div>
@@ -422,18 +370,53 @@
                             <input type="text" value="{{ $localidad ?: '—' }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
                         </div>
 
-                        <div>
+                        <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Provincia (No modificable)</label>
                             <input type="text" value="{{ $provincia ?: '—' }}" readonly disabled class="w-full text-sm rounded-xl border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 py-2.5 px-3.5 shadow-sm cursor-not-allowed select-none" />
                         </div>
 
                     </div>
 
+                    <!-- Sección de Contacto de Emergencia editable -->
+                    <div class="p-5 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border-2 border-amber-500/20 space-y-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                Contacto de Emergencia (Modificable)
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Indica el nombre y teléfono de un familiar o persona cercana a quien podamos avisar en caso de emergencia médica o laboral.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                    <span>Nombre de la Persona de Emergencia</span>
+                                    <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span>
+                                </label>
+                                <input type="text" wire:model="contacto_emergencia_nombre" placeholder="Nombre completo (ej. María García)" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+                                @error('contacto_emergencia_nombre') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                <p class="mt-1 text-[11px] text-gray-400">Persona de referencia para casos de emergencia laboral.</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                    <span>Teléfono de Contacto de Emergencia</span>
+                                    <span class="text-gray-400 font-normal text-[11px]">(Opcional)</span>
+                                </label>
+                                <input type="text" wire:model="contacto_emergencia_telefono" placeholder="600000000" class="w-full text-sm rounded-xl border-gray-300 dark:border-white/10 dark:bg-gray-800 text-gray-800 dark:text-gray-200 py-2.5 px-3.5 shadow-sm focus:border-amber-500 focus:ring-amber-500" />
+                                @error('contacto_emergencia_telefono') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                <p class="mt-1 text-[11px] text-gray-400">Número de teléfono directo ante cualquier urgencia.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
                         <button type="button" wire:click="irPaso(2)" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-xs font-bold transition-all">
                             ← Volver
                         </button>
-                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2">
+                        <button type="submit" class="inline-flex items-center justify-center px-7 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg gap-2 cursor-pointer">
                             <span>Validar Datos y Continuar</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
