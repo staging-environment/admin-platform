@@ -129,26 +129,11 @@
                             loadingCierre: false,
                             doCerrarTurno() {
                                 this.loadingCierre = true;
-                                if (navigator.geolocation) {
-                                    navigator.geolocation.getCurrentPosition(
-                                        (position) => {
-                                            $wire.cerrarTurnoAnterior(position.coords.latitude, position.coords.longitude)
-                                                .then(() => { this.loadingCierre = false; })
-                                                .catch(() => { this.loadingCierre = false; });
-                                        },
-                                        (error) => {
-                                            console.warn('Geolocation error:', error);
-                                            $wire.cerrarTurnoAnterior(null, null)
-                                                .then(() => { this.loadingCierre = false; })
-                                                .catch(() => { this.loadingCierre = false; });
-                                        },
-                                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                                    );
-                                } else {
-                                    $wire.cerrarTurnoAnterior(null, null)
+                                getFichajeGeolocation((lat, lng) => {
+                                    $wire.cerrarTurnoAnterior(lat, lng)
                                         .then(() => { this.loadingCierre = false; })
                                         .catch(() => { this.loadingCierre = false; });
-                                }
+                                });
                             }
                         }">
                             <div class="space-y-1">
@@ -226,26 +211,11 @@
                                      loading: false,
                                      doCheckIn() {
                                          this.loading = true;
-                                         if (navigator.geolocation) {
-                                             navigator.geolocation.getCurrentPosition(
-                                                 (position) => {
-                                                     $wire.checkIn(position.coords.latitude, position.coords.longitude)
-                                                         .then(() => { this.loading = false; })
-                                                         .catch(() => { this.loading = false; });
-                                                 },
-                                                 (error) => {
-                                                     console.warn('Geolocation error:', error);
-                                                     $wire.checkIn(null, null)
-                                                         .then(() => { this.loading = false; })
-                                                         .catch(() => { this.loading = false; });
-                                                 },
-                                                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                                             );
-                                         } else {
-                                             $wire.checkIn(null, null)
+                                         getFichajeGeolocation((lat, lng) => {
+                                             $wire.checkIn(lat, lng)
                                                  .then(() => { this.loading = false; })
                                                  .catch(() => { this.loading = false; });
-                                         }
+                                         });
                                      }
                                  }">
                                      <div>
@@ -300,26 +270,11 @@
                                     loadingCierre: false,
                                     doCerrarTurno() {
                                         this.loadingCierre = true;
-                                        if (navigator.geolocation) {
-                                            navigator.geolocation.getCurrentPosition(
-                                                (position) => {
-                                                    $wire.cerrarTurnoAnterior(position.coords.latitude, position.coords.longitude)
-                                                        .then(() => { this.loadingCierre = false; })
-                                                        .catch(() => { this.loadingCierre = false; });
-                                                },
-                                                (error) => {
-                                                    console.warn('Geolocation error:', error);
-                                                    $wire.cerrarTurnoAnterior(null, null)
-                                                        .then(() => { this.loadingCierre = false; })
-                                                        .catch(() => { this.loadingCierre = false; });
-                                                },
-                                                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                                            );
-                                        } else {
-                                            $wire.cerrarTurnoAnterior(null, null)
+                                        getFichajeGeolocation((lat, lng) => {
+                                            $wire.cerrarTurnoAnterior(lat, lng)
                                                 .then(() => { this.loadingCierre = false; })
                                                 .catch(() => { this.loadingCierre = false; });
-                                        }
+                                        });
                                     }
                                 }">
                                     <div class="text-center pb-1">
@@ -349,26 +304,11 @@
                                      loading: false,
                                      doCheckOut() {
                                          this.loading = true;
-                                         if (navigator.geolocation) {
-                                             navigator.geolocation.getCurrentPosition(
-                                                 (position) => {
-                                                     $wire.checkOut(position.coords.latitude, position.coords.longitude)
-                                                         .then(() => { this.loading = false; })
-                                                         .catch(() => { this.loading = false; });
-                                                 },
-                                                 (error) => {
-                                                     console.warn('Geolocation error:', error);
-                                                     $wire.checkOut(null, null)
-                                                         .then(() => { this.loading = false; })
-                                                         .catch(() => { this.loading = false; });
-                                                 },
-                                                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                                             );
-                                         } else {
-                                             $wire.checkOut(null, null)
+                                         getFichajeGeolocation((lat, lng) => {
+                                             $wire.checkOut(lat, lng)
                                                  .then(() => { this.loading = false; })
                                                  .catch(() => { this.loading = false; });
-                                         }
+                                         });
                                      }
                                  }">
                                      <div>
@@ -1447,4 +1387,35 @@
         </div>
         @endif
     </div>
+
+    <script>
+        function getFichajeGeolocation(callback) {
+            if (!navigator.geolocation) {
+                callback(null, null);
+                return;
+            }
+
+            // 1. Intentar con alta precisión (GPS por satélite) hasta 10 segundos
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    callback(pos.coords.latitude, pos.coords.longitude);
+                },
+                (err) => {
+                    console.warn('Alta precisión no disponible o agotada, reintentando con precisión de red/wifi...', err);
+                    // 2. Si falla o timeout en satélite, intentar con red/wifi antes de descartar
+                    navigator.geolocation.getCurrentPosition(
+                        (fallbackPos) => {
+                            callback(fallbackPos.coords.latitude, fallbackPos.coords.longitude);
+                        },
+                        (finalErr) => {
+                            console.warn('Geolocalización no disponible:', finalErr);
+                            callback(null, null);
+                        },
+                        { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 }
+                    );
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+            );
+        }
+    </script>
 </x-filament-panels::page>
