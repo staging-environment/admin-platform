@@ -117,7 +117,9 @@
                                 </x-slot>
                             </x-dropdown>
                         </div>
-                    @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+                    @endif
+
+                    @if(auth()->user()?->can('acceder_portal_fichajes'))
                         <x-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
                             {{ __('Fichajes') }}
                         </x-nav-link>
@@ -150,10 +152,10 @@
 
                                 <x-slot name="content">
                                     <x-dropdown-link href="/admin/portal-empleado?tab=formacion_empresa" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')">
-                                        {{ __('Formación Asignada') }}
+                                        {{ __('Cursos') }}
                                     </x-dropdown-link>
                                     <x-dropdown-link href="/admin/portal-empleado?tab=mis_titulaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'mis_titulaciones'">
-                                        {{ __('Mis Titulaciones y Diplomas') }}
+                                        {{ __('Diplomas') }}
                                     </x-dropdown-link>
                                 </x-slot>
                             </x-dropdown>
@@ -356,7 +358,9 @@
                         @endif
                     </div>
                 </div>
-            @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+            @endif
+
+            @if(auth()->user()?->can('acceder_portal_fichajes'))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Portal del Empleado') }}
@@ -387,10 +391,10 @@
                             </button>
                             <div x-show="openSub" style="display: none;" class="ps-6 space-y-1 bg-gray-50 py-1">
                                 <a href="/admin/portal-empleado?tab=formacion_empresa" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')) ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
-                                    └─ {{ __('Formación Asignada') }}
+                                    └─ {{ __('Cursos') }}
                                 </a>
                                 <a href="/admin/portal-empleado?tab=mis_titulaciones" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && request()->query('tab') === 'mis_titulaciones') ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
-                                    └─ {{ __('Mis Titulaciones y Diplomas') }}
+                                    └─ {{ __('Diplomas') }}
                                 </a>
                             </div>
                         </div>
