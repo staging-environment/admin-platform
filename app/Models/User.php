@@ -44,6 +44,11 @@ class User extends Authenticatable implements FilamentUser // <-- Añade "implem
             return $sessionRole;
         }
 
+        // Si tiene rol Gestor y Empleado, por defecto al entrar inicia como Empleado
+        if (in_array('Gestor', $dbRoles, true) && in_array('Empleado', $dbRoles, true)) {
+            return 'Empleado';
+        }
+
         if (in_array('Gestor', $dbRoles, true)) {
             return 'Gestor';
         }

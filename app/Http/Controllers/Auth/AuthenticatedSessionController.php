@@ -30,7 +30,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
         if ($user) {
-            $activeRole = method_exists($user, 'getActiveRole') ? $user->getActiveRole() : null;
+            $assignedRoles = $user->roles->pluck('name')->toArray();
+
+            // Si un usuario tiene rol Gestor y Empleado, cuando haga login entra como rol Empleado
+            if (in_array('Gestor', $assignedRoles, true) && in_array('Empleado', $assignedRoles, true)) {
+                $activeRole = 'Empleado';
+            } else {
+                $activeRole = method_exists($user, 'getActiveRole') ? $user->getActiveRole() : null;
+            }
+
             if ($activeRole) {
                 session(['active_role' => $activeRole]);
             }
