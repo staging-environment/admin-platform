@@ -119,7 +119,7 @@
                         </div>
                     @endif
 
-                    @if(auth()->user()?->can('acceder_portal_fichajes'))
+                    @if(auth()->user()?->can('acceder_portal_fichajes') && !auth()->user()?->can('gestion_recursos_humanos') && !auth()->user()?->can('ver_dashboard'))
                         <x-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
                             {{ __('Fichajes') }}
                         </x-nav-link>
@@ -251,7 +251,12 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()?->name }}</div>
+                            <div class="flex items-center gap-1.5">
+                                <span>{{ Auth::user()?->name }}</span>
+                                @if(Auth::user()?->hasMultipleRoles())
+                                    <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">{{ Auth::user()->getActiveRole() }}</span>
+                                @endif
+                            </div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -262,6 +267,25 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(Auth::user()?->hasMultipleRoles())
+                            <div class="px-4 py-2 border-b border-gray-100 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                                {{ __('Cambiar Rol') }}
+                            </div>
+                            @foreach(Auth::user()->getAssignedRoles() as $assignedRole)
+                                <form method="POST" action="{{ route('profile.switch-role') }}">
+                                    @csrf
+                                    <input type="hidden" name="role" value="{{ $assignedRole }}">
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-xs flex items-center justify-between {{ Auth::user()->getActiveRole() === $assignedRole ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-gray-700 hover:bg-gray-100' }}">
+                                        <span>{{ $assignedRole }}</span>
+                                        @if(Auth::user()->getActiveRole() === $assignedRole)
+                                            <span class="text-[10px] text-indigo-600 font-extrabold">✓ En uso</span>
+                                        @endif
+                                    </button>
+                                </form>
+                            @endforeach
+                            <div class="border-t border-gray-100"></div>
+                        @endif
+
                         @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
                             <x-dropdown-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50 dark:bg-amber-950/20">
                                 {{ __('⚡ Salir de la suplantación') }}
@@ -360,7 +384,7 @@
                 </div>
             @endif
 
-            @if(auth()->user()?->can('acceder_portal_fichajes'))
+            @if(auth()->user()?->can('acceder_portal_fichajes') && !auth()->user()?->can('gestion_recursos_humanos') && !auth()->user()?->can('ver_dashboard'))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Portal del Empleado') }}
@@ -461,11 +485,35 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name }}</div>
+                <div class="font-medium text-base text-gray-800 flex items-center gap-2">
+                    <span>{{ Auth::user()?->name }}</span>
+                    @if(Auth::user()?->hasMultipleRoles())
+                        <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">{{ Auth::user()->getActiveRole() }}</span>
+                    @endif
+                </div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(Auth::user()?->hasMultipleRoles())
+                    <div class="px-4 py-1 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                        {{ __('Cambiar Rol') }}
+                    </div>
+                    @foreach(Auth::user()->getAssignedRoles() as $assignedRole)
+                        <form method="POST" action="{{ route('profile.switch-role') }}">
+                            @csrf
+                            <input type="hidden" name="role" value="{{ $assignedRole }}">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-xs flex items-center justify-between {{ Auth::user()->getActiveRole() === $assignedRole ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-gray-700 hover:bg-gray-100' }}">
+                                <span>{{ $assignedRole }}</span>
+                                @if(Auth::user()->getActiveRole() === $assignedRole)
+                                    <span class="text-[10px] text-indigo-600 font-extrabold">✓ En uso</span>
+                                @endif
+                            </button>
+                        </form>
+                    @endforeach
+                    <div class="border-t border-gray-200 my-1"></div>
+                @endif
+
                 @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
                     <x-responsive-nav-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50">
                         {{ __('⚡ Salir de la suplantación') }}

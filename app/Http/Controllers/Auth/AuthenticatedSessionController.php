@@ -30,11 +30,26 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
         if ($user) {
+            $activeRole = method_exists($user, 'getActiveRole') ? $user->getActiveRole() : null;
+            if ($activeRole) {
+                session(['active_role' => $activeRole]);
+            }
+
             $empleado = \App\Models\Empleado::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($user->email))])->first();
             $isEmpleado = $user->hasRole('Empleado') || ($empleado && !$user->hasRole(['Admin', 'admin', 'Administrador', 'CEO', 'Gestor']));
 
             if ($isEmpleado && (\Illuminate\Support\Facades\Hash::check('1234', $user->password) || ($empleado && !$empleado->onboarding_completado))) {
                 return redirect()->route('empleado.onboarding');
+            }
+
+            // Para el rol gestor, la pantalla por defecto al hacer login debe ser el listado de empleados
+            if ($activeRole === 'Gestor' || $user->hasRole('Gestor')) {
+                return redirect()->intended('/admin/recursos-humanos');
+            }
+
+            // Si es rol empleado, pantalla por defecto al portal de checkin y checkout
+            if ($activeRole === 'Empleado' || $isEmpleado) {
+                return redirect()->intended('/admin/portal-empleado');
             }
         }
 

@@ -20,6 +20,18 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- Alertas de Estado --}}
+            @if (session('status') === 'role-switched')
+                <div class="p-4 sm:p-5 bg-indigo-500/10 border-2 border-indigo-500/40 rounded-2xl text-indigo-900 dark:text-indigo-200 flex items-start gap-4 shadow-sm">
+                    <div class="p-2 bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-indigo-800 dark:text-indigo-300">¡Rol cambiado correctamente!</h3>
+                        <p class="text-xs mt-0.5 text-indigo-700 dark:text-indigo-300/90">Ahora estás operando con el rol <strong>{{ auth()->user()->getActiveRole() }}</strong>. Los permisos de la plataforma se han adaptado a este perfil.</p>
+                    </div>
+                </div>
+            @endif
+
             @if (session('status') === 'password-updated')
                 <div class="p-4 sm:p-5 bg-emerald-500/10 border-2 border-emerald-500/40 rounded-2xl text-emerald-900 dark:text-emerald-200 flex items-start gap-4 shadow-sm">
                     <div class="p-2 bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0">
@@ -42,6 +54,76 @@
                         <p class="text-xs mt-0.5 text-amber-800/90 dark:text-amber-200/90">Tu cuenta tiene actualmente la contraseña provisional por defecto (1234). Por motivos de seguridad, debes actualizarla a continuación.</p>
                     </div>
                 </div>
+            @endif
+
+            {{-- SELECCIONADOR DE ROL ACTIVO (Para usuarios con multiples roles) --}}
+            @if ($user->hasMultipleRoles())
+            <div class="bg-white dark:bg-gray-900 shadow-sm border border-indigo-100 dark:border-indigo-950/40 rounded-3xl p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="p-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            </span>
+                            <h2 class="text-base font-bold text-gray-900 dark:text-white">
+                                Rol Activo en la Plataforma
+                            </h2>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Dispones de varios roles asignados. Selecciona con qué perfil deseas operar para que se adapten los permisos y accesos del sistema.
+                        </p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        Rol en uso: <strong>{{ $user->getActiveRole() }}</strong>
+                    </span>
+                </div>
+
+                <div class="mt-6">
+                    <form method="POST" action="{{ route('profile.switch-role') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @csrf
+                        @foreach ($user->getAssignedRoles() as $assignedRole)
+                            @php
+                                $isActive = $user->getActiveRole() === $assignedRole;
+                            @endphp
+                            <div class="relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all {{ $isActive ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20 shadow-sm' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 bg-white dark:bg-gray-800' }}">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" id="role_{{ $assignedRole }}" name="role" value="{{ $assignedRole }}" {{ $isActive ? 'checked' : '' }} onchange="this.form.submit()" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                                    <label for="role_{{ $assignedRole }}" class="cursor-pointer">
+                                        <div class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            <span>{{ $assignedRole }}</span>
+                                            @if($isActive)
+                                                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-600 text-white">Activo</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            @if($assignedRole === 'Gestor')
+                                                Gestión de Recursos Humanos y listado de empleados.
+                                            @elseif($assignedRole === 'Empleado')
+                                                Portal del empleado (checkin/checkout, fichajes, vacaciones y cursos).
+                                            @elseif($assignedRole === 'Administrador' || $assignedRole === 'CEO' || $assignedRole === 'admin')
+                                                Control administrativo global de la plataforma.
+                                            @else
+                                                Acceso a funciones específicas del rol {{ $assignedRole }}.
+                                            @endif
+                                        </p>
+                                    </label>
+                                </div>
+                                <div>
+                                    @if(!$isActive)
+                                        <button type="submit" name="role" value="{{ $assignedRole }}" class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+                                            Activar
+                                        </button>
+                                    @else
+                                        <span class="px-3 py-1 text-xs font-bold rounded-xl text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/50">
+                                            ✓ Activo
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </form>
+                </div>
+            </div>
             @endif
 
             {{-- FICHA DE DATOS DEL EMPLEADO / USUARIO (Apariencia como vista de Administración) --}}

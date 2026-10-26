@@ -49,6 +49,15 @@ class RedirectToDefaultPanelPage
         }
 
         if ($user && ($request->is('admin') || $request->is('admin/'))) {
+            $activeRole = method_exists($user, 'getActiveRole') ? $user->getActiveRole() : null;
+
+            // Para el rol gestor, la pantalla por defecto debe ser la del listado de empleados
+            if ($activeRole === 'Gestor' || $user->hasRole('Gestor')) {
+                \Illuminate\Support\Facades\Log::info("Redirecting Gestor to /admin/recursos-humanos", [
+                    'user_email' => $user->email
+                ]);
+                return redirect('/admin/recursos-humanos');
+            }
             $isAdmin = $user->can('ver_dashboard') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1;
             
             if (!$isAdmin) {
