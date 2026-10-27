@@ -20,3 +20,9 @@
      - Subir a `origin main`: `git push origin main`.
      - Actualizar producción: `ddev exec php artisan migrate --force && ddev exec npm run build && ddev exec php artisan optimize:clear`.
   2. Sincronizar repositorio local y ramas `main` y `pre`.
+
+## Tareas Programadas y Sincronización MITECO (REGLA CRÍTICA)
+- Las tareas programadas en producción residen en `/etc/cron.d/utrecar-scheduler` (propiedad `root:root`, permisos `644`) y ejecutan `php artisan schedule:run` cada minuto. **NUNCA** configurarlas vía `crontab -e` del usuario `developer`.
+- MITECO sincroniza precios cada 5 minutos mediante `UploadPricesToMitecoJob` si hay cambios en `preciosdeproductos`.
+- Para diagnósticos o forzar sincronización manual: `ddev exec php artisan miteco:sync {--force}`.
+- Guía detallada y resolución de incidencias en [.agents/rules/miteco_and_scheduler.md](file:///home/developer/Projects/admin-platform/.agents/rules/miteco_and_scheduler.md).

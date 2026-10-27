@@ -87,7 +87,7 @@ class MitecoService
     /**
      * Fetch prices from virtusgesnet and upload them to MITECO for all stations.
      */
-    public function uploadPrices(): array
+    public function uploadPrices(bool $force = false): array
     {
         // 1. Fetch current prices from database for comparison
         $currentPrices = [];
@@ -130,8 +130,8 @@ class MitecoService
             }
         }
 
-        // 3. Apply Monday 06:00 AM constraint if prices haven't changed
-        if (!$pricesChanged) {
+        // 3. Apply Monday 06:00 AM constraint if prices haven't changed and not forced
+        if (!$pricesChanged && !$force) {
             $now = now('Europe/Madrid');
             // Since this runs every 5 minutes, we check if it's Monday between 06:00 and 06:04
             $isMonday6AM = $now->isMonday() && $now->hour === 6 && $now->minute < 5;
@@ -226,6 +226,25 @@ class MitecoService
             ];
             Cache::put('miteco_last_update_status', $statusData);
         } else {
+            // Notify Telegram on failure
+            try {
+                $telegramService = app(\App\Services\TelegramService::class);
+                $users = \App\Models\User::whereNotNull('telegram_chat_id')->get();
+                if ($users->isNotEmpty()) {
+                    $errorDetails = $res['message'] ?? 'Fallo en la comunicación con Miteco.';
+                    $text = "🚨 <b>ALERTA MITECO: Fallo en la sincronización de precios</b>\n\n";
+                    $text .= "No se han podido enviar los precios al Ministerio:\n";
+                    $text .= "⚠️ <b>Error:</b> " . htmlspecialchars($errorDetails) . "\n\n";
+                    $text .= "<i>Compruebe la conectividad o credenciales desde el panel de administración.</i>";
+
+                    foreach ($users as $user) {
+                        $telegramService->sendMessage($user->telegram_chat_id, $text);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error("Failed to send Miteco failure notification: " . $e->getMessage());
+            }
+
             $statusData = [
                 'timestamp' => now('Europe/Madrid')->toIso8601String(),
                 'status' => 'failed',

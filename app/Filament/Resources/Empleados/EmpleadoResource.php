@@ -220,17 +220,21 @@ class EmpleadoResource extends Resource
                                           $venc = ($latest && $latest->fecha_vencimiento_contrato) ? $latest->fecha_vencimiento_contrato : ($record?->fecha_vencimiento_contrato);
 
                                           if ($val === 'Indefinido') {
-                                              return 'Fijo';
+                                              return !$latest ? 'Fijo (Sin documento)' : 'Fijo';
                                           }
                                           if (in_array(strtolower(trim($val ?? '')), ['eventual', 'temporal'])) {
                                               if ($venc) {
                                                   $isExpired = $venc->endOfDay()->isPast();
                                                   $formatted = $venc->format('d/m/Y');
-                                                  return $isExpired 
+                                                  $label = $isExpired 
                                                       ? "Eventual (Vencido: {$formatted})" 
                                                       : "Eventual (Fin: {$formatted})";
+                                                  return !$latest ? "{$label} (Sin documento)" : $label;
                                               }
-                                              return 'Eventual';
+                                              return !$latest ? 'Eventual (Sin documento)' : 'Eventual';
+                                          }
+                                          if (!$latest && !empty($val)) {
+                                              return "{$val} (Sin documento)";
                                           }
                                           return $val;
                                       })
@@ -241,6 +245,7 @@ class EmpleadoResource extends Resource
                                               ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
                                               ->orderBy('id', 'desc')
                                               ->first();
+                                          if (!$latest) return 'danger';
                                           $val = ($latest && $latest->tipo_contrato) ? $latest->tipo_contrato : ($record?->tipo_contrato);
                                           $venc = ($latest && $latest->fecha_vencimiento_contrato) ? $latest->fecha_vencimiento_contrato : ($record?->fecha_vencimiento_contrato);
                                           if (in_array(strtolower(trim($val ?? '')), ['eventual', 'temporal']) && $venc && $venc->endOfDay()->isPast()) {

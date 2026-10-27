@@ -197,7 +197,7 @@ class ViewEmpleado extends ViewRecord
                         $venc = $latest->fecha_vencimiento_contrato ?: $venc;
                     }
 
-                    if (!$hasDocs && empty($tipo)) {
+                    if (!$hasDocs) {
                         return 'danger';
                     }
 
