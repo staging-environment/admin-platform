@@ -213,34 +213,25 @@
                                     </div>
                                 </div>
                             @else
-                                 <div class="w-full max-w-xs space-y-4" x-data="{
-                                     loading: false,
-                                     doCheckIn() {
-                                         this.loading = true;
-                                         getFichajeGeolocation((lat, lng) => {
-                                             $wire.checkIn(lat, lng)
-                                                 .then(() => { this.loading = false; })
-                                                 .catch(() => { this.loading = false; });
-                                         });
-                                     }
-                                 }">
-                                     @if($fichajesDelDia && $fichajesDelDia->count() > 0)
-                                         <div class="text-center pb-1">
-                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-bold rounded-full text-xs border border-blue-200 dark:border-blue-900">
-                                                 Turno {{ $fichajesDelDia->count() + 1 }} de hoy
-                                             </span>
-                                         </div>
-                                     @endif
-                                     <div>
-                                         <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Selecciona Hora de Entrada</label>
-                                         <input type="time" wire:model="hora_entrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                     </div>
-                                     <button @click="doCheckIn" x-bind:disabled="loading" style="background-color: #16a34a; color: #ffffff;" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
-                                         <span x-show="!loading">{{ ($fichajesDelDia && $fichajesDelDia->count() > 0) ? 'Registrar Nueva Entrada' : 'Registrar Entrada' }}</span>
-                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
-                                     </button>
-                                 </div>
+                                <div class="w-full max-w-xs space-y-3 text-center">
+                                    @if($fichajesDelDia && $fichajesDelDia->count() > 0)
+                                        <div>
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-bold rounded-full text-xs border border-blue-200 dark:border-blue-900">
+                                                Turno {{ $fichajesDelDia->count() + 1 }} de hoy
+                                            </span>
+                                        </div>
+                                    @endif
+                                    <button type="button" 
+                                            wire:click="abrirModalCheckIn" 
+                                            style="background-color: #16a34a; color: #ffffff;" 
+                                            class="w-full py-3.5 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                        </svg>
+                                        <span>{{ ($fichajesDelDia && $fichajesDelDia->count() > 0) ? 'Registrar Nueva Entrada' : 'Registrar Entrada' }}</span>
+                                    </button>
+                                    <p class="text-[11px] text-gray-400">Pulsa para seleccionar tu hora de entrada en la ventana emergente.</p>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -315,27 +306,18 @@
                                     </div>
                                 @endif
                             @else
-                                 <div class="w-full max-w-xs space-y-4" x-data="{
-                                     loading: false,
-                                     doCheckOut() {
-                                         this.loading = true;
-                                         getFichajeGeolocation((lat, lng) => {
-                                             $wire.checkOut(lat, lng)
-                                                 .then(() => { this.loading = false; })
-                                                 .catch(() => { this.loading = false; });
-                                         });
-                                     }
-                                 }">
-                                     <div>
-                                         <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Selecciona Hora de Salida</label>
-                                         <input type="time" wire:model="hora_salida" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
-                                     </div>
-                                     <button @click="doCheckOut" x-bind:disabled="loading" style="background-color: #ea580c; color: #ffffff;" class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-600/10 hover:shadow-orange-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                                         <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
-                                         <span x-show="!loading">Registrar Salida</span>
-                                         <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
-                                     </button>
-                                 </div>
+                                <div class="w-full max-w-xs space-y-3 text-center">
+                                    <button type="button" 
+                                            wire:click="abrirModalCheckOut" 
+                                            style="background-color: #ea580c; color: #ffffff;" 
+                                            class="w-full py-3.5 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-600/10 hover:shadow-orange-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        <span>Registrar Salida</span>
+                                    </button>
+                                    <p class="text-[11px] text-gray-400">Pulsa para seleccionar tu hora de salida en la ventana emergente.</p>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -1007,6 +989,144 @@
             @endif
 
             <!-- MODALS -->
+            <!-- Modal Flotante: Registrar Entrada -->
+            <x-filament::modal id="checkin-modal" width="md">
+                <x-slot name="heading">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 bg-green-500/10 text-green-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        </span>
+                        <span>Registrar Entrada</span>
+                        @if($fichajesDelDia && $fichajesDelDia->count() > 0)
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800">
+                                Turno {{ $fichajesDelDia->count() + 1 }}
+                            </span>
+                        @endif
+                    </div>
+                </x-slot>
+
+                <div class="space-y-4 py-3" x-data="{
+                    loading: false,
+                    doCheckInModal() {
+                        this.loading = true;
+                        getFichajeGeolocation((lat, lng) => {
+                            $wire.checkIn(lat, lng)
+                                .then(() => {
+                                    this.loading = false;
+                                    $dispatch('close-modal', { id: 'checkin-modal' });
+                                })
+                                .catch(() => {
+                                    this.loading = false;
+                                });
+                        });
+                    }
+                }">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Selecciona la hora de inicio de tu turno. El sistema almacenará internamente la hora real y la ubicación GPS.
+                    </p>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">Hora de Entrada</label>
+                        <input type="time" wire:model="hora_entrada" class="w-full text-center text-3xl font-extrabold py-3 rounded-2xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:border-green-500 focus:ring-green-500 shadow-sm" />
+                    </div>
+
+                    <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 space-y-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center justify-between">
+                            <span>🕒 Hora real del sistema:</span>
+                            <span class="font-mono font-bold text-gray-700 dark:text-gray-200">{{ \Carbon\Carbon::now()->timezone('Europe/Madrid')->format('H:i:s') }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>📍 Geolocalización:</span>
+                            <span class="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Captura automática GPS
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-bind:disabled="loading" x-on:click="$dispatch('close-modal', { id: 'checkin-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <button type="button" @click="doCheckInModal" x-bind:disabled="loading" style="background-color: #16a34a; color: #ffffff;" class="py-2.5 px-5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm">
+                            <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                            <span x-show="!loading">Confirmar Entrada</span>
+                            <span x-show="loading" style="display: none;">Registrando...</span>
+                        </button>
+                    </div>
+                </div>
+            </x-filament::modal>
+
+            <!-- Modal Flotante: Registrar Salida -->
+            <x-filament::modal id="checkout-modal" width="md">
+                <x-slot name="heading">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 bg-orange-500/10 text-orange-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </span>
+                        <span>Registrar Salida</span>
+                    </div>
+                </x-slot>
+
+                <div class="space-y-4 py-3" x-data="{
+                    loading: false,
+                    doCheckOutModal() {
+                        this.loading = true;
+                        getFichajeGeolocation((lat, lng) => {
+                            $wire.checkOut(lat, lng)
+                                .then(() => {
+                                    this.loading = false;
+                                    $dispatch('close-modal', { id: 'checkout-modal' });
+                                })
+                                .catch(() => {
+                                    this.loading = false;
+                                });
+                        });
+                    }
+                }">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Selecciona la hora de finalización de tu turno. El sistema almacenará internamente la hora real y la ubicación GPS.
+                    </p>
+
+                    @if($fichajeActivo && $fichajeActivo->hora_entrada)
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                            <span>Entrada registrada de este turno:</span>
+                            <span class="font-bold font-mono text-sm">{{ \Carbon\Carbon::parse($fichajeActivo->hora_entrada)->format('H:i') }}</span>
+                        </div>
+                    @endif
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2">Hora de Salida</label>
+                        <input type="time" wire:model="hora_salida" class="w-full text-center text-3xl font-extrabold py-3 rounded-2xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:border-orange-500 focus:ring-orange-500 shadow-sm" />
+                    </div>
+
+                    <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 space-y-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center justify-between">
+                            <span>🕒 Hora real del sistema:</span>
+                            <span class="font-mono font-bold text-gray-700 dark:text-gray-200">{{ \Carbon\Carbon::now()->timezone('Europe/Madrid')->format('H:i:s') }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>📍 Geolocalización:</span>
+                            <span class="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Captura automática GPS
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-bind:disabled="loading" x-on:click="$dispatch('close-modal', { id: 'checkout-modal' })">
+                            Cancelar
+                        </x-filament::button>
+                        <button type="button" @click="doCheckOutModal" x-bind:disabled="loading" style="background-color: #ea580c; color: #ffffff;" class="py-2.5 px-5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-600/10 hover:shadow-orange-700/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm">
+                            <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
+                            <span x-show="!loading">Confirmar Salida</span>
+                            <span x-show="loading" style="display: none;">Registrando...</span>
+                        </button>
+                    </div>
+                </div>
+            </x-filament::modal>
+
             <x-filament::modal id="edit-fichaje-modal" width="md">
                 <x-slot name="heading">
                     Editar Fichaje del {{ $editingFecha ? \Carbon\Carbon::parse($editingFecha)->format('d/m/Y') : '' }}

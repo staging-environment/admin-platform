@@ -354,6 +354,18 @@ class FichaEmpleado extends Page
         ]);
     }
 
+    public function abrirModalCheckIn(): void
+    {
+        $this->hora_entrada = Carbon::now()->format('H:i');
+        $this->dispatch('open-modal', id: 'checkin-modal');
+    }
+
+    public function abrirModalCheckOut(): void
+    {
+        $this->hora_salida = Carbon::now()->format('H:i');
+        $this->dispatch('open-modal', id: 'checkout-modal');
+    }
+
     public function checkIn($latitude = null, $longitude = null): void
     {
         if (!$this->empleado) {
@@ -433,6 +445,7 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->dispatch('close-modal', id: 'checkin-modal');
         $this->hora_salida = Carbon::now()->format('H:i');
         $this->loadFichajes();
     }
@@ -537,6 +550,7 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->dispatch('close-modal', id: 'checkout-modal');
         $this->hora_entrada = Carbon::now()->format('H:i');
         $this->loadFichajes();
     }
