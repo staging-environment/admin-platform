@@ -197,14 +197,20 @@
                                         <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Debes cerrar primero el turno anterior del <strong>{{ \Carbon\Carbon::parse($fichajePendienteAnterior->fecha)->format('d/m/Y') }}</strong> para poder iniciar tu jornada de hoy.</p>
                                     </div>
                                 </div>
-                            @elseif($fichajeDelDia && $fichajeDelDia->hora_entrada)
+                            @elseif($fichajeActivo && $fichajeActivo->hora_entrada)
                                 <div class="text-center space-y-2">
                                     <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 font-bold rounded-full text-sm border border-green-200 dark:border-green-900">
-                                        <span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
-                                        Entrada Registrada
+                                        <span class="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                                        Jornada en Curso
                                     </div>
-                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_entrada)->format('H:i') }}</h2>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkin_at ? $fichajeDelDia->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_entrada)->format('d/m/Y H:i:s') }}</p>
+                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeActivo->hora_entrada)->format('H:i') }}</h2>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeActivo->server_checkin_at ? $fichajeActivo->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeActivo->fecha . ' ' . $fichajeActivo->hora_entrada)->format('d/m/Y H:i:s') }}</p>
+                                    <div>
+                                        <button type="button" wire:click="editFichaje({{ $fichajeActivo->id }})" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1 mt-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            Modificar hora de entrada
+                                        </button>
+                                    </div>
                                 </div>
                             @else
                                  <div class="w-full max-w-xs space-y-4" x-data="{
@@ -218,13 +224,20 @@
                                          });
                                      }
                                  }">
+                                     @if($fichajesDelDia && $fichajesDelDia->count() > 0)
+                                         <div class="text-center pb-1">
+                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-bold rounded-full text-xs border border-blue-200 dark:border-blue-900">
+                                                 Turno {{ $fichajesDelDia->count() + 1 }} de hoy
+                                             </span>
+                                         </div>
+                                     @endif
                                      <div>
                                          <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Selecciona Hora de Entrada</label>
                                          <input type="time" wire:model="hora_entrada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-lg font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
                                      </div>
                                      <button @click="doCheckIn" x-bind:disabled="loading" style="background-color: #16a34a; color: #ffffff;" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg shadow-green-600/10 hover:shadow-green-700/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                          <span x-show="loading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" style="display: none;"></span>
-                                         <span x-show="!loading">Registrar Entrada</span>
+                                         <span x-show="!loading">{{ ($fichajesDelDia && $fichajesDelDia->count() > 0) ? 'Registrar Nueva Entrada' : 'Registrar Entrada' }}</span>
                                          <span x-show="loading" style="display: none;">Obteniendo ubicación...</span>
                                      </button>
                                  </div>
@@ -256,15 +269,6 @@
                                     </svg>
                                     <p class="text-xs font-medium">No hay jornada activa que cerrar durante la baja médica.</p>
                                 </div>
-                            @elseif($fichajeDelDia && $fichajeDelDia->hora_salida)
-                                <div class="text-center space-y-2">
-                                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold rounded-full text-sm border border-amber-200 dark:border-amber-900">
-                                        <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
-                                        Salida Registrada
-                                    </div>
-                                    <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeDelDia->hora_salida)->format('H:i') }}</h2>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeDelDia->server_checkout_at ? $fichajeDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeDelDia->fecha . ' ' . $fichajeDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
-                                </div>
                             @elseif($fichajePendienteAnterior)
                                 <div class="w-full max-w-xs space-y-4" x-data="{
                                     loadingCierre: false,
@@ -292,13 +296,24 @@
                                         <span x-show="loadingCierre" style="display: none;">Obteniendo ubicación...</span>
                                     </button>
                                 </div>
-                            @elseif(!$fichajeDelDia || !$fichajeDelDia->hora_entrada)
-                                <div class="text-center space-y-2 max-w-xs text-gray-400">
-                                    <svg class="w-12 h-12 mx-auto stroke-current" fill="none" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                    <p class="text-sm font-medium">Debes registrar tu entrada primero para poder registrar la salida.</p>
-                                </div>
+                            @elseif(!$fichajeActivo)
+                                @if($ultimoFichajeCerradoDelDia)
+                                    <div class="text-center space-y-2">
+                                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold rounded-full text-sm border border-amber-200 dark:border-amber-900">
+                                            <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                                            Última Salida: {{ \Carbon\Carbon::parse($ultimoFichajeCerradoDelDia->hora_salida)->format('H:i') }}
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $ultimoFichajeCerradoDelDia->server_checkout_at ? $ultimoFichajeCerradoDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($ultimoFichajeCerradoDelDia->fecha . ' ' . $ultimoFichajeCerradoDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Jornada previa completada. Si inicias otro turno hoy, registra tu entrada primero.</p>
+                                    </div>
+                                @else
+                                    <div class="text-center space-y-2 max-w-xs text-gray-400">
+                                        <svg class="w-12 h-12 mx-auto stroke-current" fill="none" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                        </svg>
+                                        <p class="text-sm font-medium">Debes registrar tu entrada primero para poder registrar la salida.</p>
+                                    </div>
+                                @endif
                             @else
                                  <div class="w-full max-w-xs space-y-4" x-data="{
                                      loading: false,
