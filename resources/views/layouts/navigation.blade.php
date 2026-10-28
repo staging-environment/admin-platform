@@ -117,7 +117,9 @@
                                 </x-slot>
                             </x-dropdown>
                         </div>
-                    @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+                    @endif
+
+                    @if(auth()->user()?->can('acceder_portal_fichajes') && !auth()->user()?->can('gestion_recursos_humanos') && !auth()->user()?->can('ver_dashboard'))
                         <x-nav-link href="/admin/portal-empleado?tab=fichajes" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'fichajes' || !request()->has('tab'))">
                             {{ __('Fichajes') }}
                         </x-nav-link>
@@ -150,10 +152,10 @@
 
                                 <x-slot name="content">
                                     <x-dropdown-link href="/admin/portal-empleado?tab=formacion_empresa" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')">
-                                        {{ __('Formación Asignada') }}
+                                        {{ __('Cursos') }}
                                     </x-dropdown-link>
                                     <x-dropdown-link href="/admin/portal-empleado?tab=mis_titulaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'mis_titulaciones'">
-                                        {{ __('Mis Titulaciones y Diplomas') }}
+                                        {{ __('Diplomas') }}
                                     </x-dropdown-link>
                                 </x-slot>
                             </x-dropdown>
@@ -163,6 +165,18 @@
                     @if(auth()->user()?->can('utilizar_explorador'))
                         <x-nav-link href="/admin/file-explorer" :active="$isFileExplorerActive">
                             {{ __('Explorador de Archivos') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()?->can('acceso_odoo'))
+                        <x-nav-link href="https://odoo.utrecar.com" target="_blank" class="inline-flex items-center gap-1.5 font-bold text-purple-700 hover:text-purple-900 border-b-2 border-transparent hover:border-purple-500 transition duration-150 ease-in-out">
+                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+                            </svg>
+                            <span>{{ __('Odoo') }}</span>
+                            <svg class="w-3 h-3 text-purple-400 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
                         </x-nav-link>
                     @endif
 
@@ -249,7 +263,12 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()?->name }}</div>
+                            <div class="flex items-center gap-1.5">
+                                <span>{{ Auth::user()?->name }}</span>
+                                @if(Auth::user()?->hasMultipleRoles())
+                                    <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">{{ Auth::user()->getActiveRole() }}</span>
+                                @endif
+                            </div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -260,6 +279,25 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(Auth::user()?->hasMultipleRoles())
+                            <div class="px-4 py-2 border-b border-gray-100 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                                {{ __('Cambiar Rol') }}
+                            </div>
+                            @foreach(Auth::user()->getAssignedRoles() as $assignedRole)
+                                <form method="POST" action="{{ route('profile.switch-role') }}">
+                                    @csrf
+                                    <input type="hidden" name="role" value="{{ $assignedRole }}">
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-xs flex items-center justify-between {{ Auth::user()->getActiveRole() === $assignedRole ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-gray-700 hover:bg-gray-100' }}">
+                                        <span>{{ $assignedRole }}</span>
+                                        @if(Auth::user()->getActiveRole() === $assignedRole)
+                                            <span class="text-[10px] text-indigo-600 font-extrabold">✓ En uso</span>
+                                        @endif
+                                    </button>
+                                </form>
+                            @endforeach
+                            <div class="border-t border-gray-100"></div>
+                        @endif
+
                         @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
                             <x-dropdown-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50 dark:bg-amber-950/20">
                                 {{ __('⚡ Salir de la suplantación') }}
@@ -356,7 +394,9 @@
                         @endif
                     </div>
                 </div>
-            @elseif(auth()->user()?->can('acceder_portal_fichajes'))
+            @endif
+
+            @if(auth()->user()?->can('acceder_portal_fichajes') && !auth()->user()?->can('gestion_recursos_humanos') && !auth()->user()?->can('ver_dashboard'))
                 <div class="pt-4 pb-2 border-t border-gray-200">
                     <div class="px-4 font-semibold text-xs uppercase tracking-wider text-gray-400">
                         {{ __('Portal del Empleado') }}
@@ -387,10 +427,10 @@
                             </button>
                             <div x-show="openSub" style="display: none;" class="ps-6 space-y-1 bg-gray-50 py-1">
                                 <a href="/admin/portal-empleado?tab=formacion_empresa" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && (request()->query('tab') === 'formacion_empresa' || request()->query('tab') === 'formacion')) ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
-                                    └─ {{ __('Formación Asignada') }}
+                                    └─ {{ __('Cursos') }}
                                 </a>
                                 <a href="/admin/portal-empleado?tab=mis_titulaciones" class="block py-2 text-sm {{ (request()->is('admin/portal-empleado*') && request()->query('tab') === 'mis_titulaciones') ? 'text-indigo-600 font-bold' : 'text-gray-600 hover:text-indigo-600' }}">
-                                    └─ {{ __('Mis Titulaciones y Diplomas') }}
+                                    └─ {{ __('Diplomas') }}
                                 </a>
                             </div>
                         </div>
@@ -401,6 +441,20 @@
             @if(auth()->user()?->can('utilizar_explorador'))
                 <x-responsive-nav-link href="/admin/file-explorer" :active="request()->is('admin/file-explorer*')">
                     {{ __('Explorador de Archivos') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()?->can('acceso_odoo'))
+                <x-responsive-nav-link href="https://odoo.utrecar.com" target="_blank" class="text-purple-700 font-bold flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+                        </svg>
+                        {{ __('Acceso a Odoo') }}
+                    </span>
+                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
                 </x-responsive-nav-link>
             @endif
 
@@ -457,11 +511,35 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name }}</div>
+                <div class="font-medium text-base text-gray-800 flex items-center gap-2">
+                    <span>{{ Auth::user()?->name }}</span>
+                    @if(Auth::user()?->hasMultipleRoles())
+                        <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">{{ Auth::user()->getActiveRole() }}</span>
+                    @endif
+                </div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(Auth::user()?->hasMultipleRoles())
+                    <div class="px-4 py-1 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                        {{ __('Cambiar Rol') }}
+                    </div>
+                    @foreach(Auth::user()->getAssignedRoles() as $assignedRole)
+                        <form method="POST" action="{{ route('profile.switch-role') }}">
+                            @csrf
+                            <input type="hidden" name="role" value="{{ $assignedRole }}">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-xs flex items-center justify-between {{ Auth::user()->getActiveRole() === $assignedRole ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-gray-700 hover:bg-gray-100' }}">
+                                <span>{{ $assignedRole }}</span>
+                                @if(Auth::user()->getActiveRole() === $assignedRole)
+                                    <span class="text-[10px] text-indigo-600 font-extrabold">✓ En uso</span>
+                                @endif
+                            </button>
+                        </form>
+                    @endforeach
+                    <div class="border-t border-gray-200 my-1"></div>
+                @endif
+
                 @if(session()->has('impersonated_by') || (class_exists(\STS\FilamentImpersonate\Facades\Impersonation::class) && \STS\FilamentImpersonate\Facades\Impersonation::isImpersonating()))
                     <x-responsive-nav-link :href="route('filament-impersonate.leave')" class="text-amber-700 font-bold bg-amber-50">
                         {{ __('⚡ Salir de la suplantación') }}

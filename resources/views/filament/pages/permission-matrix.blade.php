@@ -57,6 +57,7 @@
                         ],
                         'Gasolineras' => [
                             'gestion_gasolineras' => 'Gestión de Gasolineras',
+                            'acceso_odoo' => 'Acceso a Odoo (ERP / TPV)',
                         ],
                         'Ofertas de Empleo' => [
                             'gestion_ofertas' => 'Gestión de Ofertas de Trabajo',
