@@ -358,7 +358,7 @@
                         {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->nombre ?? '') : '—' }}
                     </td>
                     <td style="text-transform: uppercase; color: #475569;">
-                        {{ $fichaje->empleado?->gasolinera?->Nombre ?? '—' }}
+                        {{ ($fichaje->empleado?->estaciones_nombres && $fichaje->empleado?->estaciones_nombres !== '—') ? $fichaje->empleado?->estaciones_nombres : ($fichaje->empleado?->gasolinera?->Nombre ?? '—') }}
                     </td>
                     <td>
                         {{ \Carbon\Carbon::parse($fichaje->fecha)->format('d/m/Y') }}

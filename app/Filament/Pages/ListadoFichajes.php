@@ -92,7 +92,12 @@ class ListadoFichajes extends Page
             $query->where('empleado_fichajes.fecha', '<=', $this->filterDateTo);
         }
         if ($this->filterGasolinera) {
-            $query->where('empleados.gasolinera_codigo', $this->filterGasolinera);
+            $gCode = (int) $this->filterGasolinera;
+            $query->where(function ($q) use ($gCode) {
+                $q->where('empleados.gasolinera_codigo', $gCode)
+                  ->orWhereJsonContains('empleados.gasolineras_codigos', $gCode)
+                  ->orWhereJsonContains('empleados.gasolineras_codigos', (string) $gCode);
+            });
         }
 
         if ($search) {

@@ -29,6 +29,7 @@ class ManageEmpleadoDocumentos extends Component
     public $fecha_inicio;
     public $fecha_fin;
     public $gasolinera_codigo;
+    public $gasolineras_codigos = [];
     public $puesto;
 
     // Properties for inline editing
@@ -45,6 +46,7 @@ class ManageEmpleadoDocumentos extends Component
     public $edit_tipo;
     public $edit_nombre;
     public $edit_gasolinera_codigo;
+    public $edit_gasolineras_codigos = [];
     public $edit_puesto;
 
     protected $rules = [
@@ -57,7 +59,11 @@ class ManageEmpleadoDocumentos extends Component
         'fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
         'edit_fecha_caducidad_dni.after' => 'La fecha de caducidad debe ser posterior a la de hoy.',
         'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-        'edit_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.'
+        'edit_fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+        'gasolineras_codigos.required' => 'Debes seleccionar al menos una ubicación de trabajo.',
+        'gasolineras_codigos.min' => 'Debes seleccionar al menos una ubicación de trabajo.',
+        'edit_gasolineras_codigos.required' => 'Debes seleccionar al menos una ubicación de trabajo.',
+        'edit_gasolineras_codigos.min' => 'Debes seleccionar al menos una ubicación de trabajo.',
     ];
 
     protected $validationAttributes = [
@@ -67,6 +73,8 @@ class ManageEmpleadoDocumentos extends Component
         'fecha_fin' => 'fecha de fin',
         'edit_fecha_inicio' => 'fecha de inicio',
         'edit_fecha_fin' => 'fecha de fin',
+        'gasolineras_codigos' => 'ubicación de trabajo',
+        'edit_gasolineras_codigos' => 'ubicación de trabajo',
     ];
 
     public function mount($empleadoId, $family = null)
@@ -83,7 +91,9 @@ class ManageEmpleadoDocumentos extends Component
             $this->tipo_contrato = $this->empleado->tipo_contrato;
             $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
             $this->tipo_jornada = 'Jornada completa';
-            $this->gasolinera_codigo = $this->empleado->gasolinera_codigo;
+            $codigos = $this->empleado->gasolineras_codigos ?: ($this->empleado->gasolinera_codigo ? [$this->empleado->gasolinera_codigo] : []);
+            $this->gasolineras_codigos = array_values(array_filter(array_map('strval', (array) $codigos)));
+            $this->gasolinera_codigo = !empty($this->gasolineras_codigos) ? (int)$this->gasolineras_codigos[0] : null;
             $this->puesto = $this->empleado->puesto;
         } elseif ($this->family === 'formacion') {
             $this->tipo = 'Prevención de riesgos laborales';
@@ -151,7 +161,8 @@ class ManageEmpleadoDocumentos extends Component
             $rules['fecha_vencimiento_contrato'] = 'required_if:tipo_contrato,Eventual|nullable|date';
             $rules['tipo_jornada'] = 'required|string|in:Jornada completa,Media Jornada,Otros';
             $rules['tipo_jornada_otro'] = 'required_if:tipo_jornada,Otros|nullable|string|max:255';
-            $rules['gasolinera_codigo'] = 'required|integer|exists:virtusgesnet.estaciones,Codigo';
+            $rules['gasolineras_codigos'] = 'required|array|min:1';
+            $rules['gasolineras_codigos.*'] = 'integer';
             $rules['puesto'] = 'required|string|max:255';
         }
         if ($this->family === 'formacion') {
@@ -174,6 +185,9 @@ class ManageEmpleadoDocumentos extends Component
 
         $path = $this->file->store('empleados/documentos', 'local');
 
+        $codigos = array_values(array_unique(array_filter(array_map('intval', (array) $this->gasolineras_codigos))));
+        $primaryCodigo = !empty($codigos) ? $codigos[0] : null;
+
         $this->empleado->documentos()->create([
             'tipo' => $this->tipo,
             'nombre' => $this->nombre,
@@ -183,7 +197,8 @@ class ManageEmpleadoDocumentos extends Component
             'fecha_vencimiento_contrato' => ($this->family === 'contratos' && $this->tipo_contrato === 'Eventual' && $this->fecha_vencimiento_contrato) ? $this->fecha_vencimiento_contrato : null,
             'tipo_jornada' => $this->family === 'contratos' ? ($this->tipo_jornada ?: null) : null,
             'tipo_jornada_otro' => ($this->family === 'contratos' && $this->tipo_jornada === 'Otros') ? $this->tipo_jornada_otro : null,
-            'gasolinera_codigo' => $this->family === 'contratos' ? ($this->gasolinera_codigo ?: null) : null,
+            'gasolineras_codigos' => $this->family === 'contratos' ? $codigos : null,
+            'gasolinera_codigo' => $this->family === 'contratos' ? $primaryCodigo : null,
             'puesto' => $this->family === 'contratos' ? ($this->puesto ?: null) : null,
             'fecha_inicio' => $this->family === 'formacion' ? $this->fecha_inicio : null,
             'fecha_fin' => $this->family === 'formacion' ? $this->fecha_fin : null,
@@ -224,7 +239,9 @@ class ManageEmpleadoDocumentos extends Component
     {
         $this->tipo_contrato = $this->empleado->tipo_contrato;
         $this->fecha_vencimiento_contrato = $this->empleado->fecha_vencimiento_contrato?->format('Y-m-d');
-        $this->gasolinera_codigo = $this->empleado->gasolinera_codigo;
+        $codigos = $this->empleado->gasolineras_codigos ?: ($this->empleado->gasolinera_codigo ? [$this->empleado->gasolinera_codigo] : []);
+        $this->gasolineras_codigos = array_values(array_filter(array_map('strval', (array) $codigos)));
+        $this->gasolinera_codigo = !empty($this->gasolineras_codigos) ? (int)$this->gasolineras_codigos[0] : null;
         $this->puesto = $this->empleado->puesto;
     }
 
@@ -306,7 +323,9 @@ class ManageEmpleadoDocumentos extends Component
             $this->edit_fecha_vencimiento_contrato = $doc->fecha_vencimiento_contrato ? $doc->fecha_vencimiento_contrato->format('Y-m-d') : null;
             $this->edit_tipo_jornada = $doc->tipo_jornada ?: 'Jornada completa';
             $this->edit_tipo_jornada_otro = $doc->tipo_jornada_otro;
-            $this->edit_gasolinera_codigo = $doc->gasolinera_codigo ?: $this->empleado->gasolinera_codigo;
+            $docCodigos = $doc->gasolineras_codigos ?: ($doc->gasolinera_codigo ? [$doc->gasolinera_codigo] : ($this->empleado->gasolineras_codigos ?: ($this->empleado->gasolinera_codigo ? [$this->empleado->gasolinera_codigo] : [])));
+            $this->edit_gasolineras_codigos = array_values(array_filter(array_map('strval', (array) $docCodigos)));
+            $this->edit_gasolinera_codigo = !empty($this->edit_gasolineras_codigos) ? (int)$this->edit_gasolineras_codigos[0] : null;
             $this->edit_puesto = $doc->puesto ?: $this->empleado->puesto;
         } elseif ($this->family === 'dni') {
             $this->edit_fecha_caducidad_dni = $this->empleado->fecha_caducidad_dni ? $this->empleado->fecha_caducidad_dni->format('Y-m-d') : null;
@@ -339,13 +358,17 @@ class ManageEmpleadoDocumentos extends Component
                 'edit_fecha_vencimiento_contrato' => 'required_if:edit_tipo_contrato,Eventual|nullable|date',
                 'edit_tipo_jornada' => 'required|string|in:Jornada completa,Media Jornada,Otros',
                 'edit_tipo_jornada_otro' => 'required_if:edit_tipo_jornada,Otros|nullable|string|max:255',
-                'edit_gasolinera_codigo' => 'required|integer|exists:virtusgesnet.estaciones,Codigo',
+                'edit_gasolineras_codigos' => 'required|array|min:1',
+                'edit_gasolineras_codigos.*' => 'integer',
                 'edit_puesto' => 'required|string|max:255',
             ];
             if ($this->edit_file) {
                 $rules['edit_file'] = 'file|max:10240';
             }
             $this->validate($rules);
+
+            $codigos = array_values(array_unique(array_filter(array_map('intval', (array) $this->edit_gasolineras_codigos))));
+            $primaryCodigo = !empty($codigos) ? $codigos[0] : null;
 
             $path = $doc->file_path;
             if ($this->edit_file) {
@@ -362,7 +385,8 @@ class ManageEmpleadoDocumentos extends Component
                 'fecha_vencimiento_contrato' => ($this->edit_tipo_contrato === 'Eventual' && $this->edit_fecha_vencimiento_contrato) ? $this->edit_fecha_vencimiento_contrato : null,
                 'tipo_jornada' => $this->edit_tipo_jornada ?: null,
                 'tipo_jornada_otro' => ($this->edit_tipo_jornada === 'Otros') ? $this->edit_tipo_jornada_otro : null,
-                'gasolinera_codigo' => $this->edit_gasolinera_codigo ?: null,
+                'gasolineras_codigos' => $codigos,
+                'gasolinera_codigo' => $primaryCodigo,
                 'puesto' => $this->edit_puesto ?: null,
             ]);
             $this->empleado->syncLatestContract();
@@ -426,6 +450,44 @@ class ManageEmpleadoDocumentos extends Component
         $this->edit_file = null;
         
         session()->flash('message', 'Documento actualizado correctamente.');
+    }
+
+    public function getEstacionesDisponiblesProperty()
+    {
+        try {
+            $estaciones = \App\Models\Gasolinera::query()
+                ->whereNotNull('Nombre')
+                ->where('Nombre', '!=', '')
+                ->orderBy('Codigo')
+                ->pluck('Nombre', 'Codigo')
+                ->toArray();
+            if (!empty($estaciones)) {
+                return $estaciones;
+            }
+        } catch (\Throwable $e) {}
+
+        return [
+            1 => 'E.S. VISTALEGRE',
+            2 => 'RONDA NORTE',
+            3 => 'E.S RODALABOTA',
+            4 => 'E.S. ATENAS',
+        ];
+    }
+
+    public function removeEstacion($codigo)
+    {
+        $this->gasolineras_codigos = array_values(array_filter(
+            (array) $this->gasolineras_codigos,
+            fn($c) => (string)$c !== (string)$codigo
+        ));
+    }
+
+    public function removeEditEstacion($codigo)
+    {
+        $this->edit_gasolineras_codigos = array_values(array_filter(
+            (array) $this->edit_gasolineras_codigos,
+            fn($c) => (string)$c !== (string)$codigo
+        ));
     }
 
     public function render()

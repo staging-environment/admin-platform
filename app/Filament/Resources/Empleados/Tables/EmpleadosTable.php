@@ -85,11 +85,12 @@ class EmpleadosTable
                     ->grow(false)
                     ->default('—'),
 
-                 TextColumn::make('gasolinera.Nombre')
+                 TextColumn::make('ubicacion_trabajo')
                     ->label('Ubicación de trabajo')
                     ->size('xs')
                     ->color('gray')
                     ->grow(false)
+                    ->state(fn ($record) => $record->estaciones_nombres)
                     ->default('—'),
 
                 TextColumn::make('puesto')
@@ -157,11 +158,17 @@ class EmpleadosTable
 
                                 return $query->where(function ($q) use ($codigo) {
                                     $q->where('gasolinera_codigo', $codigo)
+                                      ->orWhereJsonContains('gasolineras_codigos', (int) $codigo)
+                                      ->orWhereJsonContains('gasolineras_codigos', (string) $codigo)
                                       ->orWhereIn('id', function ($subQuery) use ($codigo) {
                                           $subQuery->select('ed1.empleado_id')
                                               ->from('empleado_documentos as ed1')
                                               ->where('ed1.tipo', 'Contratos')
-                                              ->where('ed1.gasolinera_codigo', $codigo)
+                                              ->where(function ($sq) use ($codigo) {
+                                                  $sq->where('ed1.gasolinera_codigo', $codigo)
+                                                     ->orWhereJsonContains('ed1.gasolineras_codigos', (int) $codigo)
+                                                     ->orWhereJsonContains('ed1.gasolineras_codigos', (string) $codigo);
+                                              })
                                               ->whereRaw('ed1.id = (select ed2.id from empleado_documentos as ed2 where ed2.empleado_id = ed1.empleado_id and ed2.tipo = "Contratos" order by ed2.id desc limit 1)');
                                       });
                                 });

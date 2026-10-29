@@ -156,7 +156,7 @@
                                     {{ $fichaje->empleado ? mb_strtoupper($fichaje->empleado->nombre ?? '') : '—' }}
                                 </td>
                                 <td class="py-2 px-4 text-xs text-gray-600 dark:text-gray-400 font-medium uppercase">
-                                    {{ $fichaje->empleado?->gasolinera?->Nombre ?? '—' }}
+                                    {{ ($fichaje->empleado?->estaciones_nombres && $fichaje->empleado?->estaciones_nombres !== '—') ? $fichaje->empleado?->estaciones_nombres : ($fichaje->empleado?->gasolinera?->Nombre ?? '—') }}
                                 </td>
                                 <td class="py-2 px-4 text-gray-700 dark:text-gray-300 text-xs">
                                     <div class="flex flex-col">
