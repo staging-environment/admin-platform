@@ -94,6 +94,33 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
+    
+    /**
+     * Cambiar de rol activo para usuarios que disponen de varios roles.
+     */
+    public function switchRole(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $assignedRoles = $user->roles->pluck('name')->toArray();
+
+        $request->validate([
+            'role' => ['required', 'string', \Illuminate\Validation\Rule::in($assignedRoles)],
+        ]);
+
+        $newRole = $request->input('role');
+        session(['active_role' => $newRole]);
+
+        // Redirección inteligente según el rol activado
+        $targetUrl = '/admin';
+        if ($newRole === 'Gestor') {
+            $targetUrl = '/admin/recursos-humanos';
+        } elseif ($newRole === 'Empleado') {
+            $targetUrl = '/admin/portal-empleado';
+        }
+
+        return redirect($targetUrl)->with('status', 'role-switched');
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

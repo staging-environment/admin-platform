@@ -28,6 +28,7 @@ class Empleado extends Model
         'fecha_reconocimiento' => 'date',
         'fecha_vencimiento_contrato' => 'date',
         'gasolinera_codigo' => 'integer',
+        'gasolineras_codigos' => 'array',
         'fecha_caducidad_dni' => 'date',
         'fecha_baja' => 'date',
         'onboarding_completado' => 'boolean',
@@ -116,6 +117,53 @@ class Empleado extends Model
         return $this->belongsTo(Gasolinera::class, 'gasolinera_codigo', 'Codigo');
     }
 
+    public function getEstacionesAttribute()
+    {
+        $codigos = $this->gasolineras_codigos;
+        if (empty($codigos) && $this->gasolinera_codigo) {
+            $codigos = [$this->gasolinera_codigo];
+        }
+        if (empty($codigos)) {
+            return collect();
+        }
+        try {
+            return Gasolinera::whereIn('Codigo', $codigos)->get();
+        } catch (\Throwable $e) {
+            return collect();
+        }
+    }
+
+    public function getEstacionesNombresAttribute(): string
+    {
+        $codigos = $this->gasolineras_codigos;
+        if (empty($codigos) && $this->gasolinera_codigo) {
+            $codigos = [$this->gasolinera_codigo];
+        }
+        if (empty($codigos)) {
+            return '—';
+        }
+
+        $map = [
+            1 => 'E.S. VISTALEGRE',
+            2 => 'RONDA NORTE',
+            3 => 'E.S RODALABOTA',
+            4 => 'E.S. ATENAS',
+            5 => 'Trieste',
+        ];
+
+        try {
+            $nombres = Gasolinera::whereIn('Codigo', $codigos)->pluck('Nombre')->filter()->toArray();
+            if (!empty($nombres)) {
+                return implode(', ', $nombres);
+            }
+        } catch (\Throwable $e) {
+            // Fallback to static map
+        }
+
+        $nombres = array_filter(array_map(fn($c) => $map[(int)$c] ?? null, $codigos));
+        return !empty($nombres) ? implode(', ', $nombres) : '—';
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'email', 'email');
@@ -176,10 +224,25 @@ class Empleado extends Model
 
         if ($latest) {
             $isEventual = in_array(strtolower(trim($latest->tipo_contrato ?? '')), ['eventual', 'temporal']);
+            
+            $codigos = $latest->gasolineras_codigos;
+            if (empty($codigos) && $latest->gasolinera_codigo) {
+                $codigos = [$latest->gasolinera_codigo];
+            }
+            if (empty($codigos) && !empty($this->gasolineras_codigos)) {
+                $codigos = $this->gasolineras_codigos;
+            } elseif (empty($codigos) && $this->gasolinera_codigo) {
+                $codigos = [$this->gasolinera_codigo];
+            }
+
+            $codigos = !empty($codigos) ? array_values(array_unique(array_filter(array_map('intval', (array) $codigos)))) : null;
+            $primaryCodigo = (!empty($codigos) && isset($codigos[0])) ? (int)$codigos[0] : $this->gasolinera_codigo;
+
             $this->update([
                 'tipo_contrato' => $latest->tipo_contrato,
                 'fecha_vencimiento_contrato' => $isEventual ? $latest->fecha_vencimiento_contrato : null,
-                'gasolinera_codigo' => $latest->gasolinera_codigo ?: $this->gasolinera_codigo,
+                'gasolineras_codigos' => $codigos,
+                'gasolinera_codigo' => $primaryCodigo,
                 'puesto' => $latest->puesto ?: $this->puesto,
             ]);
         } else {

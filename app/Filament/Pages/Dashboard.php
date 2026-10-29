@@ -39,14 +39,18 @@ class Dashboard extends \Filament\Pages\Dashboard
     public function mount(): void
     {
         $user = auth()->user();
-        if ($user && $user->can('ver_ficha_empleado') && !$user->can('ver_dashboard')) {
-            redirect()->to('/admin/portal-empleado');
-            return;
-        }
+        if ($user) {
+            $activeRole = method_exists($user, 'getActiveRole') ? $user->getActiveRole() : null;
 
-        if ($user && !$user->can('ver_dashboard') && $user->can('gestion_recursos_humanos')) {
-            redirect()->to('/admin/recursos-humanos');
-            return;
+            if ($activeRole === 'Gestor' || (!$user->can('ver_dashboard') && $user->can('gestion_recursos_humanos'))) {
+                redirect()->to('/admin/recursos-humanos');
+                return;
+            }
+
+            if ($activeRole === 'Empleado' || ($user->can('ver_ficha_empleado') && !$user->can('ver_dashboard'))) {
+                redirect()->to('/admin/portal-empleado');
+                return;
+            }
         }
 
         // Si no hay datos en caché, los obtenemos inmediatamente (primer acceso)

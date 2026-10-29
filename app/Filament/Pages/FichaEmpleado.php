@@ -38,6 +38,9 @@ class FichaEmpleado extends Page
 
     public $empleado;
     public $fichajeDelDia;
+    public $fichajeActivo = null;
+    public $ultimoFichajeCerradoDelDia = null;
+    public $fichajesDelDia = null;
     public $fichajePendienteAnterior = null;
     public $hora_salida_pendiente = null;
     public $recentFichajes;
@@ -277,11 +280,28 @@ class FichaEmpleado extends Page
             $this->fichajePendienteAnterior = null;
         }
 
-        // Busca el fichaje más reciente del día de hoy
-        $this->fichajeDelDia = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
+        // Todos los fichajes registrados hoy (para permitir múltiples check-in y check-out en el mismo día)
+        $this->fichajesDelDia = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', $today)
-            ->latest('id')
-            ->first();
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // Fichaje activo en curso de hoy (abierto sin hora de salida)
+        $this->fichajeActivo = $this->fichajesDelDia->whereNull('hora_salida')->last();
+
+        // Último fichaje cerrado de hoy
+        $this->ultimoFichajeCerradoDelDia = $this->fichajesDelDia->whereNotNull('hora_salida')->last();
+
+        // Mantener $fichajeDelDia por compatibilidad: activo si existe, si no el último
+        $this->fichajeDelDia = $this->fichajeActivo ?: $this->fichajesDelDia->last();
+
+        // Restablecer horas por defecto si corresponde
+        if (!$this->fichajeActivo && empty($this->hora_entrada)) {
+            $this->hora_entrada = Carbon::now()->format('H:i');
+        }
+        if ($this->fichajeActivo && empty($this->hora_salida)) {
+            $this->hora_salida = Carbon::now()->format('H:i');
+        }
 
         $this->recentFichajes = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
             ->where('fecha', '>=', Carbon::today()->subDays(6)->format('Y-m-d'))
@@ -332,6 +352,18 @@ class FichaEmpleado extends Page
         }, $filename, [
             'Content-Type' => 'application/pdf',
         ]);
+    }
+
+    public function abrirModalCheckIn(): void
+    {
+        $this->hora_entrada = Carbon::now()->format('H:i');
+        $this->dispatch('open-modal', id: 'checkin-modal');
+    }
+
+    public function abrirModalCheckOut(): void
+    {
+        $this->hora_salida = Carbon::now()->format('H:i');
+        $this->dispatch('open-modal', id: 'checkout-modal');
     }
 
     public function checkIn($latitude = null, $longitude = null): void
@@ -413,6 +445,8 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->dispatch('close-modal', id: 'checkin-modal');
+        $this->hora_salida = Carbon::now()->format('H:i');
         $this->loadFichajes();
     }
 
@@ -494,18 +528,12 @@ class FichaEmpleado extends Page
             ->first();
 
         if (!$fichaje) {
-            $fichaje = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
-                ->where('fecha', $today)
-                ->latest('id')
-                ->first();
-        }
-
-        if (!$fichaje) {
             Notification::make()
                 ->title('Error')
-                ->body('No puedes registrar salida sin haber registrado entrada primero.')
+                ->body('No tienes ninguna jornada activa abierta en el día de hoy para registrar la salida.')
                 ->danger()
                 ->send();
+            $this->loadFichajes();
             return;
         }
 
@@ -522,6 +550,8 @@ class FichaEmpleado extends Page
             ->success()
             ->send();
 
+        $this->dispatch('close-modal', id: 'checkout-modal');
+        $this->hora_entrada = Carbon::now()->format('H:i');
         $this->loadFichajes();
     }
 

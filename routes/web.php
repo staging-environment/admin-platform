@@ -20,7 +20,10 @@ Route::get('/', function () {
     $homeConfig = null;
     try {
         $homeConfig = \App\Models\HomeConfig::find(1);
-        $gasolineras = Gasolinera::with('contenido')->get()->map(function ($estacion) {
+        $gasolineras = Gasolinera::with('contenido')
+            ->where('Codigo', '!=', 5)
+            ->whereRaw('LOWER(TRIM(Nombre)) NOT LIKE ?', ['%triest%'])
+            ->get()->map(function ($estacion) {
             $estacion->diesel = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
                 ->where('CodigoProducto', '1')->value('PVP');
             $estacion->gasolina95 = PreciosProducto::where('CodigoEstacion', $estacion->Codigo)
@@ -101,7 +104,14 @@ Route::post('/ofertas/{id}/apply', [JobOfferController::class, 'apply'])->name('
 
 Route::get('/estacion/{slug}', function ($slug) {
     try {
-        $estacion = Gasolinera::with('contenido')->get()->first(function ($e) use ($slug) {
+        if (str_contains(strtolower($slug), 'triest')) {
+            return redirect('/');
+        }
+
+        $estacion = Gasolinera::with('contenido')
+            ->where('Codigo', '!=', 5)
+            ->whereRaw('LOWER(TRIM(Nombre)) NOT LIKE ?', ['%triest%'])
+            ->get()->first(function ($e) use ($slug) {
             return \Illuminate\Support\Str::slug($e->Nombre) === $slug || $e->Codigo == $slug;
         });
         
@@ -326,6 +336,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('admin.competitor.apply_suggested_price');
 
+    Route::post('/profile/switch-role', [ProfileController::class, 'switchRole'])->name('profile.switch-role');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

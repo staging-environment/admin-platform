@@ -19,7 +19,103 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser // <-- Añade "implements FilamentUser"
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable;
+    use HasRoles {
+        hasRole as protected hasRoleFromTrait;
+        getRoleNames as protected getRoleNamesFromTrait;
+    }
+
+    
+    /**
+     * Obtiene el rol activo del usuario en la sesión actual.
+     * Si sólo tiene un rol asignado, retorna ese rol.
+     * Si tiene varios roles, retorna el seleccionado en sesión ('active_role').
+     * Si no hay rol en sesión, prioriza 'Gestor' si lo tiene, o el primero.
+     */
+    public function getActiveRole(): ?string
+    {
+        $dbRoles = $this->roles->pluck('name')->toArray();
+        if (count($dbRoles) <= 1) {
+            return $dbRoles[0] ?? null;
+        }
+
+        $sessionRole = session('active_role');
+        if ($sessionRole && in_array($sessionRole, $dbRoles, true)) {
+            return $sessionRole;
+        }
+
+        // Si tiene rol Gestor y Empleado, por defecto al entrar inicia como Empleado
+        if (in_array('Gestor', $dbRoles, true) && in_array('Empleado', $dbRoles, true)) {
+            return 'Empleado';
+        }
+
+        if (in_array('Gestor', $dbRoles, true)) {
+            return 'Gestor';
+        }
+
+        return $dbRoles[0] ?? null;
+    }
+
+    /**
+     * Comprueba si el usuario tiene un rol determinado.
+     * Si tiene múltiples roles asignados, la comprobación se evalúa contra el rol activo.
+     */
+    public function hasRole($roles, string $guard = null): bool
+    {
+        $dbRoles = $this->roles->pluck('name')->toArray();
+        if (count($dbRoles) > 1) {
+            $activeRole = $this->getActiveRole();
+            if ($activeRole) {
+                if (is_string($roles)) {
+                    return $activeRole === $roles;
+                }
+                if (is_array($roles)) {
+                    return in_array($activeRole, $roles, true);
+                }
+                if ($roles instanceof \Illuminate\Support\Collection) {
+                    $names = $roles->map(fn($r) => is_string($r) ? $r : ($r->name ?? null))->filter();
+                    return $names->contains($activeRole);
+                }
+                if ($roles instanceof \Spatie\Permission\Contracts\Role) {
+                    return $activeRole === $roles->name;
+                }
+            }
+        }
+
+        return $this->hasRoleFromTrait($roles, $guard);
+    }
+
+    /**
+     * Retorna los nombres de roles efectivos del usuario.
+     */
+    public function getRoleNames(): \Illuminate\Support\Collection
+    {
+        $dbRoles = $this->roles->pluck('name')->toArray();
+        if (count($dbRoles) > 1) {
+            $activeRole = $this->getActiveRole();
+            if ($activeRole) {
+                return collect([$activeRole]);
+            }
+        }
+
+        return $this->getRoleNamesFromTrait();
+    }
+
+    /**
+     * Retorna todos los nombres de roles asignados en base de datos.
+     */
+    public function getAssignedRoles(): \Illuminate\Support\Collection
+    {
+        return $this->roles->pluck('name');
+    }
+
+    /**
+     * Indica si el usuario tiene más de un rol asignado.
+     */
+    public function hasMultipleRoles(): bool
+    {
+        return $this->roles->count() > 1;
+    }
 
     public function mustChangePassword(): bool
     {

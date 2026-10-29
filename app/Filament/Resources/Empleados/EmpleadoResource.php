@@ -192,10 +192,17 @@ class EmpleadoResource extends Resource
                                     ->label('Ubicación de trabajo')
                                     ->state(function ($record) {
                                         $latest = $record?->documentos()->where('tipo', 'Contratos')->latest('id')->first();
-                                        if ($latest && $latest->gasolinera_codigo) {
-                                            return \App\Models\Gasolinera::where('Codigo', $latest->gasolinera_codigo)->first()?->Nombre;
+                                        if ($latest) {
+                                            $nombres = $latest->estaciones_nombres;
+                                            if ($nombres && $nombres !== '—') {
+                                                return $nombres;
+                                            }
                                         }
-                                        return $record?->gasolinera?->Nombre;
+                                        $empNombres = $record?->estaciones_nombres;
+                                        if ($empNombres && $empNombres !== '—') {
+                                            return $empNombres;
+                                        }
+                                        return $record?->gasolinera?->Nombre ?: 'No asignada';
                                     })
                                     ->placeholder('No asignada'),
                                 \Filament\Infolists\Components\TextEntry::make('puesto')

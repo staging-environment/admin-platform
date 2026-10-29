@@ -308,6 +308,9 @@
              class="space-y-6 relative z-10"
              style="display: none;">
             @forelse($gasolineras as $gasolinera)
+                @if($gasolinera->Codigo == 5 || str_contains(strtolower($gasolinera->Nombre), 'triest'))
+                    @continue
+                @endif
                 @php
                     $contenido = $gasolinera->contenido;
                     $mainImage = null;
@@ -892,6 +895,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             @foreach($gasolineras as $gasolinera)
+                @if($gasolinera->Codigo == 5 || str_contains(strtolower($gasolinera->Nombre), 'triest'))
+                    @continue
+                @endif
                 @if($gasolinera->contenido && $gasolinera->contenido->latitud && $gasolinera->contenido->longitud)
                     try {
                         const mapId = 'map-{{ $gasolinera->Codigo }}';

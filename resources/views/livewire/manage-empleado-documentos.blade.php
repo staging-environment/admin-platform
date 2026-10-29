@@ -161,14 +161,62 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end pt-2 border-t border-gray-200 dark:border-white/10">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Ubicación de trabajo <span class="text-red-500">*</span></label>
-                                <select wire:model="gasolinera_codigo" class="w-full rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm">
-                                    <option value="">Selecciona ubicación...</option>
-                                    @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
-                                        <option value="{{ $codigo }}">{{ $nombre }}</option>
-                                    @endforeach
-                                </select>
-                                @error('gasolinera_codigo') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                                    Ubicación de trabajo <span class="text-red-500">*</span>
+                                </label>
+                                <div x-data="{ open: false }" class="relative" @click.outside="open = false">
+                                    <button type="button" @click="open = !open" 
+                                        class="w-full flex items-center justify-between rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm px-3 py-2 focus:border-amber-500 focus:ring-amber-500 shadow-sm text-left h-[38px]">
+                                        <span class="truncate block text-xs">
+                                            @php
+                                                $countSelected = count($gasolineras_codigos ?? []);
+                                                $estMap = $this->estacionesDisponibles;
+                                            @endphp
+                                            @if ($countSelected === 0)
+                                                <span class="text-gray-400">Seleccionar estaciones...</span>
+                                            @elseif ($countSelected === 1)
+                                                {{ $estMap[$gasolineras_codigos[0]] ?? ('Estación ' . $gasolineras_codigos[0]) }}
+                                            @else
+                                                <span class="font-semibold text-amber-700 dark:text-amber-400">{{ $countSelected }} estaciones seleccionadas</span>
+                                            @endif
+                                        </span>
+                                        <svg class="w-4 h-4 ml-2 text-gray-400 shrink-0 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    {{-- Dropdown con checkboxes --}}
+                                    <div x-show="open" x-cloak 
+                                        class="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-2 space-y-1">
+                                        <div class="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700">
+                                            Estaciones disponibles
+                                        </div>
+                                        @foreach($this->estacionesDisponibles as $cod => $nom)
+                                            <label class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-amber-50 dark:hover:bg-amber-950/30 cursor-pointer text-xs font-medium text-gray-700 dark:text-gray-200 transition-colors">
+                                                <input type="checkbox" wire:model.live="gasolineras_codigos" value="{{ (string)$cod }}" 
+                                                    class="rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 shadow-sm" />
+                                                <span class="truncate">{{ $nom }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- Badges de estaciones seleccionadas con botón para desmarcar --}}
+                                @if(!empty($gasolineras_codigos))
+                                    <div class="flex flex-wrap gap-1.5 mt-2">
+                                        @foreach($gasolineras_codigos as $cod)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 shadow-2xs">
+                                                {{ $this->estacionesDisponibles[$cod] ?? ('Estación ' . $cod) }}
+                                                <button type="button" wire:click="removeEstacion('{{ $cod }}')" class="hover:text-red-600 text-amber-600 dark:text-amber-400 dark:hover:text-red-400 focus:outline-none">
+                                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @error('gasolineras_codigos') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
@@ -446,14 +494,56 @@
                                                 <input type="text" wire:model="edit_tipo_jornada_otro" placeholder="Detalle de jornada" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1" />
                                             @endif
                                             <div class="pt-1 border-t border-gray-200 dark:border-gray-700">
-                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Ubicación de trabajo <span class="text-red-500">*</span></label>
-                                                <select wire:model="edit_gasolinera_codigo" class="rounded-lg border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs focus:border-amber-500 focus:ring-amber-500 shadow-sm py-1 w-full">
-                                                    <option value="">Selecciona ubicación...</option>
-                                                    @foreach(\App\Models\Gasolinera::pluck('Nombre', 'Codigo') as $codigo => $nombre)
-                                                        <option value="{{ $codigo }}">{{ $nombre }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('edit_gasolinera_codigo') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
+                                                <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                                    Ubicación de trabajo <span class="text-red-500">*</span>
+                                                </label>
+                                                <div x-data="{ open: false }" class="relative" @click.outside="open = false">
+                                                    <button type="button" @click="open = !open" 
+                                                        class="w-full flex items-center justify-between rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-xs px-2.5 py-1 focus:border-amber-500 focus:ring-amber-500 shadow-sm text-left min-h-[30px]">
+                                                        <span class="truncate block">
+                                                            @php
+                                                                $countEdit = count($edit_gasolineras_codigos ?? []);
+                                                                $estMap = $this->estacionesDisponibles;
+                                                            @endphp
+                                                            @if ($countEdit === 0)
+                                                                <span class="text-gray-400">Seleccionar estaciones...</span>
+                                                            @elseif ($countEdit === 1)
+                                                                {{ $estMap[$edit_gasolineras_codigos[0]] ?? ('Estación ' . $edit_gasolineras_codigos[0]) }}
+                                                            @else
+                                                                <span class="font-semibold text-amber-700 dark:text-amber-400">{{ $countEdit }} estaciones</span>
+                                                            @endif
+                                                        </span>
+                                                        <svg class="w-3.5 h-3.5 ml-1.5 text-gray-400 shrink-0 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </button>
+
+                                                    {{-- Dropdown con checkboxes --}}
+                                                    <div x-show="open" x-cloak 
+                                                        class="absolute z-50 left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-1.5 space-y-1">
+                                                        @foreach($this->estacionesDisponibles as $cod => $nom)
+                                                            <label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-amber-50 dark:hover:bg-amber-950/30 cursor-pointer text-[11px] font-medium text-gray-700 dark:text-gray-200">
+                                                                <input type="checkbox" wire:model.live="edit_gasolineras_codigos" value="{{ (string)$cod }}" 
+                                                                    class="rounded border-gray-300 dark:border-gray-600 text-amber-600 focus:ring-amber-500 text-xs" />
+                                                                <span class="truncate">{{ $nom }}</span>
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+
+                                                @if(!empty($edit_gasolineras_codigos))
+                                                    <div class="flex flex-wrap gap-1 mt-1">
+                                                        @foreach($edit_gasolineras_codigos as $cod)
+                                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300">
+                                                                {{ $this->estacionesDisponibles[$cod] ?? ('Estación ' . $cod) }}
+                                                                <button type="button" wire:click="removeEditEstacion('{{ $cod }}')" class="hover:text-red-600 text-amber-600 dark:text-amber-400">
+                                                                    ×
+                                                                </button>
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                                @error('edit_gasolineras_codigos') <span class="text-[10px] text-red-500 block mt-1">{{ $message }}</span> @enderror
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Puesto <span class="text-red-500">*</span></label>
@@ -462,13 +552,32 @@
                                             </div>
                                         </div>
                                     @else
-                                        <span class="text-xs text-gray-700 dark:text-gray-300">
-                                            @if (($doc->tipo_jornada ?? '') === 'Otros')
-                                                {{ $doc->tipo_jornada_otro ?: 'Otros (no especificado)' }}
-                                            @else
-                                                {{ $doc->tipo_jornada ?: 'No especificada' }}
+                                        <div class="flex flex-col space-y-1">
+                                            <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                                                @if (($doc->tipo_jornada ?? '') === 'Otros')
+                                                    {{ $doc->tipo_jornada_otro ?: 'Otros (no especificado)' }}
+                                                @else
+                                                    {{ $doc->tipo_jornada ?: 'No especificada' }}
+                                                @endif
+                                            </span>
+                                            @php
+                                                $estacionesNombres = $doc->estaciones_nombres;
+                                            @endphp
+                                            @if ($estacionesNombres && $estacionesNombres !== '—')
+                                                <div class="flex items-center gap-1 text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                                                    <svg class="w-3.5 h-3.5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                    <span class="truncate max-w-[200px]" title="{{ $estacionesNombres }}">{{ $estacionesNombres }}</span>
+                                                </div>
                                             @endif
-                                        </span>
+                                            @if ($doc->puesto)
+                                                <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate max-w-[200px]">
+                                                    {{ $doc->puesto }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </td>
                             @elseif ($family === 'formacion')

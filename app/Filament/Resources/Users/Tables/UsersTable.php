@@ -83,12 +83,66 @@ class UsersTable
                     ->badge()
                     ->separator(','),
 
+                TextColumn::make('estado_usuario')
+                    ->label('Estado')
+                    ->badge()
+                    ->getStateUsing(function ($record) {
+                        $empleado = $record->empleado ?: \App\Models\Empleado::onlyTrashed()->where('email', $record->email)->first();
+                        if ($empleado && ($empleado->estado === 'Baja' || $empleado->trashed())) {
+                            return 'No activo';
+                        }
+                        return 'Activo';
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'Activo' => 'success',
+                        'No activo' => 'danger',
+                        default => 'gray',
+                    }),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                \Filament\Tables\Filters\SelectFilter::make('estado')
+                    ->label('Estado')
+                    ->options([
+                        'activos' => 'Activos',
+                        'no_activos' => 'No activos',
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
+                        return $query->when(
+                            $data['value'] ?? null,
+                            function (\Illuminate\Database\Eloquent\Builder $query, $value) {
+                                if ($value === 'activos') {
+                                    return $query->whereNotExists(function ($subQuery) {
+                                        $subQuery->select(\Illuminate\Support\Facades\DB::raw(1))
+                                            ->from('empleados')
+                                            ->whereColumn('empleados.email', 'users.email')
+                                            ->where(function ($q) {
+                                                $q->where('empleados.estado', 'Baja')
+                                                  ->orWhereNotNull('empleados.deleted_at');
+                                            });
+                                    });
+                                }
+
+                                if ($value === 'no_activos') {
+                                    return $query->whereExists(function ($subQuery) {
+                                        $subQuery->select(\Illuminate\Support\Facades\DB::raw(1))
+                                            ->from('empleados')
+                                            ->whereColumn('empleados.email', 'users.email')
+                                            ->where(function ($q) {
+                                                $q->where('empleados.estado', 'Baja')
+                                                  ->orWhereNotNull('empleados.deleted_at');
+                                            });
+                                    });
+                                }
+
+                                return $query;
+                            }
+                        );
+                    }),
                 \Filament\Tables\Filters\SelectFilter::make('roles')
                     ->relationship('roles', 'name')
                     ->preload()
@@ -127,7 +181,7 @@ class UsersTable
                         );
                     }),
             ], layout: \Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->filtersFormColumns(3)
+            ->filtersFormColumns(['sm' => 2, 'lg' => 4])
             ->filtersApplyAction(
                 fn ($action) => $action
                     ->color('success')

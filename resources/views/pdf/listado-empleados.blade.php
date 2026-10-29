@@ -266,7 +266,7 @@
                         {{ $emp->email ?: '—' }}
                     </td>
                     <td style="text-transform: uppercase; color: #475569;">
-                        {{ $emp->gasolinera?->Nombre ?? '—' }}
+                        {{ ($emp->estaciones_nombres && $emp->estaciones_nombres !== '—') ? $emp->estaciones_nombres : ($emp->gasolinera?->Nombre ?? '—') }}
                     </td>
                     <td style="text-transform: uppercase; color: #475569;">
                         {{ $emp->puesto ?: '—' }}

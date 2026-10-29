@@ -235,37 +235,18 @@ class EmpleadoOnboardingWizard extends Component
     public function guardarPaso3Datos()
     {
         $this->validate([
-            'telefono_principal' => 'required|string|max:20',
-            'direccion' => 'required|string|max:255',
-            'codigo_postal' => 'required|string|max:10',
-            'localidad' => 'required|string|max:255',
-            'provincia' => 'required|string|max:255',
-            'iban' => 'required|string|max:40',
             'contacto_emergencia_nombre' => 'nullable|string|max:255',
             'contacto_emergencia_telefono' => 'nullable|string|max:20',
-        ], [
-            'telefono_principal.required' => 'El teléfono de contacto es obligatorio.',
-            'direccion.required' => 'La dirección es obligatoria.',
-            'codigo_postal.required' => 'El código postal es obligatorio.',
-            'localidad.required' => 'La localidad es obligatoria.',
-            'provincia.required' => 'La provincia es obligatoria.',
-            'iban.required' => 'El código IBAN bancario es obligatorio para el pago de nóminas.',
         ]);
 
         $this->empleado->update([
-            'telefono_principal' => $this->telefono_principal,
-            'direccion' => $this->direccion,
-            'codigo_postal' => $this->codigo_postal,
-            'localidad' => $this->localidad,
-            'provincia' => $this->provincia,
-            'iban' => strtoupper(str_replace(' ', '', $this->iban)),
             'contacto_emergencia_nombre' => $this->contacto_emergencia_nombre ?: null,
             'contacto_emergencia_telefono' => $this->contacto_emergencia_telefono ?: null,
             'onboarding_paso_actual' => max(4, (int) $this->empleado->onboarding_paso_actual),
         ]);
 
         $this->paso = 4;
-        session()->flash('success_step', 'Datos personales validados correctamente. Por favor, revisa y confirma las normativas de empresa.');
+        session()->flash('success_step', 'Datos de contacto de emergencia guardados correctamente. Por favor, revisa y confirma las normativas de empresa.');
     }
 
     public function guardarPaso4Documentos()
