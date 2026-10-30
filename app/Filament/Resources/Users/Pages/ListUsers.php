@@ -17,6 +17,23 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('exportOnboardingPendingPdf')
+                ->label('Informe Onboarding Pendiente')
+                ->icon('heroicon-o-document-chart-bar')
+                ->color('warning')
+                ->size(\Filament\Support\Enums\Size::ExtraSmall)
+                ->extraAttributes([
+                    'style' => 'padding: 0.25rem 0.65rem !important; font-size: 0.75rem !important; min-height: 28px !important; height: 28px !important;',
+                ])
+                ->action(function (\App\Services\OnboardingReportService $reportService) {
+                    $pdf = $reportService->generatePdf();
+                    $filename = 'Informe_Onboarding_Pendiente_' . \Carbon\Carbon::now()->format('Ymd_His') . '.pdf';
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $filename, [
+                        'Content-Type' => 'application/pdf',
+                    ]);
+                }),
             Actions\CreateAction::make()
                 ->color('success')
                 ->extraAttributes([

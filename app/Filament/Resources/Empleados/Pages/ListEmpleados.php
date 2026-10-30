@@ -28,6 +28,23 @@ class ListEmpleados extends ListRecords
                     'style' => 'padding: 0.25rem 0.65rem !important; font-size: 0.75rem !important; min-height: 28px !important; height: 28px !important;',
                 ])
                 ->action(fn () => $this->exportPdf()),
+            Action::make('exportOnboardingPdf')
+                ->label('Onboarding Pendiente (PDF)')
+                ->icon('heroicon-o-clock')
+                ->color('warning')
+                ->size(\Filament\Support\Enums\Size::ExtraSmall)
+                ->extraAttributes([
+                    'style' => 'padding: 0.25rem 0.65rem !important; font-size: 0.75rem !important; min-height: 28px !important; height: 28px !important;',
+                ])
+                ->action(function (\App\Services\OnboardingReportService $reportService) {
+                    $pdf = $reportService->generatePdf();
+                    $filename = 'Informe_Onboarding_Pendiente_' . \Carbon\Carbon::now()->format('Ymd_His') . '.pdf';
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $filename, [
+                        'Content-Type' => 'application/pdf',
+                    ]);
+                }),
             CreateAction::make()
                 ->color('success')
                 ->size(\Filament\Support\Enums\Size::ExtraSmall)
