@@ -32,3 +32,11 @@
 - En estaciones de 1 puesto diurno (Vistalegre, Rodalabota y Atenas), se sigue un ciclo estricto de 12 días 4x2 entre 3 personas (4 Mañanas, 2 Descansos, 4 Tardes, 2 Descansos). En Ronda Norte (24h) existen Puesto 1 (M/T), Puesto 2 (M/T) y Turno Noche.
 - La especificación completa de negocio, suplencias y arquitectura técnica está documentada en [.agents/rules/planing_turnos.md](file:///home/developer/Projects/admin-platform/.agents/rules/planing_turnos.md).
 
+## Arquitectura Multiempresa (Utrecar y Trieste) (REGLA ESTRATÉGICA)
+- El grupo opera con dos sociedades: **Utrecar S.L.** (estaciones 1 a 4) y **Trieste S.L.** (estación Repsol Trieste).
+- **Admin-Platform (Laravel)** lidera RRHH, portal de empleados, fichajes, planing 4x2, precios competencia y web.
+- **Odoo 17 ERP** lidera compras, inventario de combustible y tienda, facturación de proveedores y contabilidad multiempresa.
+- Los proveedores se unifican como contactos globales en Odoo, pero los pedidos, facturas y tanques se segregan por CIF de empresa.
+- Especificación completa documentada en [.agents/rules/arquitectura_multiempresa.md](file:///home/developer/Projects/admin-platform/.agents/rules/arquitectura_multiempresa.md) y [docs/PRD_ARQUITECTURA_MULTIEMPRESA_ODOO_UTRECAR_TRIESTE.md](file:///home/developer/Projects/admin-platform/docs/PRD_ARQUITECTURA_MULTIEMPRESA_ODOO_UTRECAR_TRIESTE.md).
+
+
