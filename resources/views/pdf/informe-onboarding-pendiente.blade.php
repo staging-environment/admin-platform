@@ -275,7 +275,7 @@
                         @endif
                         <td style="vertical-align: middle;">
                             <div class="header-subtitle">UTRECAR - ACTIVE NETWORK &bull; DEPARTAMENTO DE RECURSOS HUMANOS</div>
-                            <div class="header-title">Informe de Empleados con Onboarding Pendiente</div>
+                            <div class="header-title">Informe de Empleados {{ !empty($onlyActive) ? 'en Alta ' : '' }}con Onboarding Pendiente</div>
                         </td>
                     </tr>
                 </table>
@@ -291,23 +291,32 @@
     <!-- Tarjetas KPI -->
     <table class="kpi-table">
         <tr>
-            <td class="kpi-card" style="width: 20%;">
+            <td class="kpi-card" style="width: {{ !empty($onlyActive) ? '25%' : '20%' }};">
                 <div class="kpi-value">{{ $totalEvaluados }}</div>
                 <div class="kpi-label">Total Empleados Evaluados</div>
             </td>
+            @if(empty($onlyActive))
             <td class="kpi-card kpi-card-warning" style="width: 20%;">
                 <div class="kpi-value" style="color: #b45309;">{{ $totalPendientes }}</div>
                 <div class="kpi-label" style="color: #92400e;">Onboarding Pendiente ({{ $tasaPendiente }}%)</div>
             </td>
-            <td class="kpi-card kpi-card-danger" style="width: 20%;">
+            @endif
+            <td class="kpi-card kpi-card-danger" style="width: {{ !empty($onlyActive) ? '25%' : '20%' }};">
                 <div class="kpi-value" style="color: #b91c1c;">{{ $totalAlta }}</div>
                 <div class="kpi-label" style="color: #991b1b;">En Alta / Activos (Prioritarios)</div>
             </td>
+            @if(empty($onlyActive))
             <td class="kpi-card" style="width: 20%;">
                 <div class="kpi-value" style="color: #475569;">{{ $totalBaja }}</div>
                 <div class="kpi-label">En Baja (Histórico)</div>
             </td>
-            <td class="kpi-card kpi-card-success" style="width: 20%;">
+            @else
+            <td class="kpi-card kpi-card-success" style="width: 25%;">
+                <div class="kpi-value" style="color: #047857;">{{ $stats['total_completados'] }}</div>
+                <div class="kpi-label" style="color: #065f46;">Onboarding Completado ({{ $stats['total_evaluados'] > 0 ? round(($stats['total_completados'] / $stats['total_evaluados']) * 100) : 0 }}%)</div>
+            </td>
+            @endif
+            <td class="kpi-card kpi-card-success" style="width: {{ !empty($onlyActive) ? '25%' : '20%' }};">
                 <div class="kpi-value" style="color: #047857;">50.0%</div>
                 <div class="kpi-label" style="color: #065f46;">Avance Promedio Registrado</div>
             </td>
@@ -403,6 +412,7 @@
         </tbody>
     </table>
 
+    @if($empleadosBaja->isNotEmpty())
     <!-- SECCIÓN 2: EMPLEADOS EN BAJA (Inicia en Página 2) -->
     <div class="section-header baja">
         &bull; Sección 2: Empleados en Baja de la Empresa — Registro Histórico ({{ $empleadosBaja->count() }})
@@ -458,16 +468,19 @@
             @endforelse
         </tbody>
     </table>
+    @endif
 
     <!-- Plan de Acción y Recomendaciones -->
     <div class="recommendations-box">
         <div class="recommendations-title">&bull; Recomendaciones y Plan de Acción Operativo para Recursos Humanos:</div>
         <strong>1. Regularización Prioritaria ({{ $totalAlta }} Empleados en Alta):</strong>
-        Se requiere instar a los 8 empleados activos a iniciar sesión en el portal del empleado para realizar el cambio de contraseña inicial y aceptar digitalmente las políticas internas de la empresa y normativa RGPD.<br>
+        Se requiere instar a los {{ $totalAlta }} empleados activos a iniciar sesión en el portal del empleado para realizar el cambio de contraseña inicial y aceptar digitalmente las políticas internas de la empresa y normativa RGPD.<br>
         <strong>2. Estado de Documentación y Datos Bancarios:</strong>
-        Todos los 17 expedientes cuentan con DNI digitalizado y número de cuenta IBAN verificado (100% de cumplimiento en Fases 2 y 3).<br>
+        Todos los expedientes cuentan con DNI digitalizado y número de cuenta IBAN verificado (100% de cumplimiento en Fases 2 y 3).<br>
+        @if($totalBaja > 0)
         <strong>3. Gestión del Registro Histórico ({{ $totalBaja }} Empleados en Baja):</strong>
-        Para los 9 trabajadores desvinculados de la empresa, se sugiere proceder al cierre administrativo del proceso de onboarding o archivo del expediente desde el panel de gestión para no distorsionar las métricas de cumplimiento normativo.
+        Para los {{ $totalBaja }} trabajadores desvinculados de la empresa, se sugiere proceder al cierre administrativo del proceso de onboarding o archivo del expediente desde el panel de gestión para no distorsionar las métricas de cumplimiento normativo.
+        @endif
     </div>
 
     <!-- Script de Paginación DomPDF -->

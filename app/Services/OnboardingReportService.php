@@ -15,13 +15,14 @@ class OnboardingReportService
      * Obtiene los datos consolidados de todos los usuarios con rol Empleado
      * filtrando aquellos que no han completado el proceso de onboarding.
      */
-    public function getReportData(): array
+    public function getReportData(bool $onlyActive = false): array
     {
         $allUsers = User::role('Empleado')
             ->with(['empleado.gasolinera', 'empleado.documentos', 'empleado.ausencias'])
             ->get();
 
         $totalEvaluados = $allUsers->count();
+        $totalPendientesGlobal = 0;
         $pendingList = [];
 
         foreach ($allUsers as $u) {
@@ -32,12 +33,18 @@ class OnboardingReportService
                 continue;
             }
 
+            $totalPendientesGlobal++;
+
+            $estado = $emp ? ($emp->estado ?? 'Baja') : 'Sin Ficha';
+
+            if ($onlyActive && $estado !== 'Alta') {
+                continue;
+            }
+
             $hasDefaultPass = Hash::check('1234', $u->password);
             $hasValidDniIban = $emp && !empty($emp->dni) && !str_starts_with($emp->dni, 'PENDIENTE') && !empty($emp->iban);
             $hasDniDoc = $emp && $emp->documentos()->where('tipo', 'DNI')->exists();
             $hasPolicies = $emp && ($emp->politicas_aceptadas_at !== null);
-
-            $estado = $emp ? ($emp->estado ?? 'Baja') : 'Sin Ficha';
 
             // Nombre y apellidos formateados
             $nombre = $emp?->nombre ? trim($emp->nombre) : trim($u->name);
@@ -84,18 +91,20 @@ class OnboardingReportService
         });
 
         $totalPendientes = count($pendingList);
-        $totalCompletados = $totalEvaluados - $totalPendientes;
+        $totalCompletados = $totalEvaluados - $totalPendientesGlobal;
         $totalAlta = count(array_filter($pendingList, fn($e) => $e['emp_estado'] === 'Alta'));
-        $totalBaja = $totalPendientes - $totalAlta;
+        $totalBaja = $onlyActive ? 0 : ($totalPendientes - $totalAlta);
 
         return [
             'empleados' => $pendingList,
+            'onlyActive' => $onlyActive,
             'stats' => [
                 'total_evaluados' => $totalEvaluados,
                 'total_completados' => $totalCompletados,
                 'total_pendientes' => $totalPendientes,
                 'total_alta' => $totalAlta,
                 'total_baja' => $totalBaja,
+                'tasa_pendiente' => $totalEvaluados > 0 ? round(($totalPendientesGlobal / $totalEvaluados) * 100, 1) : 0,
                 'progreso_promedio' => 50.0,
             ],
             'generatedAt' => Carbon::now()->timezone('Europe/Madrid')->format('d/m/Y H:i'),
@@ -105,9 +114,9 @@ class OnboardingReportService
     /**
      * Genera la instancia PDF lista para renderizar o descargar.
      */
-    public function generatePdf(): DomPdfInstance
+    public function generatePdf(bool $onlyActive = false): DomPdfInstance
     {
-        $data = $this->getReportData();
+        $data = $this->getReportData($onlyActive);
 
         return Pdf::loadView('pdf.informe-onboarding-pendiente', $data)
             ->setPaper('a4', 'landscape');
@@ -116,9 +125,9 @@ class OnboardingReportService
     /**
      * Guarda el archivo PDF en una ruta absoluta o relativa.
      */
-    public function savePdfToFile(string $filePath): string
+    public function savePdfToFile(string $filePath, bool $onlyActive = false): string
     {
-        $pdf = $this->generatePdf();
+        $pdf = $this->generatePdf($onlyActive);
         $dir = dirname($filePath);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);

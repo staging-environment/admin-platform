@@ -8,14 +8,15 @@ use Illuminate\Console\Command;
 
 class GenerarInformeOnboardingCommand extends Command
 {
-    protected $signature = 'empleados:informe-onboarding {--output= : Ruta donde guardar el archivo PDF}';
+    protected $signature = 'empleados:informe-onboarding {--output= : Ruta donde guardar el archivo PDF} {--activos : Filtrar únicamente empleados en estado de Alta}';
     protected $description = 'Genera un informe PDF con todos los usuarios con rol Empleado que tienen el proceso de onboarding pendiente';
 
     public function handle(OnboardingReportService $reportService): int
     {
-        $this->info("Recopilando datos de empleados con rol Empleado y onboarding pendiente...");
+        $onlyActive = (bool) $this->option('activos');
+        $this->info("Recopilando datos de empleados con rol Empleado y onboarding pendiente" . ($onlyActive ? " (solo activos)..." : "..."));
 
-        $data = $reportService->getReportData();
+        $data = $reportService->getReportData($onlyActive);
         $stats = $data['stats'];
 
         $this->table(
@@ -32,7 +33,7 @@ class GenerarInformeOnboardingCommand extends Command
         $outputPath = $this->option('output') ?: base_path('informe_empleados_onboarding_pendiente_' . Carbon::now()->format('Ymd_His') . '.pdf');
 
         $this->info("Generando archivo PDF con DomPDF...");
-        $reportService->savePdfToFile($outputPath);
+        $reportService->savePdfToFile($outputPath, $onlyActive);
 
         $this->info("¡Informe generado con éxito en: {$outputPath}");
 
