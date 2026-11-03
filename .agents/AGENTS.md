@@ -26,3 +26,9 @@
 - MITECO sincroniza precios cada 5 minutos mediante `UploadPricesToMitecoJob` si hay cambios en `preciosdeproductos`.
 - Para diagnósticos o forzar sincronización manual: `ddev exec php artisan miteco:sync {--force}`.
 - Guía detallada y resolución de incidencias en [.agents/rules/miteco_and_scheduler.md](file:///home/developer/Projects/admin-platform/.agents/rules/miteco_and_scheduler.md).
+
+## Planificación de Turnos (Planing) (REGLA DE DOMINIO)
+- La gestión de turnos se organiza mensualmente para las 4 estaciones de servicio (Vistalegre, Ronda Norte, Rodalabota y Atenas).
+- En estaciones de 1 puesto diurno (Vistalegre, Rodalabota y Atenas), se sigue un ciclo estricto de 12 días 4x2 entre 3 personas (4 Mañanas, 2 Descansos, 4 Tardes, 2 Descansos). En Ronda Norte (24h) existen Puesto 1 (M/T), Puesto 2 (M/T) y Turno Noche.
+- La especificación completa de negocio, suplencias y arquitectura técnica está documentada en [.agents/rules/planing_turnos.md](file:///home/developer/Projects/admin-platform/.agents/rules/planing_turnos.md).
+
