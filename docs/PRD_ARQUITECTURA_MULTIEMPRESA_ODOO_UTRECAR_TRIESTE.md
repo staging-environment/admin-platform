@@ -68,3 +68,4 @@ Grupo Empresarial
 2. **Fase 2 (Proveedores)**: Migración y saneamiento de los 483 proveedores de `virtusgesnet.proveedores` a Odoo como contactos compartidos.
 3. **Fase 3 (Inventario)**: Modelado de tanques y almacenes con control de aforos y mermas en Odoo.
 4. **Fase 4 (Circuito de Compras)**: Puesta en marcha del flujo oficial de pedidos de compra y facturación en Odoo, independizándose de Aseproda.
+

@@ -38,7 +38,33 @@ class Empleado extends Model
         'onboarding_verificado_por_admin' => 'boolean',
         'onboarding_verificado_at' => 'datetime',
         'onboarding_checklist' => 'array',
+        'color_hex' => 'string',
     ];
+
+    public function getColorAttribute(): string
+    {
+        if (!empty($this->color_hex)) {
+            return $this->color_hex;
+        }
+
+        // Paleta armónica de colores distintivos para cuadrantes
+        $palette = [
+            '#0284c7', // Azul cielo
+            '#16a34a', // Verde esmeralda
+            '#d97706', // Ámbar
+            '#7c3aed', // Violeta
+            '#db2777', // Rosa
+            '#0d9488', // Turquesa
+            '#4f46e5', // Índigo
+            '#ea580c', // Naranja
+            '#0891b2', // Cian
+            '#9333ea', // Morado
+            '#059669', // Verde oscuro
+            '#b91c1c', // Rojo teja
+        ];
+
+        return $palette[($this->id ?? 1) % count($palette)];
+    }
 
 
     protected static function booted()

@@ -1,6 +1,6 @@
 # Módulo de Planificación y Gestión de Turnos (Planing)
 
-Este documento recoge las reglas de negocio, la estructura operativa de las estaciones de servicio de Utrecar y la arquitectura prevista para el desarrollo del módulo de **Planing de Turnos**.
+Este documento recoge las reglas de negocio, la estructura operativa de las estaciones de servicio de Utrecar y la arquitectura del módulo de **Planing de Turnos**. Documento de requisitos completo en [`docs/PRD_MODULO_PLANING_TURNOS.md`](file:///docs/PRD_MODULO_PLANING_TURNOS.md).
 
 ---
 
@@ -17,67 +17,77 @@ Utrecar opera con **4 estaciones de servicio**, cada una con particularidades ho
 
 ---
 
-## 2. El Patrón Rotativo 4x2 (Ciclo de 12 Días)
+## 2. Regla Visual del Planing: Solo Turnos de Trabajo (REGLA CRÍTICA)
+
+* **En el cuadrante NO se muestran filas de descanso ni quién está librando.**
+* La cuadrícula mensual y el informe impreso muestran **única y exclusivamente quién trabaja cada día y en qué turno** (Mañana, Tarde y Noche).
+* Quien no aparece asignado a un turno en un día determinado se entiende automáticamente que está en su jornada de descanso reglamentario (D) o permiso.
+
+### Filas por Gasolinera en la Cuadrícula:
+* **Estaciones Diurnas (Vistalegre, Rodalabota, Atenas)**:
+  * `MAÑANA`
+  * `TARDE`
+* **Estación 24 Horas (Ronda Norte)**:
+  * `PUESTO 1 - MAÑANA`
+  * `PUESTO 1 - TARDE`
+  * `PUESTO 2 - MAÑANA`
+  * `PUESTO 2 - TARDE`
+  * `NOCHE`
+
+---
+
+## 3. El Patrón Rotativo 4x2 (Ciclo de 12 Días)
 
 En todas las líneas de trabajo diurno se aplica un ciclo rotativo estricto de **12 días** entre **3 empleados**:
-
 1. **4 días** en turno de **Mañana (M)**.
 2. **2 días** de **Descanso (D)**.
 3. **4 días** en turno de **Tarde (T)**.
 4. **2 días** de **Descanso (D)**.
 
-### Matriz de Cobertura Continua:
+### Matriz de Cobertura Continua (Fases a intervalos de 4 días):
 ```text
 Día:         01 02 03 04 05 06 07 08 09 10 11 12
 Empleado A:   M  M  M  M  D  D  T  T  T  T  D  D  -> Se repite
 Empleado B:   T  T  D  D  M  M  M  M  D  D  T  T
 Empleado C:   D  D  T  T  T  T  D  D  M  M  M  M
+
+Visible en Pantalla:
+MAÑANA:       A  A  A  A  B  B  B  B  C  C  C  C
+TARDE:        B  B  C  C  C  C  A  A  A  A  B  B
 ```
 * **Garantía operativa**: En todo momento coinciden exactamente 2 empleados trabajando (1 mañana, 1 tarde) y 1 descansando.
 * El mes siguiente **continúa la secuencia matemática** sin reiniciarse al día 1.
 
 ---
 
-## 3. Sustituciones, Suplencias y Vacaciones
+## 4. Sustituciones, Suplencias y Vacaciones
 
-El cuadrante mensual cuenta con una **base teórica (4x2)** y **modificaciones operativas reales**:
-* **Vacaciones / Bajas**: Cuando un empleado titular no puede realizar su turno asignado, se asigna un suplente (ej. *José Manuel sustituyendo a Zambrano o Emilio*, *Javier sustituyendo a Carvajal*, *Conso sustituyendo a Miguel Ángel*).
-* **Representación Visual**:
-  * La celda del turno debe destacar con el color del empleado asignado.
-  * Si hay una sustitución, debe indicarse con un estilo diferenciado (ej. borde punteado o píldora de suplente) mostrando quién está trabajando realmente y quién es el titular ausente.
-* **Observaciones y Acuerdos de Mes**: Espacio de texto libre al pie del cuadrante para reflejar acuerdos de gerencia (ej. *apoyo en cafetería*, *horas fuera de turno*, etc.).
+* **Base teórica (4x2)** vs **Modificaciones operativas reales**:
+  * Cuando un titular no puede realizar su turno (vacaciones, baja, permiso), se asigna un suplente.
+  * La celda del turno conserva quién es el titular teórico y quién está trabajando realmente, con un estilo visual diferenciado.
+* **Observaciones del Mes**: Espacio de texto libre al pie del cuadrante para reflejar acuerdos de gerencia.
 
 ---
 
-## 4. Requisitos de Interfaz y Navegación (Filament / Blade)
+## 5. Requisitos de Interfaz y Navegación (Filament v5)
 
-### Ubicación en el Menú:
-* Se ubica en el menú principal dentro de **Recursos humanos**, inmediatamente debajo de **Vacaciones**.
-* Ítem: **`Planing`** (desplegable de tercer nivel).
-  * └─ **Vistalegre** (`/admin/planing/vistalegre`)
-  * └─ **Ronda Norte** (`/admin/planing/ronda-norte`)
-  * └─ **Rodalabota** (`/admin/planing/rodalabota`)
-  * └─ **Atenas** (`/admin/planing/atenas`)
-
-### Cuadrícula Mensual:
-* Selector de Mes y Año con navegación anterior / siguiente.
-* Botón **"Generar Cuadrante Teórico 4x2"** que rellena automáticamente el mes continuando el ciclo anterior.
-* Cada celda es interactiva: clic para cambiar empleado, registrar sustituto o añadir una nota.
-* Botón de **"Exportar Cuadrante en PDF"** formateado para imprimir y colgar en la cartelera de la gasolinera.
+* **Ubicación en el Menú**:
+  * Menú principal en **Recursos humanos**, debajo de **Vacaciones**.
+  * Ítem: **`Planing`** (`/admin/planing-turnos`).
+* **Permiso Spatie**: `gestion_planing` (y compatibilidad con `gestion_recursos_humanos`).
+* **Acciones en Cuadrante**:
+  * Selector ágil de gasolinera (Vistalegre, Ronda Norte, Rodalabota, Atenas).
+  * Selector de Mes y Año con navegación anterior / siguiente.
+  * Botón **"Generar Cuadrante 4x2"** que rellena automáticamente el mes continuando el ciclo.
+  * Clic en celda para modificar empleado, registrar sustituto o añadir una nota.
+  * Botón **"Exportar PDF"** formateado para imprimir y colgar en la cartelera.
 
 ---
 
-## 5. Arquitectura de Datos Prevista (Laravel)
+## 6. Arquitectura de Datos (Laravel)
 
-* **`cuadrantes_mensuales`**:
+* **`planing_cuadrantes`**:
   * `id`, `gasolinera_codigo` (1, 2, 3, 4), `anio`, `mes`, `observaciones`, `estado` (borrador, publicado), timestamps.
-* **`cuadrante_asignaciones`**:
-  * `id`, `cuadrante_mensual_id`, `fecha` (date), `puesto` (Puesto 1, Puesto 2, Noche), `turno` (M, T, N, D), `empleado_id` (quien trabaja), `empleado_titular_id` (a quien le tocaba por 4x2), `tipo` (ordinario, sustitucion, refuerzo), `motivo_sustitucion`, `notas`, timestamps.
+* **`planing_turnos`**:
+  * `id`, `planing_cuadrante_id`, `fecha` (date), `puesto` (Puesto 1, Puesto 2, Puesto Único, Noche), `turno` (M, T, N), `empleado_id` (quien trabaja), `empleado_titular_id` (a quien le tocaba por 4x2), `es_sustitucion` (bool), `motivo_sustitucion`, `notas`, timestamps.
 * **`empleados.color_hex`**: Color corporativo de cada trabajador para pintar las celdas del cuadrante de forma inmediata.
-
----
-
-## 6. Recursos ya Desarrollados en el Proyecto
-* **Comando Artisan**: `app/Console/Commands/GenerarPropuestaPlaningPdfCommand.php` (`php artisan planing:generar-propuesta-pdf`).
-* **Vista Blade PDF Ejecutiva**: `resources/views/pdf/propuesta-planing-turnos.blade.php`.
-* **Dossier Ejecutivo PDF para Dirección**: `Propuesta_Modulo_Planing_Turnos_Utrecar.pdf` (3 páginas, A4 portrait, libre de jerga técnica).

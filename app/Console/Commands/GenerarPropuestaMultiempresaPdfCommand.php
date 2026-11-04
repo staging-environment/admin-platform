@@ -27,3 +27,4 @@ class GenerarPropuestaMultiempresaPdfCommand extends Command
         return 0;
     }
 }
+

@@ -25,3 +25,4 @@ Este documento establece las reglas de arquitectura y reparto de responsabilidad
 ## 3. Desconexión de Aseproda (VirtusGesNet)
 * Aseproda se mantiene únicamente como pasarela provisional de pista en las estaciones de Utrecar hasta su migración al TPV de Odoo.
 * Todos los datos de proveedores e inventario histórico de `virtusgesnet` se centralizan en Odoo.
+
