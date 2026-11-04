@@ -27,6 +27,10 @@ class PlaningTurnos extends Page
 
     protected string $view = 'filament.pages.planing-turnos';
 
+    protected $queryString = [
+        'gasolineraCodigo' => ['except' => 1, 'as' => 'estacion'],
+    ];
+
     // Estado principal
     public int $gasolineraCodigo = 1;
     public int $anio;
@@ -66,14 +70,28 @@ class PlaningTurnos extends Page
 
     public function getBreadcrumbs(): array
     {
+        $estacionNombre = match ($this->gasolineraCodigo) {
+            1 => 'Vistalegre',
+            2 => 'Ronda Norte',
+            3 => 'Rodalabota',
+            4 => 'Atenas',
+            default => 'Estación',
+        };
+
         return [
             'Recursos humanos',
             'Planing',
+            $estacionNombre,
         ];
     }
 
     public function mount(): void
     {
+        $estacion = request()->query('estacion');
+        if ($estacion && in_array((int) $estacion, [1, 2, 3, 4])) {
+            $this->gasolineraCodigo = (int) $estacion;
+        }
+
         $this->anio = (int) now()->format('Y');
         $this->mes = (int) now()->format('n');
 
@@ -400,3 +418,4 @@ class PlaningTurnos extends Page
         return Empleado::whereIn('id', array_keys($empleadosIds))->orderBy('nombre')->get();
     }
 }
+

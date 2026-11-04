@@ -58,3 +58,4 @@ class PlaningCuadrante extends Model
         return $meses[$this->mes] ?? 'Mes ' . $this->mes;
     }
 }
+

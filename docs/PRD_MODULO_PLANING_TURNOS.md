@@ -169,3 +169,4 @@ En estricto cumplimiento de la regla de seguridad del proyecto:
 * Cabecera con logotipo de Utrecar, nombre de la estación, mes y año.
 * Matriz de turnos con los colores asignados y tipografía clara y legible desde media distancia.
 * Pie de página con las observaciones del mes y espacio de firmas de conformidad.
+

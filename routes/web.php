@@ -221,6 +221,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/ficha-empleado', function (\Illuminate\Http\Request $request) {
         return redirect('/admin/portal-empleado' . ($request->getQueryString() ? '?' . $request->getQueryString() : ''));
     });
+    Route::get('/admin/planing/{station}', function (string $station) {
+        $map = [
+            'vistalegre' => 1,
+            'ronda-norte' => 2,
+            'rodalabota' => 3,
+            'atenas' => 4,
+        ];
+        $code = $map[strtolower($station)] ?? 1;
+        return redirect("/admin/planing-turnos?estacion={$code}");
+    });
+    Route::redirect('/admin/planing', '/admin/planing-turnos');
     Route::redirect('/dashboard', '/admin')->name('dashboard');
     // Endpoint JSON para AJAX polling de mercados energeticos (dashboard)
     Route::get('/admin/api/fuel-markets-data', function () {
