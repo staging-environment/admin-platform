@@ -284,15 +284,10 @@
                                                             <span class="truncate font-black tracking-wide text-xs" style="color: {{ $fila['color_text'] }};">
                                                                 {{ $empleado->nombre_corto }}
                                                             </span>
-                                                            @if($esSustitucion)
-                                                                <span class="text-red-600 font-black text-sm shrink-0" title="Sustitución: {{ $turnoReg->motivo_sustitucion ?? 'Suplente' }}">*</span>
+                                                            @if($esSustitucion && $turnoReg->motivo_sustitucion && !str_contains(mb_strtolower($turnoReg->motivo_sustitucion), 'permanente'))
+                                                                <span class="text-red-600 font-black text-sm shrink-0" title="Sustitución puntual: {{ $turnoReg->motivo_sustitucion }}">*</span>
                                                             @endif
                                                         </div>
-                                                        @if($esSustitucion && $turnoReg->motivo_sustitucion)
-                                                            <div class="text-[8.5px] font-bold text-red-600 dark:text-red-400 uppercase tracking-tighter truncate mt-0.5">
-                                                                {{ $turnoReg->motivo_sustitucion }}
-                                                            </div>
-                                                        @endif
                                                     @else
                                                         <div class="flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-primary-600 transition">
                                                             <span class="text-xs font-bold">+</span>

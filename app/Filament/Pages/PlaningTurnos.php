@@ -233,8 +233,11 @@ class PlaningTurnos extends Page
         $cuadrante = $service->obtenerOCrearCuadrante($this->gasolineraCodigo, $this->anio, $this->mes);
 
         $nuevoEmpleadoId = !empty($this->modalEmpleadoId) ? (int) $this->modalEmpleadoId : null;
-        $esSustitucion = $this->modalEsSustitucion || ($this->modalAlcance === 'en_adelante');
-        $motivo = $this->modalMotivo ?: ($this->modalAlcance === 'en_adelante' ? 'Sustitución permanente' : null);
+        
+        // Si la sustitución es permanente o para todo el mes, NO se marca como sustitución visual en el cuadrante
+        $esPermanente = ($this->modalAlcance === 'en_adelante' || $this->modalAlcance === 'todo_el_mes');
+        $esSustitucion = $esPermanente ? false : (bool) $this->modalEsSustitucion;
+        $motivo = $esSustitucion ? $this->modalMotivo : null;
 
         // Turno actual seleccionado
         $registroActual = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
@@ -275,10 +278,9 @@ class PlaningTurnos extends Page
                     $tf->empleado_titular_id = $tf->empleado_id ?: $titularId;
                 }
                 $tf->empleado_id = $nuevoEmpleadoId;
-                $tf->es_sustitucion = true;
-                if ($motivo) {
-                    $tf->motivo_sustitucion = $motivo;
-                }
+                // Permanente: sin marca de sustitución en el cuadrante
+                $tf->es_sustitucion = false;
+                $tf->motivo_sustitucion = null;
                 $tf->save();
                 $totalAfectados++;
             }
@@ -298,10 +300,8 @@ class PlaningTurnos extends Page
                     $tm->empleado_titular_id = $tm->empleado_id ?: $titularId;
                 }
                 $tm->empleado_id = $nuevoEmpleadoId;
-                $tm->es_sustitucion = $esSustitucion;
-                if ($motivo) {
-                    $tm->motivo_sustitucion = $motivo;
-                }
+                $tm->es_sustitucion = false;
+                $tm->motivo_sustitucion = null;
                 $tm->save();
                 $totalAfectados++;
             }
