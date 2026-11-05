@@ -92,9 +92,9 @@
     </div>
 
     {{-- 2. Barra de Control Temporal y Acciones --}}
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-        {{-- Navegación de Mes/Año --}}
-        <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+        {{-- Navegación de Mes/Año (Selector Principal < MES AÑO >) --}}
+        <div class="flex items-center">
             <div class="flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-1 border border-gray-200 dark:border-white/10">
                 <button
                     type="button"
@@ -105,7 +105,7 @@
                     <x-filament::icon icon="heroicon-m-chevron-left" class="w-5 h-5" />
                 </button>
 
-                <div class="px-3 text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">
+                <div class="px-4 text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">
                     {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM YYYY') }}
                 </div>
 
@@ -118,68 +118,15 @@
                     <x-filament::icon icon="heroicon-m-chevron-right" class="w-5 h-5" />
                 </button>
             </div>
-
-            <button
-                type="button"
-                wire:click="irMesActual"
-                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/20 transition border border-gray-200 dark:border-white/10"
-            >
-                Mes Actual
-            </button>
-
-            {{-- Selectores rápidos --}}
-            <select
-                wire:model.live="mes"
-                class="text-xs font-medium bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-gray-700 dark:text-gray-300 focus:ring-primary-500 focus:border-primary-500"
-            >
-                @foreach([
-                    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-                    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-                ] as $num => $nombre)
-                    <option value="{{ $num }}">{{ $nombre }}</option>
-                @endforeach
-            </select>
-
-            <select
-                wire:model.live="anio"
-                class="text-xs font-medium bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-gray-700 dark:text-gray-300 focus:ring-primary-500 focus:border-primary-500"
-            >
-                @foreach([2025, 2026, 2027, 2028] as $a)
-                    <option value="{{ $a }}">{{ $a }}</option>
-                @endforeach
-            </select>
         </div>
 
-        {{-- Acciones principales y Selector de Vista --}}
-        <div class="flex flex-wrap items-center gap-2.5">
-            {{-- Selector de Vista (Cuadrícula vs Tabla Horizontal) --}}
-            <div class="flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-1 border border-gray-200 dark:border-white/10">
-                <button
-                    type="button"
-                    wire:click="cambiarVista('cuadricula')"
-                    title="Vista Cuadrícula en Recuadros (Sin scroll horizontal)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition {{ $vista === 'cuadricula' ? 'bg-white dark:bg-white/20 text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-white/20' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
-                >
-                    <x-filament::icon icon="heroicon-m-squares-2x2" class="w-4 h-4" />
-                    <span>Cuadrícula</span>
-                </button>
-                <button
-                    type="button"
-                    wire:click="cambiarVista('horizontal')"
-                    title="Vista Tabla Horizontal Tradicional"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition {{ $vista === 'horizontal' ? 'bg-white dark:bg-white/20 text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-white/20' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
-                >
-                    <x-filament::icon icon="heroicon-m-table-cells" class="w-4 h-4" />
-                    <span>Tabla Horizontal</span>
-                </button>
-            </div>
-
+        {{-- Acciones principales --}}
+        <div class="flex items-center gap-2.5">
             <button
                 type="button"
                 wire:click="generarCuadrante"
                 wire:confirm="¿Deseas calcular o rellenar la rotación teórica 4x2 para este mes? Los turnos manuales y sustituciones existentes se respetarán."
-                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition shadow-sm"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition shadow-sm"
             >
                 <x-filament::icon icon="heroicon-m-arrow-path" class="w-4 h-4" />
                 <span>Generar Cuadrante 4x2</span>
@@ -188,7 +135,7 @@
             <button
                 type="button"
                 wire:click="exportarPdf"
-                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs transition shadow-sm"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs transition shadow-sm"
             >
                 <x-filament::icon icon="heroicon-m-document-arrow-down" class="w-4 h-4" />
                 <span>Exportar PDF</span>
@@ -196,20 +143,19 @@
         </div>
     </div>
 
-    {{-- 3. Visualización del Planing (Modo Cuadrícula Semanal en Recuadros o Tabla Horizontal) --}}
+    {{-- 3. Visualización del Planing en Cuadrícula Semanal --}}
     <x-filament::section>
-        @if($vista === 'cuadricula')
-            {{-- VISTA CUADRÍCULA EN BLOQUES SEMANALES (Formato Excel / Cuadrante en Recuadros sin scroll) --}}
-            <div class="space-y-4">
-                {{-- Encabezado General del Cuadrante --}}
-                <div class="flex items-center justify-between px-2 py-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/10">
-                    <div class="text-sm md:text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                        {{ $estaciones[$gasolineraCodigo]['nombre'] ?? 'Estación' }}
-                    </div>
-                    <div class="text-xs md:text-sm font-extrabold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                        {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM [\'\']YY') }}
-                    </div>
+        {{-- VISTA CUADRÍCULA EN BLOQUES SEMANALES (Formato Cuadrante en Recuadros) --}}
+        <div class="space-y-4">
+            {{-- Encabezado General del Cuadrante --}}
+            <div class="flex items-center justify-between px-2 py-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/10">
+                <div class="text-sm md:text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                    {{ $estaciones[$gasolineraCodigo]['nombre'] ?? 'Estación' }}
                 </div>
+                <div class="text-xs md:text-sm font-extrabold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                    {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM [\'\']YY') }}
+                </div>
+            </div>
 
                 {{-- Bloques Semanales (Semana a Semana) --}}
                 @foreach($this->semanasMes as $semana)
@@ -306,81 +252,6 @@
                     </div>
                 @endforeach
             </div>
-        @else
-            {{-- VISTA TABLA HORIZONTAL (Tradicional) --}}
-            <div class="cuadrante-scroll-container border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900">
-                <table class="w-full border-collapse text-xs">
-                    <thead>
-                        {{-- Fila 1: Días de la semana --}}
-                        <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10">
-                            <th class="sticky-col p-2 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-white/10 min-w-[140px] max-w-[160px]">
-                                Turno / Puesto
-                            </th>
-                            @foreach($this->diasMes as $dia)
-                                <th class="p-1 text-center font-bold border-r border-gray-200/60 dark:border-white/10 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'text-gray-600 dark:text-gray-300' }}">
-                                    <div class="text-[10px] uppercase font-bold">{{ $dia['diaSemana'] }}</div>
-                                    <div class="text-xs font-extrabold mt-0.5">{{ $dia['numero'] }}</div>
-                                </th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-                        @foreach($this->filasTurnos as $fila)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
-                                {{-- Cabecera de Fila (Turno/Puesto) --}}
-                                <td class="sticky-col p-2.5 border-r border-gray-200 dark:border-white/10 font-bold text-gray-900 dark:text-white">
-                                    <div class="flex items-center gap-1.5">
-                                        <x-filament::icon :icon="$fila['icono']" class="w-4 h-4 text-gray-400" />
-                                        <span class="text-xs uppercase tracking-tight">{{ $fila['etiqueta'] }}</span>
-                                    </div>
-                                </td>
-
-                                {{-- Celdas de cada día --}}
-                                @foreach($this->diasMes as $dia)
-                                    @php
-                                        $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
-                                        $turnoReg = $this->turnosMap[$key] ?? null;
-                                        $empleado = $turnoReg?->empleado;
-                                        $esSustitucion = $turnoReg?->es_sustitucion;
-                                        $color = $empleado?->color ?? '#64748b';
-                                    @endphp
-
-                                    <td
-                                        wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
-                                        class="cell-turno p-1 border-r border-gray-200/50 dark:border-white/5 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/[0.03]' : '' }}"
-                                        title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución)' : '') : 'Clic para asignar turno' }}"
-                                    >
-                                        @if($empleado)
-                                            <div
-                                                class="h-full w-full rounded-md p-1 flex flex-col justify-center items-center text-center transition shadow-xs {{ $esSustitucion ? 'border-2 border-dashed' : 'border' }}"
-                                                style="background-color: {{ $color }}18; border-color: {{ $color }}; color: {{ $color }};"
-                                            >
-                                                <span class="font-extrabold text-[10.5px] leading-tight truncate max-w-full">
-                                                    {{ mb_strtoupper(explode(' ', trim($empleado->nombre))[0]) }}
-                                                    @if($esSustitucion)
-                                                        <span class="text-red-500 font-black" title="Sustitución: {{ $turnoReg->motivo_sustitucion ?? 'Suplente' }}">*</span>
-                                                    @endif
-                                                </span>
-
-                                                @if($esSustitucion && $turnoReg->motivo_sustitucion)
-                                                    <span class="text-[8px] font-semibold uppercase opacity-85 truncate">
-                                                        {{ $turnoReg->motivo_sustitucion }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        @else
-                                            <div class="h-full w-full rounded-md border border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:border-gray-400 hover:text-gray-500">
-                                                <span class="text-xs">+</span>
-                                            </div>
-                                        @endif
-                                    </td>
-                                @endforeach
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
 
         {{-- Nota visual indicativa --}}
         <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 px-1">
