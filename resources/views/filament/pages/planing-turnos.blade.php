@@ -39,6 +39,28 @@
         .dark .cell-turno:hover {
             filter: brightness(1.15);
         }
+
+        .card-dia-cuadricula {
+            transition: all 0.15s ease-in-out;
+        }
+
+        .card-dia-cuadricula:hover {
+            border-color: rgba(99, 102, 241, 0.45);
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        .badge-turno-cuadricula {
+            transition: transform 0.12s ease, filter 0.12s ease;
+        }
+
+        .badge-turno-cuadricula:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.96);
+        }
+
+        .dark .badge-turno-cuadricula:hover {
+            filter: brightness(1.12);
+        }
     </style>
 
     {{-- 1. Barra Superior de Selección de Gasolinera --}}
@@ -129,8 +151,30 @@
             </select>
         </div>
 
-        {{-- Acciones principales --}}
-        <div class="flex items-center gap-2.5">
+        {{-- Acciones principales y Selector de Vista --}}
+        <div class="flex flex-wrap items-center gap-2.5">
+            {{-- Selector de Vista (Cuadrícula vs Tabla Horizontal) --}}
+            <div class="flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-1 border border-gray-200 dark:border-white/10">
+                <button
+                    type="button"
+                    wire:click="cambiarVista('cuadricula')"
+                    title="Vista Cuadrícula en Recuadros (Sin scroll horizontal)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition {{ $vista === 'cuadricula' ? 'bg-white dark:bg-white/20 text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-white/20' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
+                >
+                    <x-filament::icon icon="heroicon-m-squares-2x2" class="w-4 h-4" />
+                    <span>Cuadrícula</span>
+                </button>
+                <button
+                    type="button"
+                    wire:click="cambiarVista('horizontal')"
+                    title="Vista Tabla Horizontal Tradicional"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition {{ $vista === 'horizontal' ? 'bg-white dark:bg-white/20 text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-white/20' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}"
+                >
+                    <x-filament::icon icon="heroicon-m-table-cells" class="w-4 h-4" />
+                    <span>Tabla Horizontal</span>
+                </button>
+            </div>
+
             <button
                 type="button"
                 wire:click="generarCuadrante"
@@ -152,80 +196,264 @@
         </div>
     </div>
 
-    {{-- 3. Cuadrícula Interactiva del Planing (Solo Turnos de Trabajo, Sin Descanso) --}}
+    {{-- 3. Visualización del Planing (Modo Cuadrícula en Recuadros o Tabla Horizontal) --}}
     <x-filament::section>
-        <div class="cuadrante-scroll-container border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900">
-            <table class="w-full border-collapse text-xs">
-                <thead>
-                    {{-- Fila 1: Días de la semana --}}
-                    <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10">
-                        <th class="sticky-col p-2 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-white/10 min-w-[140px] max-w-[160px]">
-                            Turno / Puesto
-                        </th>
-                        @foreach($this->diasMes as $dia)
-                            <th class="p-1 text-center font-bold border-r border-gray-200/60 dark:border-white/10 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'text-gray-600 dark:text-gray-300' }}">
-                                <div class="text-[10px] uppercase font-bold">{{ $dia['diaSemana'] }}</div>
-                                <div class="text-xs font-extrabold mt-0.5">{{ $dia['numero'] }}</div>
-                            </th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-                    @foreach($this->filasTurnos as $fila)
-                        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
-                            {{-- Cabecera de Fila (Turno/Puesto) --}}
-                            <td class="sticky-col p-2.5 border-r border-gray-200 dark:border-white/10 font-bold text-gray-900 dark:text-white">
-                                <div class="flex items-center gap-1.5">
-                                    <x-filament::icon :icon="$fila['icono']" class="w-4 h-4 text-gray-400" />
-                                    <span class="text-xs uppercase tracking-tight">{{ $fila['etiqueta'] }}</span>
+        @if($vista === 'cuadricula')
+            {{-- VISTA CUADRÍCULA EN RECUADROS (100% Pantalla, Sin Scroll Horizontal) --}}
+            <div class="space-y-2">
+                {{-- Encabezado con los 7 días de la semana --}}
+                <div class="grid grid-cols-7 gap-2">
+                    @foreach([
+                        ['corto' => 'LUN', 'largo' => 'Lunes', 'finde' => false],
+                        ['corto' => 'MAR', 'largo' => 'Martes', 'finde' => false],
+                        ['corto' => 'MIÉ', 'largo' => 'Miércoles', 'finde' => false],
+                        ['corto' => 'JUE', 'largo' => 'Jueves', 'finde' => false],
+                        ['corto' => 'VIE', 'largo' => 'Viernes', 'finde' => false],
+                        ['corto' => 'SÁB', 'largo' => 'Sábado', 'finde' => true],
+                        ['corto' => 'DOM', 'largo' => 'Domingo', 'finde' => true],
+                    ] as $col)
+                        <div class="py-2 px-1 text-center font-extrabold text-[11px] uppercase tracking-wider rounded-lg border {{ $col['finde'] ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-300/40 dark:border-amber-500/20' : 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200/70 dark:border-white/10' }}">
+                            <span class="hidden md:inline">{{ $col['largo'] }}</span>
+                            <span class="md:hidden">{{ $col['corto'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Matriz de Semanas (Recuadros de días) --}}
+                @foreach($this->semanasMes as $semana)
+                    <div class="grid grid-cols-7 gap-2">
+                        @foreach($semana['dias'] as $dia)
+                            @if(!$dia['esMesActual'])
+                                {{-- Día de otro mes (atenuado para alinear la semana) --}}
+                                <div class="min-h-[110px] rounded-xl border border-dashed border-gray-200/50 dark:border-white/5 bg-gray-50/30 dark:bg-white/[0.01] p-2 opacity-30 select-none flex flex-col justify-between">
+                                    <div class="text-right text-[11px] font-bold text-gray-400">
+                                        {{ $dia['numero'] }}
+                                    </div>
+                                    <div class="text-[9px] text-center text-gray-400 italic">
+                                        &nbsp;
+                                    </div>
                                 </div>
-                            </td>
-
-                            {{-- Celdas de cada día --}}
-                            @foreach($this->diasMes as $dia)
-                                @php
-                                    $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
-                                    $turnoReg = $this->turnosMap[$key] ?? null;
-                                    $empleado = $turnoReg?->empleado;
-                                    $esSustitucion = $turnoReg?->es_sustitucion;
-                                    $color = $empleado?->color ?? '#64748b';
-                                @endphp
-
-                                <td
-                                    wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
-                                    class="cell-turno p-1 border-r border-gray-200/50 dark:border-white/5 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/[0.03]' : '' }}"
-                                    title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución)' : '') : 'Clic para asignar turno' }}"
-                                >
-                                    @if($empleado)
-                                        <div
-                                            class="h-full w-full rounded-md p-1 flex flex-col justify-center items-center text-center transition shadow-xs {{ $esSustitucion ? 'border-2 border-dashed' : 'border' }}"
-                                            style="background-color: {{ $color }}18; border-color: {{ $color }}; color: {{ $color }};"
-                                        >
-                                            <span class="font-extrabold text-[10.5px] leading-tight truncate max-w-full">
-                                                {{ mb_strtoupper(explode(' ', trim($empleado->nombre))[0]) }}
-                                                @if($esSustitucion)
-                                                    <span class="text-red-500 font-black" title="Sustitución: {{ $turnoReg->motivo_sustitucion ?? 'Suplente' }}">*</span>
-                                                @endif
-                                            </span>
-
-                                            @if($esSustitucion && $turnoReg->motivo_sustitucion)
-                                                <span class="text-[8px] font-semibold uppercase opacity-85 truncate">
-                                                    {{ $turnoReg->motivo_sustitucion }}
+                            @else
+                                {{-- Día del Mes Actual: Recuadro Interactivo --}}
+                                <div class="card-dia-cuadricula min-h-[110px] rounded-xl border {{ $dia['esHoy'] ? 'border-primary-500 ring-2 ring-primary-500/20 bg-primary-50/[0.05]' : ($dia['esFinDeSemana'] ? 'border-amber-200/90 dark:border-amber-500/20 bg-amber-500/[0.02]' : 'border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900') }} p-2 shadow-2xs flex flex-col justify-between transition-all duration-150">
+                                    
+                                    {{-- Encabezado del Recuadro --}}
+                                    <div class="flex items-center justify-between pb-1 mb-1.5 border-b border-gray-100 dark:border-white/5">
+                                        <span class="text-[10px] font-bold uppercase {{ $dia['esFinDeSemana'] ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                            {{ $dia['diaSemana'] }}
+                                        </span>
+                                        <div class="flex items-center gap-1">
+                                            @if($dia['esHoy'])
+                                                <span class="px-1 py-0.2 text-[8.5px] font-black uppercase rounded bg-primary-600 text-white tracking-tight">
+                                                    Hoy
                                                 </span>
                                             @endif
+                                            <span class="w-5 h-5 flex items-center justify-center rounded-md text-[11px] font-black {{ $dia['esFinDeSemana'] ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300' : 'bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200' }}">
+                                                {{ $dia['numero'] }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Turnos asignados dentro del Recuadro --}}
+                                    @if($gasolineraCodigo === 2)
+                                        {{-- RONDA NORTE: 5 Turnos (P1-M, P2-M / P1-T, P2-T / Noche) --}}
+                                        <div class="space-y-1 flex-1 flex flex-col justify-center">
+                                            <div class="grid grid-cols-2 gap-1">
+                                                @foreach([
+                                                    ['puesto' => 'Puesto 1', 'turno' => 'M', 'label' => 'P1-M'],
+                                                    ['puesto' => 'Puesto 2', 'turno' => 'M', 'label' => 'P2-M'],
+                                                    ['puesto' => 'Puesto 1', 'turno' => 'T', 'label' => 'P1-T'],
+                                                    ['puesto' => 'Puesto 2', 'turno' => 'T', 'label' => 'P2-T'],
+                                                ] as $cfg)
+                                                    @php
+                                                        $k = $dia['fecha'] . '_' . $cfg['puesto'] . '_' . $cfg['turno'];
+                                                        $tReg = $this->turnosMap[$k] ?? null;
+                                                        $emp = $tReg?->empleado;
+                                                        $esSust = $tReg?->es_sustitucion;
+                                                        $c = $emp?->color ?? '#64748b';
+                                                    @endphp
+                                                    <div
+                                                        wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $cfg['puesto'] }}', '{{ $cfg['turno'] }}')"
+                                                        class="cursor-pointer badge-turno-cuadricula"
+                                                        title="{{ $tReg ? ($emp ? $emp->nombre . ' ' . $emp->apellidos : 'Sin asignar') . ($esSust ? ' (Sustitución)' : '') : 'Asignar ' . $cfg['label'] }}"
+                                                    >
+                                                        @if($emp)
+                                                            <div
+                                                                class="rounded px-1 py-0.5 flex items-center justify-between text-left text-[10px] {{ $esSust ? 'border border-dashed' : 'border' }}"
+                                                                style="background-color: {{ $c }}18; border-color: {{ $c }}; color: {{ $c }};"
+                                                            >
+                                                                <span class="font-extrabold truncate max-w-[85%]">
+                                                                    {{ mb_strtoupper(explode(' ', trim($emp->nombre))[0]) }}
+                                                                </span>
+                                                                <span class="text-[8px] opacity-75 font-bold">{{ $cfg['turno'] }}</span>
+                                                            </div>
+                                                        @else
+                                                            <div class="rounded border border-dashed border-gray-200 dark:border-white/10 px-1 py-0.5 text-[9px] text-gray-400 text-center hover:border-primary-400 hover:text-primary-600 bg-gray-50/50">
+                                                                {{ $cfg['label'] }}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            {{-- Turno Noche --}}
+                                            @php
+                                                $kNoche = $dia['fecha'] . '_Noche_N';
+                                                $tNoche = $this->turnosMap[$kNoche] ?? null;
+                                                $empNoche = $tNoche?->empleado;
+                                                $esSustNoche = $tNoche?->es_sustitucion;
+                                                $cNoche = $empNoche?->color ?? '#8b5cf6';
+                                            @endphp
+                                            <div
+                                                wire:click="abrirModalTurno('{{ $dia['fecha'] }}', 'Noche', 'N')"
+                                                class="cursor-pointer badge-turno-cuadricula"
+                                                title="{{ $tNoche ? ($empNoche ? $empNoche->nombre . ' ' . $empNoche->apellidos : 'Sin asignar') . ($esSustNoche ? ' (Sustitución)' : '') : 'Asignar Turno Noche' }}"
+                                            >
+                                                @if($empNoche)
+                                                    <div
+                                                        class="rounded px-1.5 py-0.5 flex items-center justify-between text-left text-[10px] {{ $esSustNoche ? 'border border-dashed' : 'border' }}"
+                                                        style="background-color: {{ $cNoche }}18; border-color: {{ $cNoche }}; color: {{ $cNoche }};"
+                                                    >
+                                                        <span class="font-extrabold truncate max-w-[85%]">
+                                                            🌙 {{ mb_strtoupper(explode(' ', trim($empNoche->nombre))[0]) }}
+                                                        </span>
+                                                        <span class="text-[8px] opacity-75 font-bold">N</span>
+                                                    </div>
+                                                @else
+                                                    <div class="rounded border border-dashed border-purple-200/60 dark:border-purple-900/30 px-1 py-0.5 text-[9px] text-purple-400 text-center hover:border-purple-400 hover:text-purple-600 bg-purple-50/30">
+                                                        🌙 Noche Libre
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     @else
-                                        <div class="h-full w-full rounded-md border border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:border-gray-400 hover:text-gray-500">
-                                            <span class="text-xs">+</span>
+                                        {{-- ESTACIONES DIURNAS (Vistalegre, Rodalabota, Atenas): Mañana y Tarde --}}
+                                        <div class="space-y-1.5 flex-1 flex flex-col justify-center">
+                                            @foreach($this->filasTurnos as $fila)
+                                                @php
+                                                    $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
+                                                    $turnoReg = $this->turnosMap[$key] ?? null;
+                                                    $empleado = $turnoReg?->empleado;
+                                                    $esSustitucion = $turnoReg?->es_sustitucion;
+                                                    $color = $empleado?->color ?? '#64748b';
+                                                @endphp
+
+                                                <div
+                                                    wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
+                                                    class="cursor-pointer badge-turno-cuadricula"
+                                                    title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Asignar turno ' . $fila['etiqueta'] }}"
+                                                >
+                                                    @if($empleado)
+                                                        <div
+                                                            class="w-full rounded-lg px-2 py-1 flex items-center justify-between text-left shadow-2xs {{ $esSustitucion ? 'border-2 border-dashed' : 'border' }}"
+                                                            style="background-color: {{ $color }}18; border-color: {{ $color }}; color: {{ $color }};"
+                                                        >
+                                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                                <span class="text-[9px] font-black uppercase px-1 py-0.5 rounded bg-white/80 dark:bg-black/50 shrink-0 leading-none">
+                                                                    {{ $fila['turno'] }}
+                                                                </span>
+                                                                <span class="font-extrabold text-[11px] leading-tight truncate">
+                                                                    {{ mb_strtoupper(explode(' ', trim($empleado->nombre))[0]) }}
+                                                                </span>
+                                                            </div>
+
+                                                            @if($esSustitucion)
+                                                                <span class="text-red-500 font-black text-xs shrink-0" title="Sustitución: {{ $turnoReg->motivo_sustitucion ?? 'Suplente' }}">*</span>
+                                                            @endif
+                                                        </div>
+                                                    @else
+                                                        <div class="w-full rounded-lg border border-dashed border-gray-200 dark:border-white/10 hover:border-primary-400 dark:hover:border-primary-500 py-1 px-2 flex items-center justify-between text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 bg-gray-50/50 dark:bg-white/[0.02]">
+                                                            <span class="text-[9px] font-bold uppercase text-gray-400">
+                                                                {{ $fila['turno'] }}
+                                                            </span>
+                                                            <span class="text-[10px] font-medium">+ Asignar</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @endif
-                                </td>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @endforeach
+            </div>
+        @else
+            {{-- VISTA TABLA HORIZONTAL (Tradicional) --}}
+            <div class="cuadrante-scroll-container border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900">
+                <table class="w-full border-collapse text-xs">
+                    <thead>
+                        {{-- Fila 1: Días de la semana --}}
+                        <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10">
+                            <th class="sticky-col p-2 text-left font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-white/10 min-w-[140px] max-w-[160px]">
+                                Turno / Puesto
+                            </th>
+                            @foreach($this->diasMes as $dia)
+                                <th class="p-1 text-center font-bold border-r border-gray-200/60 dark:border-white/10 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'text-gray-600 dark:text-gray-300' }}">
+                                    <div class="text-[10px] uppercase font-bold">{{ $dia['diaSemana'] }}</div>
+                                    <div class="text-xs font-extrabold mt-0.5">{{ $dia['numero'] }}</div>
+                                </th>
                             @endforeach
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                        @foreach($this->filasTurnos as $fila)
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                {{-- Cabecera de Fila (Turno/Puesto) --}}
+                                <td class="sticky-col p-2.5 border-r border-gray-200 dark:border-white/10 font-bold text-gray-900 dark:text-white">
+                                    <div class="flex items-center gap-1.5">
+                                        <x-filament::icon :icon="$fila['icono']" class="w-4 h-4 text-gray-400" />
+                                        <span class="text-xs uppercase tracking-tight">{{ $fila['etiqueta'] }}</span>
+                                    </div>
+                                </td>
+
+                                {{-- Celdas de cada día --}}
+                                @foreach($this->diasMes as $dia)
+                                    @php
+                                        $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
+                                        $turnoReg = $this->turnosMap[$key] ?? null;
+                                        $empleado = $turnoReg?->empleado;
+                                        $esSustitucion = $turnoReg?->es_sustitucion;
+                                        $color = $empleado?->color ?? '#64748b';
+                                    @endphp
+
+                                    <td
+                                        wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
+                                        class="cell-turno p-1 border-r border-gray-200/50 dark:border-white/5 {{ $dia['esFinDeSemana'] ? 'bg-amber-500/[0.03]' : '' }}"
+                                        title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución)' : '') : 'Clic para asignar turno' }}"
+                                    >
+                                        @if($empleado)
+                                            <div
+                                                class="h-full w-full rounded-md p-1 flex flex-col justify-center items-center text-center transition shadow-xs {{ $esSustitucion ? 'border-2 border-dashed' : 'border' }}"
+                                                style="background-color: {{ $color }}18; border-color: {{ $color }}; color: {{ $color }};"
+                                            >
+                                                <span class="font-extrabold text-[10.5px] leading-tight truncate max-w-full">
+                                                    {{ mb_strtoupper(explode(' ', trim($empleado->nombre))[0]) }}
+                                                    @if($esSustitucion)
+                                                        <span class="text-red-500 font-black" title="Sustitución: {{ $turnoReg->motivo_sustitucion ?? 'Suplente' }}">*</span>
+                                                    @endif
+                                                </span>
+
+                                                @if($esSustitucion && $turnoReg->motivo_sustitucion)
+                                                    <span class="text-[8px] font-semibold uppercase opacity-85 truncate">
+                                                        {{ $turnoReg->motivo_sustitucion }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="h-full w-full rounded-md border border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:border-gray-400 hover:text-gray-500">
+                                                <span class="text-xs">+</span>
+                                            </div>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
 
         {{-- Nota visual indicativa --}}
         <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 px-1">

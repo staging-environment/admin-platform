@@ -29,6 +29,7 @@ class PlaningTurnos extends Page
 
     protected $queryString = [
         'gasolineraCodigo' => ['except' => 1, 'as' => 'estacion'],
+        'vista' => ['except' => 'cuadricula'],
     ];
 
     // Estado principal
@@ -36,6 +37,7 @@ class PlaningTurnos extends Page
     public int $anio;
     public int $mes;
     public ?string $observaciones = '';
+    public string $vista = 'cuadricula'; // 'cuadricula' (por defecto en recuadros sin scroll) o 'horizontal' (tabla corrida)
 
     // Estado del modal de turno
     public bool $mostrarModalTurno = false;
@@ -92,10 +94,20 @@ class PlaningTurnos extends Page
             $this->gasolineraCodigo = (int) $estacion;
         }
 
+        $vistaQuery = request()->query('vista');
+        if ($vistaQuery && in_array($vistaQuery, ['cuadricula', 'horizontal'])) {
+            $this->vista = $vistaQuery;
+        }
+
         $this->anio = (int) now()->format('Y');
         $this->mes = (int) now()->format('n');
 
         $this->cargarObservaciones();
+    }
+
+    public function cambiarVista(string $nuevaVista): void
+    {
+        $this->vista = in_array($nuevaVista, ['cuadricula', 'horizontal']) ? $nuevaVista : 'cuadricula';
     }
 
     public function seleccionarGasolinera(int $codigo): void
@@ -286,6 +298,47 @@ class PlaningTurnos extends Page
             fn () => print($pdf->output()),
             $filename
         );
+    }
+
+    public function getSemanasMesProperty(): array
+    {
+        $primerDiaMes = Carbon::create($this->anio, $this->mes, 1)->startOfDay();
+        $ultimoDiaMes = Carbon::create($this->anio, $this->mes, 1)->endOfMonth()->startOfDay();
+
+        // En España/Europa, la semana arranca en Lunes (Carbon::MONDAY = 1)
+        $inicioCalendario = $primerDiaMes->copy()->startOfWeek(Carbon::MONDAY);
+        $finCalendario = $ultimoDiaMes->copy()->endOfWeek(Carbon::SUNDAY);
+
+        $semanas = [];
+        $cursor = $inicioCalendario->copy();
+        $diasCortos = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+        $diasLargos = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+        while ($cursor->lte($finCalendario)) {
+            $diasSemana = [];
+            $numeroSemana = (int) $cursor->isoWeek();
+
+            for ($i = 0; $i < 7; $i++) {
+                $esMesActual = ($cursor->month === $this->mes && $cursor->year === $this->anio);
+                $diasSemana[] = [
+                    'numero' => $cursor->day,
+                    'fecha' => $cursor->toDateString(),
+                    'diaSemana' => $diasCortos[$i],
+                    'diaSemanaLargo' => $diasLargos[$i],
+                    'esMesActual' => $esMesActual,
+                    'esFinDeSemana' => in_array($i, [5, 6]), // Sábado y Domingo
+                    'esHoy' => $cursor->isToday(),
+                ];
+                $cursor->addDay();
+            }
+
+            $semanas[] = [
+                'numeroSemana' => $numeroSemana,
+                'dias' => $diasSemana,
+            ];
+        }
+
+        return $semanas;
     }
 
     public function getDiasMesProperty(): array
