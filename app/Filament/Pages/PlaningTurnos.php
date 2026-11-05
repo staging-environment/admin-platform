@@ -45,11 +45,13 @@ class PlaningTurnos extends Page
     public ?string $modalFecha = null;
     public ?string $modalPuesto = null;
     public ?string $modalTurno = null;
-    public ?int $modalEmpleadoId = null;
+    public $modalEmpleadoId = null;
+    public ?int $modalTitularId = null;
     public bool $modalEsSustitucion = false;
     public ?string $modalMotivo = null;
     public ?string $modalNotas = null;
     public ?string $modalTitularNombre = null;
+    public string $modalAlcance = 'puntual'; // 'puntual', 'en_adelante', 'todo_el_mes'
 
     public static function canAccess(): bool
     {
@@ -191,19 +193,22 @@ class PlaningTurnos extends Page
         $this->modalFecha = $fecha;
         $this->modalPuesto = $puesto;
         $this->modalTurno = $turno;
+        $this->modalAlcance = 'puntual';
 
         if ($registro) {
             $this->modalTurnoId = $registro->id;
             $this->modalEmpleadoId = $registro->empleado_id;
+            $this->modalTitularId = $registro->empleado_titular_id ?: $registro->empleado_id;
             $this->modalEsSustitucion = (bool) $registro->es_sustitucion;
             $this->modalMotivo = $registro->motivo_sustitucion;
             $this->modalNotas = $registro->notas;
             $this->modalTitularNombre = $registro->empleadoTitular
                 ? $registro->empleadoTitular->nombre . ' ' . $registro->empleadoTitular->apellidos
-                : null;
+                : ($registro->empleado ? $registro->empleado->nombre . ' ' . $registro->empleado->apellidos : null);
         } else {
             $this->modalTurnoId = null;
             $this->modalEmpleadoId = null;
+            $this->modalTitularId = null;
             $this->modalEsSustitucion = false;
             $this->modalMotivo = null;
             $this->modalNotas = null;
@@ -227,21 +232,89 @@ class PlaningTurnos extends Page
         $service = app(PlaningTurnosService::class);
         $cuadrante = $service->obtenerOCrearCuadrante($this->gasolineraCodigo, $this->anio, $this->mes);
 
+        $nuevoEmpleadoId = !empty($this->modalEmpleadoId) ? (int) $this->modalEmpleadoId : null;
+        $esSustitucion = $this->modalEsSustitucion || ($this->modalAlcance === 'en_adelante');
+        $motivo = $this->modalMotivo ?: ($this->modalAlcance === 'en_adelante' ? 'Sustitución permanente' : null);
+
+        // Turno actual seleccionado
+        $registroActual = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
+            ->where('fecha', $this->modalFecha)
+            ->where('puesto', $this->modalPuesto)
+            ->where('turno', $this->modalTurno)
+            ->first();
+
+        $titularId = $this->modalTitularId
+            ?: ($registroActual?->empleado_titular_id ?: $registroActual?->empleado_id);
+
+        // 1. Asignar el turno actual seleccionado
         $service->asignarTurnoManual(
             $cuadrante->id,
             $this->modalFecha,
             $this->modalPuesto,
             $this->modalTurno,
-            $this->modalEmpleadoId ?: null,
-            $this->modalEsSustitucion,
-            $this->modalMotivo,
+            $nuevoEmpleadoId,
+            $esSustitucion,
+            $motivo,
             $this->modalNotas
         );
 
+        $totalAfectados = 1;
+
+        // 2. Si el usuario seleccionó sustitución permanente en adelante
+        if ($this->modalAlcance === 'en_adelante' && $titularId && $nuevoEmpleadoId) {
+            $turnosFuturos = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
+                ->where('fecha', '>', $this->modalFecha)
+                ->where(function ($q) use ($titularId) {
+                    $q->where('empleado_id', $titularId)
+                      ->orWhere('empleado_titular_id', $titularId);
+                })
+                ->get();
+
+            foreach ($turnosFuturos as $tf) {
+                if (!$tf->empleado_titular_id) {
+                    $tf->empleado_titular_id = $tf->empleado_id ?: $titularId;
+                }
+                $tf->empleado_id = $nuevoEmpleadoId;
+                $tf->es_sustitucion = true;
+                if ($motivo) {
+                    $tf->motivo_sustitucion = $motivo;
+                }
+                $tf->save();
+                $totalAfectados++;
+            }
+        }
+        // 3. Si el usuario seleccionó reemplazar en todo el mes
+        elseif ($this->modalAlcance === 'todo_el_mes' && $titularId && $nuevoEmpleadoId) {
+            $turnosMes = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
+                ->where('fecha', '!=', $this->modalFecha)
+                ->where(function ($q) use ($titularId) {
+                    $q->where('empleado_id', $titularId)
+                      ->orWhere('empleado_titular_id', $titularId);
+                })
+                ->get();
+
+            foreach ($turnosMes as $tm) {
+                if (!$tm->empleado_titular_id) {
+                    $tm->empleado_titular_id = $tm->empleado_id ?: $titularId;
+                }
+                $tm->empleado_id = $nuevoEmpleadoId;
+                $tm->es_sustitucion = $esSustitucion;
+                if ($motivo) {
+                    $tm->motivo_sustitucion = $motivo;
+                }
+                $tm->save();
+                $totalAfectados++;
+            }
+        }
+
         $this->mostrarModalTurno = false;
 
+        $msg = $totalAfectados > 1
+            ? "Se han actualizado {$totalAfectados} turnos correctamente (sustitución en lote)."
+            : "Turno actualizado correctamente.";
+
         Notification::make()
-            ->title('Turno actualizado correctamente')
+            ->title($msg)
             ->success()
             ->send();
     }
@@ -365,61 +438,82 @@ class PlaningTurnos extends Page
     public function getFilasTurnosProperty(): array
     {
         if ($this->gasolineraCodigo === 2) {
-            // Ronda Norte (24H): 5 turnos de trabajo
+            // Ronda Norte (24H): 5 turnos de trabajo con colores propios de turno
             return [
                 [
                     'puesto' => 'Puesto 1',
                     'turno' => 'M',
                     'etiqueta' => 'PUESTO 1 - MAÑANA',
                     'icono' => 'heroicon-m-sun',
-                    'color_badge' => 'bg-sky-50 text-sky-700 border-sky-300',
+                    'color_hex' => '#0284c7',
+                    'color_bg' => '#e0f2fe',
+                    'color_border' => '#7dd3fc',
+                    'color_text' => '#0369a1',
                 ],
                 [
                     'puesto' => 'Puesto 1',
                     'turno' => 'T',
                     'etiqueta' => 'PUESTO 1 - TARDE',
                     'icono' => 'heroicon-m-clock',
-                    'color_badge' => 'bg-amber-50 text-amber-700 border-amber-300',
+                    'color_hex' => '#ea580c',
+                    'color_bg' => '#ffedd5',
+                    'color_border' => '#fdba74',
+                    'color_text' => '#c2410c',
                 ],
                 [
                     'puesto' => 'Puesto 2',
                     'turno' => 'M',
                     'etiqueta' => 'PUESTO 2 - MAÑANA',
                     'icono' => 'heroicon-m-sun',
-                    'color_badge' => 'bg-sky-50 text-sky-700 border-sky-300',
+                    'color_hex' => '#0d9488',
+                    'color_bg' => '#ccfbf1',
+                    'color_border' => '#5eead4',
+                    'color_text' => '#0f766e',
                 ],
                 [
                     'puesto' => 'Puesto 2',
                     'turno' => 'T',
                     'etiqueta' => 'PUESTO 2 - TARDE',
                     'icono' => 'heroicon-m-clock',
-                    'color_badge' => 'bg-amber-50 text-amber-700 border-amber-300',
+                    'color_hex' => '#db2777',
+                    'color_bg' => '#fce7f3',
+                    'color_border' => '#f472b6',
+                    'color_text' => '#be185d',
                 ],
                 [
                     'puesto' => 'Noche',
                     'turno' => 'N',
                     'etiqueta' => 'TURNO NOCHE',
                     'icono' => 'heroicon-m-moon',
-                    'color_badge' => 'bg-purple-50 text-purple-700 border-purple-300',
+                    'color_hex' => '#7c3aed',
+                    'color_bg' => '#f3e8ff',
+                    'color_border' => '#c084fc',
+                    'color_text' => '#6d28d9',
                 ],
             ];
         }
 
-        // Estaciones Diurnas (1, 3, 4): Solo Mañana y Tarde
+        // Estaciones Diurnas (1: Vistalegre, 3: Rodalabota, 4: Atenas)
         return [
             [
                 'puesto' => 'Puesto Único',
                 'turno' => 'M',
                 'etiqueta' => 'MAÑANA',
                 'icono' => 'heroicon-m-sun',
-                'color_badge' => 'bg-sky-50 text-sky-700 border-sky-300',
+                'color_hex' => '#0284c7',
+                'color_bg' => '#e0f2fe',
+                'color_border' => '#7dd3fc',
+                'color_text' => '#0369a1',
             ],
             [
                 'puesto' => 'Puesto Único',
                 'turno' => 'T',
                 'etiqueta' => 'TARDE',
                 'icono' => 'heroicon-m-clock',
-                'color_badge' => 'bg-amber-50 text-amber-700 border-amber-300',
+                'color_hex' => '#ea580c',
+                'color_bg' => '#ffedd5',
+                'color_border' => '#fdba74',
+                'color_text' => '#c2410c',
             ],
         ];
     }

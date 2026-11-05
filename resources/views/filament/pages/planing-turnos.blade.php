@@ -252,12 +252,18 @@
                             <tbody class="divide-y divide-gray-400 dark:divide-white/20">
                                 @foreach($this->filasTurnos as $fila)
                                     <tr>
-                                        {{-- Etiqueta del Turno (MAÑANA, TARDE, etc.) --}}
-                                        <td class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-white/5 uppercase text-xs tracking-wider">
-                                            {{ $fila['etiqueta'] }}
+                                        {{-- Etiqueta del Turno (MAÑANA, TARDE, etc.) con el color del turno --}}
+                                        <td
+                                            class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider"
+                                            style="background-color: {{ $fila['color_bg'] }}; color: {{ $fila['color_text'] }}; border-color: {{ $fila['color_border'] }};"
+                                        >
+                                            <div class="flex items-center justify-center gap-1.5">
+                                                <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5" style="color: {{ $fila['color_text'] }};" />
+                                                <span>{{ $fila['etiqueta'] }}</span>
+                                            </div>
                                         </td>
 
-                                        {{-- Celdas de los 7 Días --}}
+                                        {{-- Celdas de los 7 Días con el color dependiente del turno --}}
                                         @foreach($semana['dias'] as $dia)
                                             @if($dia['esMesActual'])
                                                 @php
@@ -265,18 +271,17 @@
                                                     $turnoReg = $this->turnosMap[$key] ?? null;
                                                     $empleado = $turnoReg?->empleado;
                                                     $esSustitucion = $turnoReg?->es_sustitucion;
-                                                    $color = $empleado?->color ?? '#64748b';
                                                 @endphp
 
                                                 <td
                                                     wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
-                                                    class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-95 dark:hover:brightness-110 font-black text-xs uppercase"
-                                                    style="{{ $empleado ? ('background-color: ' . $color . '35; color: #0f172a;') : '' }}"
+                                                    class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-90 dark:hover:brightness-110 font-black text-xs uppercase"
+                                                    style="{{ $empleado ? ('background-color: ' . $fila['color_bg'] . '; color: ' . $fila['color_text'] . '; border-color: ' . $fila['color_border'] . ';') : '' }}"
                                                     title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
                                                 >
                                                     @if($empleado)
-                                                        <div class="flex items-center justify-center gap-1 truncate dark:text-white">
-                                                            <span class="truncate font-black tracking-wide text-xs">
+                                                        <div class="flex items-center justify-center gap-1 truncate">
+                                                            <span class="truncate font-black tracking-wide text-xs" style="color: {{ $fila['color_text'] }};">
                                                                 {{ $empleado->nombre_corto }}
                                                             </span>
                                                             @if($esSustitucion)
@@ -430,34 +435,31 @@
             </x-filament::section>
         </div>
 
-        {{-- Leyenda de Empleados y Colores --}}
+        {{-- Leyenda de Turnos y Colores --}}
         <div class="lg:col-span-1">
             <x-filament::section>
                 <x-slot name="heading">
-                    Plantilla Asignada
+                    Leyenda de Turnos
                 </x-slot>
                 <x-slot name="description">
-                    Código de colores para reconocimiento inmediato.
+                    Código de colores asignado a cada turno de trabajo.
                 </x-slot>
 
                 <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                    @forelse($this->empleadosLegenda as $emp)
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200/60 dark:border-white/10">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs" style="background-color: {{ $emp->color }};"></span>
-                                <span class="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">
-                                    {{ $emp->nombre }} {{ $emp->apellidos }}
-                                </span>
+                    @foreach($this->filasTurnos as $fila)
+                        <div
+                            class="flex items-center justify-between p-2 rounded-lg border shadow-2xs font-bold text-xs"
+                            style="background-color: {{ $fila['color_bg'] }}; border-color: {{ $fila['color_border'] }}; color: {{ $fila['color_text'] }};"
+                        >
+                            <div class="flex items-center gap-2">
+                                <x-filament::icon :icon="$fila['icono']" class="w-4 h-4" />
+                                <span class="font-black uppercase tracking-tight">{{ $fila['etiqueta'] }}</span>
                             </div>
-                            <span class="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-medium shrink-0">
-                                {{ $emp->puesto ?? 'Expendedor' }}
+                            <span class="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-white/70 dark:bg-black/30">
+                                {{ $fila['turno'] }}
                             </span>
                         </div>
-                    @empty
-                        <div class="text-xs text-gray-400 italic py-2">
-                            Pulsa en "Generar Cuadrante 4x2" para visualizar el equipo.
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
             </x-filament::section>
         </div>
@@ -466,12 +468,12 @@
     {{-- 5. Modal de Asignación / Modificación de Turno --}}
     @if($mostrarModalTurno)
         <div class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl max-w-md w-full overflow-hidden transition-all">
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transition-all">
                 {{-- Encabezado Modal --}}
                 <div class="px-6 py-4 bg-gray-50 dark:bg-white/5 border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white">
-                            Asignación de Turno
+                            Asignación y Sustitución de Turno
                         </h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
                             {{ \Carbon\Carbon::parse($modalFecha)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
@@ -489,27 +491,37 @@
                 {{-- Cuerpo Modal --}}
                 <div class="p-6 space-y-4">
                     {{-- Información del Puesto y Turno --}}
-                    <div class="p-3 bg-primary-50/60 dark:bg-primary-950/30 rounded-xl border border-primary-200/60 dark:border-primary-800/40 flex items-center justify-between">
+                    @php
+                        $filaActual = collect($this->filasTurnos)->first(fn($f) => $f['puesto'] === $modalPuesto && $f['turno'] === $modalTurno);
+                        $bgTurno = $filaActual['color_bg'] ?? '#f0fdf4';
+                        $borderTurno = $filaActual['color_border'] ?? '#86efac';
+                        $textTurno = $filaActual['color_text'] ?? '#166534';
+                    @endphp
+
+                    <div
+                        class="p-3 rounded-xl border flex items-center justify-between shadow-xs font-bold"
+                        style="background-color: {{ $bgTurno }}; border-color: {{ $borderTurno }}; color: {{ $textTurno }};"
+                    >
                         <div>
-                            <div class="text-[10px] uppercase font-bold text-primary-600 dark:text-primary-400">Puesto</div>
-                            <div class="text-xs font-extrabold text-gray-900 dark:text-white">{{ $modalPuesto }}</div>
+                            <div class="text-[10px] uppercase font-bold opacity-80">Puesto</div>
+                            <div class="text-xs font-black">{{ $modalPuesto }}</div>
                         </div>
                         <div class="text-right">
-                            <div class="text-[10px] uppercase font-bold text-primary-600 dark:text-primary-400">Turno</div>
-                            <div class="text-xs font-extrabold text-gray-900 dark:text-white">
+                            <div class="text-[10px] uppercase font-bold opacity-80">Turno</div>
+                            <div class="text-xs font-black">
                                 {{ $modalTurno === 'M' ? 'Mañana' : ($modalTurno === 'T' ? 'Tarde' : 'Noche') }}
                             </div>
                         </div>
                     </div>
 
-                    {{-- Selector de Empleado --}}
+                    {{-- Selector de Empleado (wire:model.live para sincronización inmediata) --}}
                     <div>
                         <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
                             Empleado Asignado
                         </label>
                         <select
-                            wire:model="modalEmpleadoId"
-                            class="w-full text-xs bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                            wire:model.live="modalEmpleadoId"
+                            class="w-full text-xs bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500 font-bold"
                         >
                             <option value="">-- Sin asignar / Dejar libre --</option>
                             @foreach($this->empleadosDisponibles as $emp)
@@ -518,6 +530,55 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    {{-- Ámbito de la Modificación / Sustitución --}}
+                    <div class="space-y-2 pt-2 border-t border-gray-100 dark:border-white/5">
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300">
+                            Ámbito de la modificación
+                        </label>
+                        <div class="space-y-1.5">
+                            <label class="flex items-start gap-2.5 p-2 rounded-lg border cursor-pointer transition text-xs {{ $modalAlcance === 'puntual' ? 'bg-primary-50/50 border-primary-500 dark:bg-primary-950/20' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                                <input
+                                    type="radio"
+                                    wire:model.live="modalAlcance"
+                                    value="puntual"
+                                    class="mt-0.5 text-primary-600 focus:ring-primary-500"
+                                />
+                                <div>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200">Solo este día puntual</span>
+                                    <p class="text-[10.5px] text-gray-500 dark:text-gray-400">Modifica exclusivamente el turno de esta fecha.</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-2.5 p-2 rounded-lg border cursor-pointer transition text-xs {{ $modalAlcance === 'en_adelante' ? 'bg-amber-50 border-amber-500 dark:bg-amber-950/30' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                                <input
+                                    type="radio"
+                                    wire:model.live="modalAlcance"
+                                    value="en_adelante"
+                                    class="mt-0.5 text-amber-600 focus:ring-amber-500"
+                                />
+                                <div>
+                                    <span class="font-black text-amber-900 dark:text-amber-300">Sustitución permanente (desde esta fecha en adelante)</span>
+                                    <p class="text-[10.5px] text-amber-700 dark:text-amber-400">
+                                        Reemplaza automáticamente todos los turnos del titular desde el {{ \Carbon\Carbon::parse($modalFecha)->isoFormat('D [de] MMMM') }} hasta fin de mes.
+                                    </p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start gap-2.5 p-2 rounded-lg border cursor-pointer transition text-xs {{ $modalAlcance === 'todo_el_mes' ? 'bg-primary-50/50 border-primary-500 dark:bg-primary-950/20' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                                <input
+                                    type="radio"
+                                    wire:model.live="modalAlcance"
+                                    value="todo_el_mes"
+                                    class="mt-0.5 text-primary-600 focus:ring-primary-500"
+                                />
+                                <div>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200">Reemplazar en todo el mes completo</span>
+                                    <p class="text-[10.5px] text-gray-500 dark:text-gray-400">Reemplaza al titular en todos los turnos que tuviera en este mes.</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
 
                     {{-- Checkbox Sustitución --}}
@@ -529,23 +590,24 @@
                                 class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             />
                             <span class="text-xs font-bold text-gray-700 dark:text-gray-300">
-                                Es una sustitución o suplencia
+                                Marcar explícitamente como sustitución / suplencia
                             </span>
                         </label>
                     </div>
 
                     {{-- Campos condicionales de sustitución --}}
-                    @if($modalEsSustitucion)
+                    @if($modalEsSustitucion || $modalAlcance === 'en_adelante')
                         <div class="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800/40 space-y-3">
                             <div>
                                 <label class="block text-[11px] font-bold text-amber-900 dark:text-amber-200 mb-1">
                                     Motivo de la sustitución
                                 </label>
                                 <select
-                                    wire:model="modalMotivo"
+                                    wire:model.live="modalMotivo"
                                     class="w-full text-xs bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 rounded-lg p-2 text-gray-900 dark:text-white focus:ring-amber-500 focus:border-amber-500"
                                 >
                                     <option value="">-- Seleccionar motivo --</option>
+                                    <option value="Sustitución permanente">Sustitución permanente</option>
                                     <option value="Vacaciones">Vacaciones</option>
                                     <option value="Baja médica">Baja médica / IT</option>
                                     <option value="Permiso">Permiso retribuido</option>
@@ -557,7 +619,7 @@
 
                             @if($modalTitularNombre)
                                 <div class="text-[11px] text-amber-800 dark:text-amber-300 font-medium">
-                                    <strong>Titular teórico:</strong> {{ $modalTitularNombre }}
+                                    <strong>Titular teórico reemplazado:</strong> {{ $modalTitularNombre }}
                                 </div>
                             @endif
                         </div>
@@ -585,27 +647,29 @@
                                 type="button"
                                 wire:click="borrarAsignacionModal"
                                 wire:confirm="¿Seguro que deseas eliminar esta asignación del cuadrante?"
-                                class="px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-semibold transition"
+                                class="px-3.5 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-bold transition border border-transparent hover:border-red-200"
                             >
                                 Borrar Asignación
                             </button>
                         @endif
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2.5">
                         <button
                             type="button"
                             wire:click="cerrarModal"
-                            class="px-3.5 py-2 rounded-lg bg-gray-200/80 hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 font-semibold text-xs transition"
+                            class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-300 font-bold text-xs transition"
                         >
                             Cancelar
                         </button>
                         <button
                             type="button"
                             wire:click="guardarTurnoModal"
-                            class="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs transition shadow-sm"
+                            class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-white font-black text-xs transition shadow-md hover:brightness-110 active:brightness-95 cursor-pointer"
+                            style="background-color: #059669 !important; color: #ffffff !important;"
                         >
-                            Guardar Turno
+                            <x-filament::icon icon="heroicon-m-check" class="w-4 h-4 text-white" />
+                            <span>Guardar Asignación</span>
                         </button>
                     </div>
                 </div>
