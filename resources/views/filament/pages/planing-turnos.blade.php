@@ -124,16 +124,6 @@
         <div class="flex items-center gap-2.5">
             <button
                 type="button"
-                wire:click="generarCuadrante"
-                wire:confirm="¿Deseas calcular o rellenar la rotación teórica 4x2 para este mes? Los turnos manuales y sustituciones existentes se respetarán."
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition shadow-sm"
-            >
-                <x-filament::icon icon="heroicon-m-arrow-path" class="w-4 h-4" />
-                <span>Generar Cuadrante 4x2</span>
-            </button>
-
-            <button
-                type="button"
                 wire:click="exportarPdf"
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-xs transition shadow-sm"
             >

@@ -42,6 +42,11 @@ Schedule::call(function () {
 Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 1, '04:00');
 Schedule::command('app:sync-feria-utrera-dates')->yearlyOn(8, 20, '04:00');
 
+// ── Generación Automática de Cuadrantes de Turnos (Horizonte 12 meses) ───────
+// Mantiene siempre calculados los turnos rotativos 4x2 para los próximos 12 meses
+// en todas las estaciones con empleados activos. Se ejecuta a diario a las 03:00.
+Schedule::command('planing:generar-cuadrantes')->dailyAt('03:00');
+
 // ?? Comando de Prueba / Simulaci?n de Alertas de Competencia ??????????????????
 Artisan::command('minetur:test-alert {--clear : Limpiar alertas existentes}', function () {
     $service = app(\App\Services\MineturService::class);

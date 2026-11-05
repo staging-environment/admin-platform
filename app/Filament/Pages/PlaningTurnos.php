@@ -105,6 +105,9 @@ class PlaningTurnos extends Page
         $this->mes = (int) now()->format('n');
 
         $this->cargarObservaciones();
+
+        // Asegurar que la estación activa tenga su horizonte de 12 meses calculado automáticamente
+        app(PlaningTurnosService::class)->asegurarHorizonte12Meses($this->gasolineraCodigo, 12, false);
     }
 
     public function cambiarVista(string $nuevaVista): void
@@ -116,6 +119,9 @@ class PlaningTurnos extends Page
     {
         $this->gasolineraCodigo = $codigo;
         $this->cargarObservaciones();
+
+        // Asegurar que la estación seleccionada tenga su horizonte de 12 meses calculado
+        app(PlaningTurnosService::class)->asegurarHorizonte12Meses($codigo, 12, false);
     }
 
     public function updatedAnio(): void
@@ -520,10 +526,20 @@ class PlaningTurnos extends Page
 
     public function getTurnosMapProperty(): array
     {
+        $service = app(PlaningTurnosService::class);
+
         $cuadrante = PlaningCuadrante::where('gasolinera_codigo', $this->gasolineraCodigo)
             ->where('anio', $this->anio)
             ->where('mes', $this->mes)
             ->first();
+
+        if (!$cuadrante) {
+            $service->asegurarCuadranteMes($this->gasolineraCodigo, $this->anio, $this->mes, false);
+            $cuadrante = PlaningCuadrante::where('gasolinera_codigo', $this->gasolineraCodigo)
+                ->where('anio', $this->anio)
+                ->where('mes', $this->mes)
+                ->first();
+        }
 
         if (!$cuadrante) {
             return [];
@@ -532,6 +548,13 @@ class PlaningTurnos extends Page
         $turnos = PlaningTurno::with(['empleado', 'empleadoTitular'])
             ->where('planing_cuadrante_id', $cuadrante->id)
             ->get();
+
+        if ($turnos->isEmpty() && $service->tieneEmpleados($this->gasolineraCodigo)) {
+            $service->generarCuadranteTeorico($this->gasolineraCodigo, $this->anio, $this->mes, false);
+            $turnos = PlaningTurno::with(['empleado', 'empleadoTitular'])
+                ->where('planing_cuadrante_id', $cuadrante->id)
+                ->get();
+        }
 
         $map = [];
         foreach ($turnos as $t) {

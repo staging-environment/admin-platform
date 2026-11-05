@@ -214,13 +214,13 @@ class PlaningTurnosService
 
                     // Puesto 1 (M y T)
                     $turnosP1 = $this->calcularTurnosDia4x2($diaIndice, $equipoPuesto1);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'M', $turnosP1['M']?->id);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'T', $turnosP1['T']?->id);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'M', $turnosP1['M']?->id, $sobrescribir);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'T', $turnosP1['T']?->id, $sobrescribir);
 
                     // Puesto 2 (M y T) - desfase de 2 días para no sincronizar exactamente con Puesto 1
                     $turnosP2 = $this->calcularTurnosDia4x2($diaIndice + 2, $equipoPuesto2);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'M', $turnosP2['M']?->id);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'T', $turnosP2['T']?->id);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'M', $turnosP2['M']?->id, $sobrescribir);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'T', $turnosP2['T']?->id, $sobrescribir);
 
                     // Turno Noche (N) - Alternancia entre 2 personas
                     $empNoche = null;
@@ -228,7 +228,7 @@ class PlaningTurnosService
                         $idxNoche = (int) floor($diaIndice / 2) % count($equipoNoche);
                         $empNoche = $equipoNoche[$idxNoche] ?? $equipoNoche[0];
                     }
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Noche', 'N', $empNoche?->id);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Noche', 'N', $empNoche?->id, $sobrescribir);
 
                     $turnosInsertados += 5;
                 }
@@ -243,10 +243,10 @@ class PlaningTurnosService
                     $turnosDia = $this->calcularTurnosDia4x2($diaIndice, $equipo);
 
                     // Turno Mañana
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'M', $turnosDia['M']?->id);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'M', $turnosDia['M']?->id, $sobrescribir);
 
                     // Turno Tarde
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'T', $turnosDia['T']?->id);
+                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'T', $turnosDia['T']?->id, $sobrescribir);
 
                     $turnosInsertados += 2;
                 }
@@ -259,7 +259,7 @@ class PlaningTurnosService
     /**
      * Guarda un turno teórico en el cuadrante si no existe ya una sustitución manual
      */
-    protected function guardarTurnoTeorico(int $cuadranteId, string $fecha, string $puesto, string $turno, ?int $empleadoId): void
+    protected function guardarTurnoTeorico(int $cuadranteId, string $fecha, string $puesto, string $turno, ?int $empleadoId, bool $sobrescribir = true): void
     {
         $existente = PlaningTurno::where('planing_cuadrante_id', $cuadranteId)
             ->where('fecha', $fecha)
@@ -268,6 +268,10 @@ class PlaningTurnosService
             ->first();
 
         if ($existente) {
+            if (!$sobrescribir) {
+                return;
+            }
+
             // Si ya existe y es sustitución manual, no sobrescribimos el trabajador real, solo el titular
             if ($existente->es_sustitucion) {
                 $existente->empleado_titular_id = $empleadoId;
@@ -288,6 +292,104 @@ class PlaningTurnosService
                 'es_sustitucion' => false,
             ]);
         }
+    }
+
+    /**
+     * Comprueba si una estación tiene empleados activos asignados para poder rotar
+     */
+    public function tieneEmpleados(int $gasolineraCodigo): bool
+    {
+        return $this->getEmpleadosEstacion($gasolineraCodigo)->count() > 0;
+    }
+
+    /**
+     * Asegura que exista el cuadrante del mes y tenga turnos generados si la estación tiene empleados.
+     */
+    public function asegurarCuadranteMes(int $gasolineraCodigo, int $anio, int $mes, bool $sobrescribir = false): int
+    {
+        if (!$this->tieneEmpleados($gasolineraCodigo)) {
+            return 0;
+        }
+
+        $cuadrante = $this->obtenerOCrearCuadrante($gasolineraCodigo, $anio, $mes);
+        $turnosCount = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)->count();
+
+        if ($turnosCount === 0 || $sobrescribir) {
+            return $this->generarCuadranteTeorico($gasolineraCodigo, $anio, $mes, $sobrescribir);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Genera automáticamente los cuadrantes para los próximos X meses (por defecto 12)
+     * a partir del mes actual para todas las gasolineras con empleados (o una específica).
+     *
+     * @param int|null $gasolineraCodigo Código de la gasolinera (1, 2, 3, 4) o null para todas
+     * @param int $meses Cantidad de meses hacia adelante desde el mes actual (rolling 12-month)
+     * @param bool $sobrescribir Si se deben regenerar meses que ya contengan turnos
+     * @return array Resumen de operaciones realizadas
+     */
+    public function asegurarHorizonte12Meses(?int $gasolineraCodigo = null, int $meses = 12, bool $sobrescribir = false): array
+    {
+        $estaciones = $gasolineraCodigo ? [$gasolineraCodigo] : [1, 2, 3, 4];
+        $mesActual = Carbon::now()->startOfMonth();
+        $resultado = [
+            'total_meses_generados' => 0,
+            'total_turnos_generados' => 0,
+            'estaciones' => [],
+        ];
+
+        foreach ($estaciones as $codigo) {
+            $nombreEstacion = match ($codigo) {
+                1 => 'Vistalegre',
+                2 => 'Ronda Norte',
+                3 => 'Rodalabota',
+                4 => 'Atenas',
+                default => "Estación #{$codigo}",
+            };
+
+            $empleados = $this->getEmpleadosEstacion($codigo);
+            if ($empleados->isEmpty()) {
+                $resultado['estaciones'][$codigo] = [
+                    'nombre' => $nombreEstacion,
+                    'estado' => 'sin_empleados',
+                    'mensaje' => 'Omitido: sin empleados asignados',
+                    'meses_procesados' => 0,
+                ];
+                continue;
+            }
+
+            $mesesGenerados = 0;
+            $turnosGeneradosEstacion = 0;
+
+            for ($i = 0; $i < $meses; $i++) {
+                $fechaCursor = $mesActual->copy()->addMonths($i);
+                $anio = (int) $fechaCursor->format('Y');
+                $mes = (int) $fechaCursor->format('n');
+
+                $cuadrante = $this->obtenerOCrearCuadrante($codigo, $anio, $mes);
+                $turnosCount = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)->count();
+
+                if ($turnosCount === 0 || $sobrescribir) {
+                    $insertados = $this->generarCuadranteTeorico($codigo, $anio, $mes, $sobrescribir);
+                    $mesesGenerados++;
+                    $turnosGeneradosEstacion += $insertados;
+                }
+            }
+
+            $resultado['total_meses_generados'] += $mesesGenerados;
+            $resultado['total_turnos_generados'] += $turnosGeneradosEstacion;
+            $resultado['estaciones'][$codigo] = [
+                'nombre' => $nombreEstacion,
+                'estado' => 'ok',
+                'empleados_activos' => $empleados->count(),
+                'meses_generados' => $mesesGenerados,
+                'turnos_generados' => $turnosGeneradosEstacion,
+            ];
+        }
+
+        return $resultado;
     }
 
     /**
