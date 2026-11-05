@@ -66,6 +66,27 @@ class Empleado extends Model
         return $palette[($this->id ?? 1) % count($palette)];
     }
 
+    public function getNombreCortoAttribute(): string
+    {
+        $nombre = trim($this->nombre);
+        $partes = preg_split('/\s+/', $nombre);
+
+        if (count($partes) >= 2) {
+            $p0 = mb_strtoupper($partes[0]);
+            $p1 = mb_strtoupper($partes[1]);
+
+            if (in_array($p0, ['ANTONIO', 'ANT.', 'ANT'])) {
+                return 'ANT. ' . $p1;
+            }
+            if (in_array($p0, ['MIGUEL', 'JOSE', 'JUAN', 'MARI', 'MARIA'])) {
+                return $p0 . ' ' . $p1;
+            }
+            return $p0;
+        }
+
+        return mb_strtoupper($nombre);
+    }
+
 
     protected static function booted()
     {
