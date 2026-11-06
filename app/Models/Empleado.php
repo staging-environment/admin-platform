@@ -47,9 +47,9 @@ class Empleado extends Model
         $nombreCompleto = mb_strtolower(trim($this->nombre . ' ' . ($this->apellidos ?? '')));
 
         // 1. Asignaciones 100% individuales y únicas (cada trabajador tiene su color exclusivo)
-        // RONDA NORTE
-        if ($id === 93 || (str_contains($nombreCompleto, 'romero') && str_contains($nombreCompleto, 'martin'))) {
-            // Romero (Ronda Norte Noche): Amarillo puro brillante según Excel oficial
+        // RONDA NORTE & VISTALEGRE
+        if ($id === 93 || $id === 84 || (str_contains($nombreCompleto, 'romero') && !str_contains($nombreCompleto, 'zambrano'))) {
+            // Romero (Antonio Romero / Antonio Jesús Rodríguez Romero): Amarillo puro brillante según Excel oficial
             return [
                 'bg' => '#ffff00',
                 'text' => '#1f2937',
@@ -139,16 +139,6 @@ class Empleado extends Model
         }
 
         // VISTALEGRE
-        if ($id === 84 || (str_contains($nombreCompleto, 'antonio jesus') && str_contains($nombreCompleto, 'rodriguez'))) {
-            // Ant. Jesús (Vistalegre): Verde lima fresco (diferenciado de Carvajal e Israel)
-            return [
-                'bg' => '#bef264',
-                'text' => '#365314',
-                'border' => '#84cc16',
-                'color' => '#65a30d',
-            ];
-        }
-
         if ($id === 95 || str_contains($nombreCompleto, 'felisa')) {
             // Felisa Díaz (Vistalegre): Rosa chicle pastel (diferenciado del salmón de Laura)
             return [
@@ -292,13 +282,10 @@ class Empleado extends Model
         $nombreCompleto = mb_strtoupper($nombre . ' ' . $apellidos);
 
         // Identificación inequívoca por ID o nombre específico
-        if ($id === 84 || str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
-            return 'ANT. JESUS';
-        }
         if ($id === 87 || str_contains($nombreCompleto, 'ZAMBRANO')) {
             return 'ZAMBRANO';
         }
-        if ($id === 93 || (str_contains($nombreCompleto, 'ROMERO') && str_contains($nombreCompleto, 'MARTIN'))) {
+        if ($id === 93 || $id === 84 || str_contains($nombreCompleto, 'ROMERO')) {
             return 'ROMERO';
         }
         if ($id === 71 || str_contains($nombreCompleto, 'CARVAJAL')) {

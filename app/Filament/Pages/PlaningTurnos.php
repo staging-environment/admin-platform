@@ -495,7 +495,7 @@ class PlaningTurnos extends Page
                 'Puesto 2' => [
                     'id' => 'Puesto 2',
                     'nombre' => 'Puesto 2 (Empleado 2)',
-                    'subtitulo' => 'Turnos: Mañana, Tarde y Noche',
+                    'subtitulo' => 'Turnos: Mañana y Tarde',
                     'icono' => 'heroicon-m-user-group',
                     'color_badge' => 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
                     'filas' => [
@@ -515,16 +515,6 @@ class PlaningTurnos extends Page
                             'etiqueta' => 'TARDE',
                             'icono' => 'heroicon-m-clock',
                             'color_hex' => '#db2777',
-                            'color_bg' => '#f8fafc',
-                            'color_border' => '#cbd5e1',
-                            'color_text' => '#1e293b',
-                        ],
-                        [
-                            'puesto' => 'Noche',
-                            'turno' => 'N',
-                            'etiqueta' => 'TURNO NOCHE',
-                            'icono' => 'heroicon-m-moon',
-                            'color_hex' => '#7c3aed',
                             'color_bg' => '#f8fafc',
                             'color_border' => '#cbd5e1',
                             'color_text' => '#1e293b',
