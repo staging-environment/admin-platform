@@ -129,9 +129,18 @@ class PlaningTurnosService
             return $equipo ?: $empleados->take(3)->values()->all();
         }
 
-        if ($gasolineraCodigo === 3) { // Rodalabota
-            $equipo = $this->buscarPorNombres($empleados, ['Marrufo', 'Borja', 'Emilio']);
-            return $equipo ?: $empleados->take(3)->values()->all();
+        if ($gasolineraCodigo === 3) { // Rodalabota - Rotación oficial 4x2: Marrufo (0), Emilio (1), Borja (2)
+            $empMarrufo = Empleado::where('apellidos', 'like', '%MARRUFO%')->first();
+            $empEmilio  = Empleado::where('nombre', 'like', '%EMILIO%')->first();
+            $empBorja   = Empleado::where('nombre', 'like', '%BORJA%')->first();
+
+            $equipo = array_filter([$empMarrufo, $empEmilio, $empBorja]);
+            if (count($equipo) === 3) {
+                return array_values($equipo);
+            }
+
+            return $this->buscarPorNombres($empleados, ['Marrufo', 'Emilio', 'Borja'])
+                ?: $empleados->take(3)->values()->all();
         }
 
         if ($gasolineraCodigo === 4) { // Atenas

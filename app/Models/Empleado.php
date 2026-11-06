@@ -171,32 +171,32 @@ class Empleado extends Model
 
         // RODALABOTA
         if ($id === 79 || str_contains($nombreCompleto, 'marrufo')) {
-            // Antonio Marrufo (Rodalabota): Azul zafiro suave
+            // Antonio Marrufo (Rodalabota): Verde claro según Excel oficial
             return [
-                'bg' => '#60a5fa',
-                'text' => '#1e3a8a',
-                'border' => '#2563eb',
-                'color' => '#3b82f6',
+                'bg' => '#92d050',
+                'text' => '#1f2937',
+                'border' => '#65a30d',
+                'color' => '#84cc16',
             ];
         }
 
         if ($id === 68 || str_contains($nombreCompleto, 'borja')) {
-            // Borja Jesús (Rodalabota): Lila violeta claro
+            // Borja Jesús (Rodalabota): Azul suave según Excel oficial
             return [
-                'bg' => '#c084fc',
-                'text' => '#4c1d95',
-                'border' => '#9333ea',
-                'color' => '#a855f7',
+                'bg' => '#5b9bd5',
+                'text' => '#ffffff',
+                'border' => '#2c5b94',
+                'color' => '#4472c4',
             ];
         }
 
         if ($id === 76 || str_contains($nombreCompleto, 'emilio')) {
-            // Emilio González (Rodalabota): Verde menta brillante
+            // Emilio González (Rodalabota): Naranja cálido según Excel oficial
             return [
-                'bg' => '#4ade80',
-                'text' => '#14532d',
-                'border' => '#16a34a',
-                'color' => '#22c55e',
+                'bg' => '#ed7d31',
+                'text' => '#ffffff',
+                'border' => '#c65911',
+                'color' => '#ed7d31',
             ];
         }
 
