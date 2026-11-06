@@ -47,7 +47,7 @@ class Empleado extends Model
 
         // 1. Asignaciones directas del cuadrante oficial de gasolineras
         if (str_contains($nombreCompleto, 'sergio')) {
-            // Sergio (Ronda Norte): Rojo intenso con texto blanco
+            // Sergio (Ronda Norte P2): Rojo intenso con texto blanco
             return [
                 'bg' => '#ef4444',
                 'text' => '#ffffff',
@@ -57,7 +57,7 @@ class Empleado extends Model
         }
 
         if (str_contains($nombreCompleto, 'laura') || str_contains($nombreCompleto, 'felisa')) {
-            // Laura (Ronda Norte) y Felisa (Vistalegre): Rosa salmón pastel con texto oscuro
+            // Laura (Ronda Norte P2) y Felisa (Vistalegre): Rosa salmón pastel con texto oscuro
             return [
                 'bg' => '#f8cbad',
                 'text' => '#1f2937',
@@ -66,8 +66,8 @@ class Empleado extends Model
             ];
         }
 
-        if (str_contains($nombreCompleto, 'israel') || str_contains($nombreCompleto, 'antonio jesus') || str_contains($nombreCompleto, 'arcos')) {
-            // Israel (Ronda Norte) y Ant. Jesús (Vistalegre): Verde claro pastel con texto oscuro
+        if (str_contains($nombreCompleto, 'israel') || str_contains($nombreCompleto, 'carvajal') || str_contains($nombreCompleto, 'antonio jesus')) {
+            // Israel (Ronda Norte P2), Carvajal (Ronda Norte P1) y Ant. Jesús (Vistalegre): Verde claro pastel
             return [
                 'bg' => '#a9d08e',
                 'text' => '#1f2937',
@@ -76,8 +76,8 @@ class Empleado extends Model
             ];
         }
 
-        if (str_contains($nombreCompleto, 'consolacion') || str_contains($nombreCompleto, 'blanquero') || str_contains($nombreCompleto, 'miguel angel')) {
-            // Conso y Miguel Ángel (Vistalegre): Naranja con texto oscuro
+        if (str_contains($nombreCompleto, 'arcos') || str_contains($nombreCompleto, 'consolacion') || str_contains($nombreCompleto, 'blanquero') || str_contains($nombreCompleto, 'miguel angel')) {
+            // Jesús Arcos (Ronda Norte P1), Conso y Miguel Ángel (Vistalegre): Naranja cálido
             return [
                 'bg' => '#ed7d31',
                 'text' => '#1f2937',
@@ -86,53 +86,43 @@ class Empleado extends Model
             ];
         }
 
-        if (str_contains($nombreCompleto, 'carvajal')) {
-            // Antonio Carvajal (Ronda Norte Puesto 1): Azul cielo suave
+        if (str_contains($nombreCompleto, 'prieto') || str_contains($nombreCompleto, 'carmen')) {
+            // Mari Carmen Prieto (Ronda Norte P1): Azul cielo suave según Excel oficial
             return [
-                'bg' => '#93c5fd',
-                'text' => '#1e3a8a',
-                'border' => '#60a5fa',
-                'color' => '#3b82f6',
+                'bg' => '#8ea9db',
+                'text' => '#1f2937',
+                'border' => '#4472c4',
+                'color' => '#5b9bd5',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'campos')) {
-            // Antonio Campos (Ronda Norte Puesto 1): Amarillo ámbar cálido
+        if (str_contains($nombreCompleto, 'acaiña') || str_contains($nombreCompleto, 'francisco')) {
+            // Fran (Ronda Norte Turno Noche): Púrpura intenso con texto blanco según Excel oficial
             return [
-                'bg' => '#fde047',
-                'text' => '#713f12',
+                'bg' => '#7030a0',
+                'text' => '#ffffff',
+                'border' => '#59267c',
+                'color' => '#7030a0',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'romero')) {
+            // Antonio Romero (Ronda Norte Turno Noche): Amarillo brillante según Excel oficial
+            return [
+                'bg' => '#ffff00',
+                'text' => '#1f2937',
                 'border' => '#eab308',
                 'color' => '#eab308',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'prieto') || str_contains($nombreCompleto, 'carmen')) {
-            // Mari Carmen Prieto (Ronda Norte Puesto 1): Violeta pastel
+        if (str_contains($nombreCompleto, 'campos')) {
+            // Antonio Campos: Amarillo ámbar cálido
             return [
-                'bg' => '#d8b4fe',
-                'text' => '#581c87',
-                'border' => '#c084fc',
-                'color' => '#a855f7',
-            ];
-        }
-
-        if (str_contains($nombreCompleto, 'acaiña') || str_contains($nombreCompleto, 'francisco')) {
-            // Francisco (Ronda Norte Turno Noche): Índigo
-            return [
-                'bg' => '#818cf8',
-                'text' => '#ffffff',
-                'border' => '#4f46e5',
-                'color' => '#6366f1',
-            ];
-        }
-
-        if (str_contains($nombreCompleto, 'romero')) {
-            // Antonio Romero (Ronda Norte Turno Noche): Turquesa
-            return [
-                'bg' => '#5eead4',
-                'text' => '#134e4a',
-                'border' => '#14b8a6',
-                'color' => '#0d9488',
+                'bg' => '#fde047',
+                'text' => '#713f12',
+                'border' => '#eab308',
+                'color' => '#eab308',
             ];
         }
 
@@ -195,6 +185,15 @@ class Empleado extends Model
         if (str_contains($nombreCompleto, 'ROMERO')) {
             return 'ROMERO';
         }
+        if (str_contains($nombreCompleto, 'ACAIÑA') || str_contains($nombreCompleto, 'FRANCISCO')) {
+            return 'FRAN';
+        }
+        if (str_contains($nombreCompleto, 'PRIETO') || str_contains($nombreCompleto, 'MARI CARMEN') || str_contains($nombreCompleto, 'MARIA DEL CARMEN')) {
+            return 'MARI CRMEN';
+        }
+        if (str_contains($nombreCompleto, 'ARCOS') || (str_contains($nombreCompleto, 'JESUS') && !str_contains($nombreCompleto, 'ANTONIO JESUS') && !str_contains($nombreCompleto, 'BORJA'))) {
+            return 'JESUS';
+        }
         if (str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
             return 'ANT. JESUS';
         }
@@ -203,12 +202,6 @@ class Empleado extends Model
         }
         if (str_contains($nombreCompleto, 'MIGUEL ANGEL')) {
             return 'MIGUEL ANGEL';
-        }
-        if (str_contains($nombreCompleto, 'MARI CARMEN') || str_contains($nombreCompleto, 'MARIA DEL CARMEN')) {
-            return 'MARI CARMEN';
-        }
-        if (str_contains($nombreCompleto, 'ACAIÑA') || str_contains($nombreCompleto, 'FRANCISCO')) {
-            return 'FRANCISCO';
         }
 
         $partes = preg_split('/\s+/', $nombre);

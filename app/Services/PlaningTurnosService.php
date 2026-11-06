@@ -74,17 +74,47 @@ class PlaningTurnosService
         // Si la estación es Ronda Norte (Código 2) - 24 Horas
         if ($gasolineraCodigo === 2) {
             if ($linea === 'Puesto 1') {
-                return $this->buscarPorNombres($empleados, ['Carvajal', 'Campos', 'Prieto'])
-                    ?: $this->buscarPorNombres($empleados, ['Antonio Carvajal', 'Antonio Campos', 'Mari Carmen'])
+                // Equipo Puesto 1 oficial: Mari Carmen Prieto (0), Jesús Arcos (1), Antonio Carvajal (2)
+                $empMariCarmen = Empleado::where('nombre', 'like', '%CARMEN%')->where('apellidos', 'like', '%PRIETO%')->first();
+                $empJesus      = Empleado::where('nombre', 'like', '%JESUS%')->where('apellidos', 'like', '%ARCOS%')->first();
+                $empCarvajal   = Empleado::where('apellidos', 'like', '%CARVAJAL%')->first();
+
+                $equipo = array_filter([$empMariCarmen, $empJesus, $empCarvajal]);
+                if (count($equipo) === 3) {
+                    return array_values($equipo);
+                }
+
+                return $this->buscarPorNombres($empleados, ['Prieto', 'Arcos', 'Carvajal'])
                     ?: $empleados->slice(0, 3)->values()->all();
             }
+
             if ($linea === 'Puesto 2') {
+                // Equipo Puesto 2 oficial: Laura Linares (0), Israel Vega (1), Sergio Povea (2)
+                $empLaura  = Empleado::where('nombre', 'like', '%LAURA%')->first();
+                $empIsrael = Empleado::where('nombre', 'like', '%ISRAEL%')->first();
+                $empSergio = Empleado::where('nombre', 'like', '%SERGIO%')->first();
+
+                $equipo = array_filter([$empLaura, $empIsrael, $empSergio]);
+                if (count($equipo) === 3) {
+                    return array_values($equipo);
+                }
+
                 return $this->buscarPorNombres($empleados, ['Laura', 'Israel', 'Sergio'])
                     ?: $empleados->slice(3, 3)->values()->all();
             }
+
             if ($linea === 'Noche') {
+                // Turno Noche oficial: Francisco Acaiña (0), Antonio Romero (1)
+                $empFran   = Empleado::where('apellidos', 'like', '%ACAIÑA%')->first()
+                    ?: Empleado::where('nombre', 'like', '%FRANCISCO%')->first();
+                $empRomero = Empleado::where('apellidos', 'like', '%ROMERO%')->where('nombre', 'like', '%ANTONIO%')->first();
+
+                $equipo = array_filter([$empFran, $empRomero]);
+                if (count($equipo) === 2) {
+                    return array_values($equipo);
+                }
+
                 return $this->buscarPorNombres($empleados, ['Acaiña', 'Romero'])
-                    ?: $this->buscarPorNombres($empleados, ['Francisco', 'Romero'])
                     ?: $empleados->slice(6, 2)->values()->all();
             }
 
@@ -233,11 +263,19 @@ class PlaningTurnosService
                     $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'M', $turnosP2['M']?->id, $sobrescribir);
                     $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'T', $turnosP2['T']?->id, $sobrescribir);
 
-                    // Turno Noche (N) - Alternancia entre empleados de noche
+                    // Turno Noche (N) - Ciclo rotativo oficial de 6 días: 4 días Fran (0), 2 días Romero (1)
                     $empNoche = null;
-                    if (count($equipoNoche) > 0) {
-                        $idxNoche = (int) floor($diaIndice / 2) % count($equipoNoche);
-                        $empNoche = $equipoNoche[$idxNoche] ?? $equipoNoche[0];
+                    if (count($equipoNoche) >= 2) {
+                        $mod6 = $diaIndice % 6;
+                        if ($mod6 < 0) {
+                            $mod6 += 6;
+                        }
+                        // En 2026-11-01 (diaIndice = 311, mod6 = 5) -> Fran
+                        // En 2026-11-02 y 03 (mod6 = 0, 1) -> Romero
+                        // En 2026-11-04..07 (mod6 = 2..5) -> Fran
+                        $empNoche = ($mod6 === 0 || $mod6 === 1) ? $equipoNoche[1] : $equipoNoche[0];
+                    } elseif (count($equipoNoche) === 1) {
+                        $empNoche = $equipoNoche[0];
                     }
                     $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Noche', 'N', $empNoche?->id, $sobrescribir);
 
