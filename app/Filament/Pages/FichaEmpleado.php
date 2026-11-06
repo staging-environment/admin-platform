@@ -335,14 +335,64 @@ class FichaEmpleado extends Page
 
         $fichajes = $this->getTodosLosFichajesQuery()->get();
 
+        $porEmpleado = [];
+        $totalMinutosGlobal = 0;
+        $totalFichajesCompletosGlobal = 0;
+        $totalFichajesEnCursoGlobal = 0;
+
+        foreach ($fichajes as $f) {
+            $empId = $f->empleado_id ?? ($f->empleado->id ?? 0);
+            if (!isset($porEmpleado[$empId])) {
+                $porEmpleado[$empId] = [
+                    'empleado' => $f->empleado ?? null,
+                    'apellidos' => $f->empleado->apellidos ?? '',
+                    'nombre' => $f->empleado->nombre ?? '',
+                    'dni' => $f->empleado->dni ?? '',
+                    'ubicacion' => $f->empleado?->gasolinera?->Nombre ?? '—',
+                    'total_minutos' => 0,
+                    'fichajes_completos' => 0,
+                    'fichajes_en_curso' => 0,
+                    'total_fichajes' => 0,
+                ];
+            }
+
+            $porEmpleado[$empId]['total_fichajes']++;
+
+            if ($f->hora_entrada && $f->hora_salida) {
+                $diffMins = $f->minutos_trabajados ?? 0;
+                $porEmpleado[$empId]['total_minutos'] += $diffMins;
+                $porEmpleado[$empId]['fichajes_completos']++;
+                $totalMinutosGlobal += $diffMins;
+                $totalFichajesCompletosGlobal++;
+            } else {
+                $porEmpleado[$empId]['fichajes_en_curso']++;
+                $totalFichajesEnCursoGlobal++;
+            }
+        }
+
+        uasort($porEmpleado, function($a, $b) {
+            $cmp = strcmp($a['apellidos'], $b['apellidos']);
+            return $cmp === 0 ? strcmp($a['nombre'], $b['nombre']) : $cmp;
+        });
+
+        $isSingleEmployee = count($porEmpleado) === 1;
+        $singleEmpleado = $isSingleEmployee ? reset($porEmpleado) : null;
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.control-general-fichajes', [
             'fichajes' => $fichajes,
             'filterDateFrom' => $this->filterDateFrom,
             'filterDateTo' => $this->filterDateTo,
             'filterSearch' => $this->filterSearch,
+            'filterGasolineraNombre' => null,
             'sortField' => $this->sortField,
             'sortDirection' => $this->sortDirection,
             'generatedAt' => Carbon::now()->timezone('Europe/Madrid')->format('d/m/Y H:i'),
+            'desglosePorEmpleado' => $porEmpleado,
+            'totalMinutosGlobal' => $totalMinutosGlobal,
+            'totalFichajesCompletosGlobal' => $totalFichajesCompletosGlobal,
+            'totalFichajesEnCursoGlobal' => $totalFichajesEnCursoGlobal,
+            'isSingleEmployee' => $isSingleEmployee,
+            'singleEmpleado' => $singleEmpleado,
         ])->setPaper('a4', 'landscape');
 
         $filename = 'Control_General_Fichajes_' . Carbon::now()->format('Ymd_His') . '.pdf';
@@ -1146,6 +1196,14 @@ class FichaEmpleado extends Page
 
         $fecha = $this->retroactive_fecha;
 
+        $serverCheckoutAt = null;
+        if ($this->retroactive_hora_salida) {
+            $serverCheckoutAt = Carbon::parse($fecha . ' ' . $this->retroactive_hora_salida);
+            if ($this->retroactive_hora_salida < $this->retroactive_hora_entrada) {
+                $serverCheckoutAt->addDay();
+            }
+        }
+
         EmpleadoFichaje::updateOrCreate(
             [
                 'empleado_id' => $this->empleado->id,
@@ -1155,7 +1213,7 @@ class FichaEmpleado extends Page
                 'hora_entrada' => $this->retroactive_hora_entrada,
                 'hora_salida' => $this->retroactive_hora_salida,
                 'server_checkin_at' => Carbon::parse($fecha . ' ' . $this->retroactive_hora_entrada),
-                'server_checkout_at' => $this->retroactive_hora_salida ? Carbon::parse($fecha . ' ' . $this->retroactive_hora_salida) : null,
+                'server_checkout_at' => $serverCheckoutAt,
                 'is_retroactive' => true,
             ]
         );

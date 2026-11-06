@@ -396,20 +396,7 @@
                         @endif
                     </td>
                     <td style="text-align: right;" class="total-time">
-                        @php
-                            if ($fichaje->hora_entrada && $fichaje->hora_salida) {
-                                $fechaStr = $fichaje->fecha ? ($fichaje->fecha instanceof \Carbon\Carbon ? $fichaje->fecha->format('Y-m-d') : substr((string)$fichaje->fecha, 0, 10)) : '2000-01-01';
-                                $t1 = \Carbon\Carbon::parse($fechaStr . ' ' . substr((string)$fichaje->hora_entrada, 0, 5));
-                                $t2 = \Carbon\Carbon::parse($fechaStr . ' ' . substr((string)$fichaje->hora_salida, 0, 5));
-                                if ($t2->lessThan($t1)) {
-                                    $t2->addDay();
-                                }
-                                $diff = $t1->diff($t2);
-                                echo $diff->format('%hh %im');
-                            } else {
-                                echo '-';
-                            }
-                        @endphp
+                        {{ $fichaje->horas_trabajadas_formateadas }}
                     </td>
                 </tr>
             @empty

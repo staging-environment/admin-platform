@@ -254,16 +254,7 @@
                                     @endif
                                 </td>
                                 <td class="py-2 px-4 font-bold text-gray-700 dark:text-gray-300 text-xs">
-                                    @php
-                                        if ($fichaje->hora_salida) {
-                                            $t1 = \Carbon\Carbon::parse($fichaje->hora_entrada);
-                                            $t2 = \Carbon\Carbon::parse($fichaje->hora_salida);
-                                            $diff = $t1->diff($t2);
-                                            echo $diff->format('%h h %i m');
-                                        } else {
-                                            echo '-';
-                                        }
-                                    @endphp
+                                    {{ $fichaje->horas_trabajadas_formateadas }}
                                 </td>
                                 <td class="py-2 px-4 text-right">
                                     <a href="/admin/portal-empleado?empleado_id={{ $fichaje->empleado_id }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">

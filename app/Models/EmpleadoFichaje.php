@@ -27,6 +27,61 @@ class EmpleadoFichaje extends Model
     }
 
     /**
+     * Calcula los minutos totales trabajados en el turno.
+     * Si la hora de salida es menor que la de entrada (ej: turno nocturno que cruza la medianoche),
+     * o si el check-out del servidor se registró al día siguiente, computa el tiempo hasta el día siguiente.
+     */
+    public function getMinutosTrabajadosAttribute(): ?int
+    {
+        if (!$this->hora_entrada || !$this->hora_salida) {
+            return null;
+        }
+
+        $fechaStr = $this->fecha ? ($this->fecha instanceof Carbon ? $this->fecha->format('Y-m-d') : substr((string)$this->fecha, 0, 10)) : '2000-01-01';
+        $horaEntradaStr = substr((string)$this->hora_entrada, 0, 5);
+        $horaSalidaStr = substr((string)$this->hora_salida, 0, 5);
+
+        $t1 = Carbon::parse($fechaStr . ' ' . $horaEntradaStr, 'Europe/Madrid');
+        $t2 = Carbon::parse($fechaStr . ' ' . $horaSalidaStr, 'Europe/Madrid');
+
+        if ($t2->lessThan($t1)) {
+            $t2->addDay();
+        } elseif ($this->server_checkin_at && $this->server_checkout_at) {
+            $diffDays = $this->server_checkin_at->copy()->timezone('Europe/Madrid')->startOfDay()
+                ->diffInDays($this->server_checkout_at->copy()->timezone('Europe/Madrid')->startOfDay(), false);
+            if ($diffDays > 0) {
+                $t2->addDays($diffDays);
+            }
+        }
+
+        return (int) $t1->diffInMinutes($t2);
+    }
+
+    /**
+     * Devuelve el tiempo trabajado en formato legible (ej: '8h 29m').
+     */
+    public function getHorasTrabajadasFormateadasAttribute(): string
+    {
+        $mins = $this->minutos_trabajados;
+        if ($mins === null) {
+            return '-';
+        }
+
+        $hours = floor($mins / 60);
+        $remMins = $mins % 60;
+
+        return "{$hours}h {$remMins}m";
+    }
+
+    /**
+     * Alias de horas_trabajadas_formateadas.
+     */
+    public function getHorasTrabajadasAttribute(): string
+    {
+        return $this->horas_trabajadas_formateadas;
+    }
+
+    /**
      * Devuelve la lista de alertas si hay una discrepancia mayor a 5 minutos (300 seg)
      * entre la hora marcada por el empleado y la hora real capturada por el sistema.
      */

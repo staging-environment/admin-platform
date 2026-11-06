@@ -165,13 +165,7 @@ class ListadoFichajes extends Page
             $porEmpleado[$empId]['total_fichajes']++;
 
             if ($f->hora_entrada && $f->hora_salida) {
-                $fechaStr = $f->fecha ? ($f->fecha instanceof Carbon ? $f->fecha->format('Y-m-d') : substr((string)$f->fecha, 0, 10)) : '2000-01-01';
-                $t1 = Carbon::parse($fechaStr . ' ' . substr((string)$f->hora_entrada, 0, 5));
-                $t2 = Carbon::parse($fechaStr . ' ' . substr((string)$f->hora_salida, 0, 5));
-                if ($t2->lessThan($t1)) {
-                    $t2->addDay();
-                }
-                $diffMins = $t1->diffInMinutes($t2);
+                $diffMins = $f->minutos_trabajados ?? 0;
                 $porEmpleado[$empId]['total_minutos'] += $diffMins;
                 $porEmpleado[$empId]['fichajes_completos']++;
                 $totalMinutosGlobal += $diffMins;

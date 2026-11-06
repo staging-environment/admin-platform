@@ -423,18 +423,7 @@
                                         @endif
                                     </td>
                                     <td class="py-2 px-4 text-sm font-semibold text-amber-600 dark:text-amber-400">
-                                        @if($fichaje->hora_entrada && $fichaje->hora_salida)
-                                            @php
-                                                $in = \Carbon\Carbon::parse($fichaje->hora_entrada);
-                                                $out = \Carbon\Carbon::parse($fichaje->hora_salida);
-                                                $mins = $in->diffInMinutes($out);
-                                                $hours = floor($mins / 60);
-                                                $remMins = $mins % 60;
-                                                echo "{$hours}h {$remMins}m";
-                                            @endphp
-                                        @else
-                                            -
-                                        @endif
+                                        {{ $fichaje->horas_trabajadas_formateadas }}
                                     </td>
                                     <td class="py-2 px-4 text-sm text-right space-x-2">
                                         <button wire:click="editFichaje({{ $fichaje->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
