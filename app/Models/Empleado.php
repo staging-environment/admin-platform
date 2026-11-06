@@ -140,12 +140,12 @@ class Empleado extends Model
 
         // VISTALEGRE
         if ($id === 84 || str_contains($nombreCompleto, 'antonio jesus') || str_contains($nombreCompleto, 'ant. jesus')) {
-            // Ant. Jesús (Vistalegre): Verde claro pastel según Excel oficial
+            // Ant. Jesús (Vistalegre): Verde menta pastel distintivo (diferenciado de Carvajal)
             return [
-                'bg' => '#a9d08e',
-                'text' => '#1f2937',
-                'border' => '#689f38',
-                'color' => '#70ad47',
+                'bg' => '#86efac',
+                'text' => '#14532d',
+                'border' => '#22c55e',
+                'color' => '#16a34a',
             ];
         }
 

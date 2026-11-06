@@ -329,8 +329,13 @@ class PlaningTurnosService
 
                     $turnosDia = $this->calcularTurnosDia4x2($diaIndice, $equipo);
 
-                    // En Vistalegre, del 5 de noviembre en adelante, Consolación sustituye a Miguel Ángel según Excel oficial
-                    if ($gasolineraCodigo === 1 && $d >= 5 && $empConso && $empMiguelAngel) {
+                    // En Vistalegre, del 5 de noviembre en adelante de forma permanente, Consolación sustituye a Miguel Ángel según directriz oficial
+                    $esConsoActiva = ($gasolineraCodigo === 1 && $empConso && $empMiguelAngel) && (
+                        $anio > 2026 ||
+                        ($anio === 2026 && $mes > 11) ||
+                        ($anio === 2026 && $mes === 11 && $d >= 5)
+                    );
+                    if ($esConsoActiva) {
                         if ($turnosDia['M']?->id === $empMiguelAngel->id) {
                             $turnosDia['M'] = $empConso;
                         }
@@ -425,9 +430,10 @@ class PlaningTurnosService
      * @param int|null $gasolineraCodigo Código de la gasolinera (1, 2, 3, 4) o null para todas
      * @param int $meses Cantidad de meses hacia adelante desde el mes actual (rolling 12-month)
      * @param bool $sobrescribir Si se deben regenerar meses que ya contengan turnos
+     * @param bool $preservarMesActual Si se debe proteger el mes en curso contra sobrescrituras si ya tiene turnos
      * @return array Resumen de operaciones realizadas
      */
-    public function asegurarHorizonte12Meses(?int $gasolineraCodigo = null, int $meses = 12, bool $sobrescribir = false): array
+    public function asegurarHorizonte12Meses(?int $gasolineraCodigo = null, int $meses = 12, bool $sobrescribir = false, bool $preservarMesActual = true): array
     {
         $estaciones = $gasolineraCodigo ? [$gasolineraCodigo] : [1, 2, 3, 4];
         $mesActual = Carbon::now()->startOfMonth();
@@ -460,7 +466,7 @@ class PlaningTurnosService
             $mesesGenerados = 0;
             $turnosGeneradosEstacion = 0;
 
-            for ($i = 0; $i < $meses; $i++) {
+            for ($i = 0; $i <= $meses; $i++) {
                 $fechaCursor = $mesActual->copy()->addMonths($i);
                 $anio = (int) $fechaCursor->format('Y');
                 $mes = (int) $fechaCursor->format('n');
@@ -468,8 +474,11 @@ class PlaningTurnosService
                 $cuadrante = $this->obtenerOCrearCuadrante($codigo, $anio, $mes);
                 $turnosCount = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)->count();
 
-                if ($turnosCount === 0 || $sobrescribir) {
-                    $insertados = $this->generarCuadranteTeorico($codigo, $anio, $mes, $sobrescribir);
+                // Si es el mes en curso y se solicita preservar, no se sobrescribe si ya tiene turnos
+                $debeSobrescribir = $sobrescribir && !($i === 0 && $preservarMesActual && $turnosCount > 0);
+
+                if ($turnosCount === 0 || $debeSobrescribir) {
+                    $insertados = $this->generarCuadranteTeorico($codigo, $anio, $mes, $debeSobrescribir);
                     $mesesGenerados++;
                     $turnosGeneradosEstacion += $insertados;
                 }

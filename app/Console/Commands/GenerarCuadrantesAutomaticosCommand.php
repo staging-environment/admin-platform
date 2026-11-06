@@ -15,7 +15,8 @@ class GenerarCuadrantesAutomaticosCommand extends Command
     protected $signature = 'planing:generar-cuadrantes 
                             {--estacion= : Código específico de estación (1=Vistalegre, 2=Ronda Norte, 3=Rodalabota, 4=Atenas)}
                             {--meses=12 : Horizonte de meses a calcular hacia adelante desde el mes actual}
-                            {--force : Sobrescribir turnos ordinarios existentes (conserva sustituciones manuales)}';
+                            {--force : Sobrescribir turnos ordinarios existentes (conserva sustituciones manuales)}
+                            {--incluir-actual : Sobrescribir también el mes en curso si se usa --force}';
 
     /**
      * The console command description.
@@ -32,10 +33,11 @@ class GenerarCuadrantesAutomaticosCommand extends Command
         $estacion = $this->option('estacion') ? (int) $this->option('estacion') : null;
         $meses = max(1, (int) ($this->option('meses') ?: 12));
         $force = (bool) $this->option('force');
+        $preservarActual = ! (bool) $this->option('incluir-actual');
 
-        $this->info("Iniciando generación automática de cuadrantes (Horizonte: {$meses} meses, Forzar: " . ($force ? 'Sí' : 'No') . ")...");
+        $this->info("Iniciando generación automática de cuadrantes (Horizonte: {$meses} meses, Forzar: " . ($force ? 'Sí' : 'No') . ", Preservar Mes Actual: " . ($preservarActual ? 'Sí' : 'No') . ")...");
 
-        $resultado = $service->asegurarHorizonte12Meses($estacion, $meses, $force);
+        $resultado = $service->asegurarHorizonte12Meses($estacion, $meses, $force, $preservarActual);
 
         $filasTabla = [];
         foreach ($resultado['estaciones'] as $codigo => $info) {
