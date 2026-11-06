@@ -128,7 +128,7 @@ class PlaningTurnos extends Page
 
     public function setFiltroPuesto(string $puesto): void
     {
-        $this->filtroPuestoRonda = in_array($puesto, ['todos', 'Puesto 1', 'Puesto 2', 'Noche']) ? $puesto : 'todos';
+        $this->filtroPuestoRonda = in_array($puesto, ['todos', 'Puesto 1', 'Puesto 2']) ? $puesto : 'todos';
     }
 
     public function updatedAnio(): void
@@ -456,7 +456,7 @@ class PlaningTurnos extends Page
                 'Puesto 1' => [
                     'id' => 'Puesto 1',
                     'nombre' => 'Puesto 1 (Empleado 1)',
-                    'subtitulo' => 'Turnos Diurnos: Mañana y Tarde',
+                    'subtitulo' => 'Turnos: Mañana, Tarde y Noche',
                     'icono' => 'heroicon-m-user',
                     'color_badge' => 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
                     'filas' => [
@@ -480,12 +480,22 @@ class PlaningTurnos extends Page
                             'color_border' => '#cbd5e1',
                             'color_text' => '#1e293b',
                         ],
+                        [
+                            'puesto' => 'Noche',
+                            'turno' => 'N',
+                            'etiqueta' => 'TURNO NOCHE',
+                            'icono' => 'heroicon-m-moon',
+                            'color_hex' => '#7c3aed',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
                     ],
                 ],
                 'Puesto 2' => [
                     'id' => 'Puesto 2',
                     'nombre' => 'Puesto 2 (Empleado 2)',
-                    'subtitulo' => 'Turnos Diurnos: Mañana y Tarde',
+                    'subtitulo' => 'Turnos: Mañana, Tarde y Noche',
                     'icono' => 'heroicon-m-user-group',
                     'color_badge' => 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
                     'filas' => [
@@ -509,19 +519,10 @@ class PlaningTurnos extends Page
                             'color_border' => '#cbd5e1',
                             'color_text' => '#1e293b',
                         ],
-                    ],
-                ],
-                'Noche' => [
-                    'id' => 'Noche',
-                    'nombre' => 'Turno Noche (24 Horas)',
-                    'subtitulo' => 'Horario Nocturno Continuo',
-                    'icono' => 'heroicon-m-moon',
-                    'color_badge' => 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800',
-                    'filas' => [
                         [
                             'puesto' => 'Noche',
                             'turno' => 'N',
-                            'etiqueta' => 'NOCHE',
+                            'etiqueta' => 'TURNO NOCHE',
                             'icono' => 'heroicon-m-moon',
                             'color_hex' => '#7c3aed',
                             'color_bg' => '#f8fafc',
@@ -576,9 +577,14 @@ class PlaningTurnos extends Page
     public function getFilasTurnosProperty(): array
     {
         $filas = [];
+        $vistos = [];
         foreach ($this->bloquesPuestos as $bloque) {
             foreach ($bloque['filas'] as $f) {
-                $filas[] = $f;
+                $k = $f['puesto'] . '_' . $f['turno'];
+                if (!isset($vistos[$k])) {
+                    $vistos[$k] = true;
+                    $filas[] = $f;
+                }
             }
         }
         return $filas;

@@ -156,7 +156,7 @@
                             wire:click="setFiltroPuesto('todos')"
                             class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'todos' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
                         >
-                            Ver Todos los Puestos
+                            Ver Ambos Puestos
                         </button>
                         <button
                             type="button"
@@ -171,13 +171,6 @@
                             class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Puesto 2' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
                         >
                             Puesto 2 (Empleado 2)
-                        </button>
-                        <button
-                            type="button"
-                            wire:click="setFiltroPuesto('Noche')"
-                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Noche' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
-                        >
-                            Turno Noche
                         </button>
                     </div>
                 @endif
