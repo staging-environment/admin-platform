@@ -41,34 +41,106 @@ class Empleado extends Model
         'color_hex' => 'string',
     ];
 
-    public function getColorAttribute(): string
+    public function getEstiloColorAttribute(): array
     {
-        if (!empty($this->color_hex)) {
-            return $this->color_hex;
+        $nombreCompleto = mb_strtolower(trim($this->nombre . ' ' . $this->apellidos));
+
+        // 1. Asignaciones directas del cuadrante oficial de gasolineras
+        if (str_contains($nombreCompleto, 'sergio')) {
+            // Sergio (Ronda Norte): Rojo intenso con texto blanco
+            return [
+                'bg' => '#ef4444',
+                'text' => '#ffffff',
+                'border' => '#dc2626',
+                'color' => '#ef4444',
+            ];
         }
 
-        // Paleta armónica de colores distintivos para cuadrantes
+        if (str_contains($nombreCompleto, 'laura') || str_contains($nombreCompleto, 'felisa')) {
+            // Laura (Ronda Norte) y Felisa (Vistalegre): Rosa salmón pastel con texto oscuro
+            return [
+                'bg' => '#f8cbad',
+                'text' => '#1f2937',
+                'border' => '#e29e74',
+                'color' => '#f8cbad',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'israel') || str_contains($nombreCompleto, 'antonio jesus') || str_contains($nombreCompleto, 'arcos')) {
+            // Israel (Ronda Norte) y Ant. Jesús (Vistalegre): Verde claro pastel con texto oscuro
+            return [
+                'bg' => '#a9d08e',
+                'text' => '#1f2937',
+                'border' => '#70ad47',
+                'color' => '#a9d08e',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'consolacion') || str_contains($nombreCompleto, 'blanquero') || str_contains($nombreCompleto, 'miguel angel')) {
+            // Conso y Miguel Ángel (Vistalegre): Naranja con texto oscuro
+            return [
+                'bg' => '#ed7d31',
+                'text' => '#1f2937',
+                'border' => '#c65911',
+                'color' => '#ed7d31',
+            ];
+        }
+
+        // 2. Si tiene un color personalizado explícito en base de datos
+        if (!empty($this->color_hex)) {
+            return [
+                'bg' => $this->color_hex,
+                'text' => '#ffffff',
+                'border' => $this->color_hex,
+                'color' => $this->color_hex,
+            ];
+        }
+
+        // 3. Paleta armónica distintiva por defecto para otros trabajadores
         $palette = [
-            '#0284c7', // Azul cielo
-            '#16a34a', // Verde esmeralda
-            '#d97706', // Ámbar
-            '#7c3aed', // Violeta
-            '#db2777', // Rosa
-            '#0d9488', // Turquesa
-            '#4f46e5', // Índigo
-            '#ea580c', // Naranja
-            '#0891b2', // Cian
-            '#9333ea', // Morado
-            '#059669', // Verde oscuro
-            '#b91c1c', // Rojo teja
+            ['bg' => '#bae6fd', 'text' => '#0369a1', 'border' => '#7dd3fc', 'color' => '#0284c7'], // Azul cielo
+            ['bg' => '#fef08a', 'text' => '#854d0e', 'border' => '#fde047', 'color' => '#d97706'], // Ámbar/Amarillo
+            ['bg' => '#e9d5ff', 'text' => '#6b21a8', 'border' => '#d8b4fe', 'color' => '#9333ea'], // Violeta
+            ['bg' => '#fed7aa', 'text' => '#9a3412', 'border' => '#fdba74', 'color' => '#ea580c'], // Melocotón
+            ['bg' => '#99f6e4', 'text' => '#115e59', 'border' => '#5eead4', 'color' => '#0d9488'], // Turquesa
+            ['bg' => '#fbcfe8', 'text' => '#9d174d', 'border' => '#f472b6', 'color' => '#db2777'], // Rosa
         ];
 
         return $palette[($this->id ?? 1) % count($palette)];
     }
 
+    public function getColorBgAttribute(): string
+    {
+        return $this->estilo_color['bg'];
+    }
+
+    public function getColorTextAttribute(): string
+    {
+        return $this->estilo_color['text'];
+    }
+
+    public function getColorBorderAttribute(): string
+    {
+        return $this->estilo_color['border'];
+    }
+
+    public function getColorAttribute(): string
+    {
+        return $this->estilo_color['color'] ?? ($this->color_hex ?: '#0284c7');
+    }
+
     public function getNombreCortoAttribute(): string
     {
         $nombre = trim($this->nombre);
+        $nombreMayus = mb_strtoupper($nombre);
+
+        if (str_contains($nombreMayus, 'CONSOLACION')) {
+            return 'CONSOLACION';
+        }
+        if (str_contains($nombreMayus, 'MIGUEL ANGEL')) {
+            return 'MIGUEL ANGEL';
+        }
+
         $partes = preg_split('/\s+/', $nombre);
 
         if (count($partes) >= 2) {
@@ -84,7 +156,7 @@ class Empleado extends Model
             return $p0;
         }
 
-        return mb_strtoupper($nombre);
+        return $nombreMayus;
     }
 
 

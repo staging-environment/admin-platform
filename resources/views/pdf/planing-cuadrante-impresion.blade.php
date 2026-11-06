@@ -194,16 +194,15 @@
                             $turnoReg = $turnosMap[$key] ?? null;
                             $empleado = $turnoReg?->empleado;
                             $esSustitucion = $turnoReg?->es_sustitucion;
-                            $color = $empleado?->color ?? '#475569';
                         @endphp
 
                         <td class="{{ $dia['esFinDeSemana'] ? 'weekend-cell' : '' }}">
                             @if($empleado)
                                 <div
                                     class="badge-empleado {{ $esSustitucion ? 'sustitucion-badge' : '' }}"
-                                    style="background-color: {{ $color }}22; border: 0.8px solid {{ $color }}; color: {{ $color }};"
+                                    style="background-color: {{ $empleado->color_bg }}; border: 0.8px solid {{ $empleado->color_border }}; color: {{ $empleado->color_text }};"
                                 >
-                                    {{ mb_strtoupper(explode(' ', trim($empleado->nombre))[0]) }}{{ $esSustitucion ? '*' : '' }}
+                                    {{ $empleado->nombre_corto }}{{ $esSustitucion ? '*' : '' }}
                                 </div>
                             @else
                                 <span style="color: #cbd5e1;">—</span>
@@ -236,8 +235,8 @@
                     <div style="margin-top: 3px;">
                         @foreach($empleadosLegenda as $emp)
                             <div style="margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <span style="display: inline-block; width: 6px; height: 6px; background-color: {{ $emp->color }}; border-radius: 50%; margin-right: 3px;"></span>
-                                <strong>{{ $emp->nombre }} {{ $emp->apellidos }}</strong>
+                                <span style="display: inline-block; width: 6px; height: 6px; background-color: {{ $emp->color_bg }}; border: 1px solid {{ $emp->color_border }}; border-radius: 50%; margin-right: 3px;"></span>
+                                <strong>{{ $emp->nombre_corto }}</strong> ({{ $emp->nombre }} {{ $emp->apellidos }})
                             </div>
                         @endforeach
                     </div>

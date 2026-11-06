@@ -15,7 +15,7 @@ class PlaningTurnosService
      * Estructura de puestos por gasolinera
      */
     public const PUESTOS_DIURNOS = ['Puesto Único'];
-    public const PUESTOS_RONDA_NORTE = ['Puesto 1', 'Puesto 2', 'Noche'];
+    public const PUESTOS_RONDA_NORTE = ['Puesto Único'];
 
     /**
      * Obtiene o crea el cuadrante mensual para una gasolinera
@@ -71,25 +71,16 @@ class PlaningTurnosService
     {
         $empleados = $this->getEmpleadosEstacion($gasolineraCodigo);
 
-        // Si la estación es Ronda Norte (Código 2)
+        // Si la estación es Ronda Norte (Código 2) - Rotación 4x2 oficial: Laura, Israel, Sergio
         if ($gasolineraCodigo === 2) {
-            if ($linea === 'Puesto 1') {
-                return $this->buscarPorNombres($empleados, ['Mari Carmen', 'Carvajal', 'Jesús'])
-                    ?: $empleados->slice(0, 3)->values()->all();
-            }
-            if ($linea === 'Puesto 2') {
-                return $this->buscarPorNombres($empleados, ['Laura', 'Sergio', 'Israel'])
-                    ?: $empleados->slice(3, 3)->values()->all();
-            }
-            if ($linea === 'Noche') {
-                return $this->buscarPorNombres($empleados, ['Fran', 'Romero'])
-                    ?: $empleados->slice(6, 2)->values()->all();
-            }
+            return $this->buscarPorNombres($empleados, ['Laura', 'Israel', 'Sergio'])
+                ?: $empleados->take(3)->values()->all();
         }
 
         // Estaciones Diurnas (1, 3, 4)
-        if ($gasolineraCodigo === 1) { // Vistalegre
-            $equipo = $this->buscarPorNombres($empleados, ['Jesús', 'Felisa', 'Miguel Ángel']);
+        if ($gasolineraCodigo === 1) { // Vistalegre - Rotación oficial: Ant. Jesús, Miguel Ángel (o Consolación), Felisa
+            $equipo = $this->buscarPorNombres($empleados, ['Antonio Jesus', 'Blanquero', 'Felisa'])
+                ?: $this->buscarPorNombres($empleados, ['Jesús', 'Miguel Ángel', 'Felisa']);
             return $equipo ?: $empleados->take(3)->values()->all();
         }
 
@@ -152,11 +143,11 @@ class PlaningTurnosService
             ];
         }
 
-        // Desfases de fase para ciclo de 12 días
-        // Emp0: offset 0
-        // Emp1: offset 8
-        // Emp2: offset 4
-        $offsets = [0 => 0, 1 => 8, 2 => 4];
+        // Desfases de fase para ciclo rotativo 4x2 de 12 días
+        // Emp0 (Laura / Ant. Jesús): offset 0
+        // Emp1 (Israel / Miguel Ángel): offset 4
+        // Emp2 (Sergio / Felisa): offset 8
+        $offsets = [0 => 0, 1 => 4, 2 => 8];
         $turnos = ['M' => null, 'T' => null];
 
         foreach ([0, 1, 2] as $k) {
@@ -165,10 +156,10 @@ class PlaningTurnosService
                 $diaEnCiclo += 12;
             }
 
-            // 0..3: Mañana
-            // 4..5: Descanso
-            // 6..9: Tarde
-            // 10..11: Descanso
+            // 0..3: Mañana (4 días)
+            // 4..5: Descanso (2 días)
+            // 6..9: Tarde (4 días)
+            // 10..11: Descanso (2 días)
             if ($diaEnCiclo <= 3) {
                 $turnos['M'] = $equipo[$k];
             } elseif ($diaEnCiclo >= 6 && $diaEnCiclo <= 9) {
@@ -181,14 +172,19 @@ class PlaningTurnosService
 
     /**
      * Genera o regenera el cuadrante teórico 4x2 para un mes completo.
-     * Solo almacena los turnos de trabajo efectivos (M, T, N). Nunca descanso.
+     * Solo almacena los turnos de trabajo efectivos (M, T). Nunca descanso.
      */
     public function generarCuadranteTeorico(int $gasolineraCodigo, int $anio, int $mes, bool $sobrescribir = true): int
     {
         $cuadrante = $this->obtenerOCrearCuadrante($gasolineraCodigo, $anio, $mes);
 
         $diasEnMes = Carbon::create($anio, $mes, 1)->daysInMonth;
-        $fechaRefEpoch = Carbon::create(2026, 1, 1); // Epoch de referencia matemática
+        // Epoch de referencia calibrado para sincronizar exactamente con el cuadrante real de Excel
+        // En 2026-11-01 (día 311 desde 2025-12-25), (311 % 12) = 11:
+        // Emp1 (Israel / Miguel Ángel) -> (11+4)%12 = 3 (Mañana)
+        // Emp2 (Sergio / Felisa)       -> (11+8)%12 = 7 (Tarde)
+        // Emp0 (Laura / Ant. Jesús)    -> (11+0)%12 = 11 (Descanso)
+        $fechaRefEpoch = Carbon::create(2025, 12, 25);
 
         $turnosInsertados = 0;
 
@@ -202,54 +198,21 @@ class PlaningTurnosService
                     ->delete();
             }
 
-            if ($gasolineraCodigo === 2) {
-                // Ronda Norte (24H)
-                $equipoPuesto1 = $this->resolverEquipoBase(2, 'Puesto 1');
-                $equipoPuesto2 = $this->resolverEquipoBase(2, 'Puesto 2');
-                $equipoNoche   = $this->resolverEquipoBase(2, 'Noche');
+            $equipo = $this->resolverEquipoBase($gasolineraCodigo, 'Puesto Único');
 
-                for ($d = 1; $d <= $diasEnMes; $d++) {
-                    $fecha = Carbon::create($anio, $mes, $d);
-                    $diaIndice = $fechaRefEpoch->diffInDays($fecha, false);
+            for ($d = 1; $d <= $diasEnMes; $d++) {
+                $fecha = Carbon::create($anio, $mes, $d);
+                $diaIndice = $fechaRefEpoch->diffInDays($fecha, false);
 
-                    // Puesto 1 (M y T)
-                    $turnosP1 = $this->calcularTurnosDia4x2($diaIndice, $equipoPuesto1);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'M', $turnosP1['M']?->id, $sobrescribir);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 1', 'T', $turnosP1['T']?->id, $sobrescribir);
+                $turnosDia = $this->calcularTurnosDia4x2($diaIndice, $equipo);
 
-                    // Puesto 2 (M y T) - desfase de 2 días para no sincronizar exactamente con Puesto 1
-                    $turnosP2 = $this->calcularTurnosDia4x2($diaIndice + 2, $equipoPuesto2);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'M', $turnosP2['M']?->id, $sobrescribir);
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto 2', 'T', $turnosP2['T']?->id, $sobrescribir);
+                // Turno Mañana
+                $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'M', $turnosDia['M']?->id, $sobrescribir);
 
-                    // Turno Noche (N) - Alternancia entre 2 personas
-                    $empNoche = null;
-                    if (count($equipoNoche) > 0) {
-                        $idxNoche = (int) floor($diaIndice / 2) % count($equipoNoche);
-                        $empNoche = $equipoNoche[$idxNoche] ?? $equipoNoche[0];
-                    }
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Noche', 'N', $empNoche?->id, $sobrescribir);
+                // Turno Tarde
+                $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'T', $turnosDia['T']?->id, $sobrescribir);
 
-                    $turnosInsertados += 5;
-                }
-            } else {
-                // Estaciones Diurnas (1, 3, 4) -> 1 Puesto, 2 Turnos diarios (M, T)
-                $equipo = $this->resolverEquipoBase($gasolineraCodigo, 'Puesto Único');
-
-                for ($d = 1; $d <= $diasEnMes; $d++) {
-                    $fecha = Carbon::create($anio, $mes, $d);
-                    $diaIndice = $fechaRefEpoch->diffInDays($fecha, false);
-
-                    $turnosDia = $this->calcularTurnosDia4x2($diaIndice, $equipo);
-
-                    // Turno Mañana
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'M', $turnosDia['M']?->id, $sobrescribir);
-
-                    // Turno Tarde
-                    $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'T', $turnosDia['T']?->id, $sobrescribir);
-
-                    $turnosInsertados += 2;
-                }
+                $turnosInsertados += 2;
             }
         });
 

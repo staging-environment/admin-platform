@@ -443,63 +443,7 @@ class PlaningTurnos extends Page
 
     public function getFilasTurnosProperty(): array
     {
-        if ($this->gasolineraCodigo === 2) {
-            // Ronda Norte (24H): 5 turnos de trabajo con colores propios de turno
-            return [
-                [
-                    'puesto' => 'Puesto 1',
-                    'turno' => 'M',
-                    'etiqueta' => 'PUESTO 1 - MAÑANA',
-                    'icono' => 'heroicon-m-sun',
-                    'color_hex' => '#0284c7',
-                    'color_bg' => '#e0f2fe',
-                    'color_border' => '#7dd3fc',
-                    'color_text' => '#0369a1',
-                ],
-                [
-                    'puesto' => 'Puesto 1',
-                    'turno' => 'T',
-                    'etiqueta' => 'PUESTO 1 - TARDE',
-                    'icono' => 'heroicon-m-clock',
-                    'color_hex' => '#ea580c',
-                    'color_bg' => '#ffedd5',
-                    'color_border' => '#fdba74',
-                    'color_text' => '#c2410c',
-                ],
-                [
-                    'puesto' => 'Puesto 2',
-                    'turno' => 'M',
-                    'etiqueta' => 'PUESTO 2 - MAÑANA',
-                    'icono' => 'heroicon-m-sun',
-                    'color_hex' => '#0d9488',
-                    'color_bg' => '#ccfbf1',
-                    'color_border' => '#5eead4',
-                    'color_text' => '#0f766e',
-                ],
-                [
-                    'puesto' => 'Puesto 2',
-                    'turno' => 'T',
-                    'etiqueta' => 'PUESTO 2 - TARDE',
-                    'icono' => 'heroicon-m-clock',
-                    'color_hex' => '#db2777',
-                    'color_bg' => '#fce7f3',
-                    'color_border' => '#f472b6',
-                    'color_text' => '#be185d',
-                ],
-                [
-                    'puesto' => 'Noche',
-                    'turno' => 'N',
-                    'etiqueta' => 'TURNO NOCHE',
-                    'icono' => 'heroicon-m-moon',
-                    'color_hex' => '#7c3aed',
-                    'color_bg' => '#f3e8ff',
-                    'color_border' => '#c084fc',
-                    'color_text' => '#6d28d9',
-                ],
-            ];
-        }
-
-        // Estaciones Diurnas (1: Vistalegre, 3: Rodalabota, 4: Atenas)
+        // Estaciones con 2 turnos (1: Vistalegre, 2: Ronda Norte, 3: Rodalabota, 4: Atenas)
         return [
             [
                 'puesto' => 'Puesto Único',
@@ -507,9 +451,9 @@ class PlaningTurnos extends Page
                 'etiqueta' => 'MAÑANA',
                 'icono' => 'heroicon-m-sun',
                 'color_hex' => '#0284c7',
-                'color_bg' => '#e0f2fe',
-                'color_border' => '#7dd3fc',
-                'color_text' => '#0369a1',
+                'color_bg' => '#f8fafc',
+                'color_border' => '#cbd5e1',
+                'color_text' => '#1e293b',
             ],
             [
                 'puesto' => 'Puesto Único',
@@ -517,9 +461,9 @@ class PlaningTurnos extends Page
                 'etiqueta' => 'TARDE',
                 'icono' => 'heroicon-m-clock',
                 'color_hex' => '#ea580c',
-                'color_bg' => '#ffedd5',
-                'color_border' => '#fdba74',
-                'color_text' => '#c2410c',
+                'color_bg' => '#f8fafc',
+                'color_border' => '#cbd5e1',
+                'color_text' => '#1e293b',
             ],
         ];
     }

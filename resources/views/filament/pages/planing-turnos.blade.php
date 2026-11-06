@@ -67,10 +67,10 @@
     <div class="flex flex-wrap items-center gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
         @php
             $estaciones = [
-                1 => ['nombre' => 'Vistalegre', 'sub' => 'Utrera (1 Puesto)', 'icon' => 'heroicon-m-building-storefront'],
-                2 => ['nombre' => 'Ronda Norte', 'sub' => 'Utrera (24 Horas)', 'icon' => 'heroicon-m-clock'],
-                3 => ['nombre' => 'Rodalabota', 'sub' => 'El Cuervo (1 Puesto)', 'icon' => 'heroicon-m-map-pin'],
-                4 => ['nombre' => 'Atenas', 'sub' => 'Lebrija (1 Puesto)', 'icon' => 'heroicon-m-sparkles'],
+                1 => ['nombre' => 'Vistalegre', 'sub' => 'Utrera (2 Turnos)', 'icon' => 'heroicon-m-building-storefront'],
+                2 => ['nombre' => 'Ronda Norte', 'sub' => 'Utrera (2 Turnos)', 'icon' => 'heroicon-m-clock'],
+                3 => ['nombre' => 'Rodalabota', 'sub' => 'El Cuervo (2 Turnos)', 'icon' => 'heroicon-m-map-pin'],
+                4 => ['nombre' => 'Atenas', 'sub' => 'Lebrija (2 Turnos)', 'icon' => 'heroicon-m-sparkles'],
             ];
         @endphp
 
@@ -188,18 +188,17 @@
                             <tbody class="divide-y divide-gray-400 dark:divide-white/20">
                                 @foreach($this->filasTurnos as $fila)
                                     <tr>
-                                        {{-- Etiqueta del Turno (MAÑANA, TARDE, etc.) con el color del turno --}}
+                                        {{-- Etiqueta del Turno (MAÑANA, TARDE) con fondo neutro --}}
                                         <td
-                                            class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider"
-                                            style="background-color: {{ $fila['color_bg'] }}; color: {{ $fila['color_text'] }}; border-color: {{ $fila['color_border'] }};"
+                                            class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-gray-200"
                                         >
                                             <div class="flex items-center justify-center gap-1.5">
-                                                <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5" style="color: {{ $fila['color_text'] }};" />
+                                                <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
                                                 <span>{{ $fila['etiqueta'] }}</span>
                                             </div>
                                         </td>
 
-                                        {{-- Celdas de los 7 Días con el color dependiente del turno --}}
+                                        {{-- Celdas de los 7 Días con el color característico del TRABAJADOR --}}
                                         @foreach($semana['dias'] as $dia)
                                             @if($dia['esMesActual'])
                                                 @php
@@ -211,13 +210,13 @@
 
                                                 <td
                                                     wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
-                                                    class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-90 dark:hover:brightness-110 font-black text-xs uppercase"
-                                                    style="{{ $empleado ? ('background-color: ' . $fila['color_bg'] . '; color: ' . $fila['color_text'] . '; border-color: ' . $fila['color_border'] . ';') : '' }}"
+                                                    class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-95 dark:hover:brightness-110 font-black text-xs uppercase"
+                                                    style="{{ $empleado ? ('background-color: ' . $empleado->color_bg . '; color: ' . $empleado->color_text . '; border-color: ' . $empleado->color_border . ';') : '' }}"
                                                     title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
                                                 >
                                                     @if($empleado)
                                                         <div class="flex items-center justify-center gap-1 truncate">
-                                                            <span class="truncate font-black tracking-wide text-xs" style="color: {{ $fila['color_text'] }};">
+                                                            <span class="truncate font-black tracking-wide text-xs" style="color: {{ $empleado->color_text }};">
                                                                 {{ $empleado->nombre_corto }}
                                                             </span>
                                                             @if($esSustitucion && $turnoReg->motivo_sustitucion && !str_contains(mb_strtolower($turnoReg->motivo_sustitucion), 'permanente'))
@@ -291,28 +290,28 @@
             </x-filament::section>
         </div>
 
-        {{-- Leyenda de Turnos y Colores --}}
+        {{-- Leyenda de Turnos y Colores por Empleado --}}
         <div class="lg:col-span-1">
             <x-filament::section>
                 <x-slot name="heading">
-                    Leyenda de Turnos
+                    Plantilla y Código de Colores
                 </x-slot>
                 <x-slot name="description">
-                    Código de colores asignado a cada turno de trabajo.
+                    Color representativo asignado a cada trabajador.
                 </x-slot>
 
                 <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                    @foreach($this->filasTurnos as $fila)
+                    @foreach($this->empleadosLegenda as $emp)
                         <div
                             class="flex items-center justify-between p-2 rounded-lg border shadow-2xs font-bold text-xs"
-                            style="background-color: {{ $fila['color_bg'] }}; border-color: {{ $fila['color_border'] }}; color: {{ $fila['color_text'] }};"
+                            style="background-color: {{ $emp->color_bg }}; border-color: {{ $emp->color_border }}; color: {{ $emp->color_text }};"
                         >
-                            <div class="flex items-center gap-2">
-                                <x-filament::icon :icon="$fila['icono']" class="w-4 h-4" />
-                                <span class="font-black uppercase tracking-tight">{{ $fila['etiqueta'] }}</span>
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $emp->color_text }};"></span>
+                                <span class="font-black uppercase tracking-tight truncate">{{ $emp->nombre_corto }}</span>
                             </div>
-                            <span class="text-[10px] font-black uppercase px-1.5 py-0.5 rounded bg-white/70 dark:bg-black/30">
-                                {{ $fila['turno'] }}
+                            <span class="text-[10px] font-bold opacity-80 shrink-0">
+                                {{ $emp->nombre }}
                             </span>
                         </div>
                     @endforeach
