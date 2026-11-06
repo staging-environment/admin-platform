@@ -43,41 +43,43 @@ class Empleado extends Model
 
     public function getEstiloColorAttribute(): array
     {
-        $nombreCompleto = mb_strtolower(trim($this->nombre . ' ' . $this->apellidos));
+        $id = (int) ($this->id ?? 0);
+        $nombreCompleto = mb_strtolower(trim($this->nombre . ' ' . ($this->apellidos ?? '')));
 
-        // 1. Asignaciones directas del cuadrante oficial de gasolineras
-        if (str_contains($nombreCompleto, 'sergio')) {
-            // Sergio (Ronda Norte P2): Rojo intenso con texto blanco
+        // 1. Asignaciones 100% individuales y únicas (cada trabajador tiene su color exclusivo)
+        // RONDA NORTE
+        if ($id === 93 || (str_contains($nombreCompleto, 'romero') && str_contains($nombreCompleto, 'martin'))) {
+            // Romero (Ronda Norte Noche): Amarillo puro brillante según Excel oficial
             return [
-                'bg' => '#ef4444',
-                'text' => '#ffffff',
-                'border' => '#dc2626',
-                'color' => '#ef4444',
-            ];
-        }
-
-        if (str_contains($nombreCompleto, 'laura') || str_contains($nombreCompleto, 'felisa')) {
-            // Laura (Ronda Norte P2) y Felisa (Vistalegre): Rosa salmón pastel con texto oscuro
-            return [
-                'bg' => '#f8cbad',
+                'bg' => '#ffff00',
                 'text' => '#1f2937',
-                'border' => '#e29e74',
-                'color' => '#f8cbad',
+                'border' => '#ca8a04',
+                'color' => '#eab308',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'israel') || str_contains($nombreCompleto, 'carvajal') || str_contains($nombreCompleto, 'antonio jesus')) {
-            // Israel (Ronda Norte P2), Carvajal (Ronda Norte P1) y Ant. Jesús (Vistalegre): Verde claro pastel
+        if ($id === 71 || str_contains($nombreCompleto, 'carvajal')) {
+            // Antonio Carvajal (Ronda Norte P1): Verde hoja pastel según Excel oficial
             return [
                 'bg' => '#a9d08e',
                 'text' => '#1f2937',
-                'border' => '#70ad47',
-                'color' => '#a9d08e',
+                'border' => '#689f38',
+                'color' => '#70ad47',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'arcos') || str_contains($nombreCompleto, 'consolacion') || str_contains($nombreCompleto, 'blanquero') || str_contains($nombreCompleto, 'miguel angel')) {
-            // Jesús Arcos (Ronda Norte P1), Conso y Miguel Ángel (Vistalegre): Naranja cálido
+        if ($id === 83 || str_contains($nombreCompleto, 'prieto')) {
+            // Mari Carmen Prieto (Ronda Norte P1): Azul cielo lavanda suave según Excel oficial
+            return [
+                'bg' => '#8ea9db',
+                'text' => '#1f2937',
+                'border' => '#3f6bb5',
+                'color' => '#4472c4',
+            ];
+        }
+
+        if ($id === 64 || (str_contains($nombreCompleto, 'arcos') && str_contains($nombreCompleto, 'jesus'))) {
+            // Jesús Arcos (Ronda Norte P1): Naranja cálido según Excel oficial
             return [
                 'bg' => '#ed7d31',
                 'text' => '#1f2937',
@@ -86,43 +88,156 @@ class Empleado extends Model
             ];
         }
 
-        if (str_contains($nombreCompleto, 'prieto') || str_contains($nombreCompleto, 'carmen')) {
-            // Mari Carmen Prieto (Ronda Norte P1): Azul cielo suave según Excel oficial
-            return [
-                'bg' => '#8ea9db',
-                'text' => '#1f2937',
-                'border' => '#4472c4',
-                'color' => '#5b9bd5',
-            ];
-        }
-
-        if (str_contains($nombreCompleto, 'acaiña') || str_contains($nombreCompleto, 'francisco')) {
-            // Fran (Ronda Norte Turno Noche): Púrpura intenso con texto blanco según Excel oficial
+        if ($id === 60 || str_contains($nombreCompleto, 'acaiña') || (str_contains($nombreCompleto, 'francisco') && str_contains($nombreCompleto, 'alvarez'))) {
+            // Fran (Ronda Norte Noche): Púrpura intenso con texto blanco según Excel oficial
             return [
                 'bg' => '#7030a0',
                 'text' => '#ffffff',
-                'border' => '#59267c',
+                'border' => '#522177',
                 'color' => '#7030a0',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'romero')) {
-            // Antonio Romero (Ronda Norte Turno Noche): Amarillo brillante según Excel oficial
+        if ($id === 82 || (str_contains($nombreCompleto, 'sergio') && str_contains($nombreCompleto, 'povea'))) {
+            // Sergio Povea (Ronda Norte P2): Rojo intenso con texto blanco según Excel oficial
             return [
-                'bg' => '#ffff00',
-                'text' => '#1f2937',
-                'border' => '#eab308',
-                'color' => '#eab308',
+                'bg' => '#ef4444',
+                'text' => '#ffffff',
+                'border' => '#b91c1c',
+                'color' => '#ef4444',
             ];
         }
 
-        if (str_contains($nombreCompleto, 'campos')) {
-            // Antonio Campos: Amarillo ámbar cálido
+        if ($id === 103 || str_contains($nombreCompleto, 'laura')) {
+            // Laura Linares (Ronda Norte P2): Rosa salmón pastel según Excel oficial
             return [
-                'bg' => '#fde047',
-                'text' => '#713f12',
-                'border' => '#eab308',
-                'color' => '#eab308',
+                'bg' => '#f8cbad',
+                'text' => '#1f2937',
+                'border' => '#d98d60',
+                'color' => '#f8cbad',
+            ];
+        }
+
+        if ($id === 86 || str_contains($nombreCompleto, 'israel')) {
+            // Israel Vega (Ronda Norte P2): Turquesa aguamarina vivo (diferenciado de Carvajal)
+            return [
+                'bg' => '#2dd4bf',
+                'text' => '#042f2e',
+                'border' => '#0d9488',
+                'color' => '#14b8a6',
+            ];
+        }
+
+        if ($id === 69 || str_contains($nombreCompleto, 'campos')) {
+            // Antonio Campos (Ronda Norte): Ámbar dorado (diferenciado del amarillo de Romero)
+            return [
+                'bg' => '#fbbf24',
+                'text' => '#78350f',
+                'border' => '#d97706',
+                'color' => '#f59e0b',
+            ];
+        }
+
+        // VISTALEGRE
+        if ($id === 84 || (str_contains($nombreCompleto, 'antonio jesus') && str_contains($nombreCompleto, 'rodriguez'))) {
+            // Ant. Jesús (Vistalegre): Verde lima fresco (diferenciado de Carvajal e Israel)
+            return [
+                'bg' => '#bef264',
+                'text' => '#365314',
+                'border' => '#84cc16',
+                'color' => '#65a30d',
+            ];
+        }
+
+        if ($id === 95 || str_contains($nombreCompleto, 'felisa')) {
+            // Felisa Díaz (Vistalegre): Rosa chicle pastel (diferenciado del salmón de Laura)
+            return [
+                'bg' => '#fbcfe8',
+                'text' => '#831843',
+                'border' => '#f472b6',
+                'color' => '#db2777',
+            ];
+        }
+
+        if ($id === 67 || str_contains($nombreCompleto, 'blanquero')) {
+            // Miguel Ángel Blanquero (Vistalegre): Naranja teja óxido intenso
+            return [
+                'bg' => '#ea580c',
+                'text' => '#ffffff',
+                'border' => '#9a3412',
+                'color' => '#ea580c',
+            ];
+        }
+
+        if ($id === 88 || str_contains($nombreCompleto, 'consolacion')) {
+            // Consolación Zapata (Vistalegre): Melocotón albaricoque suave
+            return [
+                'bg' => '#fdba74',
+                'text' => '#7c2d12',
+                'border' => '#ea580c',
+                'color' => '#f97316',
+            ];
+        }
+
+        // RODALABOTA
+        if ($id === 79 || str_contains($nombreCompleto, 'marrufo')) {
+            // Antonio Marrufo (Rodalabota): Azul zafiro suave
+            return [
+                'bg' => '#60a5fa',
+                'text' => '#1e3a8a',
+                'border' => '#2563eb',
+                'color' => '#3b82f6',
+            ];
+        }
+
+        if ($id === 68 || str_contains($nombreCompleto, 'borja')) {
+            // Borja Jesús (Rodalabota): Lila violeta claro
+            return [
+                'bg' => '#c084fc',
+                'text' => '#4c1d95',
+                'border' => '#9333ea',
+                'color' => '#a855f7',
+            ];
+        }
+
+        if ($id === 76 || str_contains($nombreCompleto, 'emilio')) {
+            // Emilio González (Rodalabota): Verde menta brillante
+            return [
+                'bg' => '#4ade80',
+                'text' => '#14532d',
+                'border' => '#16a34a',
+                'color' => '#22c55e',
+            ];
+        }
+
+        // ATENAS
+        if ($id === 77 || str_contains($nombreCompleto, 'llompart')) {
+            // Toni Llompart (Atenas): Cian cielo
+            return [
+                'bg' => '#38bdf8',
+                'text' => '#0c4a6e',
+                'border' => '#0284c7',
+                'color' => '#0ea5e9',
+            ];
+        }
+
+        if ($id === 87 || str_contains($nombreCompleto, 'zambrano')) {
+            // Juan Antonio Zambrano (Atenas): Fucsia orquídea
+            return [
+                'bg' => '#e879f9',
+                'text' => '#701a75',
+                'border' => '#c026d3',
+                'color' => '#d946ef',
+            ];
+        }
+
+        if ($id === 70 || str_contains($nombreCompleto, 'joaquin')) {
+            // Joaquín Caro (Atenas): Turquesa menta pastel
+            return [
+                'bg' => '#5eead4',
+                'text' => '#134e4a',
+                'border' => '#14b8a6',
+                'color' => '#0d9488',
             ];
         }
 
@@ -136,14 +251,14 @@ class Empleado extends Model
             ];
         }
 
-        // 3. Paleta armónica distintiva por defecto para otros trabajadores
+        // 3. Paleta armónica distintiva por defecto para otros trabajadores (sin repetir)
         $palette = [
-            ['bg' => '#bae6fd', 'text' => '#0369a1', 'border' => '#7dd3fc', 'color' => '#0284c7'], // Azul cielo
-            ['bg' => '#fef08a', 'text' => '#854d0e', 'border' => '#fde047', 'color' => '#d97706'], // Ámbar/Amarillo
-            ['bg' => '#e9d5ff', 'text' => '#6b21a8', 'border' => '#d8b4fe', 'color' => '#9333ea'], // Violeta
-            ['bg' => '#fed7aa', 'text' => '#9a3412', 'border' => '#fdba74', 'color' => '#ea580c'], // Melocotón
-            ['bg' => '#99f6e4', 'text' => '#115e59', 'border' => '#5eead4', 'color' => '#0d9488'], // Turquesa
-            ['bg' => '#fbcfe8', 'text' => '#9d174d', 'border' => '#f472b6', 'color' => '#db2777'], // Rosa
+            ['bg' => '#bae6fd', 'text' => '#0369a1', 'border' => '#7dd3fc', 'color' => '#0284c7'],
+            ['bg' => '#fef08a', 'text' => '#854d0e', 'border' => '#fde047', 'color' => '#d97706'],
+            ['bg' => '#e9d5ff', 'text' => '#6b21a8', 'border' => '#d8b4fe', 'color' => '#9333ea'],
+            ['bg' => '#99f6e4', 'text' => '#115e59', 'border' => '#5eead4', 'color' => '#0d9488'],
+            ['bg' => '#fed7aa', 'text' => '#9a3412', 'border' => '#fdba74', 'color' => '#ea580c'],
+            ['bg' => '#ddd6fe', 'text' => '#5b21b6', 'border' => '#c4b5fd', 'color' => '#7c3aed'],
         ];
 
         return $palette[($this->id ?? 1) % count($palette)];
@@ -171,37 +286,68 @@ class Empleado extends Model
 
     public function getNombreCortoAttribute(): string
     {
+        $id = (int) ($this->id ?? 0);
         $nombre = trim($this->nombre);
         $apellidos = trim($this->apellidos ?? '');
         $nombreCompleto = mb_strtoupper($nombre . ' ' . $apellidos);
 
-        // Distinción clara e inmediata en cuadrante de gasolineras
-        if (str_contains($nombreCompleto, 'CARVAJAL')) {
-            return 'CARVAJAL';
-        }
-        if (str_contains($nombreCompleto, 'CAMPOS')) {
-            return 'CAMPOS';
-        }
-        if (str_contains($nombreCompleto, 'ROMERO')) {
-            return 'ROMERO';
-        }
-        if (str_contains($nombreCompleto, 'ACAIÑA') || str_contains($nombreCompleto, 'FRANCISCO')) {
-            return 'FRAN';
-        }
-        if (str_contains($nombreCompleto, 'PRIETO') || str_contains($nombreCompleto, 'MARI CARMEN') || str_contains($nombreCompleto, 'MARIA DEL CARMEN')) {
-            return 'MARI CRMEN';
-        }
-        if (str_contains($nombreCompleto, 'ARCOS') || (str_contains($nombreCompleto, 'JESUS') && !str_contains($nombreCompleto, 'ANTONIO JESUS') && !str_contains($nombreCompleto, 'BORJA'))) {
-            return 'JESUS';
-        }
-        if (str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
+        // Identificación inequívoca por ID o nombre específico
+        if ($id === 84 || str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
             return 'ANT. JESUS';
         }
-        if (str_contains($nombreCompleto, 'CONSOLACION')) {
+        if ($id === 87 || str_contains($nombreCompleto, 'ZAMBRANO')) {
+            return 'ZAMBRANO';
+        }
+        if ($id === 93 || (str_contains($nombreCompleto, 'ROMERO') && str_contains($nombreCompleto, 'MARTIN'))) {
+            return 'ROMERO';
+        }
+        if ($id === 71 || str_contains($nombreCompleto, 'CARVAJAL')) {
+            return 'CARVAJAL';
+        }
+        if ($id === 69 || str_contains($nombreCompleto, 'CAMPOS')) {
+            return 'CAMPOS';
+        }
+        if ($id === 60 || str_contains($nombreCompleto, 'ACAIÑA') || (str_contains($nombreCompleto, 'FRANCISCO') && str_contains($nombreCompleto, 'ALVAREZ'))) {
+            return 'FRAN';
+        }
+        if ($id === 83 || str_contains($nombreCompleto, 'PRIETO') || str_contains($nombreCompleto, 'MARI CARMEN') || str_contains($nombreCompleto, 'MARIA DEL CARMEN')) {
+            return 'MARI CRMEN';
+        }
+        if ($id === 64 || (str_contains($nombreCompleto, 'ARCOS') && str_contains($nombreCompleto, 'JESUS'))) {
+            return 'JESUS';
+        }
+        if ($id === 82 || (str_contains($nombreCompleto, 'SERGIO') && str_contains($nombreCompleto, 'POVEA'))) {
+            return 'SERGIO';
+        }
+        if ($id === 86 || str_contains($nombreCompleto, 'ISRAEL')) {
+            return 'ISRAEL';
+        }
+        if ($id === 103 || str_contains($nombreCompleto, 'LAURA')) {
+            return 'LAURA';
+        }
+        if ($id === 95 || str_contains($nombreCompleto, 'FELISA')) {
+            return 'FELISA';
+        }
+        if ($id === 67 || str_contains($nombreCompleto, 'BLANQUERO') || str_contains($nombreCompleto, 'MIGUEL ANGEL')) {
+            return 'MIGUEL ANGEL';
+        }
+        if ($id === 88 || str_contains($nombreCompleto, 'CONSOLACION')) {
             return 'CONSOLACION';
         }
-        if (str_contains($nombreCompleto, 'MIGUEL ANGEL')) {
-            return 'MIGUEL ANGEL';
+        if ($id === 79 || str_contains($nombreCompleto, 'MARRUFO')) {
+            return 'MARRUFO';
+        }
+        if ($id === 68 || str_contains($nombreCompleto, 'BORJA')) {
+            return 'BORJA';
+        }
+        if ($id === 76 || str_contains($nombreCompleto, 'EMILIO')) {
+            return 'EMILIO';
+        }
+        if ($id === 77 || str_contains($nombreCompleto, 'LLOMPART')) {
+            return 'TONI';
+        }
+        if ($id === 70 || str_contains($nombreCompleto, 'JOAQUIN')) {
+            return 'JOAQUIN';
         }
 
         $partes = preg_split('/\s+/', $nombre);
