@@ -169,50 +169,67 @@
         </tr>
     </table>
 
-    {{-- Tabla Cuadrícula Mensual --}}
-    <table class="grid-table">
-        <thead>
-            <tr>
-                <th class="col-turno-header">PUESTO / TURNO</th>
-                @foreach($dias as $dia)
-                    <th class="{{ $dia['esFinDeSemana'] ? 'weekend-header' : '' }}">
-                        {{ $dia['diaSemana'] }}<br>{{ $dia['numero'] }}
-                    </th>
-                @endforeach
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($filasTurnos as $fila)
+    {{-- Tablas Cuadrícula Mensual por Puesto / Bloque --}}
+    @php
+        $bloques = $bloquesPuestos ?? [
+            [
+                'nombre' => null,
+                'subtitulo' => null,
+                'filas' => $filasTurnos,
+            ]
+        ];
+    @endphp
+
+    @foreach($bloques as $bloque)
+        @if(!empty($bloque['nombre']))
+            <div style="margin-top: 8px; margin-bottom: 2px; font-weight: bold; font-size: 8pt; color: #0f172a; text-transform: uppercase; border-bottom: 1.5px solid #0284c7; padding-bottom: 1px;">
+                {{ $bloque['nombre'] }} <span style="font-size: 6pt; color: #64748b; font-weight: normal;">&bull; {{ $bloque['subtitulo'] }}</span>
+            </div>
+        @endif
+        <table class="grid-table">
+            <thead>
                 <tr>
-                    <td class="col-turno">
-                        {{ $fila['etiqueta'] }}
-                    </td>
-
+                    <th class="col-turno-header">TURNO</th>
                     @foreach($dias as $dia)
-                        @php
-                            $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
-                            $turnoReg = $turnosMap[$key] ?? null;
-                            $empleado = $turnoReg?->empleado;
-                            $esSustitucion = $turnoReg?->es_sustitucion;
-                        @endphp
-
-                        <td class="{{ $dia['esFinDeSemana'] ? 'weekend-cell' : '' }}">
-                            @if($empleado)
-                                <div
-                                    class="badge-empleado {{ $esSustitucion ? 'sustitucion-badge' : '' }}"
-                                    style="background-color: {{ $empleado->color_bg }}; border: 0.8px solid {{ $empleado->color_border }}; color: {{ $empleado->color_text }};"
-                                >
-                                    {{ $empleado->nombre_corto }}{{ $esSustitucion ? '*' : '' }}
-                                </div>
-                            @else
-                                <span style="color: #cbd5e1;">—</span>
-                            @endif
-                        </td>
+                        <th class="{{ $dia['esFinDeSemana'] ? 'weekend-header' : '' }}">
+                            {{ $dia['diaSemana'] }}<br>{{ $dia['numero'] }}
+                        </th>
                     @endforeach
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($bloque['filas'] as $fila)
+                    <tr>
+                        <td class="col-turno">
+                            {{ $fila['etiqueta'] }}
+                        </td>
+
+                        @foreach($dias as $dia)
+                            @php
+                                $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
+                                $turnoReg = $turnosMap[$key] ?? null;
+                                $empleado = $turnoReg?->empleado;
+                                $esSustitucion = $turnoReg?->es_sustitucion;
+                            @endphp
+
+                            <td class="{{ $dia['esFinDeSemana'] ? 'weekend-cell' : '' }}">
+                                @if($empleado)
+                                    <div
+                                        class="badge-empleado {{ $esSustitucion ? 'sustitucion-badge' : '' }}"
+                                        style="background-color: {{ $empleado->color_bg }}; border: 0.8px solid {{ $empleado->color_border }}; color: {{ $empleado->color_text }};"
+                                    >
+                                        {{ $empleado->nombre_corto }}{{ $esSustitucion ? '*' : '' }}
+                                    </div>
+                                @else
+                                    <span style="color: #cbd5e1;">—</span>
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endforeach
 
     {{-- Pie: Observaciones, Leyenda y Firmas --}}
     <table class="footer-table">

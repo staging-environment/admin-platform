@@ -136,111 +136,167 @@
     {{-- 3. Visualización del Planing en Cuadrícula Semanal --}}
     <x-filament::section>
         {{-- VISTA CUADRÍCULA EN BLOQUES SEMANALES (Formato Cuadrante en Recuadros) --}}
-        <div class="space-y-4">
+        <div class="space-y-6">
             {{-- Encabezado General del Cuadrante --}}
-            <div class="flex items-center justify-between px-2 py-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/10">
-                <div class="text-sm md:text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                    {{ $estaciones[$gasolineraCodigo]['nombre'] ?? 'Estación' }}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/10">
+                <div>
+                    <div class="text-sm md:text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                        {{ $estaciones[$gasolineraCodigo]['nombre'] ?? 'Estación' }}
+                    </div>
+                    <div class="text-xs font-bold text-gray-500 dark:text-gray-400">
+                        {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM [de] YYYY') }}
+                    </div>
                 </div>
-                <div class="text-xs md:text-sm font-extrabold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                    {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM [\'\']YY') }}
-                </div>
+
+                {{-- Selector de Puestos para Ronda Norte --}}
+                @if($gasolineraCodigo === 2)
+                    <div class="flex flex-wrap items-center gap-1.5 bg-white dark:bg-white/10 p-1 rounded-lg border border-gray-200 dark:border-white/10 text-xs">
+                        <button
+                            type="button"
+                            wire:click="setFiltroPuesto('todos')"
+                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'todos' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
+                        >
+                            Ver Todos los Puestos
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="setFiltroPuesto('Puesto 1')"
+                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Puesto 1' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
+                        >
+                            Puesto 1 (Empleado 1)
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="setFiltroPuesto('Puesto 2')"
+                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Puesto 2' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
+                        >
+                            Puesto 2 (Empleado 2)
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="setFiltroPuesto('Noche')"
+                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Noche' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
+                        >
+                            Turno Noche
+                        </button>
+                    </div>
+                @endif
             </div>
 
-                {{-- Bloques Semanales (Semana a Semana) --}}
-                @foreach($this->semanasMes as $semana)
-                    <div class="bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-400 dark:border-white/20 shadow-xs">
-                        <table class="w-full border-collapse text-xs table-fixed">
-                            <colgroup>
-                                <col class="w-[120px] md:w-[140px]">
-                                @for($i = 0; $i < 7; $i++)
-                                    <col class="w-[calc((100%-140px)/7)]">
-                                @endfor
-                            </colgroup>
-                            <thead>
-                                <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-400 dark:border-white/20">
-                                    {{-- Columna izquierda: Identificador de Semana --}}
-                                    <th class="border-r border-gray-400 dark:border-white/20 p-2 text-center font-extrabold text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Semana {{ $semana['numeroSemana'] }}
-                                    </th>
+            {{-- Renderizado de Cuadrículas por Puesto (Empleado 1, Empleado 2, Turno Noche) --}}
+            @foreach($this->bloquesPuestos as $bloque)
+                <div class="space-y-3 pt-2">
+                    @if(!empty($bloque['nombre']))
+                        <div class="flex items-center justify-between pb-1.5 border-b border-gray-200 dark:border-white/10">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 text-xs font-black uppercase rounded-md border {{ $bloque['color_badge'] }}">
+                                    {{ $bloque['nombre'] }}
+                                </span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                    {{ $bloque['subtitulo'] }}
+                                </span>
+                            </div>
+                        </div>
+                    @endif
 
-                                    {{-- 7 Columnas: Días de la semana --}}
-                                    @foreach($semana['dias'] as $dia)
-                                        @if($dia['esMesActual'])
-                                            <th class="border-r border-gray-400 dark:border-white/20 p-1.5 text-center font-black {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-900 dark:text-amber-300' : 'text-gray-800 dark:text-gray-200' }}">
-                                                <div class="text-[9.5px] uppercase font-bold text-gray-500 dark:text-gray-400">
-                                                    {{ $dia['diaSemanaLargo'] }}
-                                                </div>
-                                                <div class="text-sm font-black mt-0.5 flex items-center justify-center gap-1">
-                                                    <span>{{ $dia['numero'] }}</span>
-                                                    @if($dia['esHoy'])
-                                                        <span class="px-1 py-0.2 text-[8px] font-black uppercase rounded bg-primary-600 text-white tracking-tight">Hoy</span>
-                                                    @endif
-                                                </div>
+                    {{-- Bloques Semanales (Semana a Semana) --}}
+                    <div class="space-y-4">
+                        @foreach($this->semanasMes as $semana)
+                            <div class="bg-white dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-400 dark:border-white/20 shadow-xs">
+                                <table class="w-full border-collapse text-xs table-fixed">
+                                    <colgroup>
+                                        <col class="w-[120px] md:w-[140px]">
+                                        @for($i = 0; $i < 7; $i++)
+                                            <col class="w-[calc((100%-140px)/7)]">
+                                        @endfor
+                                    </colgroup>
+                                    <thead>
+                                        <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-400 dark:border-white/20">
+                                            {{-- Columna izquierda: Identificador de Semana --}}
+                                            <th class="border-r border-gray-400 dark:border-white/20 p-2 text-center font-extrabold text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Semana {{ $semana['numeroSemana'] }}
                                             </th>
-                                        @else
-                                            {{-- Celda vacía fuera de mes --}}
-                                            <th class="border-r border-gray-300 dark:border-white/10 p-1.5 bg-gray-50/50 dark:bg-white/[0.01]"></th>
-                                        @endif
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-400 dark:divide-white/20">
-                                @foreach($this->filasTurnos as $fila)
-                                    <tr>
-                                        {{-- Etiqueta del Turno (MAÑANA, TARDE) con fondo neutro --}}
-                                        <td
-                                            class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-gray-200"
-                                        >
-                                            <div class="flex items-center justify-center gap-1.5">
-                                                <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                                                <span>{{ $fila['etiqueta'] }}</span>
-                                            </div>
-                                        </td>
 
-                                        {{-- Celdas de los 7 Días con el color característico del TRABAJADOR --}}
-                                        @foreach($semana['dias'] as $dia)
-                                            @if($dia['esMesActual'])
-                                                @php
-                                                    $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
-                                                    $turnoReg = $this->turnosMap[$key] ?? null;
-                                                    $empleado = $turnoReg?->empleado;
-                                                    $esSustitucion = $turnoReg?->es_sustitucion;
-                                                @endphp
-
-                                                <td
-                                                    wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
-                                                    class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-95 dark:hover:brightness-110 font-black text-xs uppercase"
-                                                    style="{{ $empleado ? ('background-color: ' . $empleado->color_bg . '; color: ' . $empleado->color_text . '; border-color: ' . $empleado->color_border . ';') : '' }}"
-                                                    title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
-                                                >
-                                                    @if($empleado)
-                                                        <div class="flex items-center justify-center gap-1 truncate">
-                                                            <span class="truncate font-black tracking-wide text-xs" style="color: {{ $empleado->color_text }};">
-                                                                {{ $empleado->nombre_corto }}
-                                                            </span>
-                                                            @if($esSustitucion && $turnoReg->motivo_sustitucion && !str_contains(mb_strtolower($turnoReg->motivo_sustitucion), 'permanente'))
-                                                                <span class="text-red-600 font-black text-sm shrink-0" title="Sustitución puntual: {{ $turnoReg->motivo_sustitucion }}">*</span>
+                                            {{-- 7 Columnas: Días de la semana --}}
+                                            @foreach($semana['dias'] as $dia)
+                                                @if($dia['esMesActual'])
+                                                    <th class="border-r border-gray-400 dark:border-white/20 p-1.5 text-center font-black {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-900 dark:text-amber-300' : 'text-gray-800 dark:text-gray-200' }}">
+                                                        <div class="text-[9.5px] uppercase font-bold text-gray-500 dark:text-gray-400">
+                                                            {{ $dia['diaSemanaLargo'] }}
+                                                        </div>
+                                                        <div class="text-sm font-black mt-0.5 flex items-center justify-center gap-1">
+                                                            <span>{{ $dia['numero'] }}</span>
+                                                            @if($dia['esHoy'])
+                                                                <span class="px-1 py-0.2 text-[8px] font-black uppercase rounded bg-primary-600 text-white tracking-tight">Hoy</span>
                                                             @endif
                                                         </div>
-                                                    @else
-                                                        <div class="flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-primary-600 transition">
-                                                            <span class="text-xs font-bold">+</span>
-                                                        </div>
-                                                    @endif
+                                                    </th>
+                                                @else
+                                                    {{-- Celda vacía fuera de mes --}}
+                                                    <th class="border-r border-gray-300 dark:border-white/10 p-1.5 bg-gray-50/50 dark:bg-white/[0.01]"></th>
+                                                @endif
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-400 dark:divide-white/20">
+                                        @foreach($bloque['filas'] as $fila)
+                                            <tr>
+                                                {{-- Etiqueta del Turno (MAÑANA, TARDE) con fondo neutro --}}
+                                                <td
+                                                    class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-gray-200"
+                                                >
+                                                    <div class="flex items-center justify-center gap-1.5">
+                                                        <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                                                        <span>{{ $fila['etiqueta'] }}</span>
+                                                    </div>
                                                 </td>
-                                            @else
-                                                {{-- Celda vacía fuera de mes --}}
-                                                <td class="border-r border-gray-300 dark:border-white/10 p-2 bg-gray-50/40 dark:bg-white/[0.01]"></td>
-                                            @endif
+
+                                                {{-- Celdas de los 7 Días con el color característico del TRABAJADOR --}}
+                                                @foreach($semana['dias'] as $dia)
+                                                    @if($dia['esMesActual'])
+                                                        @php
+                                                            $key = $dia['fecha'] . '_' . $fila['puesto'] . '_' . $fila['turno'];
+                                                            $turnoReg = $this->turnosMap[$key] ?? null;
+                                                            $empleado = $turnoReg?->empleado;
+                                                            $esSustitucion = $turnoReg?->es_sustitucion;
+                                                        @endphp
+
+                                                        <td
+                                                            wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
+                                                            class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-95 dark:hover:brightness-110 font-black text-xs uppercase"
+                                                            style="{{ $empleado ? ('background-color: ' . $empleado->color_bg . '; color: ' . $empleado->color_text . '; border-color: ' . $empleado->color_border . ';') : '' }}"
+                                                            title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
+                                                        >
+                                                            @if($empleado)
+                                                                <div class="flex items-center justify-center gap-1 truncate">
+                                                                    <span class="truncate font-black tracking-wide text-xs" style="color: {{ $empleado->color_text }};">
+                                                                        {{ $empleado->nombre_corto }}
+                                                                    </span>
+                                                                    @if($esSustitucion && $turnoReg->motivo_sustitucion && !str_contains(mb_strtolower($turnoReg->motivo_sustitucion), 'permanente'))
+                                                                        <span class="text-red-600 font-black text-sm shrink-0" title="Sustitución puntual: {{ $turnoReg->motivo_sustitucion }}">*</span>
+                                                                    @endif
+                                                                </div>
+                                                            @else
+                                                                <div class="flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-primary-600 transition">
+                                                                    <span class="text-xs font-bold">+</span>
+                                                                </div>
+                                                            @endif
+                                                        </td>
+                                                    @else
+                                                        {{-- Celda vacía fuera de mes --}}
+                                                        <td class="border-r border-gray-300 dark:border-white/10 p-2 bg-gray-50/40 dark:bg-white/[0.01]"></td>
+                                                    @endif
+                                                @endforeach
+                                            </tr>
                                         @endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
+        </div>
 
         {{-- Nota visual indicativa --}}
         <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-2 px-1">

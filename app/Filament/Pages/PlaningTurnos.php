@@ -38,6 +38,7 @@ class PlaningTurnos extends Page
     public int $mes;
     public ?string $observaciones = '';
     public string $vista = 'cuadricula'; // 'cuadricula' (por defecto en recuadros sin scroll) o 'horizontal' (tabla corrida)
+    public string $filtroPuestoRonda = 'todos'; // 'todos', 'Puesto 1', 'Puesto 2', 'Noche'
 
     // Estado del modal de turno
     public bool $mostrarModalTurno = false;
@@ -118,10 +119,16 @@ class PlaningTurnos extends Page
     public function seleccionarGasolinera(int $codigo): void
     {
         $this->gasolineraCodigo = $codigo;
+        $this->filtroPuestoRonda = 'todos';
         $this->cargarObservaciones();
 
         // Asegurar que la estación seleccionada tenga su horizonte de 12 meses calculado
         app(PlaningTurnosService::class)->asegurarHorizonte12Meses($codigo, 12, false);
+    }
+
+    public function setFiltroPuesto(string $puesto): void
+    {
+        $this->filtroPuestoRonda = in_array($puesto, ['todos', 'Puesto 1', 'Puesto 2', 'Noche']) ? $puesto : 'todos';
     }
 
     public function updatedAnio(): void
@@ -365,6 +372,7 @@ class PlaningTurnos extends Page
             'anio' => $this->anio,
             'mes' => $this->mes,
             'dias' => $dias,
+            'bloquesPuestos' => $this->bloquesPuestos,
             'filasTurnos' => $filasTurnos,
             'turnosMap' => $turnosMap,
             'observaciones' => $this->observaciones,
@@ -441,87 +449,139 @@ class PlaningTurnos extends Page
         return $dias;
     }
 
-    public function getFilasTurnosProperty(): array
+    public function getBloquesPuestosProperty(): array
     {
         if ($this->gasolineraCodigo === 2) {
-            // Ronda Norte (24 Horas): 2 personas en Mañana (P1 y P2), 2 en Tarde (P1 y P2) y 1 en Noche
-            return [
-                [
-                    'puesto' => 'Puesto 1',
-                    'turno' => 'M',
-                    'etiqueta' => 'MAÑANA - P1',
-                    'icono' => 'heroicon-m-sun',
-                    'color_hex' => '#0284c7',
-                    'color_bg' => '#f8fafc',
-                    'color_border' => '#cbd5e1',
-                    'color_text' => '#1e293b',
+            $bloques = [
+                'Puesto 1' => [
+                    'id' => 'Puesto 1',
+                    'nombre' => 'Puesto 1 (Empleado 1)',
+                    'subtitulo' => 'Turnos Diurnos: Mañana y Tarde',
+                    'icono' => 'heroicon-m-user',
+                    'color_badge' => 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
+                    'filas' => [
+                        [
+                            'puesto' => 'Puesto 1',
+                            'turno' => 'M',
+                            'etiqueta' => 'MAÑANA',
+                            'icono' => 'heroicon-m-sun',
+                            'color_hex' => '#0284c7',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
+                        [
+                            'puesto' => 'Puesto 1',
+                            'turno' => 'T',
+                            'etiqueta' => 'TARDE',
+                            'icono' => 'heroicon-m-clock',
+                            'color_hex' => '#ea580c',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
+                    ],
                 ],
-                [
-                    'puesto' => 'Puesto 2',
-                    'turno' => 'M',
-                    'etiqueta' => 'MAÑANA - P2',
-                    'icono' => 'heroicon-m-sun',
-                    'color_hex' => '#0d9488',
-                    'color_bg' => '#f8fafc',
-                    'color_border' => '#cbd5e1',
-                    'color_text' => '#1e293b',
+                'Puesto 2' => [
+                    'id' => 'Puesto 2',
+                    'nombre' => 'Puesto 2 (Empleado 2)',
+                    'subtitulo' => 'Turnos Diurnos: Mañana y Tarde',
+                    'icono' => 'heroicon-m-user-group',
+                    'color_badge' => 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+                    'filas' => [
+                        [
+                            'puesto' => 'Puesto 2',
+                            'turno' => 'M',
+                            'etiqueta' => 'MAÑANA',
+                            'icono' => 'heroicon-m-sun',
+                            'color_hex' => '#0d9488',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
+                        [
+                            'puesto' => 'Puesto 2',
+                            'turno' => 'T',
+                            'etiqueta' => 'TARDE',
+                            'icono' => 'heroicon-m-clock',
+                            'color_hex' => '#db2777',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
+                    ],
                 ],
-                [
-                    'puesto' => 'Puesto 1',
-                    'turno' => 'T',
-                    'etiqueta' => 'TARDE - P1',
-                    'icono' => 'heroicon-m-clock',
-                    'color_hex' => '#ea580c',
-                    'color_bg' => '#f8fafc',
-                    'color_border' => '#cbd5e1',
-                    'color_text' => '#1e293b',
-                ],
-                [
-                    'puesto' => 'Puesto 2',
-                    'turno' => 'T',
-                    'etiqueta' => 'TARDE - P2',
-                    'icono' => 'heroicon-m-clock',
-                    'color_hex' => '#db2777',
-                    'color_bg' => '#f8fafc',
-                    'color_border' => '#cbd5e1',
-                    'color_text' => '#1e293b',
-                ],
-                [
-                    'puesto' => 'Noche',
-                    'turno' => 'N',
-                    'etiqueta' => 'TURNO NOCHE',
+                'Noche' => [
+                    'id' => 'Noche',
+                    'nombre' => 'Turno Noche (24 Horas)',
+                    'subtitulo' => 'Horario Nocturno Continuo',
                     'icono' => 'heroicon-m-moon',
-                    'color_hex' => '#7c3aed',
-                    'color_bg' => '#f8fafc',
-                    'color_border' => '#cbd5e1',
-                    'color_text' => '#1e293b',
+                    'color_badge' => 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800',
+                    'filas' => [
+                        [
+                            'puesto' => 'Noche',
+                            'turno' => 'N',
+                            'etiqueta' => 'NOCHE',
+                            'icono' => 'heroicon-m-moon',
+                            'color_hex' => '#7c3aed',
+                            'color_bg' => '#f8fafc',
+                            'color_border' => '#cbd5e1',
+                            'color_text' => '#1e293b',
+                        ],
+                    ],
                 ],
             ];
+
+            if ($this->filtroPuestoRonda !== 'todos' && isset($bloques[$this->filtroPuestoRonda])) {
+                return [$this->filtroPuestoRonda => $bloques[$this->filtroPuestoRonda]];
+            }
+
+            return $bloques;
         }
 
         // Estaciones Diurnas (1: Vistalegre, 3: Rodalabota, 4: Atenas)
         return [
-            [
-                'puesto' => 'Puesto Único',
-                'turno' => 'M',
-                'etiqueta' => 'MAÑANA',
-                'icono' => 'heroicon-m-sun',
-                'color_hex' => '#0284c7',
-                'color_bg' => '#f8fafc',
-                'color_border' => '#cbd5e1',
-                'color_text' => '#1e293b',
-            ],
-            [
-                'puesto' => 'Puesto Único',
-                'turno' => 'T',
-                'etiqueta' => 'TARDE',
-                'icono' => 'heroicon-m-clock',
-                'color_hex' => '#ea580c',
-                'color_bg' => '#f8fafc',
-                'color_border' => '#cbd5e1',
-                'color_text' => '#1e293b',
+            'Puesto Único' => [
+                'id' => 'Puesto Único',
+                'nombre' => null,
+                'subtitulo' => null,
+                'icono' => null,
+                'color_badge' => null,
+                'filas' => [
+                    [
+                        'puesto' => 'Puesto Único',
+                        'turno' => 'M',
+                        'etiqueta' => 'MAÑANA',
+                        'icono' => 'heroicon-m-sun',
+                        'color_hex' => '#0284c7',
+                        'color_bg' => '#f8fafc',
+                        'color_border' => '#cbd5e1',
+                        'color_text' => '#1e293b',
+                    ],
+                    [
+                        'puesto' => 'Puesto Único',
+                        'turno' => 'T',
+                        'etiqueta' => 'TARDE',
+                        'icono' => 'heroicon-m-clock',
+                        'color_hex' => '#ea580c',
+                        'color_bg' => '#f8fafc',
+                        'color_border' => '#cbd5e1',
+                        'color_text' => '#1e293b',
+                    ],
+                ],
             ],
         ];
+    }
+
+    public function getFilasTurnosProperty(): array
+    {
+        $filas = [];
+        foreach ($this->bloquesPuestos as $bloque) {
+            foreach ($bloque['filas'] as $f) {
+                $filas[] = $f;
+            }
+        }
+        return $filas;
     }
 
     public function getTurnosMapProperty(): array
