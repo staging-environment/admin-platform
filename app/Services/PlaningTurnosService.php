@@ -107,7 +107,8 @@ class PlaningTurnosService
                 // Turno Noche oficial: Francisco Acaiña (0), Antonio Romero (1)
                 $empFran   = Empleado::where('apellidos', 'like', '%ACAIÑA%')->first()
                     ?: Empleado::where('nombre', 'like', '%FRANCISCO%')->first();
-                $empRomero = Empleado::where('apellidos', 'like', '%ROMERO%')->where('nombre', 'like', '%ANTONIO%')->first();
+                $empRomero = Empleado::where('id', 93)->first()
+                    ?: Empleado::where('apellidos', 'like', '%ROMERO%')->where('nombre', 'like', '%ANTONIO%')->first();
 
                 $equipo = array_filter([$empFran, $empRomero]);
                 if (count($equipo) === 2) {
@@ -123,10 +124,21 @@ class PlaningTurnosService
         }
 
         // Estaciones Diurnas (1, 3, 4)
-        if ($gasolineraCodigo === 1) { // Vistalegre - Rotación oficial: Ant. Jesús, Miguel Ángel (o Consolación), Felisa
-            $equipo = $this->buscarPorNombres($empleados, ['Antonio Jesus', 'Blanquero', 'Felisa'])
-                ?: $this->buscarPorNombres($empleados, ['Jesús', 'Miguel Ángel', 'Felisa']);
-            return $equipo ?: $empleados->take(3)->values()->all();
+        if ($gasolineraCodigo === 1) { // Vistalegre - Rotación oficial 4x2: Ant. Jesús (0), Miguel Ángel (1), Felisa (2)
+            $empAntJesus    = Empleado::where('id', 84)->first()
+                ?: Empleado::where('nombre', 'like', '%ANTONIO JESUS%')->first();
+            $empMiguelAngel = Empleado::where('id', 67)->first()
+                ?: Empleado::where('apellidos', 'like', '%BLANQUERO%')->first();
+            $empFelisa      = Empleado::where('id', 95)->first()
+                ?: Empleado::where('nombre', 'like', '%FELISA%')->first();
+
+            $equipo = array_filter([$empAntJesus, $empMiguelAngel, $empFelisa]);
+            if (count($equipo) === 3) {
+                return array_values($equipo);
+            }
+
+            return $this->buscarPorNombres($empleados, ['Antonio Jesus', 'Blanquero', 'Felisa'])
+                ?: $empleados->take(3)->values()->all();
         }
 
         if ($gasolineraCodigo === 3) { // Rodalabota - Rotación oficial 4x2: Marrufo (0), Emilio (1), Borja (2)
@@ -294,11 +306,26 @@ class PlaningTurnosService
                 // Estaciones Diurnas (1, 3, 4) -> 1 Puesto, 2 Turnos diarios (M, T)
                 $equipo = $this->resolverEquipoBase($gasolineraCodigo, 'Puesto Único');
 
+                $empConso = ($gasolineraCodigo === 1)
+                    ? (Empleado::where('id', 88)->first() ?: Empleado::where('nombre', 'like', '%CONSOLACION%')->first())
+                    : null;
+                $empMiguelAngel = ($gasolineraCodigo === 1 && count($equipo) > 1) ? $equipo[1] : null;
+
                 for ($d = 1; $d <= $diasEnMes; $d++) {
                     $fecha = Carbon::create($anio, $mes, $d);
                     $diaIndice = $fechaRefEpoch->diffInDays($fecha, false);
 
                     $turnosDia = $this->calcularTurnosDia4x2($diaIndice, $equipo);
+
+                    // En Vistalegre, del 5 de noviembre en adelante, Consolación sustituye a Miguel Ángel según Excel oficial
+                    if ($gasolineraCodigo === 1 && $d >= 5 && $empConso && $empMiguelAngel) {
+                        if ($turnosDia['M']?->id === $empMiguelAngel->id) {
+                            $turnosDia['M'] = $empConso;
+                        }
+                        if ($turnosDia['T']?->id === $empMiguelAngel->id) {
+                            $turnosDia['T'] = $empConso;
+                        }
+                    }
 
                     // Turno Mañana
                     $this->guardarTurnoTeorico($cuadrante->id, $fecha->toDateString(), 'Puesto Único', 'M', $turnosDia['M']?->id, $sobrescribir);

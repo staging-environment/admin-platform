@@ -47,9 +47,9 @@ class Empleado extends Model
         $nombreCompleto = mb_strtolower(trim($this->nombre . ' ' . ($this->apellidos ?? '')));
 
         // 1. Asignaciones 100% individuales y únicas (cada trabajador tiene su color exclusivo)
-        // RONDA NORTE & VISTALEGRE
-        if ($id === 93 || $id === 84 || (str_contains($nombreCompleto, 'romero') && !str_contains($nombreCompleto, 'zambrano'))) {
-            // Romero (Antonio Romero / Antonio Jesús Rodríguez Romero): Amarillo puro brillante según Excel oficial
+        // RONDA NORTE
+        if ($id === 93 || (str_contains($nombreCompleto, 'romero') && !str_contains($nombreCompleto, 'rodriguez') && !str_contains($nombreCompleto, 'zambrano'))) {
+            // Romero (Antonio Romero Martín - Ronda Norte Noche): Amarillo puro brillante según Excel oficial
             return [
                 'bg' => '#ffff00',
                 'text' => '#1f2937',
@@ -139,33 +139,43 @@ class Empleado extends Model
         }
 
         // VISTALEGRE
-        if ($id === 95 || str_contains($nombreCompleto, 'felisa')) {
-            // Felisa Díaz (Vistalegre): Rosa chicle pastel (diferenciado del salmón de Laura)
+        if ($id === 84 || str_contains($nombreCompleto, 'antonio jesus') || str_contains($nombreCompleto, 'ant. jesus')) {
+            // Ant. Jesús (Vistalegre): Verde claro pastel según Excel oficial
             return [
-                'bg' => '#fbcfe8',
-                'text' => '#831843',
-                'border' => '#f472b6',
-                'color' => '#db2777',
+                'bg' => '#a9d08e',
+                'text' => '#1f2937',
+                'border' => '#689f38',
+                'color' => '#70ad47',
+            ];
+        }
+
+        if ($id === 95 || str_contains($nombreCompleto, 'felisa')) {
+            // Felisa Díaz (Vistalegre): Rosa salmón pastel según Excel oficial
+            return [
+                'bg' => '#f8cbad',
+                'text' => '#1f2937',
+                'border' => '#e29e74',
+                'color' => '#f8cbad',
             ];
         }
 
         if ($id === 67 || str_contains($nombreCompleto, 'blanquero')) {
-            // Miguel Ángel Blanquero (Vistalegre): Naranja teja óxido intenso
+            // Miguel Ángel Blanquero (Vistalegre): Naranja según Excel oficial
             return [
-                'bg' => '#ea580c',
+                'bg' => '#ed7d31',
                 'text' => '#ffffff',
-                'border' => '#9a3412',
-                'color' => '#ea580c',
+                'border' => '#c65911',
+                'color' => '#ed7d31',
             ];
         }
 
         if ($id === 88 || str_contains($nombreCompleto, 'consolacion')) {
-            // Consolación Zapata (Vistalegre): Melocotón albaricoque suave
+            // Consolación Zapata (Vistalegre): Naranja cálido (suplente de Miguel Ángel según Excel oficial)
             return [
-                'bg' => '#fdba74',
-                'text' => '#7c2d12',
+                'bg' => '#f97316',
+                'text' => '#ffffff',
                 'border' => '#ea580c',
-                'color' => '#f97316',
+                'color' => '#ea580c',
             ];
         }
 
@@ -282,10 +292,13 @@ class Empleado extends Model
         $nombreCompleto = mb_strtoupper($nombre . ' ' . $apellidos);
 
         // Identificación inequívoca por ID o nombre específico
+        if ($id === 84 || str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
+            return 'ANT. JESUS';
+        }
         if ($id === 87 || str_contains($nombreCompleto, 'ZAMBRANO')) {
             return 'ZAMBRANO';
         }
-        if ($id === 93 || $id === 84 || str_contains($nombreCompleto, 'ROMERO')) {
+        if ($id === 93 || str_contains($nombreCompleto, 'ROMERO')) {
             return 'ROMERO';
         }
         if ($id === 71 || str_contains($nombreCompleto, 'CARVAJAL')) {
