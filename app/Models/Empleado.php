@@ -212,32 +212,32 @@ class Empleado extends Model
 
         // ATENAS
         if ($id === 77 || str_contains($nombreCompleto, 'llompart')) {
-            // Toni Llompart (Atenas): Cian cielo
+            // Toni Llompart (Atenas): Azul cielo suave según Excel oficial
             return [
-                'bg' => '#38bdf8',
-                'text' => '#0c4a6e',
-                'border' => '#0284c7',
-                'color' => '#0ea5e9',
+                'bg' => '#9bc2e6',
+                'text' => '#1f2937',
+                'border' => '#5b9bd5',
+                'color' => '#41719c',
             ];
         }
 
         if ($id === 87 || str_contains($nombreCompleto, 'zambrano')) {
-            // Juan Antonio Zambrano (Atenas): Fucsia orquídea
+            // Juan Antonio Zambrano (Atenas): Amarillo puro brillante según Excel oficial
             return [
-                'bg' => '#e879f9',
-                'text' => '#701a75',
-                'border' => '#c026d3',
-                'color' => '#d946ef',
+                'bg' => '#ffff00',
+                'text' => '#1f2937',
+                'border' => '#ca8a04',
+                'color' => '#eab308',
             ];
         }
 
         if ($id === 70 || str_contains($nombreCompleto, 'joaquin')) {
-            // Joaquín Caro (Atenas): Turquesa menta pastel
+            // Joaquín Caro (Atenas): Naranja cálido según Excel oficial
             return [
-                'bg' => '#5eead4',
-                'text' => '#134e4a',
-                'border' => '#14b8a6',
-                'color' => '#0d9488',
+                'bg' => '#ed7d31',
+                'text' => '#ffffff',
+                'border' => '#c65911',
+                'color' => '#ed7d31',
             ];
         }
 

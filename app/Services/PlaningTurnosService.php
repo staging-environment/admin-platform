@@ -155,9 +155,21 @@ class PlaningTurnosService
                 ?: $empleados->take(3)->values()->all();
         }
 
-        if ($gasolineraCodigo === 4) { // Atenas
-            $equipo = $this->buscarPorNombres($empleados, ['Toni', 'Zambrano', 'Joaquín']);
-            return $equipo ?: $empleados->take(3)->values()->all();
+        if ($gasolineraCodigo === 4) { // Atenas - Rotación oficial 4x2: Toni (0), Joaquín (1), Zambrano (2)
+            $empToni     = Empleado::where('id', 77)->first()
+                ?: Empleado::where('apellidos', 'like', '%LLOMPART%')->first();
+            $empJoaquin  = Empleado::where('id', 70)->first()
+                ?: Empleado::where('nombre', 'like', '%JOAQUIN%')->first();
+            $empZambrano = Empleado::where('id', 87)->first()
+                ?: Empleado::where('apellidos', 'like', '%ZAMBRANO%')->first();
+
+            $equipo = array_filter([$empToni, $empJoaquin, $empZambrano]);
+            if (count($equipo) === 3) {
+                return array_values($equipo);
+            }
+
+            return $this->buscarPorNombres($empleados, ['Toni', 'Joaquín', 'Zambrano'])
+                ?: $empleados->take(3)->values()->all();
         }
 
         return $empleados->take(3)->values()->all();
