@@ -68,7 +68,7 @@
         @php
             $estaciones = [
                 1 => ['nombre' => 'Vistalegre', 'sub' => 'Utrera (2 Turnos)', 'icon' => 'heroicon-m-building-storefront'],
-                2 => ['nombre' => 'Ronda Norte', 'sub' => 'Utrera (2 Turnos)', 'icon' => 'heroicon-m-clock'],
+                2 => ['nombre' => 'Ronda Norte', 'sub' => 'Utrera (24 Horas)', 'icon' => 'heroicon-m-clock'],
                 3 => ['nombre' => 'Rodalabota', 'sub' => 'El Cuervo (2 Turnos)', 'icon' => 'heroicon-m-map-pin'],
                 4 => ['nombre' => 'Atenas', 'sub' => 'Lebrija (2 Turnos)', 'icon' => 'heroicon-m-sparkles'],
             ];

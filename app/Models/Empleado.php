@@ -86,6 +86,56 @@ class Empleado extends Model
             ];
         }
 
+        if (str_contains($nombreCompleto, 'carvajal')) {
+            // Antonio Carvajal (Ronda Norte Puesto 1): Azul cielo suave
+            return [
+                'bg' => '#93c5fd',
+                'text' => '#1e3a8a',
+                'border' => '#60a5fa',
+                'color' => '#3b82f6',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'campos')) {
+            // Antonio Campos (Ronda Norte Puesto 1): Amarillo ámbar cálido
+            return [
+                'bg' => '#fde047',
+                'text' => '#713f12',
+                'border' => '#eab308',
+                'color' => '#eab308',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'prieto') || str_contains($nombreCompleto, 'carmen')) {
+            // Mari Carmen Prieto (Ronda Norte Puesto 1): Violeta pastel
+            return [
+                'bg' => '#d8b4fe',
+                'text' => '#581c87',
+                'border' => '#c084fc',
+                'color' => '#a855f7',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'acaiña') || str_contains($nombreCompleto, 'francisco')) {
+            // Francisco (Ronda Norte Turno Noche): Índigo
+            return [
+                'bg' => '#818cf8',
+                'text' => '#ffffff',
+                'border' => '#4f46e5',
+                'color' => '#6366f1',
+            ];
+        }
+
+        if (str_contains($nombreCompleto, 'romero')) {
+            // Antonio Romero (Ronda Norte Turno Noche): Turquesa
+            return [
+                'bg' => '#5eead4',
+                'text' => '#134e4a',
+                'border' => '#14b8a6',
+                'color' => '#0d9488',
+            ];
+        }
+
         // 2. Si tiene un color personalizado explícito en base de datos
         if (!empty($this->color_hex)) {
             return [
@@ -132,13 +182,33 @@ class Empleado extends Model
     public function getNombreCortoAttribute(): string
     {
         $nombre = trim($this->nombre);
-        $nombreMayus = mb_strtoupper($nombre);
+        $apellidos = trim($this->apellidos ?? '');
+        $nombreCompleto = mb_strtoupper($nombre . ' ' . $apellidos);
 
-        if (str_contains($nombreMayus, 'CONSOLACION')) {
+        // Distinción clara e inmediata en cuadrante de gasolineras
+        if (str_contains($nombreCompleto, 'CARVAJAL')) {
+            return 'CARVAJAL';
+        }
+        if (str_contains($nombreCompleto, 'CAMPOS')) {
+            return 'CAMPOS';
+        }
+        if (str_contains($nombreCompleto, 'ROMERO')) {
+            return 'ROMERO';
+        }
+        if (str_contains($nombreCompleto, 'ANTONIO JESUS') || str_contains($nombreCompleto, 'ANT. JESUS')) {
+            return 'ANT. JESUS';
+        }
+        if (str_contains($nombreCompleto, 'CONSOLACION')) {
             return 'CONSOLACION';
         }
-        if (str_contains($nombreMayus, 'MIGUEL ANGEL')) {
+        if (str_contains($nombreCompleto, 'MIGUEL ANGEL')) {
             return 'MIGUEL ANGEL';
+        }
+        if (str_contains($nombreCompleto, 'MARI CARMEN') || str_contains($nombreCompleto, 'MARIA DEL CARMEN')) {
+            return 'MARI CARMEN';
+        }
+        if (str_contains($nombreCompleto, 'ACAIÑA') || str_contains($nombreCompleto, 'FRANCISCO')) {
+            return 'FRANCISCO';
         }
 
         $partes = preg_split('/\s+/', $nombre);
@@ -156,7 +226,7 @@ class Empleado extends Model
             return $p0;
         }
 
-        return $nombreMayus;
+        return mb_strtoupper($nombre);
     }
 
 

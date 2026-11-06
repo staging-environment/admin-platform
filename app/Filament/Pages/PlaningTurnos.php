@@ -443,7 +443,63 @@ class PlaningTurnos extends Page
 
     public function getFilasTurnosProperty(): array
     {
-        // Estaciones con 2 turnos (1: Vistalegre, 2: Ronda Norte, 3: Rodalabota, 4: Atenas)
+        if ($this->gasolineraCodigo === 2) {
+            // Ronda Norte (24 Horas): 2 personas en Mañana (P1 y P2), 2 en Tarde (P1 y P2) y 1 en Noche
+            return [
+                [
+                    'puesto' => 'Puesto 1',
+                    'turno' => 'M',
+                    'etiqueta' => 'MAÑANA - P1',
+                    'icono' => 'heroicon-m-sun',
+                    'color_hex' => '#0284c7',
+                    'color_bg' => '#f8fafc',
+                    'color_border' => '#cbd5e1',
+                    'color_text' => '#1e293b',
+                ],
+                [
+                    'puesto' => 'Puesto 2',
+                    'turno' => 'M',
+                    'etiqueta' => 'MAÑANA - P2',
+                    'icono' => 'heroicon-m-sun',
+                    'color_hex' => '#0d9488',
+                    'color_bg' => '#f8fafc',
+                    'color_border' => '#cbd5e1',
+                    'color_text' => '#1e293b',
+                ],
+                [
+                    'puesto' => 'Puesto 1',
+                    'turno' => 'T',
+                    'etiqueta' => 'TARDE - P1',
+                    'icono' => 'heroicon-m-clock',
+                    'color_hex' => '#ea580c',
+                    'color_bg' => '#f8fafc',
+                    'color_border' => '#cbd5e1',
+                    'color_text' => '#1e293b',
+                ],
+                [
+                    'puesto' => 'Puesto 2',
+                    'turno' => 'T',
+                    'etiqueta' => 'TARDE - P2',
+                    'icono' => 'heroicon-m-clock',
+                    'color_hex' => '#db2777',
+                    'color_bg' => '#f8fafc',
+                    'color_border' => '#cbd5e1',
+                    'color_text' => '#1e293b',
+                ],
+                [
+                    'puesto' => 'Noche',
+                    'turno' => 'N',
+                    'etiqueta' => 'TURNO NOCHE',
+                    'icono' => 'heroicon-m-moon',
+                    'color_hex' => '#7c3aed',
+                    'color_bg' => '#f8fafc',
+                    'color_border' => '#cbd5e1',
+                    'color_text' => '#1e293b',
+                ],
+            ];
+        }
+
+        // Estaciones Diurnas (1: Vistalegre, 3: Rodalabota, 4: Atenas)
         return [
             [
                 'puesto' => 'Puesto Único',
