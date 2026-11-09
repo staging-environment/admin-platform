@@ -333,7 +333,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </span>
-                        Historial de Fichajes (Últimos 7 días)
+                        Historial de Fichajes (Últimos 30 días)
                     </h3>
                     <button type="button" wire:click="abrirFichajeRetroactivoNuevaFecha" style="background-color: #d97706; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-amber-750 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,7 +443,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                        Aún no has registrado ningún fichaje en los últimos 7 días.
+                                        Aún no has registrado ningún fichaje en los últimos 30 días.
                                     </td>
                                 </tr>
                             @endforelse
