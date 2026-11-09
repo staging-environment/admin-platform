@@ -304,7 +304,7 @@ class FichaEmpleado extends Page
         }
 
         $this->recentFichajes = EmpleadoFichaje::where('empleado_id', $this->empleado->id)
-            ->where('fecha', '>=', Carbon::today()->subDays(6)->format('Y-m-d'))
+            ->where('fecha', '>=', Carbon::today()->subDays(30)->format('Y-m-d'))
             ->orderBy('fecha', 'desc')
             ->orderBy('hora_entrada', 'desc')
             ->get();
