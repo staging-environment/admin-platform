@@ -85,7 +85,7 @@
                                      </x-dropdown-link>
                                      @endif
 
-                                     @if(auth()->user()?->can('gestion_planing') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
+                                     @if(auth()->user()?->can('gestion_planing') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
                                      <x-dropdown-link href="/admin/planing-turnos?estacion=1" :active="request()->is('admin/planing*')">
                                          {{ __('Planing') }}
                                      </x-dropdown-link>
@@ -381,7 +381,7 @@
                         </x-responsive-nav-link>
                         @endif
 
-                        @if(auth()->user()?->can('gestion_planing') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
+                        @if(auth()->user()?->can('gestion_planing') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
                         <x-responsive-nav-link href="/admin/planing-turnos?estacion=1" :active="request()->is('admin/planing*')">
                             {{ __('Planing') }}
                         </x-responsive-nav-link>

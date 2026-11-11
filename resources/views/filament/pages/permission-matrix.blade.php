@@ -72,6 +72,7 @@
                             'gestion_eliminar_empleados' => 'Eliminar empleados',
                             'dar_baja_empleado' => 'Dar de baja a un empleado',
                             'aprobacion_vacaciones_bajas' => 'Aprobación y Gestión de Vacaciones y Bajas',
+                            'gestion_planing' => 'Gestión de Planing de Turnos',
                         ],
                         'SUBSECCIONES' => [
                             'ver_documentacion_empleados' => 'Ver Documentación de Empleados',

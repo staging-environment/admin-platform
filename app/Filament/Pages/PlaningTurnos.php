@@ -61,9 +61,11 @@ class PlaningTurnos extends Page
             return false;
         }
 
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        $user->unsetRelation('roles')->unsetRelation('permissions');
+
         // Regla: Autorización basada exclusivamente en permisos
         return $user->can('gestion_planing')
-            || $user->can('gestion_recursos_humanos')
             || $user->email === 'jarodriguezbonilla@gmail.com'
             || $user->id === 1;
     }
