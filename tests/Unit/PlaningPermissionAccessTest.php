@@ -69,6 +69,7 @@ class PlaningPermissionAccessTest extends TestCase
     public function test_usuario_sin_permiso_planing_no_puede_acceder_aunque_tenga_rrhh(): void
     {
         $user = User::factory()->create([
+            'id' => 999,
             'email' => 'rrhh_sin_planing@test.com',
         ]);
         $user->givePermissionTo('gestion_recursos_humanos');
