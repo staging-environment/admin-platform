@@ -234,13 +234,13 @@
                                     <tbody class="divide-y divide-gray-400 dark:divide-white/20">
                                         @foreach($bloque['filas'] as $fila)
                                             <tr>
-                                                {{-- Etiqueta del Turno (MAÑANA, TARDE) con fondo neutro --}}
+                                                {{-- Etiqueta del Turno (MAÑANA, TARDE, NOCHE) con fondo neutro --}}
                                                 <td
-                                                    class="border-r border-gray-400 dark:border-white/20 p-2.5 font-black text-center uppercase text-xs tracking-wider bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-gray-200"
+                                                    class="border-r border-gray-400 dark:border-white/20 py-2 px-2.5 font-black text-center uppercase text-xs tracking-wider bg-gray-50 dark:bg-white/5 text-gray-800 dark:text-gray-200"
                                                 >
-                                                    <div class="flex items-center justify-center gap-1.5">
-                                                        <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                                                        <span>{{ $fila['etiqueta'] }}</span>
+                                                    <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                                        <x-filament::icon :icon="$fila['icono']" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
+                                                        <span class="whitespace-nowrap">{{ $fila['etiqueta'] }}</span>
                                                     </div>
                                                 </td>
 

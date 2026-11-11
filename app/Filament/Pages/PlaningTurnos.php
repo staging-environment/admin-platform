@@ -483,7 +483,7 @@ class PlaningTurnos extends Page
                         [
                             'puesto' => 'Noche',
                             'turno' => 'N',
-                            'etiqueta' => 'TURNO NOCHE',
+                            'etiqueta' => 'NOCHE',
                             'icono' => 'heroicon-m-moon',
                             'color_hex' => '#7c3aed',
                             'color_bg' => '#f8fafc',
