@@ -176,7 +176,7 @@
 
                         @if(auth()->user()?->can('solicitar_ver_vacaciones'))
                         <x-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
-                            {{ __('Vacaciones') }}
+                            {{ __('Permisos') }}
                         </x-nav-link>
                         @endif
 
@@ -483,7 +483,7 @@
 
                         @if(auth()->user()?->can('solicitar_ver_vacaciones'))
                         <x-responsive-nav-link href="/admin/portal-empleado?tab=vacaciones" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && request()->query('tab') === 'vacaciones'">
-                            {{ __('Vacaciones') }}
+                            {{ __('Permisos') }}
                         </x-responsive-nav-link>
                         @endif
 
