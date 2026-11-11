@@ -388,11 +388,26 @@
                         <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
                             Empleado Asignado
                         </label>
+
+                        @if($this->empleadoActualDeBaja)
+                            <div class="mb-2.5 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/50 flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200">
+                                <x-filament::icon icon="heroicon-m-exclamation-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                <div>
+                                    <span class="font-bold">Aviso de baja:</span> El empleado asignado actualmente (<strong>{{ $this->empleadoActualDeBaja->nombre }} {{ $this->empleadoActualDeBaja->apellidos }}</strong>) se encuentra en situación de <strong>baja</strong> en esta fecha. Elige a continuación un sustituto disponible en la lista.
+                                </div>
+                            </div>
+                        @endif
+
                         <select
                             wire:model.live="modalEmpleadoId"
                             class="w-full text-xs bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500 font-bold"
                         >
                             <option value="">-- Sin asignar / Dejar libre --</option>
+                            @if($this->empleadoActualDeBaja)
+                                <option value="{{ $this->empleadoActualDeBaja->id }}" disabled class="text-rose-600 font-bold bg-rose-50 dark:bg-rose-950/30">
+                                    ⚠️ {{ $this->empleadoActualDeBaja->nombre }} {{ $this->empleadoActualDeBaja->apellidos }} (Actualmente asignado - De baja)
+                                </option>
+                            @endif
                             @foreach($this->empleadosDisponibles as $emp)
                                 <option value="{{ $emp->id }}">
                                     {{ $emp->nombre }} {{ $emp->apellidos }} ({{ $emp->puesto ?? 'Expendedor' }})

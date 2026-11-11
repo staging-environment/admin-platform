@@ -617,6 +617,45 @@ class Empleado extends Model
         return $this->ausencias()->where('tipo', 'Bajas médicas')->whereNull('fecha_fin')->exists();
     }
 
+    /**
+     * Comprueba si el empleado está en situación de baja (laboral o médica) en una fecha específica.
+     */
+    public function estaDeBajaEnFecha(?string $fecha = null): bool
+    {
+        $fecha = $fecha ? \Carbon\Carbon::parse($fecha)->toDateString() : \Carbon\Carbon::today()->toDateString();
+
+        // 1. Baja contractual o baja laboral en la empresa
+        if ($this->estado === 'Baja' || $this->trashed()) {
+            return true;
+        }
+
+        if ($this->fecha_baja) {
+            $fechaBaja = \Carbon\Carbon::parse($this->fecha_baja)->toDateString();
+            if ($fechaBaja <= $fecha) {
+                return true;
+            }
+        }
+
+        // 2. Baja médica / Incapacidad temporal activa en la fecha indicada
+        return $this->ausencias()
+            ->where(function ($q) {
+                $q->where('tipo', 'Bajas médicas')
+                  ->orWhere('tipo', 'Incapacidades')
+                  ->orWhere('tipo', 'like', '%baja%')
+                  ->orWhere('tipo', 'like', '%incapacidad%');
+            })
+            ->where('fecha_inicio', '<=', $fecha)
+            ->where(function ($q) use ($fecha) {
+                $q->whereNull('fecha_fin')
+                  ->orWhere('fecha_fin', '>=', $fecha);
+            })
+            ->where(function ($q) {
+                $q->whereNull('estado')
+                  ->orWhere('estado', '!=', 'Rechazada');
+            })
+            ->exists();
+    }
+
     public function alertas()
     {
         return $this->hasMany(EmpleadoAlerta::class);

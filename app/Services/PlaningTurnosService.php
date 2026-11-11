@@ -53,15 +53,51 @@ class PlaningTurnosService
     }
 
     /**
-     * Todos los empleados activos de la empresa para selector de suplencias
+     * Todos los empleados activos de la empresa para selector de suplencias.
+     * Si se proporciona una fecha, excluye a los empleados que se encuentren de baja (laboral o médica) en esa fecha.
      */
-    public function getTodosEmpleadosActivos(): Collection
+    public function getTodosEmpleadosActivos(?string $fecha = null): Collection
     {
-        return Empleado::query()
+        $query = Empleado::query()
             ->whereNull('deleted_at')
-            ->where('estado', 'Alta')
-            ->orderBy('nombre')
-            ->get();
+            ->where('estado', 'Alta');
+
+        if ($fecha) {
+            $fechaStr = \Carbon\Carbon::parse($fecha)->toDateString();
+
+            // 1. Filtrar empleados con fecha_baja fijada anterior o igual a la fecha seleccionada
+            $query->where(function ($q) use ($fechaStr) {
+                $q->whereNull('fecha_baja')
+                  ->orWhere('fecha_baja', '>', $fechaStr);
+            });
+
+            // 2. Excluir empleados que tengan baja médica o incapacidad activa en esa fecha
+            $empleadosDeBajaIds = \App\Models\EmpleadoAusencia::query()
+                ->where(function ($q) {
+                    $q->where('tipo', 'Bajas médicas')
+                      ->orWhere('tipo', 'Incapacidades')
+                      ->orWhere('tipo', 'like', '%baja%')
+                      ->orWhere('tipo', 'like', '%incapacidad%');
+                })
+                ->where('fecha_inicio', '<=', $fechaStr)
+                ->where(function ($q) use ($fechaStr) {
+                    $q->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', $fechaStr);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('estado')
+                      ->orWhere('estado', '!=', 'Rechazada');
+                })
+                ->pluck('empleado_id')
+                ->unique()
+                ->toArray();
+
+            if (!empty($empleadosDeBajaIds)) {
+                $query->whereNotIn('id', $empleadosDeBajaIds);
+            }
+        }
+
+        return $query->orderBy('nombre')->get();
     }
 
     /**

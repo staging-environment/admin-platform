@@ -262,6 +262,19 @@ class PlaningTurnos extends Page
         $titularId = $this->modalTitularId
             ?: ($registroActual?->empleado_titular_id ?: $registroActual?->empleado_id);
 
+        // Validación: No permitir asignar a un empleado que esté de baja en esa fecha
+        if ($nuevoEmpleadoId && $nuevoEmpleadoId !== $registroActual?->empleado_id) {
+            $empleadoCandidato = Empleado::find($nuevoEmpleadoId);
+            if ($empleadoCandidato && $empleadoCandidato->estaDeBajaEnFecha($this->modalFecha)) {
+                Notification::make()
+                    ->title('Empleado no disponible')
+                    ->body("{$empleadoCandidato->nombre} {$empleadoCandidato->apellidos} se encuentra en situación de baja en la fecha seleccionada.")
+                    ->danger()
+                    ->send();
+                return;
+            }
+        }
+
         // 1. Asignar el turno actual seleccionado
         $service->asignarTurnoManual(
             $cuadrante->id,
@@ -623,7 +636,21 @@ class PlaningTurnos extends Page
 
     public function getEmpleadosDisponiblesProperty(): Collection
     {
-        return app(PlaningTurnosService::class)->getTodosEmpleadosActivos();
+        return app(PlaningTurnosService::class)->getTodosEmpleadosActivos($this->modalFecha);
+    }
+
+    public function getEmpleadoActualDeBajaProperty(): ?Empleado
+    {
+        if (!$this->modalEmpleadoId || !$this->modalFecha) {
+            return null;
+        }
+
+        $emp = Empleado::find($this->modalEmpleadoId);
+        if ($emp && $emp->estaDeBajaEnFecha($this->modalFecha)) {
+            return $emp;
+        }
+
+        return null;
     }
 
     public function getEmpleadosLegendaProperty(): Collection
