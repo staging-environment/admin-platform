@@ -63,8 +63,8 @@
         }
     </style>
 
-    {{-- 1. Barra Superior de Selección de Gasolinera --}}
-    <div class="flex flex-wrap items-center gap-2 p-1.5 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+    {{-- 1. Barra Superior de Selección de Gasolinera (Compacta para optimizar espacio vertical) --}}
+    <div class="flex flex-wrap items-center gap-1.5 p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
         @php
             $estaciones = [
                 1 => ['nombre' => 'Vistalegre', 'sub' => 'Utrera (2 Turnos)', 'icon' => 'heroicon-m-building-storefront'],
@@ -78,21 +78,21 @@
             <button
                 type="button"
                 wire:click="seleccionarGasolinera({{ $codigo }})"
-                class="flex-1 min-w-[200px] flex items-center gap-3 px-4 py-2.5 rounded-lg text-left transition-all duration-150 {{ $gasolineraCodigo === $codigo ? 'bg-white dark:bg-white/15 text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-white/20 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50' }}"
+                class="flex-1 min-w-[160px] flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left transition-all duration-150 {{ $gasolineraCodigo === $codigo ? 'bg-white dark:bg-white/15 text-primary-600 dark:text-primary-400 shadow-xs border border-gray-200/80 dark:border-white/20 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50' }}"
             >
-                <div class="p-2 rounded-lg {{ $gasolineraCodigo === $codigo ? 'bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400' : 'bg-gray-200/60 dark:bg-white/10 text-gray-500' }}">
-                    <x-filament::icon :icon="$est['icon']" class="w-5 h-5" />
+                <div class="p-1.5 rounded-md shrink-0 {{ $gasolineraCodigo === $codigo ? 'bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400' : 'bg-gray-200/60 dark:bg-white/10 text-gray-500' }}">
+                    <x-filament::icon :icon="$est['icon']" class="w-4 h-4" />
                 </div>
-                <div>
-                    <div class="text-sm font-bold leading-tight">{{ $est['nombre'] }}</div>
-                    <div class="text-xs text-gray-400 dark:text-gray-500 font-normal">{{ $est['sub'] }}</div>
+                <div class="min-w-0">
+                    <div class="text-xs font-bold leading-tight truncate">{{ $est['nombre'] }}</div>
+                    <div class="text-[10px] text-gray-400 dark:text-gray-500 font-normal leading-tight truncate">{{ $est['sub'] }}</div>
                 </div>
             </button>
         @endforeach
     </div>
 
     {{-- 2. Barra de Control Temporal y Acciones --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2 bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 shadow-xs">
         {{-- Navegación de Mes/Año (Selector Principal < MES AÑO >) --}}
         <div class="flex items-center">
             <div class="flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-1 border border-gray-200 dark:border-white/10">
