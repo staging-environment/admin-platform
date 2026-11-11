@@ -201,3 +201,4 @@ class PlaningTurnosColorTurnoTest extends TestCase
         $this->assertEquals('Azul', $leyendaVistalegre[2]['color_nombre']);
     }
 }
+

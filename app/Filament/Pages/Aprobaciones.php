@@ -106,7 +106,7 @@ class Aprobaciones extends Page
 
     public function getVacacionesPendientesProperty()
     {
-        $query = EmpleadoVacacion::with('empleado')
+        $query = EmpleadoVacacion::with(['empleado', 'empleadoSustituto'])
             ->where('estado', 'Pendiente');
 
         if ($this->filter_pendiente_empleado) {
@@ -134,7 +134,7 @@ class Aprobaciones extends Page
 
     public function getHistoricoProcesadasProperty()
     {
-        $query = EmpleadoVacacion::with('empleado')
+        $query = EmpleadoVacacion::with(['empleado', 'empleadoSustituto'])
             ->whereIn('estado', ['Aceptada', 'Rechazada']);
 
         if ($this->filter_historico_empleado) {
@@ -170,7 +170,7 @@ class Aprobaciones extends Page
 
     public function getTiposProperty()
     {
-        return ['Vacaciones', 'Permiso Retribuido'];
+        return ['Vacaciones', 'Permiso Retribuido', 'Cambio de Turno'];
     }
 
     public function mount(): void

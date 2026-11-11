@@ -156,6 +156,107 @@
 
             @if($activeTab === 'fichajes')
                 <div class="space-y-6">
+
+                    {{-- 1. Alertas de Cambios de Turno Recibidos (Pendientes de Aceptar / Denegar por este empleado) --}}
+                    @foreach($this->solicitudesCambioPendientesRecibidas as $solRecibida)
+                        <div class="p-5 bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-blue-500/15 dark:from-amber-950/40 dark:via-indigo-950/20 dark:to-blue-950/20 border-2 border-amber-500/60 dark:border-amber-500/40 rounded-3xl shadow-md animate-fadeIn">
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="p-3 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl shrink-0 mt-0.5 shadow-xs">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2.5 py-0.5 bg-amber-600 text-white font-black text-xs rounded-full uppercase tracking-wider shadow-xs">
+                                                ● Solicitud de Cambio de Turno Recibida
+                                            </span>
+                                        </div>
+                                        <h3 class="text-base font-black text-gray-900 dark:text-white">
+                                            {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ha solicitado un cambio de turno
+                                        </h3>
+                                        <div class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                                            <p>
+                                                🗓️ <strong>Día que te pide cubrir:</strong> <span class="text-indigo-600 dark:text-indigo-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                            </p>
+                                            <p>
+                                                🔄 <strong>Día que te lo devuelve:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_devolucion)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                            </p>
+                                            @if($solRecibida->comentario_empleado)
+                                                <p class="text-[11px] text-gray-500 dark:text-gray-400 italic">
+                                                    💬 "{{ $solRecibida->comentario_empleado }}"
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2.5 shrink-0 self-end lg:self-center">
+                                    <button
+                                        type="button"
+                                        wire:click="responderCambioTurno({{ $solRecibida->id }}, true)"
+                                        style="background-color: #10b981; color: #ffffff;"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Aceptar Cambio</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        wire:click="responderCambioTurno({{ $solRecibida->id }}, false)"
+                                        style="background-color: #ef4444; color: #ffffff;"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Denegar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    {{-- 2. Alertas para el Empleado Solicitante (con la respuesta de su compañero) --}}
+                    @foreach($this->alertasCambioTurnoParaSolicitante as $alertaSol)
+                        @php
+                            $esAceptada = in_array($alertaSol->estado, ['Aceptada', 'Aprobada']);
+                            $nombreResp = $alertaSol->empleadoSustituto ? ($alertaSol->empleadoSustituto->nombre . ' ' . $alertaSol->empleadoSustituto->apellidos) : 'Tu compañero';
+                        @endphp
+                        <div class="p-5 {{ $esAceptada ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-100' : 'bg-rose-500/10 border-rose-500/40 text-rose-950 dark:text-rose-100' }} border-2 rounded-3xl shadow-sm animate-fadeIn">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="p-2.5 {{ $esAceptada ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400' }} rounded-xl shrink-0 mt-0.5">
+                                        @if($esAceptada)
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        @else
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        @endif
+                                    </div>
+                                    <div class="space-y-1">
+                                        <h4 class="font-black text-sm {{ $esAceptada ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300' }}">
+                                            {{ $esAceptada ? '¡Cambio de Turno Aceptado!' : 'Solicitud de Cambio de Turno Denegada' }}
+                                        </h4>
+                                        <p class="text-xs leading-relaxed">
+                                            @if($esAceptada)
+                                                <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> el cambio de turno. Cubrirá tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> y tú le devolverás el turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_devolucion)->format('d/m/Y') }}</strong>. El Planing de turnos ha sido actualizado.
+                                            @else
+                                                <strong>{{ $nombreResp }}</strong> ha <strong>DENEGADO</strong> tu solicitud de cambio de turno para el día <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>.
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    wire:click="marcarAlertaCambioVista({{ $alertaSol->id }})"
+                                    class="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer whitespace-nowrap {{ $esAceptada ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white' }}"
+                                >
+                                    <span>Entendido / Cerrar</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endforeach
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Check-in Card -->
                 <div class="p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm flex flex-col justify-between">
@@ -531,6 +632,11 @@
                                         <div>
                                             <div class="flex items-center gap-2">
                                                 <span class="text-xs font-bold text-gray-900 dark:text-white">{{ $v->tipo }}</span>
+                                                @if($v->tipo === 'Cambio de Turno' && $v->empleado_sustituto_id)
+                                                    <span class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
+                                                        con {{ $v->empleadoSustituto?->nombre_corto ?? 'Compañero' }}
+                                                    </span>
+                                                @endif
                                                 <span class="text-[10px] px-2 py-0.5 rounded-full font-bold
                                                     {{ in_array($v->estado, ['Aceptada', 'Aprobada']) ? 'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400' : '' }}
                                                     {{ in_array($v->estado, ['Rechazada', 'Denegada']) ? 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400' : '' }}
@@ -540,7 +646,11 @@
                                                 </span>
                                             </div>
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
+                                                @if($v->tipo === 'Cambio de Turno')
+                                                    Cubre: <strong>{{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }}</strong> &bull; Devuelve: <strong>{{ $v->fecha_devolucion ? \Carbon\Carbon::parse($v->fecha_devolucion)->format('d/m/Y') : '-' }}</strong>
+                                                @else
+                                                    Del {{ \Carbon\Carbon::parse($v->fecha_inicio)->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($v->fecha_fin)->format('d/m/Y') }}
+                                                @endif
                                             </p>
                                             @if(in_array($v->estado, ['Rechazada', 'Denegada']) && $v->comentario_aprobador)
                                                 <p class="text-[11px] text-red-600 dark:text-red-400 mt-1 font-medium italic">
@@ -1177,9 +1287,10 @@
                 <form wire:submit.prevent="solicitarVacacion" class="space-y-4 py-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Tipo de Solicitud</label>
-                        <select wire:model.live="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
+                        <select wire:model.live="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm font-bold">
                             <option value="Vacaciones">Vacaciones</option>
                             <option value="Permisos">Permiso Retribuido</option>
+                            <option value="Cambio de Turno">Cambio de Turno con Compañero</option>
                         </select>
                         @error('vacacion_tipo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -1224,6 +1335,47 @@
                                 <option value="2">Segunda quincena (del 16 al fin de mes)</option>
                             </select>
                             @error('vacacion_quincena') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    @elseif($vacacion_tipo === 'Cambio de Turno')
+                        <div class="p-3.5 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/40 rounded-2xl text-xs text-indigo-900 dark:text-indigo-200 space-y-1">
+                            <div class="font-black flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                <span>Procedimiento de Cambio de Turno</span>
+                            </div>
+                            <p class="leading-relaxed opacity-90">
+                                Tu compañero recibirá una alerta en su pantalla principal de fichajes para aceptar o denegar el cambio. Al ser aceptado, el Planing de turnos se actualizará automáticamente.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Día que solicitas (Día que necesitas cubrir)</label>
+                            <input type="date" wire:model.live="cambio_fecha_solicitada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
+                            @error('cambio_fecha_solicitada') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Compañero que te va a sustituir</label>
+                            <select wire:model.live="cambio_empleado_sustituto_id" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm">
+                                <option value="">-- Selecciona a un compañero --</option>
+                                @foreach($this->companerosDisponibles as $comp)
+                                    <option value="{{ $comp->id }}">
+                                        {{ $comp->nombre }} {{ $comp->apellidos }} ({{ $comp->puesto ?? 'Expendedor' }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('cambio_empleado_sustituto_id') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Cuándo le devuelves el día (Fecha de devolución)</label>
+                            <input type="date" wire:model.live="cambio_fecha_devolucion" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
+                            @error('cambio_fecha_devolucion') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo o comentario para el compañero (opcional)</label>
+                            <input type="text" wire:model="cambio_motivo" placeholder="Ej. Cita médica, te cubro el viernes..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
+                            @error('cambio_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
                         </div>
                     @else
                         <div>

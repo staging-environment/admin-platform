@@ -50,8 +50,9 @@ Utrecar opera con **4 estaciones de servicio**, agrupadas en dos tipologías ope
     4. `PUESTO 2 - TARDE`
     5. `NOCHE`
 * **Contenido de la Celda**:
-  * Nombre del trabajador visible con su color identificativo asignado.
-  * Si es sustitución (vacaciones, baja, etc.), se visualiza con estilo diferenciado (ej. borde punteado o píldora de sustituto).
+  * Nombre corto del trabajador visible (`nombre_corto`).
+  * **Color asignado al TURNO**: El color de fondo y borde pertenece al turno rotativo 4x2 (`Turno 1: Rojo`, `Turno 2: Verde`, `Turno 3: Azul`), no al perfil del trabajador.
+  * Si se realiza una **sustitución puntual**, el color de fondo **permanece inalterado**, actualizándose exclusivamente el nombre del trabajador asignado con un asterisco indicativo (`*`).
   * Al hacer clic en la celda se abre el modal de asignación/modificación de turno.
 
 ---
@@ -110,8 +111,15 @@ Representa cada turno concreto asignado en una fecha determinada:
 * `timestamps`: `created_at` y `updated_at`.
 * *Índice único*: `[planing_cuadrante_id, fecha, puesto, turno]`.
 
-### Modificación en Tabla `empleados`:
-* `color_hex`: `varchar(10)` nullable (ej. `#0284c7`, `#16a34a`, `#ea580c`) para pintar la píldora o celda del empleado en el cuadrante de forma persistente y homogénea.
+### Modelo de Colores de Turno (`planing_turnos.estilo_color`):
+* El color de cada celda se calcula dinámicamente mediante `PlaningTurnosService::resolverColorTurno`.
+* **Esquema Estándar (Rojo, Verde y Azul)**: Aplicado a las 4 gasolineras (Vistalegre, Rodalabota, Atenas y Ronda Norte Puesto 2).
+  * `Turno 1`: Rojo (`#ef4444`, texto blanco)
+  * `Turno 2`: Verde (`#a9d08e`, texto gris oscuro)
+  * `Turno 3`: Azul (`#8ea9db`, texto gris oscuro)
+* **Excepción Ronda Norte (Puesto 1 y Noche)**:
+  * `Puesto 1`: Mari Carmen (Azul `#8ea9db`), Antonio Carvajal (Verde `#a9d08e`), Jesús Arcos (Naranja `#ed7d31`).
+  * `Turno Noche`: Francisco Acaiña / Fran (Púrpura `#7030a0`), Antonio Romero (Amarillo `#ffff00`).
 
 ---
 
@@ -158,8 +166,8 @@ En estricto cumplimiento de la regla de seguridad del proyecto:
    * Clic en celda para abrir el modal de asignación o sustitución.
 4. **Caja de Observaciones del Mes**:
    * Campo de texto libre para guardar notas operativas del mes.
-5. **Leyenda de Empleados y Colores**:
-   * Lista visual al pie con los nombres de los trabajadores y sus respectivos colores corporativos.
+5. **Leyenda de Turnos y Código de Colores**:
+   * Lista visual que muestra los turnos de la estación (Turno 1: Rojo, Turno 2: Verde, Turno 3: Azul, o desglose en Ronda Norte) con el titular habitual de cada turno y una nota aclaratoria sobre la persistencia del fondo ante sustituciones.
 
 ---
 
@@ -167,6 +175,6 @@ En estricto cumplimiento de la regla de seguridad del proyecto:
 
 * Formato **A4 Apaisado (Landscape)**.
 * Cabecera con logotipo de Utrecar, nombre de la estación, mes y año.
-* Matriz de turnos con los colores asignados y tipografía clara y legible desde media distancia.
-* Pie de página con las observaciones del mes y espacio de firmas de conformidad.
+* Matriz de turnos con los colores asignados al turno y tipografía clara y legible desde media distancia.
+* Pie de página con las observaciones del mes, **Leyenda de Código de Colores por Turno** y espacio de firmas de conformidad.
 

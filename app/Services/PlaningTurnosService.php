@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Empleado;
+use App\Models\EmpleadoVacacion;
 use App\Models\PlaningCuadrante;
 use App\Models\PlaningTurno;
 use Carbon\Carbon;
@@ -975,6 +976,96 @@ class PlaningTurnosService
         }
 
         return [];
+    }
+
+    /**
+     * Aplica un cambio de turno aprobado entre dos compañeros en el Planing de Turnos.
+     * Intercambia el trabajador asignado en el día solicitado y en el día de devolución,
+     * manteniendo intacto el color del turno y registrando la sustitución.
+     */
+    public function aplicarCambioTurno(EmpleadoVacacion $solicitud): bool
+    {
+        $solicitante = $solicitud->empleado;
+        $companero = $solicitud->empleadoSustituto;
+
+        if (!$solicitante || !$companero || !$solicitud->fecha_inicio || !$solicitud->fecha_devolucion) {
+            return false;
+        }
+
+        $fechaSolicitada = Carbon::parse($solicitud->fecha_inicio)->toDateString();
+        $fechaDevolucion = Carbon::parse($solicitud->fecha_devolucion)->toDateString();
+
+        // 1. DÍA SOLICITADO: El compañero cubre el turno del solicitante
+        $turno1 = PlaningTurno::where('fecha', $fechaSolicitada)
+            ->where(function ($q) use ($solicitante) {
+                $q->where('empleado_id', $solicitante->id)
+                  ->orWhere('empleado_titular_id', $solicitante->id);
+            })
+            ->first();
+
+        if (!$turno1) {
+            $estacionSolicitante = $solicitante->gasolinera_codigo ?? 1;
+            $c1 = Carbon::parse($fechaSolicitada);
+            $this->asegurarCuadranteMes($estacionSolicitante, $c1->year, $c1->month);
+            $cuadrante1 = $this->obtenerOCrearCuadrante($estacionSolicitante, $c1->year, $c1->month);
+
+            $turno1 = PlaningTurno::where('planing_cuadrante_id', $cuadrante1->id)
+                ->where('fecha', $fechaSolicitada)
+                ->where(function ($q) use ($solicitante) {
+                    $q->where('empleado_id', $solicitante->id)
+                      ->orWhere('empleado_titular_id', $solicitante->id);
+                })
+                ->first();
+        }
+
+        if ($turno1) {
+            if (!$turno1->empleado_titular_id) {
+                $turno1->empleado_titular_id = $turno1->empleado_id ?: $solicitante->id;
+            }
+            $turno1->empleado_id = $companero->id;
+            $turno1->es_sustitucion = true;
+            $turno1->motivo_sustitucion = "Cambio de turno con {$solicitante->nombre_corto}";
+            $turno1->save();
+            $solicitud->turno_origen_id = $turno1->id;
+        }
+
+        // 2. DÍA DE DEVOLUCIÓN: El solicitante cubre el turno del compañero
+        $turno2 = PlaningTurno::where('fecha', $fechaDevolucion)
+            ->where(function ($q) use ($companero) {
+                $q->where('empleado_id', $companero->id)
+                  ->orWhere('empleado_titular_id', $companero->id);
+            })
+            ->first();
+
+        if (!$turno2) {
+            $estacionCompanero = $companero->gasolinera_codigo ?? ($solicitante->gasolinera_codigo ?? 1);
+            $c2 = Carbon::parse($fechaDevolucion);
+            $this->asegurarCuadranteMes($estacionCompanero, $c2->year, $c2->month);
+            $cuadrante2 = $this->obtenerOCrearCuadrante($estacionCompanero, $c2->year, $c2->month);
+
+            $turno2 = PlaningTurno::where('planing_cuadrante_id', $cuadrante2->id)
+                ->where('fecha', $fechaDevolucion)
+                ->where(function ($q) use ($companero) {
+                    $q->where('empleado_id', $companero->id)
+                      ->orWhere('empleado_titular_id', $companero->id);
+                })
+                ->first();
+        }
+
+        if ($turno2) {
+            if (!$turno2->empleado_titular_id) {
+                $turno2->empleado_titular_id = $turno2->empleado_id ?: $companero->id;
+            }
+            $turno2->empleado_id = $solicitante->id;
+            $turno2->es_sustitucion = true;
+            $turno2->motivo_sustitucion = "Devolución de cambio a {$companero->nombre_corto}";
+            $turno2->save();
+            $solicitud->turno_devolucion_id = $turno2->id;
+        }
+
+        $solicitud->save();
+
+        return true;
     }
 }
 

@@ -65,11 +65,26 @@ TARDE:        B  B  C  C  C  C  A  A  A  A  B  B
 * **Base teórica (4x2)** vs **Modificaciones operativas reales**:
   * Cuando un titular no puede realizar su turno (vacaciones, baja, permiso), se asigna un suplente.
   * La celda del turno conserva quién es el titular teórico y quién está trabajando realmente, con un estilo visual diferenciado.
+  * **Regla Crítica de Colores**: El color de fondo pertenece al **TURNO rotativo**, NO al empleado individual. Si se realiza una sustitución puntual de un día por otro trabajador, el color de fondo permanece inalterado y únicamente cambia el nombre del empleado asignado.
 * **Observaciones del Mes**: Espacio de texto libre al pie del cuadrante para reflejar acuerdos de gerencia.
 
 ---
 
-## 5. Requisitos de Interfaz y Navegación (Filament v5)
+## 5. Esquema de Colores por Turno (REGLA VISUAL DE DOMINIO)
+
+* **Esquema Estándar (Rojo, Verde y Azul)** para 4 gasolineras:
+  * **Vistalegre (1)**: Turno 1 (Rojo), Turno 2 (Verde), Turno 3 (Azul).
+  * **Rodalabota (3)**: Turno 1 (Rojo), Turno 2 (Verde), Turno 3 (Azul).
+  * **Atenas (4)**: Turno 1 (Rojo), Turno 2 (Verde), Turno 3 (Azul).
+  * **Ronda Norte - Segundo Turno / Puesto 2 (2)**: Turno 1 / Sergio (Rojo), Turno 2 / Israel (Verde), Turno 3 / Laura (Azul).
+* **Excepción: Ronda Norte - Primer Turno (Puesto 1) y Noche (2)**:
+  * **Puesto 1**: Mari Carmen Prieto (Azul `#8ea9db`), Antonio Carvajal (Verde `#a9d08e`), Jesús Arcos (Naranja `#ed7d31`).
+  * **Turno Noche**: Francisco Acaiña / Fran (Púrpura `#7030a0`), Antonio Romero (Amarillo `#ffff00`).
+* **Leyenda del Cuadrante**: La leyenda en pantalla y en PDF muestra el código de colores por turno (Turno 1, Turno 2, Turno 3 / Puesto 1 / Noche) con sus respectivos titulares habituales.
+
+---
+
+## 6. Requisitos de Interfaz y Navegación (Filament v5)
 
 * **Ubicación en el Menú**:
   * Menú principal en **Recursos humanos**, debajo de **Vacaciones**.
@@ -84,10 +99,10 @@ TARDE:        B  B  C  C  C  C  A  A  A  A  B  B
 
 ---
 
-## 6. Arquitectura de Datos (Laravel)
+## 7. Arquitectura de Datos (Laravel)
 
 * **`planing_cuadrantes`**:
   * `id`, `gasolinera_codigo` (1, 2, 3, 4), `anio`, `mes`, `observaciones`, `estado` (borrador, publicado), timestamps.
 * **`planing_turnos`**:
   * `id`, `planing_cuadrante_id`, `fecha` (date), `puesto` (Puesto 1, Puesto 2, Puesto Único, Noche), `turno` (M, T, N), `empleado_id` (quien trabaja), `empleado_titular_id` (a quien le tocaba por 4x2), `es_sustitucion` (bool), `motivo_sustitucion`, `notas`, timestamps.
-* **`empleados.color_hex`**: Color corporativo de cada trabajador para pintar las celdas del cuadrante de forma inmediata.
+* **`planing_turnos.estilo_color`**: Resuelto a través de `PlaningTurnosService::resolverColorTurno` garantizando el esquema por turno y persistencia ante suplencias.

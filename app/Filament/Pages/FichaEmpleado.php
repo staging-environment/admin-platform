@@ -89,6 +89,12 @@ class FichaEmpleado extends Page
     public $permiso_justificante;
     public $permiso_motivo;
 
+    // Form fields for shift exchange (Cambio de Turno con compañero)
+    public $cambio_fecha_solicitada = null;
+    public $cambio_empleado_sustituto_id = null;
+    public $cambio_fecha_devolucion = null;
+    public $cambio_motivo = null;
+
     // Form fields for sick leaves
     public $baja_fecha_inicio;
     public $baja_fecha_fin;
@@ -691,7 +697,8 @@ class FichaEmpleado extends Page
     public function loadVacaciones(): void
     {
         if ($this->empleado) {
-            $this->vacaciones = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+            $this->vacaciones = \App\Models\EmpleadoVacacion::with('empleadoSustituto')
+                ->where('empleado_id', $this->empleado->id)
                 ->orderBy('fecha_inicio', 'desc')
                 ->get();
         }
@@ -778,6 +785,103 @@ class FichaEmpleado extends Page
 
     public function solicitarVacacion(): void
     {
+        if ($this->vacacion_tipo === 'Cambio de Turno') {
+            $rules = [
+                'cambio_fecha_solicitada' => 'required|date|after_or_equal:today',
+                'cambio_empleado_sustituto_id' => 'required|exists:empleados,id',
+                'cambio_fecha_devolucion' => 'required|date|after_or_equal:today|different:cambio_fecha_solicitada',
+                'cambio_motivo' => 'nullable|string|max:255',
+            ];
+
+            $messages = [
+                'cambio_fecha_solicitada.required' => 'El día que solicitas cambiar es obligatorio.',
+                'cambio_fecha_solicitada.after_or_equal' => 'El día solicitado no puede ser una fecha pasada.',
+                'cambio_empleado_sustituto_id.required' => 'Debes seleccionar al compañero que te sustituirá.',
+                'cambio_fecha_devolucion.required' => 'Debes indicar el día en que devolverás el turno.',
+                'cambio_fecha_devolucion.after_or_equal' => 'El día de devolución no puede ser una fecha pasada.',
+                'cambio_fecha_devolucion.different' => 'El día de devolución debe ser diferente al día solicitado.',
+            ];
+
+            $this->validate($rules, $messages);
+
+            if ((int)$this->cambio_empleado_sustituto_id === (int)$this->empleado->id) {
+                Notification::make()
+                    ->title('Selección no válida')
+                    ->body('No puedes solicitar un cambio de turno contigo mismo.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            // Validar que el compañero no se encuentre de baja en ninguna de las dos fechas
+            $companero = Empleado::find($this->cambio_empleado_sustituto_id);
+            if ($companero) {
+                if ($companero->estaDeBajaEnFecha($this->cambio_fecha_solicitada)) {
+                    Notification::make()
+                        ->title('Compañero no disponible')
+                        ->body("{$companero->nombre} {$companero->apellidos} se encuentra en situación de baja el día {$this->cambio_fecha_solicitada}.")
+                        ->danger()
+                        ->send();
+                    return;
+                }
+                if ($companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
+                    Notification::make()
+                        ->title('Compañero no disponible')
+                        ->body("{$companero->nombre} {$companero->apellidos} se encuentra en situación de baja el día {$this->cambio_fecha_devolucion}.")
+                        ->danger()
+                        ->send();
+                    return;
+                }
+            }
+
+            // Evitar duplicados pendientes entre los mismos dos empleados y fechas
+            $existeDuplicado = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+                ->where('tipo', 'Cambio de Turno')
+                ->where('empleado_sustituto_id', $this->cambio_empleado_sustituto_id)
+                ->where('fecha_inicio', $this->cambio_fecha_solicitada)
+                ->where('fecha_devolucion', $this->cambio_fecha_devolucion)
+                ->where('estado', 'Pendiente')
+                ->exists();
+
+            if ($existeDuplicado) {
+                Notification::make()
+                    ->title('Solicitud Duplicada')
+                    ->body('Ya existe una solicitud pendiente de cambio de turno con este compañero para estas fechas.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            $nombreCompanero = $companero ? $companero->nombre_corto : 'Compañero';
+            $comentario = $this->cambio_motivo ?: "Cambio de turno con {$nombreCompanero} (Devolución: " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ")";
+
+            \App\Models\EmpleadoVacacion::create([
+                'empleado_id' => $this->empleado->id,
+                'tipo' => 'Cambio de Turno',
+                'fecha_inicio' => $this->cambio_fecha_solicitada,
+                'fecha_fin' => $this->cambio_fecha_solicitada,
+                'fecha_devolucion' => $this->cambio_fecha_devolucion,
+                'empleado_sustituto_id' => $this->cambio_empleado_sustituto_id,
+                'dias_solicitados' => 1,
+                'estado' => 'Pendiente',
+                'comentario_empleado' => $comentario,
+                'respuesta_vista_solicitante' => false,
+            ]);
+
+            $this->reset(['cambio_fecha_solicitada', 'cambio_empleado_sustituto_id', 'cambio_fecha_devolucion', 'cambio_motivo']);
+            $this->vacacion_tipo = 'Vacaciones';
+
+            Notification::make()
+                ->title('Solicitud de Cambio Enviada')
+                ->body("Se ha enviado la solicitud de cambio de turno a {$nombreCompanero}. Recibirá una alerta en su pantalla de fichaje para responder.")
+                ->success()
+                ->send();
+
+            $this->dispatch('close-modal', id: 'solicitar-vacacion-modal');
+            $this->loadVacaciones();
+            return;
+        }
+
         if ($this->vacacion_tipo === 'Vacaciones') {
             $rules = [
                 'vacacion_mes' => 'required|integer|between:1,12',
@@ -1226,5 +1330,113 @@ class FichaEmpleado extends Page
 
         $this->cerrarFichajeRetroactivo();
         $this->loadFichajes();
+    }
+
+    public function responderCambioTurno(int $solicitudId, bool $aceptar, ?string $motivo = null): void
+    {
+        if (!$this->empleado) {
+            return;
+        }
+
+        $solicitud = \App\Models\EmpleadoVacacion::with(['empleado', 'empleadoSustituto'])->find($solicitudId);
+
+        if (!$solicitud || (int)$solicitud->empleado_sustituto_id !== (int)$this->empleado->id || $solicitud->estado !== 'Pendiente') {
+            Notification::make()
+                ->title('Operación no permitida')
+                ->body('No se ha encontrado la solicitud pendiente o no eres el destinatario.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        if ($aceptar) {
+            $solicitud->estado = 'Aceptada';
+            $solicitud->comentario_aprobador = $motivo ?: 'Aceptado por el compañero';
+            $solicitud->respuesta_vista_solicitante = false;
+            $solicitud->save();
+
+            // Actualizar el cuadrante de Planing de Turnos automáticamente
+            $planingActualizado = app(\App\Services\PlaningTurnosService::class)->aplicarCambioTurno($solicitud);
+
+            $msg = $planingActualizado
+                ? 'Has aceptado el cambio de turno. El cuadrante de turnos ha sido actualizado automáticamente.'
+                : 'Has aceptado el cambio de turno correctamente.';
+
+            Notification::make()
+                ->title('Cambio de Turno Aceptado')
+                ->body($msg)
+                ->success()
+                ->send();
+        } else {
+            $solicitud->estado = 'Rechazada';
+            $solicitud->comentario_aprobador = $motivo ?: 'Denegado por el compañero';
+            $solicitud->respuesta_vista_solicitante = false;
+            $solicitud->save();
+
+            Notification::make()
+                ->title('Cambio de Turno Denegado')
+                ->body('Has denegado la solicitud de cambio de turno. Se notificará a tu compañero.')
+                ->info()
+                ->send();
+        }
+
+        $this->loadVacaciones();
+    }
+
+    public function marcarAlertaCambioVista(int $solicitudId): void
+    {
+        if (!$this->empleado) {
+            return;
+        }
+
+        $solicitud = \App\Models\EmpleadoVacacion::find($solicitudId);
+
+        if ($solicitud && (int)$solicitud->empleado_id === (int)$this->empleado->id) {
+            $solicitud->respuesta_vista_solicitante = true;
+            $solicitud->save();
+        }
+    }
+
+    public function getSolicitudesCambioPendientesRecibidasProperty()
+    {
+        if (!$this->empleado) {
+            return collect();
+        }
+
+        return \App\Models\EmpleadoVacacion::with('empleado')
+            ->where('tipo', 'Cambio de Turno')
+            ->where('empleado_sustituto_id', $this->empleado->id)
+            ->where('estado', 'Pendiente')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getAlertasCambioTurnoParaSolicitanteProperty()
+    {
+        if (!$this->empleado) {
+            return collect();
+        }
+
+        return \App\Models\EmpleadoVacacion::with('empleadoSustituto')
+            ->where('tipo', 'Cambio de Turno')
+            ->where('empleado_id', $this->empleado->id)
+            ->whereIn('estado', ['Aceptada', 'Aprobada', 'Rechazada', 'Denegada'])
+            ->where('respuesta_vista_solicitante', false)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+    }
+
+    public function getCompanerosDisponiblesProperty()
+    {
+        if (!$this->empleado) {
+            return collect();
+        }
+
+        return Empleado::query()
+            ->whereNull('deleted_at')
+            ->where('estado', 'Alta')
+            ->where('id', '!=', $this->empleado->id)
+            ->orderBy('nombre')
+            ->get();
     }
 }
