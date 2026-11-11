@@ -86,52 +86,9 @@
                                      @endif
 
                                      @if(auth()->user()?->can('gestion_planing') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
-                                     <div x-data="{ openPlaning: {{ request()->is('admin/planing*') ? 'true' : 'false' }} }">
-                                         <button @click.stop="openPlaning = !openPlaning" class="w-full flex items-center justify-between px-4 py-2 text-sm {{ request()->is('admin/planing*') ? 'text-indigo-600 font-bold bg-indigo-50/70' : 'text-gray-700 hover:bg-gray-100' }} focus:outline-none transition duration-150 ease-in-out text-start text-left">
-                                             <span>{{ __('Planing') }}</span>
-                                             <svg class="h-4 w-4 transform transition-transform duration-200" :class="{ 'rotate-90': openPlaning }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                             </svg>
-                                         </button>
-                                         <div x-show="openPlaning" style="display: none; border-left: 4px solid #6366f1 !important; background-color: #f9fafb !important; margin: 4px 0; padding: 4px 0;">
-                                             <a href="/admin/planing/vistalegre" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ (request()->is('admin/planing/vistalegre*') || (request()->is('admin/planing-turnos*') && request()->query('estacion', '1') == '1')) ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
-                                                 <span class="flex items-center">
-                                                     <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                     {{ __('Vistalegre') }}
-                                                 </span>
-                                                 @if(request()->is('admin/planing/vistalegre*') || (request()->is('admin/planing-turnos*') && request()->query('estacion', '1') == '1'))
-                                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
-                                                 @endif
-                                             </a>
-                                             <a href="/admin/planing/ronda-norte" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ (request()->is('admin/planing/ronda-norte*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '2')) ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
-                                                 <span class="flex items-center">
-                                                     <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                     {{ __('Ronda Norte') }}
-                                                 </span>
-                                                 @if(request()->is('admin/planing/ronda-norte*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '2'))
-                                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
-                                                 @endif
-                                             </a>
-                                             <a href="/admin/planing/rodalabota" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ (request()->is('admin/planing/rodalabota*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '3')) ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
-                                                 <span class="flex items-center">
-                                                     <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                     {{ __('Rodalabota') }}
-                                                 </span>
-                                                 @if(request()->is('admin/planing/rodalabota*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '3'))
-                                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
-                                                 @endif
-                                             </a>
-                                             <a href="/admin/planing/atenas" class="flex items-center justify-between w-full pr-4 py-2 text-xs font-semibold {{ (request()->is('admin/planing/atenas*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '4')) ? 'text-indigo-600 font-extrabold bg-indigo-50/80' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-100' }} transition duration-150 ease-in-out" style="padding-left: 2rem !important;">
-                                                 <span class="flex items-center">
-                                                     <span style="color: #a5b4fc; font-family: monospace; margin-right: 6px; font-weight: bold;">└─</span>
-                                                     {{ __('Atenas') }}
-                                                 </span>
-                                                 @if(request()->is('admin/planing/atenas*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '4'))
-                                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
-                                                 @endif
-                                             </a>
-                                         </div>
-                                     </div>
+                                     <x-dropdown-link href="/admin/planing-turnos?estacion=1" :active="request()->is('admin/planing*')">
+                                         {{ __('Planing') }}
+                                     </x-dropdown-link>
                                      @endif
                                     
                                      @if(auth()->user()?->can('gestion_recursos_humanos'))
@@ -425,28 +382,9 @@
                         @endif
 
                         @if(auth()->user()?->can('gestion_planing') || auth()->user()?->can('gestion_recursos_humanos') || auth()->user()?->id === 1 || auth()->user()?->email === 'jarodriguezbonilla@gmail.com')
-                        <div x-data="{ openPlaning: {{ request()->is('admin/planing*') ? 'true' : 'false' }} }">
-                            <button @click="openPlaning = !openPlaning" class="w-full flex items-center justify-between ps-3 pe-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition duration-150 ease-in-out">
-                                <span>{{ __('Planing') }}</span>
-                                <svg class="h-4 w-4 transform transition-transform duration-200" :class="{ 'rotate-90': openPlaning }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                            <div x-show="openPlaning" class="ps-4 border-l-2 border-indigo-400/50 space-y-1 bg-gray-50/50" style="display: none;">
-                                <x-responsive-nav-link href="/admin/planing/vistalegre" :active="request()->is('admin/planing/vistalegre*') || (request()->is('admin/planing-turnos*') && request()->query('estacion', '1') == '1')">
-                                    {{ __('Vistalegre') }}
-                                </x-responsive-nav-link>
-                                <x-responsive-nav-link href="/admin/planing/ronda-norte" :active="request()->is('admin/planing/ronda-norte*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '2')">
-                                    {{ __('Ronda Norte') }}
-                                </x-responsive-nav-link>
-                                <x-responsive-nav-link href="/admin/planing/rodalabota" :active="request()->is('admin/planing/rodalabota*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '3')">
-                                    {{ __('Rodalabota') }}
-                                </x-responsive-nav-link>
-                                <x-responsive-nav-link href="/admin/planing/atenas" :active="request()->is('admin/planing/atenas*') || (request()->is('admin/planing-turnos*') && request()->query('estacion') == '4')">
-                                    {{ __('Atenas') }}
-                                </x-responsive-nav-link>
-                            </div>
-                        </div>
+                        <x-responsive-nav-link href="/admin/planing-turnos?estacion=1" :active="request()->is('admin/planing*')">
+                            {{ __('Planing') }}
+                        </x-responsive-nav-link>
                         @endif
 
                         @if(auth()->user()?->can('gestion_recursos_humanos'))
