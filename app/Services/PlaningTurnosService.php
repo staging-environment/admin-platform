@@ -996,20 +996,15 @@ class PlaningTurnosService
         $fechaDevolucion = Carbon::parse($solicitud->fecha_devolucion)->toDateString();
 
         // 1. DÍA SOLICITADO: El compañero cubre el turno del solicitante
-        $turno1 = PlaningTurno::whereDate('fecha', $fechaSolicitada)
-            ->where(function ($q) use ($solicitante) {
-                $q->where('empleado_id', $solicitante->id)
-                  ->orWhere('empleado_titular_id', $solicitante->id);
-            })
-            ->first();
-
-        dump([
-            'solicitante_id' => $solicitante->id,
-            'companero_id' => $companero->id,
-            'fechaSolicitada' => $fechaSolicitada,
-            'turnos_en_db' => PlaningTurno::all()->toArray(),
-            'turno1_encontrado' => $turno1 ? $turno1->toArray() : null,
-        ]);
+        $turno1 = $solicitud->turno_origen_id ? PlaningTurno::find($solicitud->turno_origen_id) : null;
+        if (!$turno1) {
+            $turno1 = PlaningTurno::whereDate('fecha', $fechaSolicitada)
+                ->where(function ($q) use ($solicitante) {
+                    $q->where('empleado_id', $solicitante->id)
+                      ->orWhere('empleado_titular_id', $solicitante->id);
+                })
+                ->first();
+        }
 
         if (!$turno1) {
             $estacionSolicitante = $solicitante->gasolinera_codigo ?? 1;
@@ -1018,7 +1013,7 @@ class PlaningTurnosService
             $cuadrante1 = $this->obtenerOCrearCuadrante($estacionSolicitante, $c1->year, $c1->month);
 
             $turno1 = PlaningTurno::where('planing_cuadrante_id', $cuadrante1->id)
-                ->where('fecha', $fechaSolicitada)
+                ->whereDate('fecha', $fechaSolicitada)
                 ->where(function ($q) use ($solicitante) {
                     $q->where('empleado_id', $solicitante->id)
                       ->orWhere('empleado_titular_id', $solicitante->id);
@@ -1038,12 +1033,15 @@ class PlaningTurnosService
         }
 
         // 2. DÍA DE DEVOLUCIÓN: El solicitante cubre el turno del compañero
-        $turno2 = PlaningTurno::where('fecha', $fechaDevolucion)
-            ->where(function ($q) use ($companero) {
-                $q->where('empleado_id', $companero->id)
-                  ->orWhere('empleado_titular_id', $companero->id);
-            })
-            ->first();
+        $turno2 = $solicitud->turno_devolucion_id ? PlaningTurno::find($solicitud->turno_devolucion_id) : null;
+        if (!$turno2) {
+            $turno2 = PlaningTurno::whereDate('fecha', $fechaDevolucion)
+                ->where(function ($q) use ($companero) {
+                    $q->where('empleado_id', $companero->id)
+                      ->orWhere('empleado_titular_id', $companero->id);
+                })
+                ->first();
+        }
 
         if (!$turno2) {
             $estacionCompanero = $companero->gasolinera_codigo ?? ($solicitante->gasolinera_codigo ?? 1);
@@ -1052,7 +1050,7 @@ class PlaningTurnosService
             $cuadrante2 = $this->obtenerOCrearCuadrante($estacionCompanero, $c2->year, $c2->month);
 
             $turno2 = PlaningTurno::where('planing_cuadrante_id', $cuadrante2->id)
-                ->where('fecha', $fechaDevolucion)
+                ->whereDate('fecha', $fechaDevolucion)
                 ->where(function ($q) use ($companero) {
                     $q->where('empleado_id', $companero->id)
                       ->orWhere('empleado_titular_id', $companero->id);
