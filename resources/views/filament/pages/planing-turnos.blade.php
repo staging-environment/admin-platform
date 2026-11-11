@@ -167,27 +167,31 @@
                                     <thead>
                                         <tr class="bg-gray-50 dark:bg-white/5 border-b border-gray-400 dark:border-white/20">
                                             {{-- Columna izquierda: Identificador de Semana --}}
-                                            <th class="border-r border-gray-400 dark:border-white/20 p-2 text-center font-extrabold text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th class="border-r border-gray-400 dark:border-white/20 py-2 px-2 text-center font-extrabold text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                                                 Semana {{ $semana['numeroSemana'] }}
                                             </th>
 
                                             {{-- 7 Columnas: Días de la semana --}}
                                             @foreach($semana['dias'] as $dia)
                                                 @if($dia['esMesActual'])
-                                                    <th class="border-r border-gray-400 dark:border-white/20 p-1.5 text-center font-black {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-900 dark:text-amber-300' : 'text-gray-800 dark:text-gray-200' }}">
-                                                        <div class="text-[9.5px] uppercase font-bold text-gray-500 dark:text-gray-400">
-                                                            {{ $dia['diaSemanaLargo'] }}
-                                                        </div>
-                                                        <div class="text-sm font-black mt-0.5 flex items-center justify-center gap-1">
-                                                            <span>{{ $dia['numero'] }}</span>
+                                                    <th class="border-r border-gray-400 dark:border-white/20 py-2 px-1 text-center font-black {{ $dia['esFinDeSemana'] ? 'bg-amber-500/10 text-amber-900 dark:text-amber-300' : 'text-gray-800 dark:text-gray-200' }}">
+                                                        <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                                            <span class="text-[11px] font-bold tracking-wide {{ $dia['esFinDeSemana'] ? 'text-amber-900/90 dark:text-amber-300/90' : 'text-gray-600 dark:text-gray-400' }}">
+                                                                {{ $dia['diaSemanaLargo'] }}
+                                                            </span>
+                                                            <span class="text-xs font-black {{ $dia['esFinDeSemana'] ? 'text-amber-950 dark:text-amber-200' : 'text-gray-900 dark:text-white' }}">
+                                                                ({{ $dia['numero'] }})
+                                                            </span>
                                                             @if($dia['esHoy'])
-                                                                <span class="px-1 py-0.2 text-[8px] font-black uppercase rounded bg-primary-600 text-white tracking-tight">Hoy</span>
+                                                                <span class="px-1 py-0.5 text-[8px] font-black uppercase rounded bg-primary-600 text-white tracking-tight leading-none shrink-0" title="Hoy">
+                                                                    Hoy
+                                                                </span>
                                                             @endif
                                                         </div>
                                                     </th>
                                                 @else
                                                     {{-- Celda vacía fuera de mes --}}
-                                                    <th class="border-r border-gray-300 dark:border-white/10 p-1.5 bg-gray-50/50 dark:bg-white/[0.01]"></th>
+                                                    <th class="border-r border-gray-300 dark:border-white/10 py-2 px-1 bg-gray-50/50 dark:bg-white/[0.01]"></th>
                                                 @endif
                                             @endforeach
                                         </tr>
