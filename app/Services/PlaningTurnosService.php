@@ -996,12 +996,20 @@ class PlaningTurnosService
         $fechaDevolucion = Carbon::parse($solicitud->fecha_devolucion)->toDateString();
 
         // 1. DÍA SOLICITADO: El compañero cubre el turno del solicitante
-        $turno1 = PlaningTurno::where('fecha', $fechaSolicitada)
+        $turno1 = PlaningTurno::whereDate('fecha', $fechaSolicitada)
             ->where(function ($q) use ($solicitante) {
                 $q->where('empleado_id', $solicitante->id)
                   ->orWhere('empleado_titular_id', $solicitante->id);
             })
             ->first();
+
+        dump([
+            'solicitante_id' => $solicitante->id,
+            'companero_id' => $companero->id,
+            'fechaSolicitada' => $fechaSolicitada,
+            'turnos_en_db' => PlaningTurno::all()->toArray(),
+            'turno1_encontrado' => $turno1 ? $turno1->toArray() : null,
+        ]);
 
         if (!$turno1) {
             $estacionSolicitante = $solicitante->gasolinera_codigo ?? 1;
