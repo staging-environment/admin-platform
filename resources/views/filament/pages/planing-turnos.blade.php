@@ -137,45 +137,6 @@
     <x-filament::section>
         {{-- VISTA CUADRÍCULA EN BLOQUES SEMANALES (Formato Cuadrante en Recuadros) --}}
         <div class="space-y-6">
-            {{-- Encabezado General del Cuadrante --}}
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-3 py-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-300 dark:border-white/10">
-                <div>
-                    <div class="text-sm md:text-base font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                        {{ $estaciones[$gasolineraCodigo]['nombre'] ?? 'Estación' }}
-                    </div>
-                    <div class="text-xs font-bold text-gray-500 dark:text-gray-400">
-                        {{ \Carbon\Carbon::create($anio, $mes, 1)->locale('es')->isoFormat('MMMM [de] YYYY') }}
-                    </div>
-                </div>
-
-                {{-- Selector de Puestos para Ronda Norte --}}
-                @if($gasolineraCodigo === 2)
-                    <div class="flex flex-wrap items-center gap-1.5 bg-white dark:bg-white/10 p-1 rounded-lg border border-gray-200 dark:border-white/10 text-xs">
-                        <button
-                            type="button"
-                            wire:click="setFiltroPuesto('todos')"
-                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'todos' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
-                        >
-                            Ver Ambos Puestos
-                        </button>
-                        <button
-                            type="button"
-                            wire:click="setFiltroPuesto('Puesto 1')"
-                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Puesto 1' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
-                        >
-                            Puesto 1 (Empleado 1)
-                        </button>
-                        <button
-                            type="button"
-                            wire:click="setFiltroPuesto('Puesto 2')"
-                            class="px-2.5 py-1 rounded-md font-bold transition {{ $filtroPuestoRonda === 'Puesto 2' ? 'bg-primary-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10' }}"
-                        >
-                            Puesto 2 (Empleado 2)
-                        </button>
-                    </div>
-                @endif
-            </div>
-
             {{-- Renderizado de Cuadrículas por Puesto (Empleado 1, Empleado 2, Turno Noche) --}}
             @foreach($this->bloquesPuestos as $bloque)
                 <div class="space-y-3 pt-2">
