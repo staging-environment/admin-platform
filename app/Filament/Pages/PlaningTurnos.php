@@ -390,6 +390,7 @@ class PlaningTurnos extends Page
             'turnosMap' => $turnosMap,
             'observaciones' => $this->observaciones,
             'empleadosLegenda' => $empleadosLegenda,
+            'leyendaTurnos' => $this->leyendaTurnos,
         ])->setPaper('a4', 'landscape');
 
         $filename = "Planing_{$this->gasolineraCodigo}_{$this->anio}_{$this->mes}.pdf";
@@ -614,13 +615,13 @@ class PlaningTurnos extends Page
             return [];
         }
 
-        $turnos = PlaningTurno::with(['empleado', 'empleadoTitular'])
+        $turnos = PlaningTurno::with(['empleado', 'empleadoTitular', 'cuadrante'])
             ->where('planing_cuadrante_id', $cuadrante->id)
             ->get();
 
         if ($turnos->isEmpty() && $service->tieneEmpleados($this->gasolineraCodigo)) {
             $service->generarCuadranteTeorico($this->gasolineraCodigo, $this->anio, $this->mes, false);
-            $turnos = PlaningTurno::with(['empleado', 'empleadoTitular'])
+            $turnos = PlaningTurno::with(['empleado', 'empleadoTitular', 'cuadrante'])
                 ->where('planing_cuadrante_id', $cuadrante->id)
                 ->get();
         }
@@ -669,6 +670,14 @@ class PlaningTurnos extends Page
         }
 
         return Empleado::whereIn('id', array_keys($empleadosIds))->orderBy('nombre')->get();
+    }
+
+    public function getLeyendaTurnosProperty(): array
+    {
+        return app(PlaningTurnosService::class)->obtenerLeyendaTurnos(
+            $this->gasolineraCodigo,
+            $this->filtroPuestoRonda
+        );
     }
 }
 

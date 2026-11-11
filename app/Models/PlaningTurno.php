@@ -50,5 +50,44 @@ class PlaningTurno extends Model
             default => $this->turno,
         };
     }
+
+    /**
+     * Devuelve el estilo y esquema de color asignado al TURNO
+     */
+    public function getEstiloColorAttribute(): ?array
+    {
+        if (!$this->empleado_id && !$this->empleado_titular_id) {
+            return null;
+        }
+
+        $gasolineraCodigo = $this->cuadrante?->gasolinera_codigo;
+        if (!$gasolineraCodigo) {
+            $cuadrante = PlaningCuadrante::find($this->planing_cuadrante_id);
+            $gasolineraCodigo = $cuadrante?->gasolinera_codigo ?? 1;
+        }
+
+        return app(\App\Services\PlaningTurnosService::class)->resolverColorTurno(
+            $gasolineraCodigo,
+            $this->puesto,
+            $this->turno,
+            $this->empleado_titular_id,
+            $this->empleado_id
+        );
+    }
+
+    public function getColorBgAttribute(): ?string
+    {
+        return $this->estilo_color['bg'] ?? null;
+    }
+
+    public function getColorTextAttribute(): ?string
+    {
+        return $this->estilo_color['text'] ?? null;
+    }
+
+    public function getColorBorderAttribute(): ?string
+    {
+        return $this->estilo_color['border'] ?? null;
+    }
 }
 

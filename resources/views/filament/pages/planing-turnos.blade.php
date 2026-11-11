@@ -209,7 +209,7 @@
                                                     </div>
                                                 </td>
 
-                                                {{-- Celdas de los 7 Días con el color característico del TRABAJADOR --}}
+                                                {{-- Celdas de los 7 Días con el color característico del TURNO --}}
                                                 @foreach($semana['dias'] as $dia)
                                                     @if($dia['esMesActual'])
                                                         @php
@@ -217,21 +217,22 @@
                                                             $turnoReg = $this->turnosMap[$key] ?? null;
                                                             $empleado = $turnoReg?->empleado;
                                                             $esSustitucion = $turnoReg?->es_sustitucion;
+                                                            $estiloTurno = $turnoReg?->estilo_color;
                                                         @endphp
 
                                                         <td
                                                             wire:click="abrirModalTurno('{{ $dia['fecha'] }}', '{{ $fila['puesto'] }}', '{{ $fila['turno'] }}')"
                                                             class="border-r border-gray-400 dark:border-white/20 p-2 text-center select-none cursor-pointer transition-all duration-150 hover:brightness-95 dark:hover:brightness-110 font-black text-xs uppercase"
-                                                            style="{{ $empleado ? ('background-color: ' . $empleado->color_bg . '; color: ' . $empleado->color_text . '; border-color: ' . $empleado->color_border . ';') : '' }}"
-                                                            title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
+                                                            style="{{ $estiloTurno ? ('background-color: ' . $estiloTurno['bg'] . '; color: ' . $estiloTurno['text'] . '; border-color: ' . $estiloTurno['border'] . ';') : '' }}"
+                                                            title="{{ $turnoReg ? ($empleado ? $empleado->nombre . ' ' . $empleado->apellidos : 'Sin asignar') . ($esSustitucion ? ' (Sustitución puntual: ' . ($turnoReg->motivo_sustitucion ?? '') . ')' : '') : 'Clic para asignar ' . $fila['etiqueta'] }}"
                                                         >
                                                             @if($empleado)
                                                                 <div class="flex items-center justify-center gap-1 truncate">
-                                                                    <span class="truncate font-black tracking-wide text-xs" style="color: {{ $empleado->color_text }};">
+                                                                    <span class="truncate font-black tracking-wide text-xs" style="color: {{ $estiloTurno['text'] ?? '#1f2937' }};">
                                                                         {{ $empleado->nombre_corto }}
                                                                     </span>
                                                                     @if($esSustitucion && $turnoReg->motivo_sustitucion && !str_contains(mb_strtolower($turnoReg->motivo_sustitucion), 'permanente'))
-                                                                        <span class="text-red-600 font-black text-sm shrink-0" title="Sustitución puntual: {{ $turnoReg->motivo_sustitucion }}">*</span>
+                                                                        <span class="font-black text-sm shrink-0" style="color: {{ ($estiloTurno['text'] ?? '') === '#ffffff' ? '#fef08a' : '#b91c1c' }};" title="Sustitución puntual: {{ $turnoReg->motivo_sustitucion }}">*</span>
                                                                     @endif
                                                                 </div>
                                                             @else
@@ -304,31 +305,45 @@
             </x-filament::section>
         </div>
 
-        {{-- Leyenda de Turnos y Colores por Empleado --}}
+        {{-- Leyenda de Turnos y Código de Colores --}}
         <div class="lg:col-span-1">
             <x-filament::section>
                 <x-slot name="heading">
-                    Plantilla y Código de Colores
+                    Código de Colores de Turnos
                 </x-slot>
                 <x-slot name="description">
-                    Color representativo asignado a cada trabajador.
+                    Color representativo de cada turno rotativo. El color de fondo se mantiene en las sustituciones.
                 </x-slot>
 
-                <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                    @foreach($this->empleadosLegenda as $emp)
+                <div class="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                    @php
+                        $seccionActual = null;
+                    @endphp
+                    @foreach($this->leyendaTurnos as $item)
+                        @if(!empty($item['seccion']) && $item['seccion'] !== $seccionActual)
+                            @php $seccionActual = $item['seccion']; @endphp
+                            <div class="pt-2 pb-0.5 border-b border-gray-200 dark:border-white/10 text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                {{ $seccionActual }}
+                            </div>
+                        @endif
+
                         <div
                             class="flex items-center justify-between p-2 rounded-lg border shadow-2xs font-bold text-xs"
-                            style="background-color: {{ $emp->color_bg }}; border-color: {{ $emp->color_border }}; color: {{ $emp->color_text }};"
+                            style="background-color: {{ $item['color_bg'] }}; border-color: {{ $item['color_border'] }}; color: {{ $item['color_text'] }};"
                         >
                             <div class="flex items-center gap-2 truncate">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $emp->color_text }};"></span>
-                                <span class="font-black uppercase tracking-tight truncate">{{ $emp->nombre_corto }}</span>
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10" style="background-color: {{ $item['color_text'] }};"></span>
+                                <span class="font-black uppercase tracking-tight truncate">{{ $item['turno'] }} ({{ $item['color_nombre'] }})</span>
                             </div>
-                            <span class="text-[10px] font-bold opacity-80 shrink-0">
-                                {{ $emp->nombre }}
+                            <span class="text-[10px] font-bold opacity-90 shrink-0 truncate max-w-[130px]" title="Titular: {{ $item['titular'] }}">
+                                {{ $item['titular'] }}
                             </span>
                         </div>
                     @endforeach
+                </div>
+
+                <div class="mt-3 pt-2 border-t border-gray-100 dark:border-white/5 text-[11px] text-gray-500 dark:text-gray-400 leading-snug">
+                    <span class="font-bold">* Nota:</span> El color pertenece al turno. Si se reemplaza a un empleado puntualmente, el fondo permanece inalterado.
                 </div>
             </x-filament::section>
         </div>
@@ -361,10 +376,17 @@
                 <div class="p-6 space-y-4">
                     {{-- Información del Puesto y Turno --}}
                     @php
-                        $filaActual = collect($this->filasTurnos)->first(fn($f) => $f['puesto'] === $modalPuesto && $f['turno'] === $modalTurno);
-                        $bgTurno = $filaActual['color_bg'] ?? '#f0fdf4';
-                        $borderTurno = $filaActual['color_border'] ?? '#86efac';
-                        $textTurno = $filaActual['color_text'] ?? '#166534';
+                        $colorTurnoModal = app(\App\Services\PlaningTurnosService::class)->resolverColorTurno(
+                            $this->gasolineraCodigo,
+                            $modalPuesto,
+                            $modalTurno,
+                            $this->modalTitularId,
+                            $this->modalEmpleadoId
+                        );
+                        $bgTurno = $colorTurnoModal['bg'];
+                        $borderTurno = $colorTurnoModal['border'];
+                        $textTurno = $colorTurnoModal['text'];
+                        $nombreColorTurno = $colorTurnoModal['nombre'] ?? '';
                     @endphp
 
                     <div
@@ -375,8 +397,17 @@
                             <div class="text-[10px] uppercase font-bold opacity-80">Puesto</div>
                             <div class="text-xs font-black">{{ $modalPuesto }}</div>
                         </div>
+                        <div class="text-center px-2">
+                            <div class="text-[10px] uppercase font-bold opacity-80">Color del Turno</div>
+                            <div class="text-xs font-black">{{ $nombreColorTurno }}</div>
+                            @if($this->modalTitularNombre)
+                                <div class="text-[9px] opacity-80 truncate max-w-[170px]" title="{{ $this->modalTitularNombre }}">
+                                    Titular: {{ $this->modalTitularNombre }}
+                                </div>
+                            @endif
+                        </div>
                         <div class="text-right">
-                            <div class="text-[10px] uppercase font-bold opacity-80">Turno</div>
+                            <div class="text-[10px] uppercase font-bold opacity-80">Horario</div>
                             <div class="text-xs font-black">
                                 {{ $modalTurno === 'M' ? 'Mañana' : ($modalTurno === 'T' ? 'Tarde' : 'Noche') }}
                             </div>

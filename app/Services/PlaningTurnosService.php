@@ -18,6 +18,67 @@ class PlaningTurnosService
     public const PUESTOS_RONDA_NORTE = ['Puesto 1', 'Puesto 2', 'Noche'];
 
     /**
+     * Paleta de colores oficial asignada a los TURNOS de trabajo.
+     * Esquema estándar para las 4 estaciones (Vistalegre, Rodalabota, Atenas y Ronda Norte Puesto 2):
+     * Rojo, Verde y Azul.
+     */
+    public const COLOR_ROJO = [
+        'bg'     => '#ef4444',
+        'text'   => '#ffffff',
+        'border' => '#b91c1c',
+        'color'  => '#ef4444',
+        'nombre' => 'Rojo',
+    ];
+
+    public const COLOR_VERDE = [
+        'bg'     => '#a9d08e',
+        'text'   => '#1f2937',
+        'border' => '#689f38',
+        'color'  => '#70ad47',
+        'nombre' => 'Verde',
+    ];
+
+    public const COLOR_AZUL = [
+        'bg'     => '#8ea9db',
+        'text'   => '#1f2937',
+        'border' => '#3f6bb5',
+        'color'  => '#4472c4',
+        'nombre' => 'Azul',
+    ];
+
+    public const COLOR_NARANJA = [
+        'bg'     => '#ed7d31',
+        'text'   => '#ffffff',
+        'border' => '#c65911',
+        'color'  => '#ed7d31',
+        'nombre' => 'Naranja',
+    ];
+
+    public const COLOR_PURPURA = [
+        'bg'     => '#7030a0',
+        'text'   => '#ffffff',
+        'border' => '#522177',
+        'color'  => '#7030a0',
+        'nombre' => 'Púrpura',
+    ];
+
+    public const COLOR_AMARILLO = [
+        'bg'     => '#ffff00',
+        'text'   => '#1f2937',
+        'border' => '#ca8a04',
+        'color'  => '#eab308',
+        'nombre' => 'Amarillo',
+    ];
+
+    public const COLOR_DEFAULT = [
+        'bg'     => '#f1f5f9',
+        'text'   => '#475569',
+        'border' => '#cbd5e1',
+        'color'  => '#64748b',
+        'nombre' => 'Gris',
+    ];
+
+    /**
      * Obtiene o crea el cuadrante mensual para una gasolinera
      */
     public function obtenerOCrearCuadrante(int $gasolineraCodigo, int $anio, int $mes): PlaningCuadrante
@@ -565,6 +626,355 @@ class PlaningTurnosService
         $turnoModel->save();
 
         return $turnoModel;
+    }
+
+    /**
+     * Resuelve el esquema de color y estilo visual de un turno específico.
+     * En este modelo, el color pertenece al TURNO (puesto y titular de rotación),
+     * no al empleado sustituto puntual.
+     *
+     * Esquema estándar para las 4 gasolineras (Vistalegre, Rodalabota, Atenas y Ronda Norte Puesto 2):
+     * Turno 1 -> Rojo, Turno 2 -> Verde, Turno 3 -> Azul.
+     * Excepción: Primer turno de Ronda Norte (Puesto 1 y Noche) mantiene sus colores específicos.
+     */
+    public function resolverColorTurno(
+        int $gasolineraCodigo,
+        string $puesto,
+        string $turno,
+        ?int $empleadoTitularId,
+        ?int $empleadoRealId = null
+    ): array {
+        $targetId = $empleadoTitularId ?: $empleadoRealId;
+
+        if (!$targetId) {
+            return self::COLOR_DEFAULT;
+        }
+
+        $empleado = Empleado::find($targetId);
+        $nombreCompleto = $empleado ? mb_strtolower(trim($empleado->nombre . ' ' . ($empleado->apellidos ?? ''))) : '';
+
+        // =========================================================================
+        // EXCEPCIÓN: Ronda Norte (Gasolinera 2) - Primer Turno (Puesto 1) y Noche
+        // =========================================================================
+        if ($gasolineraCodigo === 2) {
+            if ($puesto === 'Noche') {
+                // Romero (Amarillo) vs Fran (Púrpura)
+                if ($targetId === 93 || str_contains($nombreCompleto, 'romero')) {
+                    return self::COLOR_AMARILLO;
+                }
+                return self::COLOR_PURPURA;
+            }
+
+            if ($puesto === 'Puesto 1') {
+                // Mari Carmen Prieto (Azul)
+                if ($targetId === 83 || str_contains($nombreCompleto, 'prieto')) {
+                    return self::COLOR_AZUL;
+                }
+                // Antonio Carvajal (Verde)
+                if ($targetId === 71 || str_contains($nombreCompleto, 'carvajal')) {
+                    return self::COLOR_VERDE;
+                }
+                // Jesús Arcos (Naranja)
+                if ($targetId === 64 || str_contains($nombreCompleto, 'arcos')) {
+                    return self::COLOR_NARANJA;
+                }
+
+                // Fallback por índice del equipo en Puesto 1
+                $equipoP1 = $this->resolverEquipoBase(2, 'Puesto 1');
+                foreach ($equipoP1 as $idx => $emp) {
+                    if ($emp && $emp->id === $targetId) {
+                        return match ($idx) {
+                            0 => self::COLOR_AZUL,
+                            1 => self::COLOR_NARANJA,
+                            2 => self::COLOR_VERDE,
+                            default => self::COLOR_AZUL,
+                        };
+                    }
+                }
+
+                return self::COLOR_AZUL;
+            }
+        }
+
+        // =========================================================================
+        // ESQUEMA ESTÁNDAR: Rojo, Verde y Azul para las 4 gasolineras
+        // (Vistalegre, Rodalabota, Atenas y Ronda Norte Puesto 2)
+        // =========================================================================
+
+        // 1. VISTALEGRE (Gasolinera 1)
+        if ($gasolineraCodigo === 1) {
+            // Turno 1 (Rojo): Antonio Jesús
+            if ($targetId === 84 || str_contains($nombreCompleto, 'antonio jesus') || str_contains($nombreCompleto, 'ant. jesus')) {
+                return self::COLOR_ROJO;
+            }
+            // Turno 2 (Verde): Miguel Ángel / Consolación
+            if ($targetId === 67 || $targetId === 88 || str_contains($nombreCompleto, 'blanquero') || str_contains($nombreCompleto, 'consolacion')) {
+                return self::COLOR_VERDE;
+            }
+            // Turno 3 (Azul): Felisa
+            if ($targetId === 95 || str_contains($nombreCompleto, 'felisa')) {
+                return self::COLOR_AZUL;
+            }
+        }
+
+        // 2. RONDA NORTE - PUESTO 2 (Gasolinera 2, Puesto 2)
+        if ($gasolineraCodigo === 2 && $puesto === 'Puesto 2') {
+            // Turno 1 (Rojo): Sergio Povea
+            if ($targetId === 82 || str_contains($nombreCompleto, 'sergio') || str_contains($nombreCompleto, 'povea')) {
+                return self::COLOR_ROJO;
+            }
+            // Turno 2 (Verde): Israel Vega
+            if ($targetId === 86 || str_contains($nombreCompleto, 'israel') || str_contains($nombreCompleto, 'vega')) {
+                return self::COLOR_VERDE;
+            }
+            // Turno 3 (Azul): Laura Linares
+            if ($targetId === 103 || str_contains($nombreCompleto, 'laura') || str_contains($nombreCompleto, 'linares')) {
+                return self::COLOR_AZUL;
+            }
+        }
+
+        // 3. RODALABOTA (Gasolinera 3)
+        if ($gasolineraCodigo === 3) {
+            // Turno 1 (Rojo): Antonio Marrufo
+            if ($targetId === 79 || str_contains($nombreCompleto, 'marrufo')) {
+                return self::COLOR_ROJO;
+            }
+            // Turno 2 (Verde): Emilio González
+            if ($targetId === 76 || str_contains($nombreCompleto, 'emilio')) {
+                return self::COLOR_VERDE;
+            }
+            // Turno 3 (Azul): Borja Jesús
+            if ($targetId === 68 || str_contains($nombreCompleto, 'borja')) {
+                return self::COLOR_AZUL;
+            }
+        }
+
+        // 4. ATENAS (Gasolinera 4)
+        if ($gasolineraCodigo === 4) {
+            // Turno 1 (Rojo): Toni Llompart
+            if ($targetId === 77 || str_contains($nombreCompleto, 'llompart') || str_contains($nombreCompleto, 'toni')) {
+                return self::COLOR_ROJO;
+            }
+            // Turno 2 (Verde): Joaquín Caro
+            if ($targetId === 70 || str_contains($nombreCompleto, 'joaquin') || str_contains($nombreCompleto, 'caro')) {
+                return self::COLOR_VERDE;
+            }
+            // Turno 3 (Azul): Juan Antonio Zambrano
+            if ($targetId === 87 || str_contains($nombreCompleto, 'zambrano')) {
+                return self::COLOR_AZUL;
+            }
+        }
+
+        // Fallback genérico por posición del equipo base
+        $equipo = $this->resolverEquipoBase($gasolineraCodigo, $puesto);
+        foreach ($equipo as $idx => $emp) {
+            if ($emp && $emp->id === $targetId) {
+                return match ($idx) {
+                    0 => self::COLOR_ROJO,
+                    1 => self::COLOR_VERDE,
+                    2 => self::COLOR_AZUL,
+                    default => self::COLOR_ROJO,
+                };
+            }
+        }
+
+        // Fallback matemático por ID para garantizar siempre Rojo, Verde o Azul
+        return match ($targetId % 3) {
+            0 => self::COLOR_ROJO,
+            1 => self::COLOR_VERDE,
+            2 => self::COLOR_AZUL,
+            default => self::COLOR_ROJO,
+        };
+    }
+
+    /**
+     * Devuelve la estructura de leyenda de turnos y códigos de colores para una gasolinera
+     */
+    public function obtenerLeyendaTurnos(int $gasolineraCodigo, string $filtroPuesto = 'todos'): array
+    {
+        if ($gasolineraCodigo === 1) { // Vistalegre
+            return [
+                [
+                    'turno' => 'Turno 1',
+                    'color_nombre' => 'Rojo',
+                    'titular' => 'Antonio Jesús Rodríguez',
+                    'color_bg' => self::COLOR_ROJO['bg'],
+                    'color_text' => self::COLOR_ROJO['text'],
+                    'color_border' => self::COLOR_ROJO['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 2',
+                    'color_nombre' => 'Verde',
+                    'titular' => 'Miguel Ángel / Consolación',
+                    'color_bg' => self::COLOR_VERDE['bg'],
+                    'color_text' => self::COLOR_VERDE['text'],
+                    'color_border' => self::COLOR_VERDE['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 3',
+                    'color_nombre' => 'Azul',
+                    'titular' => 'Felisa Díaz',
+                    'color_bg' => self::COLOR_AZUL['bg'],
+                    'color_text' => self::COLOR_AZUL['text'],
+                    'color_border' => self::COLOR_AZUL['border'],
+                    'seccion' => null,
+                ],
+            ];
+        }
+
+        if ($gasolineraCodigo === 3) { // Rodalabota
+            return [
+                [
+                    'turno' => 'Turno 1',
+                    'color_nombre' => 'Rojo',
+                    'titular' => 'Antonio Marrufo',
+                    'color_bg' => self::COLOR_ROJO['bg'],
+                    'color_text' => self::COLOR_ROJO['text'],
+                    'color_border' => self::COLOR_ROJO['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 2',
+                    'color_nombre' => 'Verde',
+                    'titular' => 'Emilio González',
+                    'color_bg' => self::COLOR_VERDE['bg'],
+                    'color_text' => self::COLOR_VERDE['text'],
+                    'color_border' => self::COLOR_VERDE['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 3',
+                    'color_nombre' => 'Azul',
+                    'titular' => 'Borja Jesús',
+                    'color_bg' => self::COLOR_AZUL['bg'],
+                    'color_text' => self::COLOR_AZUL['text'],
+                    'color_border' => self::COLOR_AZUL['border'],
+                    'seccion' => null,
+                ],
+            ];
+        }
+
+        if ($gasolineraCodigo === 4) { // Atenas
+            return [
+                [
+                    'turno' => 'Turno 1',
+                    'color_nombre' => 'Rojo',
+                    'titular' => 'Toni Llompart',
+                    'color_bg' => self::COLOR_ROJO['bg'],
+                    'color_text' => self::COLOR_ROJO['text'],
+                    'color_border' => self::COLOR_ROJO['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 2',
+                    'color_nombre' => 'Verde',
+                    'titular' => 'Joaquín Caro',
+                    'color_bg' => self::COLOR_VERDE['bg'],
+                    'color_text' => self::COLOR_VERDE['text'],
+                    'color_border' => self::COLOR_VERDE['border'],
+                    'seccion' => null,
+                ],
+                [
+                    'turno' => 'Turno 3',
+                    'color_nombre' => 'Azul',
+                    'titular' => 'Juan Antonio Zambrano',
+                    'color_bg' => self::COLOR_AZUL['bg'],
+                    'color_text' => self::COLOR_AZUL['text'],
+                    'color_border' => self::COLOR_AZUL['border'],
+                    'seccion' => null,
+                ],
+            ];
+        }
+
+        if ($gasolineraCodigo === 2) { // Ronda Norte
+            $items = [];
+
+            // Puesto 1 (Primer Turno)
+            if ($filtroPuesto === 'todos' || $filtroPuesto === 'Puesto 1') {
+                $items[] = [
+                    'turno' => 'P1 - Mañana / Tarde',
+                    'color_nombre' => 'Azul',
+                    'titular' => 'Mari Carmen Prieto',
+                    'color_bg' => self::COLOR_AZUL['bg'],
+                    'color_text' => self::COLOR_AZUL['text'],
+                    'color_border' => self::COLOR_AZUL['border'],
+                    'seccion' => 'Puesto 1 (Primer Turno)',
+                ];
+                $items[] = [
+                    'turno' => 'P1 - Mañana / Tarde',
+                    'color_nombre' => 'Verde',
+                    'titular' => 'Antonio Carvajal',
+                    'color_bg' => self::COLOR_VERDE['bg'],
+                    'color_text' => self::COLOR_VERDE['text'],
+                    'color_border' => self::COLOR_VERDE['border'],
+                    'seccion' => 'Puesto 1 (Primer Turno)',
+                ];
+                $items[] = [
+                    'turno' => 'P1 - Mañana / Tarde',
+                    'color_nombre' => 'Naranja',
+                    'titular' => 'Jesús Arcos',
+                    'color_bg' => self::COLOR_NARANJA['bg'],
+                    'color_text' => self::COLOR_NARANJA['text'],
+                    'color_border' => self::COLOR_NARANJA['border'],
+                    'seccion' => 'Puesto 1 (Primer Turno)',
+                ];
+                $items[] = [
+                    'turno' => 'Turno Noche (4x2)',
+                    'color_nombre' => 'Púrpura',
+                    'titular' => 'Francisco Acaiña (Fran)',
+                    'color_bg' => self::COLOR_PURPURA['bg'],
+                    'color_text' => self::COLOR_PURPURA['text'],
+                    'color_border' => self::COLOR_PURPURA['border'],
+                    'seccion' => 'Turno Noche',
+                ];
+                $items[] = [
+                    'turno' => 'Turno Noche (2x4)',
+                    'color_nombre' => 'Amarillo',
+                    'titular' => 'Antonio Romero',
+                    'color_bg' => self::COLOR_AMARILLO['bg'],
+                    'color_text' => self::COLOR_AMARILLO['text'],
+                    'color_border' => self::COLOR_AMARILLO['border'],
+                    'seccion' => 'Turno Noche',
+                ];
+            }
+
+            // Puesto 2 (Segundo Turno)
+            if ($filtroPuesto === 'todos' || $filtroPuesto === 'Puesto 2') {
+                $items[] = [
+                    'turno' => 'Turno 1',
+                    'color_nombre' => 'Rojo',
+                    'titular' => 'Sergio Povea',
+                    'color_bg' => self::COLOR_ROJO['bg'],
+                    'color_text' => self::COLOR_ROJO['text'],
+                    'color_border' => self::COLOR_ROJO['border'],
+                    'seccion' => 'Puesto 2 (Segundo Turno)',
+                ];
+                $items[] = [
+                    'turno' => 'Turno 2',
+                    'color_nombre' => 'Verde',
+                    'titular' => 'Israel Vega',
+                    'color_bg' => self::COLOR_VERDE['bg'],
+                    'color_text' => self::COLOR_VERDE['text'],
+                    'color_border' => self::COLOR_VERDE['border'],
+                    'seccion' => 'Puesto 2 (Segundo Turno)',
+                ];
+                $items[] = [
+                    'turno' => 'Turno 3',
+                    'color_nombre' => 'Azul',
+                    'titular' => 'Laura Linares',
+                    'color_bg' => self::COLOR_AZUL['bg'],
+                    'color_text' => self::COLOR_AZUL['text'],
+                    'color_border' => self::COLOR_AZUL['border'],
+                    'seccion' => 'Puesto 2 (Segundo Turno)',
+                ];
+            }
+
+            return $items;
+        }
+
+        return [];
     }
 }
 

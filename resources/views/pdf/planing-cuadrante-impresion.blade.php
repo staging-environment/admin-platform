@@ -210,15 +210,20 @@
                                 $turnoReg = $turnosMap[$key] ?? null;
                                 $empleado = $turnoReg?->empleado;
                                 $esSustitucion = $turnoReg?->es_sustitucion;
+                                $estiloTurno = $turnoReg?->estilo_color;
                             @endphp
 
                             <td class="{{ $dia['esFinDeSemana'] ? 'weekend-cell' : '' }}">
-                                @if($empleado)
+                                @if($empleado && $estiloTurno)
                                     <div
                                         class="badge-empleado {{ $esSustitucion ? 'sustitucion-badge' : '' }}"
-                                        style="background-color: {{ $empleado->color_bg }}; border: 0.8px solid {{ $empleado->color_border }}; color: {{ $empleado->color_text }};"
+                                        style="background-color: {{ $estiloTurno['bg'] }}; border: 0.8px solid {{ $estiloTurno['border'] }}; color: {{ $estiloTurno['text'] }};"
                                     >
                                         {{ $empleado->nombre_corto }}{{ $esSustitucion ? '*' : '' }}
+                                    </div>
+                                @elseif($empleado)
+                                    <div class="badge-empleado">
+                                        {{ $empleado->nombre_corto }}
                                     </div>
                                 @else
                                     <span style="color: #cbd5e1;">—</span>
@@ -248,12 +253,12 @@
 
             <td style="width: 25%; vertical-align: top; padding-right: 6px;">
                 <div class="legend-box">
-                    <strong style="color: #0f172a; text-transform: uppercase; font-size: 6.2pt;">Plantilla:</strong><br>
+                    <strong style="color: #0f172a; text-transform: uppercase; font-size: 6.2pt;">Código de Colores de Turnos:</strong><br>
                     <div style="margin-top: 3px;">
-                        @foreach($empleadosLegenda as $emp)
-                            <div style="margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <span style="display: inline-block; width: 6px; height: 6px; background-color: {{ $emp->color_bg }}; border: 1px solid {{ $emp->color_border }}; border-radius: 50%; margin-right: 3px;"></span>
-                                <strong>{{ $emp->nombre_corto }}</strong> ({{ $emp->nombre }} {{ $emp->apellidos }})
+                        @foreach(($leyendaTurnos ?? []) as $item)
+                            <div style="margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 5.5pt;">
+                                <span style="display: inline-block; width: 6px; height: 6px; background-color: {{ $item['color_bg'] }}; border: 0.8px solid {{ $item['color_border'] }}; border-radius: 2px; margin-right: 3px; vertical-align: middle;"></span>
+                                <strong>{{ $item['turno'] }} ({{ $item['color_nombre'] }})</strong>: {{ $item['titular'] }}
                             </div>
                         @endforeach
                     </div>
