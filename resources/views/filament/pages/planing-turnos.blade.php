@@ -476,7 +476,7 @@
                                 <div>
                                     <span class="font-black text-amber-900 dark:text-amber-300">Sustitución permanente (desde esta fecha en adelante)</span>
                                     <p class="text-[10.5px] text-amber-700 dark:text-amber-400">
-                                        Reemplaza automáticamente todos los turnos del titular desde el {{ \Carbon\Carbon::parse($modalFecha)->isoFormat('D [de] MMMM') }} hasta fin de mes.
+                                        Reemplaza automáticamente todos los turnos del titular desde el {{ \Carbon\Carbon::parse($modalFecha)->isoFormat('D [de] MMMM') }} en adelante en todos los calendarios de los próximos meses.
                                     </p>
                                 </div>
                             </label>

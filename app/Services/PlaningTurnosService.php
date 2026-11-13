@@ -618,6 +618,8 @@ class PlaningTurnosService
 
         if (!$turnoModel->exists) {
             $turnoModel->empleado_titular_id = $empleadoId;
+        } elseif (!$turnoModel->empleado_titular_id && $turnoModel->empleado_id) {
+            $turnoModel->empleado_titular_id = $turnoModel->empleado_id;
         }
 
         $turnoModel->empleado_id = $empleadoId;

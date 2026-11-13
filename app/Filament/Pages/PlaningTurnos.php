@@ -293,13 +293,23 @@ class PlaningTurnos extends Page
 
         // 2. Si el usuario seleccionó sustitución permanente en adelante
         if ($this->modalAlcance === 'en_adelante' && $titularId && $nuevoEmpleadoId) {
-            $turnosFuturos = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
+            // Asegurar que existan los cuadrantes futuros de esta estación en el horizonte (12 meses)
+            $service->asegurarHorizonte12Meses($this->gasolineraCodigo, 12, false);
+
+            $queryFuturos = PlaningTurno::whereHas('cuadrante', function ($q) {
+                    $q->where('gasolinera_codigo', $this->gasolineraCodigo);
+                })
                 ->where('fecha', '>', $this->modalFecha)
                 ->where(function ($q) use ($titularId) {
                     $q->where('empleado_id', $titularId)
                       ->orWhere('empleado_titular_id', $titularId);
-                })
-                ->get();
+                });
+
+            if (!empty($this->modalPuesto)) {
+                $queryFuturos->where('puesto', $this->modalPuesto);
+            }
+
+            $turnosFuturos = $queryFuturos->get();
 
             foreach ($turnosFuturos as $tf) {
                 if (!$tf->empleado_titular_id) {
