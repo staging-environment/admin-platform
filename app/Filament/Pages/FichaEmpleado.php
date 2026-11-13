@@ -113,6 +113,9 @@ class FichaEmpleado extends Page
     public $nuevo_doc_archivo = null;
     public bool $isAddingTitulacion = false;
 
+    // Contratos y Nóminas
+    public $contratos = [];
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -212,6 +215,7 @@ class FichaEmpleado extends Page
             $this->loadVacaciones();
             $this->loadAusencias();
             $this->loadFormacion();
+            $this->loadContratos();
         }
     }
 
@@ -321,6 +325,9 @@ class FichaEmpleado extends Page
     public function render(): \Illuminate\Contracts\View\View
     {
         $this->loadFichajes();
+        if ($this->empleado) {
+            $this->loadContratos();
+        }
         return parent::render();
     }
 
@@ -739,6 +746,67 @@ class FichaEmpleado extends Page
             $this->cursos = [];
             $this->documentosFormacion = [];
         }
+    }
+
+    public function loadContratos(): void
+    {
+        if (!$this->empleado) {
+            $this->contratos = collect();
+            return;
+        }
+
+        // 1. Contratos desde EmpleadoDocumento (Gestión documental oficial)
+        $docs = \App\Models\EmpleadoDocumento::where('empleado_id', $this->empleado->id)
+            ->where('tipo', 'Contratos')
+            ->orderByRaw('COALESCE(fecha_inicio_contrato, "1970-01-01") DESC')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($doc) {
+                return (object) [
+                    'id' => 'doc_' . $doc->id,
+                    'tipo' => 'documento',
+                    'nombre' => $doc->nombre ?: ('Contrato ' . ($doc->tipo_contrato ?? '')),
+                    'tipo_contrato' => $doc->tipo_contrato ?: 'Contrato Laboral',
+                    'fecha_inicio' => $doc->fecha_inicio_contrato,
+                    'fecha_fin' => $doc->fecha_vencimiento_contrato,
+                    'jornada' => $doc->tipo_jornada ?: 'Jornada completa',
+                    'centro_trabajo' => $doc->estaciones_nombres ?: null,
+                    'puesto' => $doc->puesto ?: $this->empleado->puesto,
+                    'file_path' => $doc->file_path,
+                    'created_at' => $doc->created_at,
+                ];
+            });
+
+        // 2. Contratos desde EmpleadoContrato si existieran
+        $contratosModel = \App\Models\EmpleadoContrato::where('empleado_id', $this->empleado->id)
+            ->orderByRaw('COALESCE(fecha_inicio, "1970-01-01") DESC')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($c) {
+                return (object) [
+                    'id' => 'c_' . $c->id,
+                    'tipo' => 'contrato_laboral',
+                    'nombre' => 'Contrato ' . ($c->tipo_contrato ?? ''),
+                    'tipo_contrato' => $c->tipo_contrato ?: 'Contrato Laboral',
+                    'fecha_inicio' => $c->fecha_inicio,
+                    'fecha_fin' => $c->fecha_fin,
+                    'jornada' => $c->jornada ?: 'Completa',
+                    'centro_trabajo' => $c->centro_trabajo ?: null,
+                    'puesto' => $this->empleado->puesto,
+                    'file_path' => $c->file_path,
+                    'created_at' => $c->created_at,
+                ];
+            });
+
+        // Unificar evitando duplicados por mismo file_path
+        $unificados = $docs;
+        foreach ($contratosModel as $c) {
+            if (!$unificados->contains(fn($u) => !empty($u->file_path) && $u->file_path === $c->file_path)) {
+                $unificados->push($c);
+            }
+        }
+
+        $this->contratos = $unificados->sortByDesc(fn($c) => $c->fecha_inicio ?? $c->created_at)->values();
     }
 
     public function guardarTitulacion(): void

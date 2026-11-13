@@ -1087,6 +1087,220 @@
                 </div>
             @endif
 
+            @if($activeTab === 'contratos_nominas' || $activeTab === 'contratos' || $activeTab === 'nominas')
+                <div x-data="{ subTab: '{{ ($activeTab === 'nominas') ? 'nominas' : 'contratos' }}' }" class="space-y-6">
+                    <!-- Selector de Pestañas: Contratos y Nóminas -->
+                    <div class="flex items-center gap-2 border-b border-gray-200 dark:border-white/10 pb-3">
+                        <button
+                            type="button"
+                            @click="subTab = 'contratos'"
+                            :class="subTab === 'contratos'
+                                ? 'bg-indigo-600 text-white font-bold shadow-sm shadow-indigo-600/30'
+                                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-semibold border border-gray-200 dark:border-white/10'"
+                            class="px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-150 inline-flex items-center gap-2.5 cursor-pointer"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>{{ __('Contratos') }}</span>
+                            <span
+                                :class="subTab === 'contratos' ? 'bg-white/20 text-white' : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'"
+                                class="text-xs px-2 py-0.5 rounded-full font-bold"
+                            >
+                                {{ count($contratos) }}
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            @click="subTab = 'nominas'"
+                            :class="subTab === 'nominas'
+                                ? 'bg-indigo-600 text-white font-bold shadow-sm shadow-indigo-600/30'
+                                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 font-semibold border border-gray-200 dark:border-white/10'"
+                            class="px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all duration-150 inline-flex items-center gap-2.5 cursor-pointer"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <span>{{ __('Nóminas') }}</span>
+                        </button>
+                    </div>
+
+                    <!-- PESTAÑA: CONTRATOS -->
+                    <div x-show="subTab === 'contratos'" class="space-y-6">
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm space-y-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-white/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            {{ __('Mis Contratos') }}
+                                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                                                {{ count($contratos) }} {{ count($contratos) === 1 ? 'contrato registrado' : 'contratos registrados' }}
+                                            </span>
+                                        </h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            {{ __('Consulta y descarga todos los contratos vigentes e históricos asociados a tu puesto en la empresa.') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if(count($contratos) === 0)
+                                <div class="py-12 text-center space-y-2">
+                                    <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-400 flex items-center justify-center mx-auto mb-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ __('No hay contratos disponibles') }}</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                                        {{ __('Actualmente no constan contratos registrados en tu expediente.') }}
+                                    </p>
+                                </div>
+                            @else
+                                <div class="overflow-x-auto rounded-2xl border border-gray-100 dark:border-white/5 shadow-xs">
+                                    <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300">
+                                        <thead class="bg-gray-50/75 dark:bg-white/5 text-[11px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-wider border-b border-gray-100 dark:border-white/5">
+                                            <tr>
+                                                <th class="py-3.5 px-4">{{ __('Contrato') }}</th>
+                                                <th class="py-3.5 px-4">{{ __('Fecha Inicio') }}</th>
+                                                <th class="py-3.5 px-4">{{ __('Fecha Fin / Vencimiento') }}</th>
+                                                <th class="py-3.5 px-4">{{ __('Jornada') }}</th>
+                                                <th class="py-3.5 px-4">{{ __('Puesto / Estación') }}</th>
+                                                <th class="py-3.5 px-4 text-right">{{ __('Acciones') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                                            @foreach($contratos as $c)
+                                                <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                                                    <td class="py-3.5 px-4">
+                                                        <div class="flex items-center gap-2.5">
+                                                            <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                                </svg>
+                                                            </span>
+                                                            <div>
+                                                                <span class="font-bold text-gray-900 dark:text-white block">
+                                                                    {{ $c->tipo_contrato ?: 'Contrato Laboral' }}
+                                                                </span>
+                                                                @if($c->nombre && $c->nombre !== $c->tipo_contrato)
+                                                                    <span class="text-[11px] text-gray-400 font-normal block truncate max-w-xs" title="{{ $c->nombre }}">
+                                                                        {{ $c->nombre }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3.5 px-4 whitespace-nowrap font-mono text-gray-700 dark:text-gray-300">
+                                                        {{ $c->fecha_inicio ? \Carbon\Carbon::parse($c->fecha_inicio)->format('d/m/Y') : ($c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d/m/Y') : '—') }}
+                                                    </td>
+                                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                                        @if($c->fecha_fin)
+                                                            <span class="font-mono text-gray-700 dark:text-gray-300">
+                                                                {{ \Carbon\Carbon::parse($c->fecha_fin)->format('d/m/Y') }}
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
+                                                                {{ __('Indefinido') }}
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                                        <span class="text-xs text-gray-600 dark:text-gray-300">
+                                                            {{ $c->jornada ?: 'Jornada completa' }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="py-3.5 px-4">
+                                                        <div class="text-xs">
+                                                            <span class="font-medium text-gray-800 dark:text-gray-200 block">
+                                                                {{ $c->puesto ?: 'Expendedor' }}
+                                                            </span>
+                                                            @if($c->centro_trabajo && $c->centro_trabajo !== '—')
+                                                                <span class="text-[11px] text-gray-400 block truncate max-w-[200px]" title="{{ $c->centro_trabajo }}">
+                                                                    {{ $c->centro_trabajo }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                                        @if($c->file_path)
+                                                            <div class="inline-flex items-center gap-1.5 justify-end">
+                                                                <!-- Acción: Ver (con un ojito) -->
+                                                                <a
+                                                                    href="{{ route('admin.recursos_humanos.ver_archivo', ['path' => $c->file_path]) }}"
+                                                                    target="_blank"
+                                                                    title="{{ __('Ver contrato') }}"
+                                                                    class="inline-flex items-center justify-center p-2 rounded-xl text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/40 transition-all shadow-xs cursor-pointer"
+                                                                >
+                                                                    <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                                    </svg>
+                                                                </a>
+
+                                                                <!-- Acción: Imprimir -->
+                                                                <button
+                                                                    type="button"
+                                                                    onclick="imprimirContrato('{{ route('admin.recursos_humanos.ver_archivo', ['path' => $c->file_path]) }}')"
+                                                                    title="{{ __('Imprimir contrato') }}"
+                                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 transition-all shadow-xs cursor-pointer"
+                                                                >
+                                                                    <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                                    </svg>
+                                                                    <span>{{ __('Imprimir') }}</span>
+                                                                </button>
+                                                            </div>
+                                                        @else
+                                                            <span class="text-[11px] text-gray-400 italic">{{ __('Sin archivo adjunto') }}</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- PESTAÑA: NÓMINAS (En blanco) -->
+                    <div x-show="subTab === 'nominas'" style="display: none;" class="space-y-6">
+                        <div class="p-12 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 text-indigo-500 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-base font-bold text-gray-800 dark:text-gray-200">{{ __('Nóminas') }}</h4>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 max-w-sm mx-auto mt-1">
+                                {{ __('Actualmente no hay nóminas disponibles.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function imprimirContrato(url) {
+                        const win = window.open(url, '_blank');
+                        if (win) {
+                            win.focus();
+                            win.onload = function() {
+                                try {
+                                    win.print();
+                                } catch(e) {}
+                            };
+                        }
+                    }
+                </script>
+            @endif
+
             <!-- MODALS -->
             <!-- Modal Flotante: Registrar Entrada -->
             <x-filament::modal id="checkin-modal" width="md">

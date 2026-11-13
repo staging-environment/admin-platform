@@ -167,6 +167,13 @@
                                 </x-slot>
                             </x-dropdown>
                         </div>
+
+                        @php
+                            $isContratosNominasActive = (request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'contratos_nominas' || request()->query('tab') === 'contratos' || request()->query('tab') === 'nominas');
+                        @endphp
+                        <x-nav-link href="/admin/portal-empleado?tab=contratos_nominas" :active="$isContratosNominasActive">
+                            {{ __('Contratos/Nominas') }}
+                        </x-nav-link>
                     @endif
 
                     @if(auth()->user()?->can('utilizar_explorador'))
@@ -447,6 +454,10 @@
                                 </a>
                             </div>
                         </div>
+
+                        <x-responsive-nav-link href="/admin/portal-empleado?tab=contratos_nominas" :active="(request()->is('admin/portal-empleado*') || request()->is('admin/ficha-empleado*')) && (request()->query('tab') === 'contratos_nominas' || request()->query('tab') === 'contratos' || request()->query('tab') === 'nominas')">
+                            {{ __('Contratos/Nominas') }}
+                        </x-responsive-nav-link>
                     </div>
                 </div>
             @endif
