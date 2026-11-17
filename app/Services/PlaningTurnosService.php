@@ -607,7 +607,8 @@ class PlaningTurnosService
         ?int $empleadoId,
         bool $esSustitucion = false,
         ?string $motivo = null,
-        ?string $notas = null
+        ?string $notas = null,
+        ?int $titularId = null
     ): PlaningTurno {
         $turnoModel = PlaningTurno::firstOrNew([
             'planing_cuadrante_id' => $cuadranteId,
@@ -616,10 +617,10 @@ class PlaningTurnosService
             'turno' => $turno,
         ]);
 
-        if (!$turnoModel->exists) {
+        if ($titularId) {
+            $turnoModel->empleado_titular_id = $titularId;
+        } elseif (!$turnoModel->empleado_titular_id && $empleadoId) {
             $turnoModel->empleado_titular_id = $empleadoId;
-        } elseif (!$turnoModel->empleado_titular_id && $turnoModel->empleado_id) {
-            $turnoModel->empleado_titular_id = $turnoModel->empleado_id;
         }
 
         $turnoModel->empleado_id = $empleadoId;
@@ -629,6 +630,57 @@ class PlaningTurnosService
         $turnoModel->save();
 
         return $turnoModel;
+    }
+
+    /**
+     * Resuelve el titular teórico de rotación 4x2 para una fecha y turno dados.
+     */
+    public function resolverTitularTeoricoFecha(int $gasolineraCodigo, string $fecha, string $puesto, string $turno): ?Empleado
+    {
+        $fechaRefEpoch = Carbon::create(2025, 12, 26);
+        $fechaObj = Carbon::parse($fecha);
+        $diaIndice = $fechaRefEpoch->diffInDays($fechaObj, false);
+
+        if ($gasolineraCodigo === 2) {
+            if ($puesto === 'Puesto 1') {
+                $equipo = $this->resolverEquipoBase(2, 'Puesto 1');
+                $turnos = $this->calcularTurnosDia4x2($diaIndice + 2, $equipo);
+                return $turnos[$turno] ?? null;
+            } elseif ($puesto === 'Puesto 2') {
+                $equipo = $this->resolverEquipoBase(2, 'Puesto 2');
+                $turnos = $this->calcularTurnosDia4x2($diaIndice, $equipo);
+                return $turnos[$turno] ?? null;
+            } elseif ($puesto === 'Noche') {
+                $equipo = $this->resolverEquipoBase(2, 'Noche');
+                if (count($equipo) >= 2) {
+                    $mod6 = $diaIndice % 6;
+                    if ($mod6 < 0) $mod6 += 6;
+                    return ($mod6 === 0 || $mod6 === 1) ? $equipo[1] : $equipo[0];
+                }
+                return $equipo[0] ?? null;
+            }
+        } else {
+            $equipo = $this->resolverEquipoBase($gasolineraCodigo, 'Puesto Único');
+            $turnos = $this->calcularTurnosDia4x2($diaIndice, $equipo);
+
+            if ($gasolineraCodigo === 1) {
+                $d = $fechaObj->day;
+                $m = $fechaObj->month;
+                $y = $fechaObj->year;
+                $esConsoActiva = ($y > 2026 || ($y === 2026 && $m > 11) || ($y === 2026 && $m === 11 && $d >= 5));
+                if ($esConsoActiva && count($equipo) > 1) {
+                    $empMiguelAngel = $equipo[1];
+                    $empConso = Empleado::where('id', 88)->first() ?: Empleado::where('nombre', 'like', '%CONSOLACION%')->first();
+                    if ($empConso && ($turnos[$turno]?->id === $empMiguelAngel->id)) {
+                        return $empConso;
+                    }
+                }
+            }
+
+            return $turnos[$turno] ?? null;
+        }
+
+        return null;
     }
 
     /**
@@ -644,13 +696,27 @@ class PlaningTurnosService
         int $gasolineraCodigo,
         string $puesto,
         string $turno,
-        ?int $empleadoTitularId,
-        ?int $empleadoRealId = null
+        int|string|null $empleadoTitularId = null,
+        int|string|null $empleadoRealId = null,
+        ?string $fecha = null
     ): array {
-        $targetId = $empleadoTitularId ?: $empleadoRealId;
+        $titularId = (!empty($empleadoTitularId) && is_numeric($empleadoTitularId)) ? (int)$empleadoTitularId : null;
+        $realId = (!empty($empleadoRealId) && is_numeric($empleadoRealId)) ? (int)$empleadoRealId : null;
+
+        $targetId = $titularId ?: $realId;
+
+        if (!$targetId && $fecha) {
+            $titularTeorico = $this->resolverTitularTeoricoFecha($gasolineraCodigo, $fecha, $puesto, $turno);
+            $targetId = $titularTeorico?->id;
+        }
 
         if (!$targetId) {
-            return self::COLOR_DEFAULT;
+            return match ($turno) {
+                'M' => self::COLOR_ROJO,
+                'T' => self::COLOR_VERDE,
+                'N' => self::COLOR_PURPURA,
+                default => self::COLOR_DEFAULT,
+            };
         }
 
         $empleado = Empleado::find($targetId);
@@ -754,12 +820,12 @@ class PlaningTurnosService
 
         // 4. ATENAS (Gasolinera 4)
         if ($gasolineraCodigo === 4) {
-            // Turno 1 (Rojo): Toni Llompart
-            if ($targetId === 77 || str_contains($nombreCompleto, 'llompart') || str_contains($nombreCompleto, 'toni')) {
+            // Turno 1 (Rojo): Toni Llompart (Antonio Llompart) - NUNCA usar str_contains('toni') porque coincide con 'anTONIo'!
+            if ($targetId === 77 || str_contains($nombreCompleto, 'llompart') || preg_match('/\btoni\b/u', $nombreCompleto)) {
                 return self::COLOR_ROJO;
             }
             // Turno 2 (Verde): Joaquín Caro
-            if ($targetId === 70 || str_contains($nombreCompleto, 'joaquin') || str_contains($nombreCompleto, 'caro')) {
+            if ($targetId === 70 || str_contains($nombreCompleto, 'caro') || preg_match('/\bjoaquin\b/u', $nombreCompleto)) {
                 return self::COLOR_VERDE;
             }
             // Turno 3 (Azul): Juan Antonio Zambrano
@@ -781,7 +847,7 @@ class PlaningTurnosService
             }
         }
 
-        // Fallback matemático por ID para garantizar siempre Rojo, Verde o Azul
+        // Fallback por ID si no está en el equipo base
         return match ($targetId % 3) {
             0 => self::COLOR_ROJO,
             1 => self::COLOR_VERDE,

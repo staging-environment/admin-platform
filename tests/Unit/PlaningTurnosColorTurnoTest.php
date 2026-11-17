@@ -200,5 +200,91 @@ class PlaningTurnosColorTurnoTest extends TestCase
         $this->assertEquals('Verde', $leyendaVistalegre[1]['color_nombre']);
         $this->assertEquals('Azul', $leyendaVistalegre[2]['color_nombre']);
     }
+
+    public function test_colores_turnos_atenas_tres_empleados_colores_distintos(): void
+    {
+        $service = app(PlaningTurnosService::class);
+
+        $empToni = Empleado::create([
+            'nombre' => 'ANTONIO',
+            'apellidos' => 'LLOMPART SERRANO',
+            'email' => 'toni.llompart@test.com',
+            'estado' => 'Alta',
+        ]);
+
+        $empJoaquin = Empleado::create([
+            'nombre' => 'JOAQUIN',
+            'apellidos' => 'CARO GONZALEZ',
+            'email' => 'joaquin.caro@test.com',
+            'estado' => 'Alta',
+        ]);
+
+        $empZambrano = Empleado::create([
+            'nombre' => 'JUAN ANTONIO',
+            'apellidos' => 'ZAMBRANO ROMERO',
+            'email' => 'juan.zambrano@test.com',
+            'estado' => 'Alta',
+        ]);
+
+        $empAngel = Empleado::create([
+            'nombre' => 'ANGEL DAVID',
+            'apellidos' => 'CASTELLANO MEDINA',
+            'email' => 'angel.castellano@test.com',
+            'estado' => 'Alta',
+        ]);
+
+        // Atenas (Estación 4)
+        $colorToni = $service->resolverColorTurno(4, 'Puesto Único', 'M', $empToni->id);
+        $colorJoaquin = $service->resolverColorTurno(4, 'Puesto Único', 'T', $empJoaquin->id);
+        $colorZambrano = $service->resolverColorTurno(4, 'Puesto Único', 'T', $empZambrano->id);
+
+        $this->assertEquals('#ef4444', $colorToni['bg'], 'Toni debe ser Rojo');
+        $this->assertEquals('#a9d08e', $colorJoaquin['bg'], 'Joaquín debe ser Verde');
+        $this->assertEquals('#8ea9db', $colorZambrano['bg'], 'Zambrano debe ser Azul');
+
+        // Los tres colores deben ser estrictamente diferentes entre sí
+        $this->assertNotEquals($colorToni['bg'], $colorZambrano['bg'], 'Toni y Zambrano NO pueden tener el mismo color');
+        $this->assertNotEquals($colorToni['bg'], $colorJoaquin['bg'], 'Toni y Joaquín NO pueden tener el mismo color');
+        $this->assertNotEquals($colorJoaquin['bg'], $colorZambrano['bg'], 'Joaquín y Zambrano NO pueden tener el mismo color');
+
+        // Cuando Ángel sustituye a Zambrano en su turno, el turno conserva su color Azul
+        $colorSustitucionAngel = $service->resolverColorTurno(4, 'Puesto Único', 'T', $empZambrano->id, $empAngel->id);
+        $this->assertEquals('#8ea9db', $colorSustitucionAngel['bg'], 'Ángel cubriendo a Zambrano debe mantener el Azul del turno');
+    }
+
+    public function test_desasignar_turno_mantiene_color_del_turno_y_no_da_type_error(): void
+    {
+        $service = app(PlaningTurnosService::class);
+
+        // Llamada con string vacío para emular wire:model vacío de Livewire (evita TypeError)
+        $color = $service->resolverColorTurno(4, 'Puesto Único', 'M', 77, '');
+        $this->assertEquals('#ef4444', $color['bg']);
+
+        // Llamada con ambos null pero con fecha
+        $colorPorFecha = $service->resolverColorTurno(4, 'Puesto Único', 'M', null, null, '2026-11-02');
+        $this->assertNotNull($colorPorFecha['bg']);
+
+        // Modelo PlaningTurno sin empleado_id (desasignado)
+        $cuadrante = PlaningCuadrante::create([
+            'gasolinera_codigo' => 4,
+            'anio' => 2026,
+            'mes' => 11,
+            'estado' => 'publicado',
+        ]);
+
+        $turno = PlaningTurno::create([
+            'planing_cuadrante_id' => $cuadrante->id,
+            'fecha' => '2026-11-02',
+            'puesto' => 'Puesto Único',
+            'turno' => 'M',
+            'empleado_id' => null, // Desasignado
+            'empleado_titular_id' => 77, // Titular de turno preservado
+            'es_sustitucion' => false,
+        ]);
+
+        $this->assertNull($turno->empleado_id);
+        $this->assertNotNull($turno->estilo_color);
+        $this->assertEquals('#ef4444', $turno->estilo_color['bg'], 'El turno desasignado conserva el color de su turno');
+    }
 }
 

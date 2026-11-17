@@ -247,7 +247,7 @@ class PlaningTurnos extends Page
         $service = app(PlaningTurnosService::class);
         $cuadrante = $service->obtenerOCrearCuadrante($this->gasolineraCodigo, $this->anio, $this->mes);
 
-        $nuevoEmpleadoId = !empty($this->modalEmpleadoId) ? (int) $this->modalEmpleadoId : null;
+        $nuevoEmpleadoId = (!empty($this->modalEmpleadoId) && is_numeric($this->modalEmpleadoId)) ? (int) $this->modalEmpleadoId : null;
         
         // Si la sustitución es permanente o para todo el mes, NO se marca como sustitución visual en el cuadrante
         $esPermanente = ($this->modalAlcance === 'en_adelante' || $this->modalAlcance === 'todo_el_mes');
@@ -261,8 +261,19 @@ class PlaningTurnos extends Page
             ->where('turno', $this->modalTurno)
             ->first();
 
-        $titularId = $this->modalTitularId
-            ?: ($registroActual?->empleado_titular_id ?: $registroActual?->empleado_id);
+        $titularId = (!empty($this->modalTitularId) && is_numeric($this->modalTitularId))
+            ? (int) $this->modalTitularId
+            : ($registroActual?->empleado_titular_id ?: $registroActual?->empleado_id);
+
+        if (!$titularId && $this->modalFecha) {
+            $titularTeorico = $service->resolverTitularTeoricoFecha(
+                $this->gasolineraCodigo,
+                $this->modalFecha,
+                $this->modalPuesto,
+                $this->modalTurno
+            );
+            $titularId = $titularTeorico?->id;
+        }
 
         // Validación: No permitir asignar a un empleado que esté de baja en esa fecha
         if ($nuevoEmpleadoId && $nuevoEmpleadoId !== $registroActual?->empleado_id) {
@@ -277,7 +288,7 @@ class PlaningTurnos extends Page
             }
         }
 
-        // 1. Asignar el turno actual seleccionado
+        // 1. Asignar el turno actual seleccionado (preservando el titular y su color de rotación)
         $service->asignarTurnoManual(
             $cuadrante->id,
             $this->modalFecha,
@@ -286,7 +297,8 @@ class PlaningTurnos extends Page
             $nuevoEmpleadoId,
             $esSustitucion,
             $motivo,
-            $this->modalNotas
+            $this->modalNotas,
+            $titularId
         );
 
         $totalAfectados = 1;

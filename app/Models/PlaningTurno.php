@@ -56,22 +56,32 @@ class PlaningTurno extends Model
      */
     public function getEstiloColorAttribute(): ?array
     {
-        if (!$this->empleado_id && !$this->empleado_titular_id) {
-            return null;
-        }
-
         $gasolineraCodigo = $this->cuadrante?->gasolinera_codigo;
         if (!$gasolineraCodigo) {
             $cuadrante = PlaningCuadrante::find($this->planing_cuadrante_id);
             $gasolineraCodigo = $cuadrante?->gasolinera_codigo ?? 1;
         }
 
+        $titularId = $this->empleado_titular_id;
+        $fechaStr = $this->fecha ? \Carbon\Carbon::parse($this->fecha)->toDateString() : null;
+
+        if (!$titularId && $fechaStr) {
+            $titularTeorico = app(\App\Services\PlaningTurnosService::class)->resolverTitularTeoricoFecha(
+                $gasolineraCodigo,
+                $fechaStr,
+                $this->puesto,
+                $this->turno
+            );
+            $titularId = $titularTeorico?->id;
+        }
+
         return app(\App\Services\PlaningTurnosService::class)->resolverColorTurno(
             $gasolineraCodigo,
             $this->puesto,
             $this->turno,
-            $this->empleado_titular_id,
-            $this->empleado_id
+            $titularId ?: $this->empleado_id,
+            $this->empleado_id,
+            $fechaStr
         );
     }
 

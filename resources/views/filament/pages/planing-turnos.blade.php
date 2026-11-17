@@ -218,6 +218,22 @@
                                                             $empleado = $turnoReg?->empleado;
                                                             $esSustitucion = $turnoReg?->es_sustitucion;
                                                             $estiloTurno = $turnoReg?->estilo_color;
+                                                            if (!$estiloTurno) {
+                                                                $titularTeorico = app(\App\Services\PlaningTurnosService::class)->resolverTitularTeoricoFecha(
+                                                                    $this->gasolineraCodigo,
+                                                                    $dia['fecha'],
+                                                                    $fila['puesto'],
+                                                                    $fila['turno']
+                                                                );
+                                                                $estiloTurno = app(\App\Services\PlaningTurnosService::class)->resolverColorTurno(
+                                                                    $this->gasolineraCodigo,
+                                                                    $fila['puesto'],
+                                                                    $fila['turno'],
+                                                                    $titularTeorico?->id,
+                                                                    null,
+                                                                    $dia['fecha']
+                                                                );
+                                                            }
                                                         @endphp
 
                                                         <td
@@ -236,7 +252,7 @@
                                                                     @endif
                                                                 </div>
                                                             @else
-                                                                <div class="flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-primary-600 transition">
+                                                                <div class="flex items-center justify-center transition opacity-60 hover:opacity-100" style="color: {{ $estiloTurno['text'] ?? '#1f2937' }};">
                                                                     <span class="text-xs font-bold">+</span>
                                                                 </div>
                                                             @endif
@@ -376,12 +392,26 @@
                 <div class="p-6 space-y-4">
                     {{-- Información del Puesto y Turno --}}
                     @php
+                        $titularIdModal = (!empty($this->modalTitularId) && is_numeric($this->modalTitularId)) ? (int)$this->modalTitularId : null;
+                        $empleadoIdModal = (!empty($this->modalEmpleadoId) && is_numeric($this->modalEmpleadoId)) ? (int)$this->modalEmpleadoId : null;
+
+                        if (!$titularIdModal && !empty($this->modalFecha)) {
+                            $titularTeoricoModal = app(\App\Services\PlaningTurnosService::class)->resolverTitularTeoricoFecha(
+                                $this->gasolineraCodigo,
+                                $this->modalFecha,
+                                $modalPuesto,
+                                $modalTurno
+                            );
+                            $titularIdModal = $titularTeoricoModal?->id;
+                        }
+
                         $colorTurnoModal = app(\App\Services\PlaningTurnosService::class)->resolverColorTurno(
                             $this->gasolineraCodigo,
                             $modalPuesto,
                             $modalTurno,
-                            $this->modalTitularId,
-                            $this->modalEmpleadoId
+                            $titularIdModal,
+                            $empleadoIdModal,
+                            $this->modalFecha
                         );
                         $bgTurno = $colorTurnoModal['bg'];
                         $borderTurno = $colorTurnoModal['border'];
