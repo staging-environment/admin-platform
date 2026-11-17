@@ -302,4 +302,64 @@ class TurnosDebitoCreditoTest extends TestCase
         $this->assertEquals(0, EmpleadoVacacion::where('empleado_deudor_id', $empleadoA->id)->where('deuda_saldada', false)->count());
         $this->assertEquals(0, EmpleadoVacacion::where('empleado_acreedor_id', $empleadoB->id)->where('deuda_saldada', false)->count());
     }
+
+    public function test_validar_disponibilidad_detecta_si_companero_trabaja_ese_dia()
+    {
+        $empleadoA = Empleado::create([
+            'nombre' => 'Empleado',
+            'apellidos' => 'A4',
+            'email' => 'emp.a4@test.com',
+            'gasolinera_codigo' => 1,
+            'estado' => 'Alta',
+        ]);
+        $empleadoB = Empleado::create([
+            'nombre' => 'Empleado',
+            'apellidos' => 'B4',
+            'email' => 'emp.b4@test.com',
+            'gasolinera_codigo' => 1,
+            'estado' => 'Alta',
+        ]);
+
+        $cuadrante = PlaningCuadrante::create([
+            'gasolinera_codigo' => 1,
+            'anio' => 2026,
+            'mes' => 11,
+        ]);
+
+        $fecha = '2026-11-25';
+
+        // Ambos tienen turno el mismo día
+        PlaningTurno::create([
+            'planing_cuadrante_id' => $cuadrante->id,
+            'fecha' => $fecha,
+            'puesto' => 'Puesto Único',
+            'turno' => 'M',
+            'empleado_id' => $empleadoA->id,
+            'empleado_titular_id' => $empleadoA->id,
+        ]);
+
+        PlaningTurno::create([
+            'planing_cuadrante_id' => $cuadrante->id,
+            'fecha' => $fecha,
+            'puesto' => 'Puesto Único',
+            'turno' => 'T',
+            'empleado_id' => $empleadoB->id,
+            'empleado_titular_id' => $empleadoB->id,
+        ]);
+
+        $service = app(PlaningTurnosService::class);
+
+        // A tiene turno
+        $this->assertTrue($service->tieneTurnoEnFecha($empleadoA, $fecha));
+        // B también tiene turno (por lo que NO está libre)
+        $this->assertTrue($service->tieneTurnoEnFecha($empleadoB, $fecha));
+        $turnoB = $service->obtenerTurnoEnFecha($empleadoB, $fecha);
+        $this->assertNotNull($turnoB);
+        $this->assertEquals('T', $turnoB->turno);
+
+        // B en otra fecha libre
+        $fechaLibre = '2026-11-26';
+        $this->assertFalse($service->tieneTurnoEnFecha($empleadoB, $fechaLibre));
+        $this->assertNull($service->obtenerTurnoEnFecha($empleadoB, $fechaLibre));
+    }
 }

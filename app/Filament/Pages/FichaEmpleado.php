@@ -97,6 +97,11 @@ class FichaEmpleado extends Page
     public $cambio_fecha_devolucion = null;
     public $cambio_motivo = null;
 
+    // Errores reactivos de disponibilidad de turnos en Cambio de Turno
+    public ?string $cambioCompaneroError = null;
+    public ?string $cambioPropioError = null;
+    public ?string $cambioDevolucionError = null;
+
     // Sección activa en la pestaña de Permisos (5 bloques clicables)
     public string $bloquePermisosActivo = 'vacaciones'; // 'vacaciones', 'permisos', 'cambio_turno', 'debito', 'credito'
 
@@ -876,176 +881,8 @@ class FichaEmpleado extends Page
 
     public function solicitarVacacion(): void
     {
-        if ($this->vacacion_tipo === 'Cambio de Turno') {
-            $rules = [
-                'cambio_fecha_solicitada' => 'required|date|after_or_equal:today',
-                'cambio_empleado_sustituto_id' => 'required|exists:empleados,id',
-                'cambio_fecha_devolucion' => 'nullable|date|after_or_equal:today|different:cambio_fecha_solicitada',
-                'cambio_motivo' => 'nullable|string|max:255',
-            ];
-
-            $messages = [
-                'cambio_fecha_solicitada.required' => 'El día que solicitas cambiar es obligatorio.',
-                'cambio_fecha_solicitada.after_or_equal' => 'El día solicitado no puede ser una fecha pasada.',
-                'cambio_empleado_sustituto_id.required' => 'Debes seleccionar al compañero que te sustituirá.',
-                'cambio_fecha_devolucion.after_or_equal' => 'El día de devolución no puede ser una fecha pasada.',
-                'cambio_fecha_devolucion.different' => 'El día de devolución debe ser diferente al día solicitado.',
-            ];
-
-            $this->validate($rules, $messages);
-
-            if ((int)$this->cambio_empleado_sustituto_id === (int)$this->empleado->id) {
-                Notification::make()
-                    ->title('Selección no válida')
-                    ->body('No puedes solicitar un cambio de turno contigo mismo.')
-                    ->danger()
-                    ->send();
-                return;
-            }
-
-            // Validar que el compañero no se encuentre de baja en ninguna de las dos fechas
-            $companero = Empleado::find($this->cambio_empleado_sustituto_id);
-            if ($companero) {
-                if ($companero->estaDeBajaEnFecha($this->cambio_fecha_solicitada)) {
-                    Notification::make()
-                        ->title('Compañero no disponible')
-                        ->body("{$companero->nombre} {$companero->apellidos} se encuentra en situación de baja el día {$this->cambio_fecha_solicitada}.")
-                        ->danger()
-                        ->send();
-                    return;
-                }
-                if (!empty($this->cambio_fecha_devolucion) && $companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
-                    Notification::make()
-                        ->title('Compañero no disponible')
-                        ->body("{$companero->nombre} {$companero->apellidos} se encuentra en situación de baja el día {$this->cambio_fecha_devolucion}.")
-                        ->danger()
-                        ->send();
-                    return;
-                }
-            }
-
-            // Validaciones con el Planing de turnos
-            $planingService = app(\App\Services\PlaningTurnosService::class);
-
-            // 1. En el día solicitado: el solicitante debe tener turno asignado y el compañero debe estar libre
-            if (!$planingService->tieneTurnoEnFecha($this->empleado, $this->cambio_fecha_solicitada)) {
-                Notification::make()
-                    ->title('No tienes turno ese día')
-                    ->body('No tienes ningún turno programado en el Planing para este día. Solo puedes solicitar que te cubran un día en el que tengas turno de trabajo.')
-                    ->danger()
-                    ->send();
-                return;
-            }
-
-            if ($planingService->tieneTurnoEnFecha($companero, $this->cambio_fecha_solicitada)) {
-                Notification::make()
-                    ->title('Compañero ocupado ese día')
-                    ->body("{$companero->nombre} ya tiene un turno de trabajo programado para el día {$this->cambio_fecha_solicitada}. Debe ser un día en el que tu compañero esté libre/descanso.")
-                    ->danger()
-                    ->send();
-                return;
-            }
-
-            // 2. Si se indica fecha de devolución: el compañero debe tener turno ese día y el solicitante debe estar libre
-            if (!empty($this->cambio_fecha_devolucion)) {
-                if (!$planingService->tieneTurnoEnFecha($companero, $this->cambio_fecha_devolucion)) {
-                    Notification::make()
-                        ->title('Compañero no trabaja ese día')
-                        ->body("{$companero->nombre} no tiene turno programado para el día de devolución ({$this->cambio_fecha_devolucion}). Debe ser un día en el que tu compañero trabaje para que puedas devolvérselo.")
-                        ->danger()
-                        ->send();
-                    return;
-                }
-
-                if ($planingService->tieneTurnoEnFecha($this->empleado, $this->cambio_fecha_devolucion)) {
-                    Notification::make()
-                        ->title('Tú ya trabajas ese día')
-                        ->body('Ya tienes un turno asignado para el día de devolución. Debes estar libre/descanso ese día para poder devolvérselo a tu compañero.')
-                        ->danger()
-                        ->send();
-                    return;
-                }
-            }
-
-            // Evitar duplicados pendientes entre los mismos dos empleados y fechas
-            $existeDuplicado = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
-                ->where('tipo', 'Cambio de Turno')
-                ->where('empleado_sustituto_id', $this->cambio_empleado_sustituto_id)
-                ->where('fecha_inicio', $this->cambio_fecha_solicitada)
-                ->where('fecha_devolucion', $this->cambio_fecha_devolucion ?: null)
-                ->where('estado', 'Pendiente')
-                ->exists();
-
-            if ($existeDuplicado) {
-                Notification::make()
-                    ->title('Solicitud Duplicada')
-                    ->body('Ya existe una solicitud pendiente de cambio de turno con este compañero para estas fechas.')
-                    ->danger()
-                    ->send();
-                return;
-            }
-
-            $nombreCompanero = $companero ? $companero->nombre_corto : 'Compañero';
-            $esSinDevolucion = empty($this->cambio_fecha_devolucion);
-
-            if ($esSinDevolucion) {
-                // Comprobar si el compañero ya le debe turnos al solicitante
-                $deudaCompanero = \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
-                    ->where('empleado_deudor_id', $companero->id)
-                    ->where('empleado_acreedor_id', $this->empleado->id)
-                    ->where('deuda_saldada', false)
-                    ->whereIn('estado', ['Aceptada', 'Aprobada'])
-                    ->exists();
-
-                if ($deudaCompanero) {
-                    $tipoCambio = 'cobro_credito';
-                    $deudorId = $companero->id;
-                    $acreedorId = $this->empleado->id;
-                    $comentario = $this->cambio_motivo ?: "Cobro de turno a crédito con {$nombreCompanero}";
-                } else {
-                    $tipoCambio = 'solicitud_cubrir';
-                    $deudorId = $this->empleado->id;
-                    $acreedorId = $companero->id;
-                    $comentario = $this->cambio_motivo ?: "Solicitud de cobertura de turno (Turno a débito/crédito) con {$nombreCompanero}";
-                }
-            } else {
-                $tipoCambio = 'directo';
-                $deudorId = null;
-                $acreedorId = null;
-                $comentario = $this->cambio_motivo ?: "Cambio de turno con {$nombreCompanero} (Devolución: " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ")";
-            }
-
-            \App\Models\EmpleadoVacacion::create([
-                'empleado_id' => $this->empleado->id,
-                'tipo' => 'Cambio de Turno',
-                'tipo_cambio' => $tipoCambio,
-                'empleado_deudor_id' => $deudorId,
-                'empleado_acreedor_id' => $acreedorId,
-                'fecha_inicio' => $this->cambio_fecha_solicitada,
-                'fecha_fin' => $this->cambio_fecha_solicitada,
-                'fecha_devolucion' => $this->cambio_fecha_devolucion ?: null,
-                'empleado_sustituto_id' => $this->cambio_empleado_sustituto_id,
-                'dias_solicitados' => 1,
-                'estado' => 'Pendiente',
-                'comentario_empleado' => $comentario,
-                'respuesta_vista_solicitante' => false,
-            ]);
-
-            $this->reset(['cambio_fecha_solicitada', 'cambio_empleado_sustituto_id', 'cambio_fecha_devolucion', 'cambio_motivo']);
-            $this->vacacion_tipo = 'Vacaciones';
-
-            $mensajeExito = $esSinDevolucion
-                ? "Se ha enviado la solicitud de cobertura a {$nombreCompanero}. Al ser aceptada, se anotará un turno a débito."
-                : "Se ha enviado la solicitud de cambio de turno a {$nombreCompanero}. Recibirá una alerta en su pantalla para responder.";
-
-            Notification::make()
-                ->title('Solicitud Enviada')
-                ->body($mensajeExito)
-                ->success()
-                ->send();
-
-            $this->dispatch('close-modal', id: 'solicitar-vacacion-modal');
-            $this->loadVacaciones();
+        if ($this->vacacion_tipo === 'Cambio de Turno' || $this->bloquePermisosActivo === 'cambio_turno') {
+            $this->solicitarCambioTurno();
             return;
         }
 
@@ -1599,12 +1436,285 @@ class FichaEmpleado extends Page
             return collect();
         }
 
-        return Empleado::query()
+        $query = Empleado::query()
             ->whereNull('deleted_at')
             ->where('estado', 'Alta')
             ->where('id', '!=', $this->empleado->id)
+            ->orderBy('apellidos')
             ->orderBy('nombre')
             ->get();
+
+        if (!empty($this->cambio_fecha_solicitada)) {
+            $planingService = app(\App\Services\PlaningTurnosService::class);
+            $query->each(function ($comp) use ($planingService) {
+                $turno = $planingService->obtenerTurnoEnFecha($comp, $this->cambio_fecha_solicitada);
+                $comp->esta_ocupado = ($turno !== null);
+                $comp->turno_info = $turno ? "Turno {$turno->turno}" : null;
+            });
+        }
+
+        return $query;
+    }
+
+    public function updatedCambioFechaSolicitada(): void
+    {
+        $this->validarDisponibilidadCambioTurno();
+    }
+
+    public function updatedCambioEmpleadoSustitutoId(): void
+    {
+        $this->validarDisponibilidadCambioTurno();
+    }
+
+    public function updatedCambioFechaDevolucion(): void
+    {
+        $this->validarDisponibilidadCambioTurno();
+    }
+
+    public function validarDisponibilidadCambioTurno(): void
+    {
+        $this->cambioPropioError = null;
+        $this->cambioCompaneroError = null;
+        $this->cambioDevolucionError = null;
+
+        if (!$this->empleado) {
+            return;
+        }
+
+        $planingService = app(\App\Services\PlaningTurnosService::class);
+
+        // 1. Validar día solicitado
+        if (!empty($this->cambio_fecha_solicitada)) {
+            // Verificar si el propio solicitante tiene turno ese día
+            $turnoPropio = $planingService->obtenerTurnoEnFecha($this->empleado, $this->cambio_fecha_solicitada);
+            if (!$turnoPropio) {
+                $this->cambioPropioError = "No tienes ningún turno programado en el Planing para el " . Carbon::parse($this->cambio_fecha_solicitada)->format('d/m/Y') . ". Solo puedes solicitar que te cubran un día en el que tengas turno de trabajo.";
+            }
+
+            // Verificar si el compañero seleccionado está libre
+            if (!empty($this->cambio_empleado_sustituto_id)) {
+                $companero = Empleado::find($this->cambio_empleado_sustituto_id);
+                if ($companero) {
+                    if ($companero->estaDeBajaEnFecha($this->cambio_fecha_solicitada)) {
+                        $this->cambioCompaneroError = "{$companero->nombre_completo} se encuentra en situación de baja médica el " . Carbon::parse($this->cambio_fecha_solicitada)->format('d/m/Y') . ".";
+                    } else {
+                        $turnoCompanero = $planingService->obtenerTurnoEnFecha($companero, $this->cambio_fecha_solicitada);
+                        if ($turnoCompanero) {
+                            $this->cambioCompaneroError = "No es posible solicitar el cambio: {$companero->nombre_completo} ya está trabajando ese día (Turno {$turnoCompanero->turno}). Debe ser un día en el que tu compañero esté libre/descanso.";
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Validar día de devolución si se indica
+        if (!empty($this->cambio_fecha_devolucion)) {
+            $turnoPropioDev = $planingService->obtenerTurnoEnFecha($this->empleado, $this->cambio_fecha_devolucion);
+            if ($turnoPropioDev) {
+                $this->cambioDevolucionError = "Ya tienes un turno asignado para el día de devolución (" . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ", Turno {$turnoPropioDev->turno}). Debes estar libre/descanso ese día para poder devolvérselo a tu compañero.";
+            }
+
+            if (!empty($this->cambio_empleado_sustituto_id)) {
+                $companero = Empleado::find($this->cambio_empleado_sustituto_id);
+                if ($companero) {
+                    if ($companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
+                        $this->cambioDevolucionError = "{$companero->nombre_completo} se encuentra en situación de baja médica el " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ".";
+                    } else {
+                        $turnoCompaneroDev = $planingService->obtenerTurnoEnFecha($companero, $this->cambio_fecha_devolucion);
+                        if (!$turnoCompaneroDev) {
+                            $this->cambioDevolucionError = "{$companero->nombre_completo} no tiene turno programado para el día de devolución (" . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . "). Debe ser un día en el que tu compañero trabaje para que puedas devolvérselo.";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function solicitarCambioTurno(): void
+    {
+        $rules = [
+            'cambio_fecha_solicitada' => 'required|date|after_or_equal:today',
+            'cambio_empleado_sustituto_id' => 'required|exists:empleados,id',
+            'cambio_fecha_devolucion' => 'nullable|date|after_or_equal:today|different:cambio_fecha_solicitada',
+            'cambio_motivo' => 'nullable|string|max:255',
+        ];
+
+        $messages = [
+            'cambio_fecha_solicitada.required' => 'El día que solicitas cambiar es obligatorio.',
+            'cambio_fecha_solicitada.after_or_equal' => 'El día solicitado no puede ser una fecha pasada.',
+            'cambio_empleado_sustituto_id.required' => 'Debes seleccionar al compañero que te sustituirá.',
+            'cambio_fecha_devolucion.after_or_equal' => 'El día de devolución no puede ser una fecha pasada.',
+            'cambio_fecha_devolucion.different' => 'El día de devolución debe ser diferente al día solicitado.',
+        ];
+
+        $this->validate($rules, $messages);
+
+        if ((int)$this->cambio_empleado_sustituto_id === (int)$this->empleado->id) {
+            Notification::make()
+                ->title('Selección no válida')
+                ->body('No puedes solicitar un cambio de turno contigo mismo.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $companero = Empleado::find($this->cambio_empleado_sustituto_id);
+        if (!$companero) {
+            return;
+        }
+
+        $planingService = app(\App\Services\PlaningTurnosService::class);
+
+        // Validar bajas médicas
+        if ($this->empleado->estaDeBajaEnFecha($this->cambio_fecha_solicitada)) {
+            Notification::make()
+                ->title('No disponible')
+                ->body('Te encuentras en situación de baja médica en la fecha solicitada.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        if ($companero->estaDeBajaEnFecha($this->cambio_fecha_solicitada)) {
+            Notification::make()
+                ->title('Compañero no disponible')
+                ->body("{$companero->nombre_completo} se encuentra en situación de baja el día " . Carbon::parse($this->cambio_fecha_solicitada)->format('d/m/Y') . ".")
+                ->danger()
+                ->send();
+            return;
+        }
+
+        // 1. Validar que el solicitante tenga turno en la fecha que pide cubrir
+        $turnoPropio = $planingService->obtenerTurnoEnFecha($this->empleado, $this->cambio_fecha_solicitada);
+        if (!$turnoPropio) {
+            Notification::make()
+                ->title('No tienes turno ese día')
+                ->body("No tienes ningún turno programado en el Planing para el " . Carbon::parse($this->cambio_fecha_solicitada)->format('d/m/Y') . ". Solo puedes solicitar que te cubran un día en el que tengas turno de trabajo.")
+                ->danger()
+                ->send();
+            return;
+        }
+
+        // 2. VALIDACIÓN CRÍTICA: El compañero solicitado DEBE ESTAR LIBRE (NO TRABAJAR ESE DÍA)
+        $turnoCompanero = $planingService->obtenerTurnoEnFecha($companero, $this->cambio_fecha_solicitada);
+        if ($turnoCompanero) {
+            Notification::make()
+                ->title('Compañero ocupado ese día')
+                ->body("No es posible solicitar el cambio: {$companero->nombre_completo} ya está trabajando el día " . Carbon::parse($this->cambio_fecha_solicitada)->format('d/m/Y') . " (Turno {$turnoCompanero->turno}). Debe ser un día en el que tu compañero esté libre/descanso.")
+                ->danger()
+                ->persistent()
+                ->send();
+            return;
+        }
+
+        // 3. Si se indica fecha de devolución:
+        if (!empty($this->cambio_fecha_devolucion)) {
+            if ($companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
+                Notification::make()
+                    ->title('Compañero no disponible')
+                    ->body("{$companero->nombre_completo} se encuentra en situación de baja el día de devolución (" . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ").")
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            $turnoCompaneroDev = $planingService->obtenerTurnoEnFecha($companero, $this->cambio_fecha_devolucion);
+            if (!$turnoCompaneroDev) {
+                Notification::make()
+                    ->title('Compañero no trabaja ese día')
+                    ->body("{$companero->nombre_completo} no tiene turno programado para el día de devolución (" . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . "). Debe ser un día en el que tu compañero trabaje para que puedas devolvérselo.")
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            $turnoPropioDev = $planingService->obtenerTurnoEnFecha($this->empleado, $this->cambio_fecha_devolucion);
+            if ($turnoPropioDev) {
+                Notification::make()
+                    ->title('Tú ya trabajas ese día')
+                    ->body("Ya tienes un turno asignado para el día de devolución (" . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ", Turno {$turnoPropioDev->turno}). Debes estar libre/descanso ese día para poder devolvérselo a tu compañero.")
+                    ->danger()
+                    ->send();
+                return;
+            }
+        }
+
+        // Evitar duplicados pendientes
+        $existeDuplicado = \App\Models\EmpleadoVacacion::where('empleado_id', $this->empleado->id)
+            ->where('tipo', 'Cambio de Turno')
+            ->where('empleado_sustituto_id', $this->cambio_empleado_sustituto_id)
+            ->where('fecha_inicio', $this->cambio_fecha_solicitada)
+            ->where('fecha_devolucion', $this->cambio_fecha_devolucion ?: null)
+            ->where('estado', 'Pendiente')
+            ->exists();
+
+        if ($existeDuplicado) {
+            Notification::make()
+                ->title('Solicitud Duplicada')
+                ->body('Ya existe una solicitud pendiente de cambio de turno con este compañero para estas fechas.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $nombreCompanero = $companero->nombre_corto;
+        $esSinDevolucion = empty($this->cambio_fecha_devolucion);
+
+        if ($esSinDevolucion) {
+            $deudaCompanero = \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+                ->where('empleado_deudor_id', $companero->id)
+                ->where('empleado_acreedor_id', $this->empleado->id)
+                ->where('deuda_saldada', false)
+                ->whereIn('estado', ['Aceptada', 'Aprobada'])
+                ->exists();
+
+            if ($deudaCompanero) {
+                $tipoCambio = 'cobro_credito';
+                $deudorId = $companero->id;
+                $acreedorId = $this->empleado->id;
+                $comentario = $this->cambio_motivo ?: "Cobro de turno a crédito con {$nombreCompanero}";
+            } else {
+                $tipoCambio = 'solicitud_cubrir';
+                $deudorId = $this->empleado->id;
+                $acreedorId = $companero->id;
+                $comentario = $this->cambio_motivo ?: "Solicitud de cobertura de turno (Turno a débito/crédito) con {$nombreCompanero}";
+            }
+        } else {
+            $tipoCambio = 'directo';
+            $deudorId = null;
+            $acreedorId = null;
+            $comentario = $this->cambio_motivo ?: "Cambio de turno con {$nombreCompanero} (Devolución: " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ")";
+        }
+
+        \App\Models\EmpleadoVacacion::create([
+            'empleado_id' => $this->empleado->id,
+            'tipo' => 'Cambio de Turno',
+            'tipo_cambio' => $tipoCambio,
+            'empleado_deudor_id' => $deudorId,
+            'empleado_acreedor_id' => $acreedorId,
+            'fecha_inicio' => $this->cambio_fecha_solicitada,
+            'fecha_fin' => $this->cambio_fecha_solicitada,
+            'fecha_devolucion' => $this->cambio_fecha_devolucion ?: null,
+            'empleado_sustituto_id' => $this->cambio_empleado_sustituto_id,
+            'dias_solicitados' => 1,
+            'estado' => 'Pendiente',
+            'comentario_empleado' => $comentario,
+            'respuesta_vista_solicitante' => false,
+        ]);
+
+        $this->reset(['cambio_fecha_solicitada', 'cambio_empleado_sustituto_id', 'cambio_fecha_devolucion', 'cambio_motivo', 'cambioCompaneroError', 'cambioPropioError', 'cambioDevolucionError']);
+
+        $mensajeExito = $esSinDevolucion
+            ? "Se ha enviado la solicitud de cobertura a {$nombreCompanero}. Al ser aceptada, se anotará un turno a débito."
+            : "Se ha enviado la solicitud de cambio de turno a {$nombreCompanero}. Recibirá una alerta en su pantalla para responder.";
+
+        Notification::make()
+            ->title('Solicitud Enviada')
+            ->body($mensajeExito)
+            ->success()
+            ->send();
+
+        $this->loadVacaciones();
     }
 
     public function seleccionarBloquePermiso(string $bloque): void
@@ -1677,8 +1787,14 @@ class FichaEmpleado extends Page
             return;
         }
 
-        if ($planingService->tieneTurnoEnFecha($deudor, $this->cobro_fecha)) {
-            Notification::make()->title('Compañero ocupado ese día')->body("{$deudor->nombre} ya tiene un turno asignado en el cuadrante para ese día. Debe ser un día en el que tu compañero esté libre/descanso.")->danger()->send();
+        $turnoDeudor = $planingService->obtenerTurnoEnFecha($deudor, $this->cobro_fecha);
+        if ($turnoDeudor) {
+            Notification::make()
+                ->title('Compañero ocupado ese día')
+                ->body("No es posible solicitar el cobro: {$deudor->nombre_completo} ya está trabajando ese día (Turno {$turnoDeudor->turno}). Debe ser un día en el que tu compañero esté libre/descanso para que pueda cubrirte.")
+                ->danger()
+                ->persistent()
+                ->send();
             return;
         }
 
@@ -1740,13 +1856,15 @@ class FichaEmpleado extends Page
 
         $planingService = app(\App\Services\PlaningTurnosService::class);
 
-        if (!$planingService->tieneTurnoEnFecha($acreedor, $this->devolucion_fecha)) {
-            Notification::make()->title('Compañero no trabaja ese día')->body("{$acreedor->nombre} no tiene turno programado para este día. Debes seleccionar una fecha en la que tu compañero trabaje para que puedas cubrírselo.")->danger()->send();
+        $turnoAcreedor = $planingService->obtenerTurnoEnFecha($acreedor, $this->devolucion_fecha);
+        if (!$turnoAcreedor) {
+            Notification::make()->title('Compañero no trabaja ese día')->body("{$acreedor->nombre_completo} no tiene turno programado para este día. Debes seleccionar una fecha en la que tu compañero trabaje para que puedas cubrírselo.")->danger()->send();
             return;
         }
 
-        if ($planingService->tieneTurnoEnFecha($this->empleado, $this->devolucion_fecha)) {
-            Notification::make()->title('Ya tienes turno ese día')->body('Tú ya tienes un turno asignado en el cuadrante para ese día. Debes seleccionar una fecha en la que estés libre/descanso para cubrir a tu compañero.')->danger()->send();
+        $turnoPropioDev = $planingService->obtenerTurnoEnFecha($this->empleado, $this->devolucion_fecha);
+        if ($turnoPropioDev) {
+            Notification::make()->title('Ya tienes turno ese día')->body("Ya tienes asignado el Turno {$turnoPropioDev->turno} ese día. Debes seleccionar una fecha en la que estés libre/descanso para cubrir a tu compañero.")->danger()->send();
             return;
         }
 

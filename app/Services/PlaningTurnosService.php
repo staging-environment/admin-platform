@@ -990,13 +990,36 @@ class PlaningTurnosService
      */
     public function tieneTurnoEnFecha(Empleado $empleado, string $fecha): bool
     {
+        return $this->obtenerTurnoEnFecha($empleado, $fecha) !== null;
+    }
+
+    /**
+     * Obtiene el turno de trabajo asignado a un empleado en una fecha concreta si existe.
+     */
+    public function obtenerTurnoEnFecha(Empleado $empleado, string $fecha): ?PlaningTurno
+    {
         $c = Carbon::parse($fecha);
         $gasolineraCodigo = $empleado->gasolinera_codigo ?? 1;
         $this->asegurarCuadranteMes($gasolineraCodigo, $c->year, $c->month);
 
+        $turno = PlaningTurno::whereDate('fecha', $fecha)
+            ->where('empleado_id', $empleado->id)
+            ->first();
+
+        if ($turno) {
+            return $turno;
+        }
+
+        // Si no se encuentra en su estación habitual, verificar las demás estaciones
+        foreach ([1, 2, 3, 4] as $gCod) {
+            if ($gCod != $gasolineraCodigo) {
+                $this->asegurarCuadranteMes($gCod, $c->year, $c->month);
+            }
+        }
+
         return PlaningTurno::whereDate('fecha', $fecha)
             ->where('empleado_id', $empleado->id)
-            ->exists();
+            ->first();
     }
 
     /**

@@ -1009,7 +1009,7 @@
                                         </p>
                                     </div>
 
-                                    <form wire:submit.prevent="solicitarVacacion" class="space-y-4">
+                                    <form wire:submit.prevent="solicitarCambioTurno" class="space-y-4">
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">
@@ -1018,6 +1018,12 @@
                                                 </label>
                                                 <input type="date" wire:model.live="cambio_fecha_solicitada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
                                                 @error('cambio_fecha_solicitada') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                                @if($cambioPropioError)
+                                                    <div class="mt-2 p-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 rounded-xl text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2 shadow-xs">
+                                                        <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                        <span>{{ $cambioPropioError }}</span>
+                                                    </div>
+                                                @endif
                                             </div>
 
                                             <div>
@@ -1027,12 +1033,21 @@
                                                 <select wire:model.live="cambio_empleado_sustituto_id" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm font-semibold">
                                                     <option value="">-- Selecciona a un compañero --</option>
                                                     @foreach($this->companerosDisponibles as $comp)
-                                                        <option value="{{ $comp->id }}">
+                                                        <option value="{{ $comp->id }}" class="{{ !empty($comp->esta_ocupado) ? 'text-red-600 font-normal' : 'text-emerald-700 font-bold' }}">
                                                             {{ $comp->apellidos }}, {{ $comp->nombre }} ({{ $comp->puesto ?? 'Expendedor' }})
+                                                            @if(!empty($this->cambio_fecha_solicitada))
+                                                                — {{ !empty($comp->esta_ocupado) ? '🔴 Ya trabaja este día (' . $comp->turno_info . ')' : '🟢 Libre / Descanso' }}
+                                                            @endif
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 @error('cambio_empleado_sustituto_id') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                                @if($cambioCompaneroError)
+                                                    <div class="mt-2 p-3 bg-red-50 dark:bg-red-950/40 border-2 border-red-500/60 rounded-xl text-xs text-red-800 dark:text-red-200 flex items-start gap-2 shadow-xs">
+                                                        <svg class="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                        <span class="font-bold">{{ $cambioCompaneroError }}</span>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -1044,6 +1059,12 @@
                                                 </label>
                                                 <input type="date" wire:model.live="cambio_fecha_devolucion" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
                                                 @error('cambio_fecha_devolucion') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                                @if($cambioDevolucionError)
+                                                    <div class="mt-2 p-2.5 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800/60 rounded-xl text-xs text-red-800 dark:text-red-200 flex items-start gap-2 shadow-xs">
+                                                        <svg class="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                        <span>{{ $cambioDevolucionError }}</span>
+                                                    </div>
+                                                @endif
                                             </div>
 
                                             <div>
@@ -1059,8 +1080,9 @@
                                         <div class="flex justify-end pt-2">
                                             <button
                                                 type="submit"
+                                                @disabled(!empty($cambioCompaneroError) || !empty($cambioPropioError) || !empty($cambioDevolucionError))
                                                 style="background-color: #4f46e5; color: #ffffff;"
-                                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
+                                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
                                             >
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                                                 <span>Enviar Solicitud de Cambio</span>
