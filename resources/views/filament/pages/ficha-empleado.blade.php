@@ -170,19 +170,49 @@
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-2">
                                             <span class="px-2.5 py-0.5 bg-amber-600 text-white font-black text-xs rounded-full uppercase tracking-wider shadow-xs">
-                                                ● Solicitud de Cambio de Turno Recibida
+                                                @if($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                    ● Oferta de Devolución de Turno
+                                                @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                    ● Solicitud de Cobro de Turno a Crédito
+                                                @elseif(empty($solRecibida->fecha_devolucion))
+                                                    ● Solicitud de Cobertura (Turno a Débito/Crédito)
+                                                @else
+                                                    ● Solicitud de Cambio de Turno Recibida
+                                                @endif
                                             </span>
                                         </div>
                                         <h3 class="text-base font-black text-gray-900 dark:text-white">
-                                            {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ha solicitado un cambio de turno
+                                            @if($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ofrece cubrir tu turno para saldar 1 turno que te debe
+                                            @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te solicita cubrir su turno para saldar 1 turno que le debes
+                                            @elseif(empty($solRecibida->fecha_devolucion))
+                                                {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te pide cubrir su turno (sin fecha de devolución)
+                                            @else
+                                                {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ha solicitado un cambio de turno
+                                            @endif
                                         </h3>
                                         <div class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
                                             <p>
-                                                🗓️ <strong>Día que te pide cubrir:</strong> <span class="text-indigo-600 dark:text-indigo-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                                🗓️ <strong>Día a cubrir:</strong> <span class="text-indigo-600 dark:text-indigo-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
                                             </p>
-                                            <p>
-                                                🔄 <strong>Día que te lo devuelve:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_devolucion)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
-                                            </p>
+                                            @if($solRecibida->fecha_devolucion)
+                                                <p>
+                                                    🔄 <strong>Día de devolución:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_devolucion)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                                </p>
+                                            @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                <p class="text-amber-700 dark:text-amber-400 font-semibold">
+                                                    ℹ️ Si aceptas, saldarás 1 de los turnos que le debes a tu compañero.
+                                                </p>
+                                            @elseif($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                <p class="text-emerald-700 dark:text-emerald-400 font-semibold">
+                                                    ℹ️ Si aceptas, tu compañero te cubrirá este día y saldará 1 turno que te debe.
+                                                </p>
+                                            @else
+                                                <p class="text-sky-700 dark:text-sky-400 font-semibold">
+                                                    ℹ️ Al no tener fecha de devolución, se te sumará 1 turno a crédito y a tu compañero 1 turno a débito al aceptar.
+                                                </p>
+                                            @endif
                                             @if($solRecibida->comentario_empleado)
                                                 <p class="text-[11px] text-gray-500 dark:text-gray-400 italic">
                                                     💬 "{{ $solRecibida->comentario_empleado }}"
@@ -234,13 +264,21 @@
                                     </div>
                                     <div class="space-y-1">
                                         <h4 class="font-black text-sm {{ $esAceptada ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300' }}">
-                                            {{ $esAceptada ? '¡Cambio de Turno Aceptado!' : 'Solicitud de Cambio de Turno Denegada' }}
+                                            {{ $esAceptada ? '¡Solicitud Aceptada!' : 'Solicitud Denegada' }}
                                         </h4>
                                         <p class="text-xs leading-relaxed">
                                             @if($esAceptada)
-                                                <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> el cambio de turno. Cubrirá tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> y tú le devolverás el turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_devolucion)->format('d/m/Y') }}</strong>. El Planing de turnos ha sido actualizado.
+                                                @if($alertaSol->tipo_cambio === 'cobro_credito')
+                                                    <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> cubrir tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> para saldar el turno que te debía. Tu crédito ha quedado saldado y el Planing de turnos se ha actualizado.
+                                                @elseif($alertaSol->tipo_cambio === 'devolucion_debito')
+                                                    <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> tu oferta de cubrir su turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>. Tu turno a débito ha quedado saldado y el Planing de turnos se ha actualizado.
+                                                @elseif(empty($alertaSol->fecha_devolucion))
+                                                    <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> cubrir tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>. Se ha añadido 1 turno a débito con este compañero y el Planing de turnos se ha actualizado.
+                                                @else
+                                                    <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> el cambio de turno. Cubrirá tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> y tú le devolverás el turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_devolucion)->format('d/m/Y') }}</strong>. El Planing de turnos ha sido actualizado.
+                                                @endif
                                             @else
-                                                <strong>{{ $nombreResp }}</strong> ha <strong>DENEGADO</strong> tu solicitud de cambio de turno para el día <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>.
+                                                <strong>{{ $nombreResp }}</strong> ha <strong>DENEGADO</strong> tu solicitud para el día <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>.
                                             @endif
                                         </p>
                                     </div>
@@ -557,59 +595,819 @@
 
                         @if($activeTab === 'vacaciones')
                 <div class="space-y-6">
-                    <!-- Guía e Información del Procedimiento de Vacaciones y Permisos -->
-                    <div class="p-6 bg-gradient-to-r from-sky-50/70 via-blue-50/40 to-indigo-50/60 dark:from-sky-950/20 dark:via-blue-950/10 dark:to-indigo-950/20 border border-sky-100 dark:border-sky-900/40 rounded-3xl shadow-sm">
-                        <div class="flex items-start gap-3.5">
-                            <div class="p-2.5 bg-sky-600 text-white rounded-2xl shadow-sm flex-shrink-0 mt-0.5">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div class="space-y-3 flex-1">
-                                <div>
-                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        Procedimiento y Gestión de Vacaciones y Permisos
-                                        <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300 rounded-full">Requiere Aprobación</span>
-                                    </h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
-                                        Para garantizar el correcto funcionamiento del servicio y la organización de los equipos, el disfrute de periodos de descanso y permisos sigue el siguiente protocolo:
-                                    </p>
+
+                    {{-- Alertas de solicitudes de cambio recibidas y respuestas para el solicitante --}}
+                    @if($this->solicitudesCambioPendientesRecibidas->isNotEmpty())
+                        @foreach($this->solicitudesCambioPendientesRecibidas as $solRecibida)
+                            <div class="p-5 bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-blue-500/15 dark:from-amber-950/40 dark:via-indigo-950/20 dark:to-blue-950/20 border-2 border-amber-500/60 dark:border-amber-500/40 rounded-3xl shadow-md animate-fadeIn">
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                    <div class="flex items-start gap-3.5">
+                                        <div class="p-3 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl shrink-0 mt-0.5 shadow-xs">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                            </svg>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2.5 py-0.5 bg-amber-600 text-white font-black text-xs rounded-full uppercase tracking-wider shadow-xs">
+                                                    @if($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                        ● Oferta de Devolución de Turno
+                                                    @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                        ● Solicitud de Cobro de Turno a Crédito
+                                                    @elseif(empty($solRecibida->fecha_devolucion))
+                                                        ● Solicitud de Cobertura de Turno (A Débito/Crédito)
+                                                    @else
+                                                        ● Solicitud de Cambio de Turno Recibida
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">
+                                                @if($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                    {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ofrece cubrir tu turno para saldar 1 turno que te debe
+                                                @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                    {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te solicita cubrir su turno para saldar 1 turno que le debes
+                                                @elseif(empty($solRecibida->fecha_devolucion))
+                                                    {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te pide cubrir su turno (sin fecha de devolución)
+                                                @else
+                                                    {{ $solRecibida->empleado->nombre }} {{ $solRecibida->empleado->apellidos }} te ha solicitado un cambio de turno
+                                                @endif
+                                            </h3>
+                                            <div class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
+                                                <p>
+                                                    🗓️ <strong>Día a cubrir:</strong> <span class="text-indigo-600 dark:text-indigo-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_inicio)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                                </p>
+                                                @if($solRecibida->fecha_devolucion)
+                                                    <p>
+                                                        🔄 <strong>Día de devolución:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ \Carbon\Carbon::parse($solRecibida->fecha_devolucion)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                                    </p>
+                                                @elseif($solRecibida->tipo_cambio === 'cobro_credito')
+                                                    <p class="text-amber-700 dark:text-amber-400 font-semibold">
+                                                        ℹ️ Si aceptas, saldarás 1 de los turnos que le debes a tu compañero.
+                                                    </p>
+                                                @elseif($solRecibida->tipo_cambio === 'devolucion_debito')
+                                                    <p class="text-emerald-700 dark:text-emerald-400 font-semibold">
+                                                        ℹ️ Si aceptas, tu compañero saldará 1 turno que te debe (te cubrirá este día).
+                                                    </p>
+                                                @else
+                                                    <p class="text-sky-700 dark:text-sky-400 font-semibold">
+                                                        ℹ️ Al no tener fecha de devolución, se te anotará 1 turno a crédito y a tu compañero 1 turno a débito al aceptar.
+                                                    </p>
+                                                @endif
+                                                @if($solRecibida->comentario_empleado)
+                                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 italic">
+                                                        💬 "{{ $solRecibida->comentario_empleado }}"
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2.5 shrink-0 self-end lg:self-center">
+                                        <button
+                                            type="button"
+                                            wire:click="responderCambioTurno({{ $solRecibida->id }}, true)"
+                                            style="background-color: #10b981; color: #ffffff;"
+                                            class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Aceptar</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            wire:click="responderCambioTurno({{ $solRecibida->id }}, false)"
+                                            style="background-color: #ef4444; color: #ffffff;"
+                                            class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            <span>Denegar</span>
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
+                        @endforeach
+                    @endif
 
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
-                                        <div class="flex items-center gap-2 text-xs font-bold text-sky-700 dark:text-sky-400">
-                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-900/60 text-[11px] font-black">1</span>
-                                            Solicitud Anticipada
+                    @if($this->alertasCambioTurnoParaSolicitante->isNotEmpty())
+                        @foreach($this->alertasCambioTurnoParaSolicitante as $alertaSol)
+                            @php
+                                $esAceptada = in_array($alertaSol->estado, ['Aceptada', 'Aprobada']);
+                                $nombreResp = $alertaSol->empleadoSustituto ? ($alertaSol->empleadoSustituto->nombre . ' ' . $alertaSol->empleadoSustituto->apellidos) : 'Tu compañero';
+                            @endphp
+                            <div class="p-5 {{ $esAceptada ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-100' : 'bg-rose-500/10 border-rose-500/40 text-rose-950 dark:text-rose-100' }} border-2 rounded-3xl shadow-sm animate-fadeIn">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="flex items-start gap-3">
+                                        <div class="p-2.5 {{ $esAceptada ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400' }} rounded-xl shrink-0 mt-0.5">
+                                            @if($esAceptada)
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            @else
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            @endif
                                         </div>
-                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                                            Pulsa en <strong>"Solicitar"</strong> para seleccionar las fechas deseadas y el tipo de permiso. Planifica tu solicitud con la debida antelación.
-                                        </p>
+                                        <div class="space-y-1">
+                                            <h4 class="font-black text-sm {{ $esAceptada ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300' }}">
+                                                {{ $esAceptada ? '¡Solicitud Aceptada!' : 'Solicitud Denegada' }}
+                                            </h4>
+                                            <p class="text-xs leading-relaxed">
+                                                @if($esAceptada)
+                                                    @if($alertaSol->tipo_cambio === 'cobro_credito')
+                                                        <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> cubrir tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> para saldar el turno que te debía. Tu crédito ha quedado saldado y el Planing de turnos se ha actualizado.
+                                                    @elseif($alertaSol->tipo_cambio === 'devolucion_debito')
+                                                        <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> tu oferta de cubrir su turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>. Tu turno a débito ha quedado saldado y el Planing de turnos se ha actualizado.
+                                                    @elseif(empty($alertaSol->fecha_devolucion))
+                                                        <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> cubrir tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>. Se ha añadido 1 turno a débito con este compañero y el Planing de turnos se ha actualizado.
+                                                    @else
+                                                        <strong>{{ $nombreResp }}</strong> ha <strong>ACEPTADO</strong> el cambio de turno. Cubrirá tu turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong> y tú le devolverás el turno el <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_devolucion)->format('d/m/Y') }}</strong>. El Planing de turnos ha sido actualizado.
+                                                    @endif
+                                                @else
+                                                    <strong>{{ $nombreResp }}</strong> ha <strong>DENEGADO</strong> tu solicitud para el día <strong>{{ \Carbon\Carbon::parse($alertaSol->fecha_inicio)->format('d/m/Y') }}</strong>.
+                                                @endif
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
-                                        <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400">
-                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-[11px] font-black">2</span>
-                                            Validación de Responsable
-                                        </div>
-                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                                            Tu solicitud queda en estado <span class="font-bold text-amber-600 dark:text-amber-400">Pendiente</span> hasta que el responsable o administrador revise la cobertura y la valide.
-                                        </p>
-                                    </div>
-
-                                    <div class="bg-white/80 dark:bg-gray-900/80 p-3.5 rounded-2xl border border-sky-100/80 dark:border-white/5 space-y-1">
-                                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                                            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-[11px] font-black">3</span>
-                                            Aprobación Confirmada
-                                        </div>
-                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                                            Una vez <span class="font-bold text-emerald-600 dark:text-emerald-400">Aprobada</span>, los días quedarán formalmente concedidos en tu calendario. No disfrutes vacaciones sin aprobación previa.
-                                        </p>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        wire:click="marcarAlertaCambioVista({{ $alertaSol->id }})"
+                                        class="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer whitespace-nowrap {{ $esAceptada ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white' }}"
+                                    >
+                                        <span>Entendido / Cerrar</span>
+                                    </button>
                                 </div>
                             </div>
+                        @endforeach
+                    @endif
+
+                    {{-- 5 Bloques Clicables de Solicitud y Gestión --}}
+                    @if(auth()->user()->can('solicitar_ver_vacaciones'))
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                            {{-- Bloque 1: Vacaciones --}}
+                            <button
+                                type="button"
+                                wire:click="seleccionarBloquePermiso('vacaciones')"
+                                class="relative flex flex-col p-4 rounded-3xl text-left border-2 transition-all cursor-pointer shadow-sm
+                                    {{ $bloquePermisosActivo === 'vacaciones'
+                                        ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-500 shadow-sky-500/10 ring-2 ring-sky-500/30'
+                                        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 hover:border-sky-300 dark:hover:border-sky-800' }}"
+                            >
+                                <div class="flex items-center justify-between w-full mb-2.5">
+                                    <div class="p-2.5 rounded-2xl {{ $bloquePermisosActivo === 'vacaciones' ? 'bg-sky-500 text-white' : 'bg-sky-500/10 text-sky-600 dark:text-sky-400' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    @if($bloquePermisosActivo === 'vacaciones')
+                                        <span class="w-2.5 h-2.5 rounded-full bg-sky-500 ring-4 ring-sky-500/20"></span>
+                                    @endif
+                                </div>
+                                <h4 class="text-sm font-black text-gray-900 dark:text-white">Vacaciones</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Por quincenas</p>
+                            </button>
+
+                            {{-- Bloque 2: Permiso Retribuido --}}
+                            <button
+                                type="button"
+                                wire:click="seleccionarBloquePermiso('permisos')"
+                                class="relative flex flex-col p-4 rounded-3xl text-left border-2 transition-all cursor-pointer shadow-sm
+                                    {{ $bloquePermisosActivo === 'permisos'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 shadow-emerald-500/10 ring-2 ring-emerald-500/30'
+                                        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 hover:border-emerald-300 dark:hover:border-emerald-800' }}"
+                            >
+                                <div class="flex items-center justify-between w-full mb-2.5">
+                                    <div class="p-2.5 rounded-2xl {{ $bloquePermisosActivo === 'permisos' ? 'bg-emerald-500 text-white' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    @if($bloquePermisosActivo === 'permisos')
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20"></span>
+                                    @endif
+                                </div>
+                                <h4 class="text-sm font-black text-gray-900 dark:text-white">Permiso Retribuido</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Con justificante</p>
+                            </button>
+
+                            {{-- Bloque 3: Cambio de Turno --}}
+                            <button
+                                type="button"
+                                wire:click="seleccionarBloquePermiso('cambio_turno')"
+                                class="relative flex flex-col p-4 rounded-3xl text-left border-2 transition-all cursor-pointer shadow-sm
+                                    {{ $bloquePermisosActivo === 'cambio_turno'
+                                        ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 shadow-indigo-500/10 ring-2 ring-indigo-500/30'
+                                        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 hover:border-indigo-300 dark:hover:border-indigo-800' }}"
+                            >
+                                <div class="flex items-center justify-between w-full mb-2.5">
+                                    <div class="p-2.5 rounded-2xl {{ $bloquePermisosActivo === 'cambio_turno' ? 'bg-indigo-500 text-white' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                        </svg>
+                                    </div>
+                                    @if($bloquePermisosActivo === 'cambio_turno')
+                                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 ring-4 ring-indigo-500/20"></span>
+                                    @endif
+                                </div>
+                                <h4 class="text-sm font-black text-gray-900 dark:text-white">Cambio de Turno</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Con compañero</p>
+                            </button>
+
+                            {{-- Bloque 4: Turnos a Débito --}}
+                            <button
+                                type="button"
+                                wire:click="seleccionarBloquePermiso('debito')"
+                                class="relative flex flex-col p-4 rounded-3xl text-left border-2 transition-all cursor-pointer shadow-sm
+                                    {{ $bloquePermisosActivo === 'debito'
+                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 shadow-amber-500/10 ring-2 ring-amber-500/30'
+                                        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 hover:border-amber-300 dark:hover:border-amber-800' }}"
+                            >
+                                <div class="flex items-center justify-between w-full mb-2.5">
+                                    <div class="p-2.5 rounded-2xl {{ $bloquePermisosActivo === 'debito' ? 'bg-amber-500 text-white' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs font-black rounded-full {{ $this->totalTurnosDebito > 0 ? 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400' }}">
+                                        {{ $this->totalTurnosDebito }}
+                                    </span>
+                                </div>
+                                <h4 class="text-sm font-black text-gray-900 dark:text-white">Turnos a Débito</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Debo a compañeros</p>
+                            </button>
+
+                            {{-- Bloque 5: Turnos a Crédito --}}
+                            <button
+                                type="button"
+                                wire:click="seleccionarBloquePermiso('credito')"
+                                class="relative flex flex-col p-4 rounded-3xl text-left border-2 transition-all cursor-pointer shadow-sm
+                                    {{ $bloquePermisosActivo === 'credito'
+                                        ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 shadow-cyan-500/10 ring-2 ring-cyan-500/30'
+                                        : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 hover:border-cyan-300 dark:hover:border-cyan-800' }}"
+                            >
+                                <div class="flex items-center justify-between w-full mb-2.5">
+                                    <div class="p-2.5 rounded-2xl {{ $bloquePermisosActivo === 'credito' ? 'bg-cyan-500 text-white' : 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                        </svg>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs font-black rounded-full {{ $this->totalTurnosCredito > 0 ? 'bg-cyan-100 dark:bg-cyan-900/60 text-cyan-800 dark:text-cyan-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400' }}">
+                                        {{ $this->totalTurnosCredito }}
+                                    </span>
+                                </div>
+                                <h4 class="text-sm font-black text-gray-900 dark:text-white">Turnos a Crédito</h4>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Me deben a favor</p>
+                            </button>
                         </div>
-                    </div>
+
+                        {{-- Panel Dinámico según el Bloque Seleccionado --}}
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm transition-all">
+
+                            {{-- 1. Formulario de Vacaciones --}}
+                            @if($bloquePermisosActivo === 'vacaciones')
+                                <div>
+                                    <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-100 dark:border-white/5">
+                                        <div class="p-2 bg-sky-500/10 text-sky-600 rounded-xl">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">Solicitud de Vacaciones</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el mes, año y la quincena correspondiente a tus días de descanso.</p>
+                                        </div>
+                                    </div>
+
+                                    <form wire:submit.prevent="solicitarVacacion" class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Mes</label>
+                                                <select wire:model="vacacion_mes" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm font-semibold">
+                                                    <option value="">-- Selecciona el mes --</option>
+                                                    <option value="1">Enero</option>
+                                                    <option value="2">Febrero</option>
+                                                    <option value="3">Marzo</option>
+                                                    <option value="4">Abril</option>
+                                                    <option value="5">Mayo</option>
+                                                    <option value="6">Junio</option>
+                                                    <option value="7">Julio</option>
+                                                    <option value="8">Agosto</option>
+                                                    <option value="9">Septiembre</option>
+                                                    <option value="10">Octubre</option>
+                                                    <option value="11">Noviembre</option>
+                                                    <option value="12">Diciembre</option>
+                                                </select>
+                                                @error('vacacion_mes') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Año</label>
+                                                <select wire:model="vacacion_ano" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm font-semibold">
+                                                    @php $currentYear = (int) \Carbon\Carbon::now()->year; @endphp
+                                                    <option value="{{ $currentYear }}">{{ $currentYear }}</option>
+                                                    <option value="{{ $currentYear + 1 }}">{{ $currentYear + 1 }}</option>
+                                                    <option value="{{ $currentYear + 2 }}">{{ $currentYear + 2 }}</option>
+                                                </select>
+                                                @error('vacacion_ano') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Quincena</label>
+                                                <select wire:model="vacacion_quincena" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm font-semibold">
+                                                    <option value="1">1ª Quincena (del 1 al 15)</option>
+                                                    <option value="2">2ª Quincena (del 16 al fin de mes)</option>
+                                                </select>
+                                                @error('vacacion_quincena') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-end pt-2">
+                                            <button
+                                                type="submit"
+                                                style="background-color: #0284c7; color: #ffffff;"
+                                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                                <span>Enviar Solicitud de Vacaciones</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
+
+                            {{-- 2. Formulario de Permiso Retribuido --}}
+                            @if($bloquePermisosActivo === 'permisos')
+                                <div>
+                                    <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-100 dark:border-white/5">
+                                        <div class="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">Solicitud de Permiso Retribuido</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Adjunta el justificante y las fechas requeridas para tu permiso retribuido.</p>
+                                        </div>
+                                    </div>
+
+                                    <form wire:submit.prevent="solicitarVacacion" class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Fecha de Inicio</label>
+                                                <input type="date" wire:model="vacacion_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-emerald-500 focus:ring-emerald-500 shadow-sm font-semibold" />
+                                                @error('vacacion_fecha_inicio') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Fecha de Fin</label>
+                                                <input type="date" wire:model="vacacion_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-emerald-500 focus:ring-emerald-500 shadow-sm font-semibold" />
+                                                @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Motivo del Permiso Retribuido</label>
+                                            <input type="text" wire:model="permiso_motivo" placeholder="Ej. Consulta médica especialista, deber inexcusable..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-emerald-500 focus:ring-emerald-500 shadow-sm font-semibold" />
+                                            @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">Justificante del Permiso (PDF, Imagen)</label>
+                                            <input type="file" wire:model="permiso_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-950/40 dark:file:text-emerald-300" />
+                                            @error('permiso_justificante') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div class="flex justify-end pt-2">
+                                            <button
+                                                type="submit"
+                                                style="background-color: #059669; color: #ffffff;"
+                                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                                <span>Enviar Solicitud de Permiso</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
+
+                            {{-- 3. Formulario de Cambio de Turno con Compañero --}}
+                            @if($bloquePermisosActivo === 'cambio_turno')
+                                <div>
+                                    <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-100 dark:border-white/5">
+                                        <div class="p-2 bg-indigo-500/10 text-indigo-600 rounded-xl">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">Cambio de Turno con Compañero</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Solicita a un compañero que cubra tu turno. Tu compañero recibirá una alerta para responder.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3.5 mb-4 bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl text-xs text-indigo-900 dark:text-indigo-200 space-y-1">
+                                        <p class="font-bold flex items-center gap-1.5">
+                                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            Información sobre el funcionamiento del cambio:
+                                        </p>
+                                        <p class="leading-relaxed">
+                                            &bull; <strong>Si indicas fecha de devolución:</strong> Se realizará un intercambio directo de un turno por otro en el Planing. No afectará a turnos a débito ni a crédito.
+                                        </p>
+                                        <p class="leading-relaxed">
+                                            &bull; <strong>Si dejas la fecha de devolución vacía:</strong> Solicitarás que tu compañero cubra tu turno. Al aceptar, se sumará <strong>1 turno a débito</strong> al que solicita y <strong>1 turno a crédito</strong> al compañero que cubre.
+                                        </p>
+                                    </div>
+
+                                    <form wire:submit.prevent="solicitarVacacion" class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">
+                                                    Día que solicitas <span class="text-red-500">*</span>
+                                                    <span class="normal-case text-[11px] font-normal text-gray-500 dark:text-gray-400 block">(Día que no puedes ir a trabajar y necesitas que te cubran)</span>
+                                                </label>
+                                                <input type="date" wire:model.live="cambio_fecha_solicitada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
+                                                @error('cambio_fecha_solicitada') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">
+                                                    Compañero que te va a sustituir <span class="text-red-500">*</span>
+                                                </label>
+                                                <select wire:model.live="cambio_empleado_sustituto_id" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm font-semibold">
+                                                    <option value="">-- Selecciona a un compañero --</option>
+                                                    @foreach($this->companerosDisponibles as $comp)
+                                                        <option value="{{ $comp->id }}">
+                                                            {{ $comp->apellidos }}, {{ $comp->nombre }} ({{ $comp->puesto ?? 'Expendedor' }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('cambio_empleado_sustituto_id') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">
+                                                    Cuándo le devuelves el día
+                                                    <span class="normal-case text-[11px] font-normal text-indigo-600 dark:text-indigo-400 block font-semibold">(Opcional - Si lo dejas vacío, genera Turno a Débito/Crédito)</span>
+                                                </label>
+                                                <input type="date" wire:model.live="cambio_fecha_devolucion" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
+                                                @error('cambio_fecha_devolucion') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-2">
+                                                    Motivo o comentario para el compañero
+                                                    <span class="normal-case text-[11px] font-normal text-gray-500 dark:text-gray-400 block">(Opcional)</span>
+                                                </label>
+                                                <input type="text" wire:model="cambio_motivo" placeholder="Ej. Cita médica, gracias compañero..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm font-semibold" />
+                                                @error('cambio_motivo') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-end pt-2">
+                                            <button
+                                                type="submit"
+                                                style="background-color: #4f46e5; color: #ffffff;"
+                                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                                <span>Enviar Solicitud de Cambio</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
+
+                            {{-- 4. Sección de Turnos a Débito --}}
+                            @if($bloquePermisosActivo === 'debito')
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-white/5">
+                                        <div class="p-2 bg-amber-500/10 text-amber-600 rounded-xl">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">Turnos a Débito (Turnos que debo a compañeros)</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Consulta los compañeros a los que les debes turnos y propón fechas para saldar tu débito.</p>
+                                        </div>
+                                    </div>
+
+                                    {{-- Resumen de saldo por compañero --}}
+                                    <div>
+                                        <h4 class="text-xs font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">Compañeros a los que debo turnos:</h4>
+                                        @if($this->saldoDebitos->isNotEmpty())
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                @foreach($this->saldoDebitos as $deb)
+                                                    @php $empAcreedor = $deb->empleadoAcreedor; @endphp
+                                                    <div class="flex items-center justify-between p-3.5 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-2xl shadow-2xs">
+                                                        <div>
+                                                            <div class="text-xs font-black text-gray-900 dark:text-white">
+                                                                {{ $empAcreedor ? ($empAcreedor->apellidos . ', ' . $empAcreedor->nombre) : 'Compañero' }}
+                                                            </div>
+                                                            <span class="inline-block mt-1 px-2.5 py-0.5 bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 text-[11px] font-bold rounded-full">
+                                                                {{ $deb->turnos_debidos }} {{ $deb->turnos_debidos == 1 ? 'turno debido' : 'turnos debidos' }}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            wire:click="abrirModalDevolverDebito({{ $deb->empleado_acreedor_id }})"
+                                                            style="background-color: #d97706; color: #ffffff;"
+                                                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap"
+                                                        >
+                                                            <span>Devolver Turno</span>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400 text-center">
+                                                ✨ ¡Estás al día! No debes ningún turno a ningún compañero actualmente.
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Tabla Paginada de Turnos a Débito --}}
+                                    <div class="pt-2">
+                                        <h4 class="text-xs font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">Histórico de Turnos a Débito:</h4>
+                                        <div class="overflow-x-auto rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xs">
+                                            <table class="min-w-full divide-y divide-gray-100 dark:divide-white/10 text-xs">
+                                                <thead class="bg-gray-50 dark:bg-gray-800/60 font-bold text-gray-700 dark:text-gray-300">
+                                                    <tr>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByDebito('fecha_inicio')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Fecha</span>
+                                                                @if($debitoSortField === 'fecha_inicio')
+                                                                    <span>{{ $debitoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByDebito('empleado')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Empleado</span>
+                                                                @if($debitoSortField === 'empleado')
+                                                                    <span>{{ $debitoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByDebito('tipo')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Concepto / Tipo</span>
+                                                                @if($debitoSortField === 'tipo')
+                                                                    <span>{{ $debitoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByDebito('estado')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Estado</span>
+                                                                @if($debitoSortField === 'estado')
+                                                                    <span>{{ $debitoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-right">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-gray-100 dark:divide-white/5 bg-white dark:bg-gray-900">
+                                                    @forelse($this->turnosDebitoList as $rDeb)
+                                                        @php
+                                                            $compRow = $this->getCompaneroDeSolicitud($rDeb);
+                                                        @endphp
+                                                        <tr class="hover:bg-gray-50/70 dark:hover:bg-white/5 transition-colors">
+                                                            <td class="px-3.5 py-3 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                                {{ \Carbon\Carbon::parse($rDeb->fecha_inicio)->format('d/m/Y') }}
+                                                            </td>
+                                                            <td class="px-3.5 py-3 font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                                                                {{ $compRow ? ($compRow->apellidos . ', ' . $compRow->nombre) : '-' }}
+                                                            </td>
+                                                            <td class="px-3.5 py-3 text-gray-600 dark:text-gray-300">
+                                                                @if($rDeb->tipo_cambio === 'devolucion_debito')
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-amber-700 dark:text-amber-400">
+                                                                        🔄 Propuesta de Devolución
+                                                                    </span>
+                                                                @elseif($rDeb->tipo_cambio === 'cobro_credito')
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-indigo-700 dark:text-indigo-400">
+                                                                        📥 Cobro reclamado por compañero
+                                                                    </span>
+                                                                @else
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300">
+                                                                        📤 Turno solicitado a cubrir
+                                                                    </span>
+                                                                @endif
+                                                                @if($rDeb->comentario_empleado)
+                                                                    <span class="text-[11px] text-gray-400 block italic">{{ $rDeb->comentario_empleado }}</span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="px-3.5 py-3 whitespace-nowrap">
+                                                                @if($rDeb->estado === 'Pendiente')
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
+                                                                        Pendiente de Aceptación
+                                                                    </span>
+                                                                @elseif(in_array($rDeb->estado, ['Aceptada', 'Aprobada']))
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
+                                                                        {{ $rDeb->deuda_saldada ? 'Validado (Saldado)' : 'Validado' }}
+                                                                    </span>
+                                                                @else
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50">
+                                                                        Denegado
+                                                                    </span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="px-3.5 py-3 text-right whitespace-nowrap">
+                                                                @if($rDeb->estado === 'Pendiente' && (int)$rDeb->empleado_id === (int)$this->empleado->id)
+                                                                    <button type="button" wire:click="deleteVacacion({{ $rDeb->id }})" wire:confirm="¿Deseas cancelar esta solicitud?" class="text-red-500 hover:text-red-700 text-xs font-semibold p-1" title="Cancelar Solicitud">
+                                                                        Cancelar
+                                                                    </button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="5" class="px-4 py-8 text-center text-xs text-gray-400">
+                                                                No hay registros de turnos a débito.
+                                                            </td>
+                                                        </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="mt-3">
+                                            {{ $this->turnosDebitoList->links() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- 5. Sección de Turnos a Crédito --}}
+                            @if($bloquePermisosActivo === 'credito')
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-white/5">
+                                        <div class="p-2 bg-cyan-500/10 text-cyan-600 rounded-xl">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-base font-black text-gray-900 dark:text-white">Turnos a Crédito (Turnos que me deben compañeros)</h3>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Consulta los compañeros que te deben turnos y solicítales una fecha para cobrar alguno de los turnos a tu favor.</p>
+                                        </div>
+                                    </div>
+
+                                    {{-- Resumen de saldo por compañero --}}
+                                    <div>
+                                        <h4 class="text-xs font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">Compañeros que me deben turnos:</h4>
+                                        @if($this->saldoCreditos->isNotEmpty())
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                @foreach($this->saldoCreditos as $cred)
+                                                    @php $empDeudor = $cred->empleadoDeudor; @endphp
+                                                    <div class="flex items-center justify-between p-3.5 bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-900/40 rounded-2xl shadow-2xs">
+                                                        <div>
+                                                            <div class="text-xs font-black text-gray-900 dark:text-white">
+                                                                {{ $empDeudor ? ($empDeudor->apellidos . ', ' . $empDeudor->nombre) : 'Compañero' }}
+                                                            </div>
+                                                            <span class="inline-block mt-1 px-2.5 py-0.5 bg-cyan-100 dark:bg-cyan-900/60 text-cyan-800 dark:text-cyan-200 text-[11px] font-bold rounded-full">
+                                                                {{ $cred->turnos_a_favor }} {{ $cred->turnos_a_favor == 1 ? 'turno a favor' : 'turnos a favor' }}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            wire:click="abrirModalCobrarCredito({{ $cred->empleado_deudor_id }})"
+                                                            style="background-color: #0891b2; color: #ffffff;"
+                                                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer whitespace-nowrap"
+                                                        >
+                                                            <span>Cobrar Turno</span>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400 text-center">
+                                                No tienes ningún turno a crédito acumulado a tu favor actualmente.
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Tabla Paginada de Turnos a Crédito --}}
+                                    <div class="pt-2">
+                                        <h4 class="text-xs font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">Histórico de Turnos a Crédito:</h4>
+                                        <div class="overflow-x-auto rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xs">
+                                            <table class="min-w-full divide-y divide-gray-100 dark:divide-white/10 text-xs">
+                                                <thead class="bg-gray-50 dark:bg-gray-800/60 font-bold text-gray-700 dark:text-gray-300">
+                                                    <tr>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByCredito('fecha_inicio')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Fecha</span>
+                                                                @if($creditoSortField === 'fecha_inicio')
+                                                                    <span>{{ $creditoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByCredito('empleado')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Empleado</span>
+                                                                @if($creditoSortField === 'empleado')
+                                                                    <span>{{ $creditoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByCredito('tipo')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Concepto / Tipo</span>
+                                                                @if($creditoSortField === 'tipo')
+                                                                    <span>{{ $creditoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-left cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" wire:click="sortByCredito('estado')">
+                                                            <div class="flex items-center gap-1">
+                                                                <span>Estado</span>
+                                                                @if($creditoSortField === 'estado')
+                                                                    <span>{{ $creditoSortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                                                @else
+                                                                    <span class="text-gray-400">↕</span>
+                                                                @endif
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" class="px-3.5 py-3 text-right">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-gray-100 dark:divide-white/5 bg-white dark:bg-gray-900">
+                                                    @forelse($this->turnosCreditoList as $rCred)
+                                                        @php
+                                                            $compRow = $this->getCompaneroDeSolicitud($rCred);
+                                                        @endphp
+                                                        <tr class="hover:bg-gray-50/70 dark:hover:bg-white/5 transition-colors">
+                                                            <td class="px-3.5 py-3 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                                {{ \Carbon\Carbon::parse($rCred->fecha_inicio)->format('d/m/Y') }}
+                                                            </td>
+                                                            <td class="px-3.5 py-3 font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                                                                {{ $compRow ? ($compRow->apellidos . ', ' . $compRow->nombre) : '-' }}
+                                                            </td>
+                                                            <td class="px-3.5 py-3 text-gray-600 dark:text-gray-300">
+                                                                @if($rCred->tipo_cambio === 'cobro_credito')
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-cyan-700 dark:text-cyan-400">
+                                                                        📥 Cobro de crédito solicitado
+                                                                    </span>
+                                                                @elseif($rCred->tipo_cambio === 'devolucion_debito')
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-400">
+                                                                        🔄 Devolución ofrecida por compañero
+                                                                    </span>
+                                                                @else
+                                                                    <span class="inline-flex items-center gap-1 font-medium text-gray-700 dark:text-gray-300">
+                                                                        🤝 Turno cubierto a compañero
+                                                                    </span>
+                                                                @endif
+                                                                @if($rCred->comentario_empleado)
+                                                                    <span class="text-[11px] text-gray-400 block italic">{{ $rCred->comentario_empleado }}</span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="px-3.5 py-3 whitespace-nowrap">
+                                                                @if($rCred->estado === 'Pendiente')
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
+                                                                        Pendiente de Aceptación
+                                                                    </span>
+                                                                @elseif(in_array($rCred->estado, ['Aceptada', 'Aprobada']))
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50">
+                                                                        {{ $rCred->deuda_saldada ? 'Validado (Cobrado)' : 'Validado' }}
+                                                                    </span>
+                                                                @else
+                                                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50">
+                                                                        Denegado
+                                                                    </span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="px-3.5 py-3 text-right whitespace-nowrap">
+                                                                @if($rCred->estado === 'Pendiente' && (int)$rCred->empleado_id === (int)$this->empleado->id)
+                                                                    <button type="button" wire:click="deleteVacacion({{ $rCred->id }})" wire:confirm="¿Deseas cancelar esta solicitud?" class="text-red-500 hover:text-red-700 text-xs font-semibold p-1" title="Cancelar Solicitud">
+                                                                        Cancelar
+                                                                    </button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="5" class="px-4 py-8 text-center text-xs text-gray-400">
+                                                                No hay registros de turnos a crédito.
+                                                            </td>
+                                                        </tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="mt-3">
+                                            {{ $this->turnosCreditoList->links() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                        </div>
+                    @endif
+
+                    {{-- Histórico General de Vacaciones y Permisos --}}
                     @if(auth()->user()->can('solicitar_ver_vacaciones'))
                         <div class="p-6 bg-white dark:bg-gray-900 border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm">
                             <div class="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-white/5">
@@ -619,11 +1417,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"/>
                                         </svg>
                                     </span>
-                                    Vacaciones / Permisos
+                                    Histórico de Vacaciones y Permisos
                                 </h3>
-                                <button type="button" @click="$dispatch('open-modal', { id: 'solicitar-vacacion-modal' })" style="background-color: #0284c7; color: #ffffff;" class="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-sky-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm">
-                                    Solicitar
-                                </button>
                             </div>
 
                             <div class="py-4 space-y-3">
@@ -1492,137 +2287,91 @@
                 </x-slot>
             </x-filament::modal>
 
-            <!-- solicitar-vacacion-modal -->
-            <x-filament::modal id="solicitar-vacacion-modal" width="md">
+            <!-- modal-cobrar-credito -->
+            <x-filament::modal id="modal-cobrar-credito" width="md">
                 <x-slot name="heading">
-                    Solicitar Vacaciones / Permiso
+                    Cobrar Turno a Crédito
                 </x-slot>
 
-                <form wire:submit.prevent="solicitarVacacion" class="space-y-4 py-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Tipo de Solicitud</label>
-                        <select wire:model.live="vacacion_tipo" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm font-bold">
-                            <option value="Vacaciones">Vacaciones</option>
-                            <option value="Permisos">Permiso Retribuido</option>
-                            <option value="Cambio de Turno">Cambio de Turno con Compañero</option>
-                        </select>
-                        @error('vacacion_tipo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                @php
+                    $deudorObj = $cobro_empleado_deudor_id ? \App\Models\Empleado::find($cobro_empleado_deudor_id) : null;
+                @endphp
+
+                <form wire:submit.prevent="enviarSolicitudCobroCredito" class="space-y-4 py-4">
+                    <div class="p-3.5 bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-900/40 rounded-2xl text-xs text-cyan-900 dark:text-cyan-200">
+                        <p class="font-bold">Compañero: {{ $deudorObj ? ($deudorObj->apellidos . ', ' . $deudorObj->nombre) : '' }}</p>
+                        <p class="mt-1 text-[11px] text-cyan-700 dark:text-cyan-300">
+                            Selecciona la fecha en la que <strong>no puedes acudir a trabajar</strong> para que tu compañero cubra tu turno y se salde el turno a tu favor.
+                        </p>
                     </div>
 
-                    @if($vacacion_tipo === 'Vacaciones')
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Mes</label>
-                                <select wire:model="vacacion_mes" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
-                                    <option value="1">Enero</option>
-                                    <option value="2">Febrero</option>
-                                    <option value="3">Marzo</option>
-                                    <option value="4">Abril</option>
-                                    <option value="5">Mayo</option>
-                                    <option value="6">Junio</option>
-                                    <option value="7">Julio</option>
-                                    <option value="8">Agosto</option>
-                                    <option value="9">Septiembre</option>
-                                    <option value="10">Octubre</option>
-                                    <option value="11">Noviembre</option>
-                                    <option value="12">Diciembre</option>
-                                </select>
-                                @error('vacacion_mes') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                            </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                            Fecha en la que necesitas que te cubra <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" wire:model.live="cobro_fecha" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-cyan-500 focus:ring-cyan-500 shadow-sm" />
+                        @error('cobro_fecha') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                    </div>
 
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Año</label>
-                                <select wire:model="vacacion_ano" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
-                                    @php $currentYear = (int) \Carbon\Carbon::now()->year; @endphp
-                                    <option value="{{ $currentYear }}">{{ $currentYear }}</option>
-                                    <option value="{{ $currentYear + 1 }}">{{ $currentYear + 1 }}</option>
-                                    <option value="{{ $currentYear + 2 }}">{{ $currentYear + 2 }}</option>
-                                </select>
-                                @error('vacacion_ano') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Quincena</label>
-                            <select wire:model="vacacion_quincena" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm">
-                                <option value="1">Primera quincena (del 1 al 15)</option>
-                                <option value="2">Segunda quincena (del 16 al fin de mes)</option>
-                            </select>
-                            @error('vacacion_quincena') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                    @elseif($vacacion_tipo === 'Cambio de Turno')
-                        <div class="p-3.5 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/40 rounded-2xl text-xs text-indigo-900 dark:text-indigo-200 space-y-1">
-                            <div class="font-black flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                                <span>Procedimiento de Cambio de Turno</span>
-                            </div>
-                            <p class="leading-relaxed opacity-90">
-                                Tu compañero recibirá una alerta en su pantalla principal de fichajes para aceptar o denegar el cambio. Al ser aceptado, el Planing de turnos se actualizará automáticamente.
-                            </p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Día que solicitas (Día que necesitas cubrir)</label>
-                            <input type="date" wire:model.live="cambio_fecha_solicitada" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
-                            @error('cambio_fecha_solicitada') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Compañero que te va a sustituir</label>
-                            <select wire:model.live="cambio_empleado_sustituto_id" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm">
-                                <option value="">-- Selecciona a un compañero --</option>
-                                @foreach($this->companerosDisponibles as $comp)
-                                    <option value="{{ $comp->id }}">
-                                        {{ $comp->nombre }} {{ $comp->apellidos }} ({{ $comp->puesto ?? 'Expendedor' }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('cambio_empleado_sustituto_id') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Cuándo le devuelves el día (Fecha de devolución)</label>
-                            <input type="date" wire:model.live="cambio_fecha_devolucion" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
-                            @error('cambio_fecha_devolucion') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo o comentario para el compañero (opcional)</label>
-                            <input type="text" wire:model="cambio_motivo" placeholder="Ej. Cita médica, te cubro el viernes..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" />
-                            @error('cambio_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                    @else
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Inicio</label>
-                            <input type="date" wire:model="vacacion_fecha_inicio" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                            @error('vacacion_fecha_inicio') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Fecha de Fin</label>
-                            <input type="date" wire:model="vacacion_fecha_fin" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                            @error('vacacion_fecha_fin') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Motivo del Permiso Retribuido</label>
-                            <input type="text" wire:model="permiso_motivo" placeholder="Escribe el motivo del permiso aquí..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" />
-                            @error('permiso_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Justificante del Permiso (PDF, Imagen)</label>
-                            <input type="file" wire:model="permiso_justificante" class="w-full text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
-                            @error('permiso_justificante') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                    @endif
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                            Motivo o comentario (opcional)
+                        </label>
+                        <input type="text" wire:model="cobro_motivo" placeholder="Ej. Compensación del turno de la semana pasada..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-cyan-500 focus:ring-cyan-500 shadow-sm" />
+                        @error('cobro_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
 
                     <div class="flex justify-end gap-3 pt-2">
-                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'solicitar-vacacion-modal' })">
+                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'modal-cobrar-credito' })">
                             Cancelar
                         </x-filament::button>
                         <x-filament::button color="info" type="submit">
-                            Enviar Solicitud
+                            Solicitar Cobertura de Turno
+                        </x-filament::button>
+                    </div>
+                </form>
+            </x-filament::modal>
+
+            <!-- modal-devolver-turno -->
+            <x-filament::modal id="modal-devolver-turno" width="md">
+                <x-slot name="heading">
+                    Proponer Devolución de Turno a Débito
+                </x-slot>
+
+                @php
+                    $acreedorObj = $devolucion_empleado_acreedor_id ? \App\Models\Empleado::find($devolucion_empleado_acreedor_id) : null;
+                @endphp
+
+                <form wire:submit.prevent="enviarSolicitudDevolucionDebito" class="space-y-4 py-4">
+                    <div class="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-2xl text-xs text-amber-900 dark:text-amber-200">
+                        <p class="font-bold">Compañero: {{ $acreedorObj ? ($acreedorObj->apellidos . ', ' . $acreedorObj->nombre) : '' }}</p>
+                        <p class="mt-1 text-[11px] text-amber-700 dark:text-amber-300">
+                            Selecciona la fecha en la que <strong>te ofreces a cubrir el turno de tu compañero</strong> para saldar tu turno a débito.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                            Fecha en la que te ofreces a cubrir su turno <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" wire:model.live="devolucion_fecha" class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm font-bold focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                        @error('devolucion_fecha') <span class="text-xs text-red-500 block mt-1 font-semibold">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                            Motivo o comentario (opcional)
+                        </label>
+                        <input type="text" wire:model="devolucion_motivo" placeholder="Ej. Te cubro este viernes para devolverte el turno..." class="w-full rounded-xl border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 text-sm focus:border-amber-500 focus:ring-amber-500 shadow-sm" />
+                        @error('devolucion_motivo') <span class="text-xs text-red-500 block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <x-filament::button color="gray" type="button" x-on:click="$dispatch('close-modal', { id: 'modal-devolver-turno' })">
+                            Cancelar
+                        </x-filament::button>
+                        <x-filament::button color="warning" type="submit">
+                            Enviar Oferta de Devolución
                         </x-filament::button>
                     </div>
                 </form>

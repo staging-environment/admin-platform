@@ -74,4 +74,19 @@ class EmpleadoVacacion extends Model
     {
         return $this->belongsTo(PlaningTurno::class, 'turno_devolucion_id');
     }
+
+    public function empleadoDeudor()
+    {
+        return $this->belongsTo(Empleado::class, 'empleado_deudor_id');
+    }
+
+    public function empleadoAcreedor()
+    {
+        return $this->belongsTo(Empleado::class, 'empleado_acreedor_id');
+    }
+
+    public function solicitudRelacionada()
+    {
+        return $this->belongsTo(EmpleadoVacacion::class, 'solicitud_relacionada_id');
+    }
 }

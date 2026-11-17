@@ -5,6 +5,8 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use App\Models\Empleado;
 use App\Models\EmpleadoFichaje;
+use App\Models\EmpleadoVacacion;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Livewire\WithFileUploads;
@@ -94,6 +96,27 @@ class FichaEmpleado extends Page
     public $cambio_empleado_sustituto_id = null;
     public $cambio_fecha_devolucion = null;
     public $cambio_motivo = null;
+
+    // Sección activa en la pestaña de Permisos (5 bloques clicables)
+    public string $bloquePermisosActivo = 'vacaciones'; // 'vacaciones', 'permisos', 'cambio_turno', 'debito', 'credito'
+
+    // Paginación y ordenación para Turnos a Débito
+    public string $debitoSortField = 'fecha_inicio';
+    public string $debitoSortDirection = 'desc';
+
+    // Paginación y ordenación para Turnos a Crédito
+    public string $creditoSortField = 'fecha_inicio';
+    public string $creditoSortDirection = 'desc';
+
+    // Campos para modal de Cobrar Turno a Crédito
+    public $cobro_empleado_deudor_id = null;
+    public $cobro_fecha = null;
+    public $cobro_motivo = null;
+
+    // Campos para modal de Devolver Turno a Débito
+    public $devolucion_empleado_acreedor_id = null;
+    public $devolucion_fecha = null;
+    public $devolucion_motivo = null;
 
     // Form fields for sick leaves
     public $baja_fecha_inicio;
@@ -857,7 +880,7 @@ class FichaEmpleado extends Page
             $rules = [
                 'cambio_fecha_solicitada' => 'required|date|after_or_equal:today',
                 'cambio_empleado_sustituto_id' => 'required|exists:empleados,id',
-                'cambio_fecha_devolucion' => 'required|date|after_or_equal:today|different:cambio_fecha_solicitada',
+                'cambio_fecha_devolucion' => 'nullable|date|after_or_equal:today|different:cambio_fecha_solicitada',
                 'cambio_motivo' => 'nullable|string|max:255',
             ];
 
@@ -865,7 +888,6 @@ class FichaEmpleado extends Page
                 'cambio_fecha_solicitada.required' => 'El día que solicitas cambiar es obligatorio.',
                 'cambio_fecha_solicitada.after_or_equal' => 'El día solicitado no puede ser una fecha pasada.',
                 'cambio_empleado_sustituto_id.required' => 'Debes seleccionar al compañero que te sustituirá.',
-                'cambio_fecha_devolucion.required' => 'Debes indicar el día en que devolverás el turno.',
                 'cambio_fecha_devolucion.after_or_equal' => 'El día de devolución no puede ser una fecha pasada.',
                 'cambio_fecha_devolucion.different' => 'El día de devolución debe ser diferente al día solicitado.',
             ];
@@ -892,10 +914,53 @@ class FichaEmpleado extends Page
                         ->send();
                     return;
                 }
-                if ($companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
+                if (!empty($this->cambio_fecha_devolucion) && $companero->estaDeBajaEnFecha($this->cambio_fecha_devolucion)) {
                     Notification::make()
                         ->title('Compañero no disponible')
                         ->body("{$companero->nombre} {$companero->apellidos} se encuentra en situación de baja el día {$this->cambio_fecha_devolucion}.")
+                        ->danger()
+                        ->send();
+                    return;
+                }
+            }
+
+            // Validaciones con el Planing de turnos
+            $planingService = app(\App\Services\PlaningTurnosService::class);
+
+            // 1. En el día solicitado: el solicitante debe tener turno asignado y el compañero debe estar libre
+            if (!$planingService->tieneTurnoEnFecha($this->empleado, $this->cambio_fecha_solicitada)) {
+                Notification::make()
+                    ->title('No tienes turno ese día')
+                    ->body('No tienes ningún turno programado en el Planing para este día. Solo puedes solicitar que te cubran un día en el que tengas turno de trabajo.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            if ($planingService->tieneTurnoEnFecha($companero, $this->cambio_fecha_solicitada)) {
+                Notification::make()
+                    ->title('Compañero ocupado ese día')
+                    ->body("{$companero->nombre} ya tiene un turno de trabajo programado para el día {$this->cambio_fecha_solicitada}. Debe ser un día en el que tu compañero esté libre/descanso.")
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            // 2. Si se indica fecha de devolución: el compañero debe tener turno ese día y el solicitante debe estar libre
+            if (!empty($this->cambio_fecha_devolucion)) {
+                if (!$planingService->tieneTurnoEnFecha($companero, $this->cambio_fecha_devolucion)) {
+                    Notification::make()
+                        ->title('Compañero no trabaja ese día')
+                        ->body("{$companero->nombre} no tiene turno programado para el día de devolución ({$this->cambio_fecha_devolucion}). Debe ser un día en el que tu compañero trabaje para que puedas devolvérselo.")
+                        ->danger()
+                        ->send();
+                    return;
+                }
+
+                if ($planingService->tieneTurnoEnFecha($this->empleado, $this->cambio_fecha_devolucion)) {
+                    Notification::make()
+                        ->title('Tú ya trabajas ese día')
+                        ->body('Ya tienes un turno asignado para el día de devolución. Debes estar libre/descanso ese día para poder devolvérselo a tu compañero.')
                         ->danger()
                         ->send();
                     return;
@@ -907,7 +972,7 @@ class FichaEmpleado extends Page
                 ->where('tipo', 'Cambio de Turno')
                 ->where('empleado_sustituto_id', $this->cambio_empleado_sustituto_id)
                 ->where('fecha_inicio', $this->cambio_fecha_solicitada)
-                ->where('fecha_devolucion', $this->cambio_fecha_devolucion)
+                ->where('fecha_devolucion', $this->cambio_fecha_devolucion ?: null)
                 ->where('estado', 'Pendiente')
                 ->exists();
 
@@ -921,14 +986,44 @@ class FichaEmpleado extends Page
             }
 
             $nombreCompanero = $companero ? $companero->nombre_corto : 'Compañero';
-            $comentario = $this->cambio_motivo ?: "Cambio de turno con {$nombreCompanero} (Devolución: " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ")";
+            $esSinDevolucion = empty($this->cambio_fecha_devolucion);
+
+            if ($esSinDevolucion) {
+                // Comprobar si el compañero ya le debe turnos al solicitante
+                $deudaCompanero = \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+                    ->where('empleado_deudor_id', $companero->id)
+                    ->where('empleado_acreedor_id', $this->empleado->id)
+                    ->where('deuda_saldada', false)
+                    ->whereIn('estado', ['Aceptada', 'Aprobada'])
+                    ->exists();
+
+                if ($deudaCompanero) {
+                    $tipoCambio = 'cobro_credito';
+                    $deudorId = $companero->id;
+                    $acreedorId = $this->empleado->id;
+                    $comentario = $this->cambio_motivo ?: "Cobro de turno a crédito con {$nombreCompanero}";
+                } else {
+                    $tipoCambio = 'solicitud_cubrir';
+                    $deudorId = $this->empleado->id;
+                    $acreedorId = $companero->id;
+                    $comentario = $this->cambio_motivo ?: "Solicitud de cobertura de turno (Turno a débito/crédito) con {$nombreCompanero}";
+                }
+            } else {
+                $tipoCambio = 'directo';
+                $deudorId = null;
+                $acreedorId = null;
+                $comentario = $this->cambio_motivo ?: "Cambio de turno con {$nombreCompanero} (Devolución: " . Carbon::parse($this->cambio_fecha_devolucion)->format('d/m/Y') . ")";
+            }
 
             \App\Models\EmpleadoVacacion::create([
                 'empleado_id' => $this->empleado->id,
                 'tipo' => 'Cambio de Turno',
+                'tipo_cambio' => $tipoCambio,
+                'empleado_deudor_id' => $deudorId,
+                'empleado_acreedor_id' => $acreedorId,
                 'fecha_inicio' => $this->cambio_fecha_solicitada,
                 'fecha_fin' => $this->cambio_fecha_solicitada,
-                'fecha_devolucion' => $this->cambio_fecha_devolucion,
+                'fecha_devolucion' => $this->cambio_fecha_devolucion ?: null,
                 'empleado_sustituto_id' => $this->cambio_empleado_sustituto_id,
                 'dias_solicitados' => 1,
                 'estado' => 'Pendiente',
@@ -939,9 +1034,13 @@ class FichaEmpleado extends Page
             $this->reset(['cambio_fecha_solicitada', 'cambio_empleado_sustituto_id', 'cambio_fecha_devolucion', 'cambio_motivo']);
             $this->vacacion_tipo = 'Vacaciones';
 
+            $mensajeExito = $esSinDevolucion
+                ? "Se ha enviado la solicitud de cobertura a {$nombreCompanero}. Al ser aceptada, se anotará un turno a débito."
+                : "Se ha enviado la solicitud de cambio de turno a {$nombreCompanero}. Recibirá una alerta en su pantalla para responder.";
+
             Notification::make()
-                ->title('Solicitud de Cambio Enviada')
-                ->body("Se ha enviado la solicitud de cambio de turno a {$nombreCompanero}. Recibirá una alerta en su pantalla de fichaje para responder.")
+                ->title('Solicitud Enviada')
+                ->body($mensajeExito)
                 ->success()
                 ->send();
 
@@ -1506,5 +1605,344 @@ class FichaEmpleado extends Page
             ->where('id', '!=', $this->empleado->id)
             ->orderBy('nombre')
             ->get();
+    }
+
+    public function seleccionarBloquePermiso(string $bloque): void
+    {
+        $this->bloquePermisosActivo = $bloque;
+        if ($bloque === 'vacaciones') {
+            $this->vacacion_tipo = 'Vacaciones';
+        } elseif ($bloque === 'permisos') {
+            $this->vacacion_tipo = 'Permisos';
+        } elseif ($bloque === 'cambio_turno') {
+            $this->vacacion_tipo = 'Cambio de Turno';
+        }
+    }
+
+    public function sortByDebito(string $field): void
+    {
+        if ($this->debitoSortField === $field) {
+            $this->debitoSortDirection = $this->debitoSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->debitoSortField = $field;
+            $this->debitoSortDirection = 'asc';
+        }
+        $this->resetPage('debitoPage');
+    }
+
+    public function sortByCredito(string $field): void
+    {
+        if ($this->creditoSortField === $field) {
+            $this->creditoSortDirection = $this->creditoSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->creditoSortField = $field;
+            $this->creditoSortDirection = 'asc';
+        }
+        $this->resetPage('creditoPage');
+    }
+
+    public function abrirModalCobrarCredito(int $empleadoId): void
+    {
+        $this->cobro_empleado_deudor_id = $empleadoId;
+        $this->cobro_fecha = null;
+        $this->cobro_motivo = null;
+        $this->dispatch('open-modal', id: 'modal-cobrar-credito');
+    }
+
+    public function enviarSolicitudCobroCredito(): void
+    {
+        $this->validate([
+            'cobro_fecha' => 'required|date|after_or_equal:today',
+            'cobro_empleado_deudor_id' => 'required|exists:empleados,id',
+            'cobro_motivo' => 'nullable|string|max:255',
+        ], [
+            'cobro_fecha.required' => 'Debes indicar la fecha del turno que necesitas que te cubra.',
+            'cobro_fecha.after_or_equal' => 'La fecha no puede ser en el pasado.',
+        ]);
+
+        $deudor = Empleado::find($this->cobro_empleado_deudor_id);
+        if (!$deudor || !$this->empleado) {
+            return;
+        }
+
+        if ($deudor->estaDeBajaEnFecha($this->cobro_fecha)) {
+            Notification::make()->title('Compañero no disponible')->body("{$deudor->nombre} {$deudor->apellidos} se encuentra en situación de baja el día {$this->cobro_fecha}.")->danger()->send();
+            return;
+        }
+
+        $planingService = app(\App\Services\PlaningTurnosService::class);
+
+        if (!$planingService->tieneTurnoEnFecha($this->empleado, $this->cobro_fecha)) {
+            Notification::make()->title('No tienes turno ese día')->body('No tienes ningún turno programado en el Planing para este día. Debes seleccionar una fecha en la que te toque trabajar para que tu compañero te cubra.')->danger()->send();
+            return;
+        }
+
+        if ($planingService->tieneTurnoEnFecha($deudor, $this->cobro_fecha)) {
+            Notification::make()->title('Compañero ocupado ese día')->body("{$deudor->nombre} ya tiene un turno asignado en el cuadrante para ese día. Debe ser un día en el que tu compañero esté libre/descanso.")->danger()->send();
+            return;
+        }
+
+        \App\Models\EmpleadoVacacion::create([
+            'empleado_id' => $this->empleado->id,
+            'empleado_sustituto_id' => $deudor->id,
+            'tipo' => 'Cambio de Turno',
+            'tipo_cambio' => 'cobro_credito',
+            'empleado_deudor_id' => $deudor->id,
+            'empleado_acreedor_id' => $this->empleado->id,
+            'fecha_inicio' => $this->cobro_fecha,
+            'fecha_fin' => $this->cobro_fecha,
+            'fecha_devolucion' => null,
+            'dias_solicitados' => 1,
+            'estado' => 'Pendiente',
+            'comentario_empleado' => $this->cobro_motivo ?: "Cobro de turno a crédito con {$deudor->nombre_corto}",
+            'respuesta_vista_solicitante' => false,
+        ]);
+
+        $this->dispatch('close-modal', id: 'modal-cobrar-credito');
+        $this->reset(['cobro_empleado_deudor_id', 'cobro_fecha', 'cobro_motivo']);
+        $this->loadVacaciones();
+
+        Notification::make()
+            ->title('Solicitud de Cobro Enviada')
+            ->body("Se ha enviado la solicitud a {$deudor->nombre_corto}. Recibirá una alerta en su pantalla para responder.")
+            ->success()
+            ->send();
+    }
+
+    public function abrirModalDevolverDebito(int $empleadoId): void
+    {
+        $this->devolucion_empleado_acreedor_id = $empleadoId;
+        $this->devolucion_fecha = null;
+        $this->devolucion_motivo = null;
+        $this->dispatch('open-modal', id: 'modal-devolver-turno');
+    }
+
+    public function enviarSolicitudDevolucionDebito(): void
+    {
+        $this->validate([
+            'devolucion_fecha' => 'required|date|after_or_equal:today',
+            'devolucion_empleado_acreedor_id' => 'required|exists:empleados,id',
+            'devolucion_motivo' => 'nullable|string|max:255',
+        ], [
+            'devolucion_fecha.required' => 'Debes indicar la fecha del turno en que te ofreces a cubrir a tu compañero.',
+            'devolucion_fecha.after_or_equal' => 'La fecha no puede ser en el pasado.',
+        ]);
+
+        $acreedor = Empleado::find($this->devolucion_empleado_acreedor_id);
+        if (!$acreedor || !$this->empleado) {
+            return;
+        }
+
+        if ($acreedor->estaDeBajaEnFecha($this->devolucion_fecha)) {
+            Notification::make()->title('Compañero no disponible')->body("{$acreedor->nombre} {$acreedor->apellidos} se encuentra en situación de baja el día {$this->devolucion_fecha}.")->danger()->send();
+            return;
+        }
+
+        $planingService = app(\App\Services\PlaningTurnosService::class);
+
+        if (!$planingService->tieneTurnoEnFecha($acreedor, $this->devolucion_fecha)) {
+            Notification::make()->title('Compañero no trabaja ese día')->body("{$acreedor->nombre} no tiene turno programado para este día. Debes seleccionar una fecha en la que tu compañero trabaje para que puedas cubrírselo.")->danger()->send();
+            return;
+        }
+
+        if ($planingService->tieneTurnoEnFecha($this->empleado, $this->devolucion_fecha)) {
+            Notification::make()->title('Ya tienes turno ese día')->body('Tú ya tienes un turno asignado en el cuadrante para ese día. Debes seleccionar una fecha en la que estés libre/descanso para cubrir a tu compañero.')->danger()->send();
+            return;
+        }
+
+        \App\Models\EmpleadoVacacion::create([
+            'empleado_id' => $this->empleado->id,
+            'empleado_sustituto_id' => $acreedor->id,
+            'tipo' => 'Cambio de Turno',
+            'tipo_cambio' => 'devolucion_debito',
+            'empleado_deudor_id' => $this->empleado->id,
+            'empleado_acreedor_id' => $acreedor->id,
+            'fecha_inicio' => $this->devolucion_fecha,
+            'fecha_fin' => $this->devolucion_fecha,
+            'fecha_devolucion' => null,
+            'dias_solicitados' => 1,
+            'estado' => 'Pendiente',
+            'comentario_empleado' => $this->devolucion_motivo ?: "Oferta de devolución de turno a {$acreedor->nombre_corto}",
+            'respuesta_vista_solicitante' => false,
+        ]);
+
+        $this->dispatch('close-modal', id: 'modal-devolver-turno');
+        $this->reset(['devolucion_empleado_acreedor_id', 'devolucion_fecha', 'devolucion_motivo']);
+        $this->loadVacaciones();
+
+        Notification::make()
+            ->title('Oferta de Devolución Enviada')
+            ->body("Se ha enviado la propuesta a {$acreedor->nombre_corto}. Recibirá una alerta en su pantalla para responder.")
+            ->success()
+            ->send();
+    }
+
+    public function getSaldoDebitosProperty()
+    {
+        if (!$this->empleado) {
+            return collect();
+        }
+
+        return \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+            ->where('empleado_deudor_id', $this->empleado->id)
+            ->where('deuda_saldada', false)
+            ->whereIn('estado', ['Aceptada', 'Aprobada'])
+            ->selectRaw('empleado_acreedor_id, COUNT(*) as turnos_debidos')
+            ->groupBy('empleado_acreedor_id')
+            ->with('empleadoAcreedor')
+            ->get();
+    }
+
+    public function getSaldoCreditosProperty()
+    {
+        if (!$this->empleado) {
+            return collect();
+        }
+
+        return \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+            ->where('empleado_acreedor_id', $this->empleado->id)
+            ->where('deuda_saldada', false)
+            ->whereIn('estado', ['Aceptada', 'Aprobada'])
+            ->selectRaw('empleado_deudor_id, COUNT(*) as turnos_a_favor')
+            ->groupBy('empleado_deudor_id')
+            ->with('empleadoDeudor')
+            ->get();
+    }
+
+    public function getTotalTurnosDebitoProperty(): int
+    {
+        if (!$this->empleado) {
+            return 0;
+        }
+
+        return \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+            ->where('empleado_deudor_id', $this->empleado->id)
+            ->where('deuda_saldada', false)
+            ->whereIn('estado', ['Aceptada', 'Aprobada'])
+            ->count();
+    }
+
+    public function getTotalTurnosCreditoProperty(): int
+    {
+        if (!$this->empleado) {
+            return 0;
+        }
+
+        return \App\Models\EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+            ->where('empleado_acreedor_id', $this->empleado->id)
+            ->where('deuda_saldada', false)
+            ->whereIn('estado', ['Aceptada', 'Aprobada'])
+            ->count();
+    }
+
+    public function getTurnosDebitoListProperty()
+    {
+        if (!$this->empleado) {
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+        }
+
+        $empId = $this->empleado->id;
+
+        $query = \App\Models\EmpleadoVacacion::with(['empleado', 'empleadoSustituto', 'empleadoDeudor', 'empleadoAcreedor'])
+            ->where('tipo', 'Cambio de Turno')
+            ->where(function ($q) use ($empId) {
+                $q->where('empleado_deudor_id', $empId)
+                  ->orWhere(function ($sub) use ($empId) {
+                      $sub->where('empleado_id', $empId)
+                          ->whereNull('fecha_devolucion')
+                          ->where(function($s) {
+                              $s->whereIn('tipo_cambio', ['solicitud_cubrir', 'devolucion_debito'])
+                                ->orWhereNull('tipo_cambio');
+                          });
+                  })
+                  ->orWhere(function ($sub) use ($empId) {
+                      $sub->where('empleado_sustituto_id', $empId)
+                          ->where('tipo_cambio', 'cobro_credito');
+                  });
+            })
+            ->where(function ($q) {
+                $q->whereNull('fecha_devolucion')
+                  ->orWhere('tipo_cambio', '!=', 'directo');
+            });
+
+        if ($this->debitoSortField === 'empleado') {
+            $query->leftJoin('empleados as emp_comp', function($join) use ($empId) {
+                $join->on('emp_comp.id', '=', DB::raw("CASE WHEN empleado_vacacions.empleado_id = {$empId} THEN empleado_vacacions.empleado_sustituto_id ELSE empleado_vacacions.empleado_id END"));
+            })->orderBy('emp_comp.apellidos', $this->debitoSortDirection)
+              ->orderBy('emp_comp.nombre', $this->debitoSortDirection)
+              ->select('empleado_vacacions.*');
+        } elseif ($this->debitoSortField === 'estado') {
+            $query->orderBy('estado', $this->debitoSortDirection);
+        } elseif ($this->debitoSortField === 'tipo') {
+            $query->orderBy('tipo_cambio', $this->debitoSortDirection);
+        } else {
+            $query->orderBy('fecha_inicio', $this->debitoSortDirection);
+        }
+
+        return $query->paginate(20, ['*'], 'debitoPage');
+    }
+
+    public function getTurnosCreditoListProperty()
+    {
+        if (!$this->empleado) {
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+        }
+
+        $empId = $this->empleado->id;
+
+        $query = \App\Models\EmpleadoVacacion::with(['empleado', 'empleadoSustituto', 'empleadoDeudor', 'empleadoAcreedor'])
+            ->where('tipo', 'Cambio de Turno')
+            ->where(function ($q) use ($empId) {
+                $q->where('empleado_acreedor_id', $empId)
+                  ->orWhere(function ($sub) use ($empId) {
+                      $sub->where('empleado_sustituto_id', $empId)
+                          ->whereNull('fecha_devolucion')
+                          ->where(function($s) {
+                              $s->whereIn('tipo_cambio', ['solicitud_cubrir'])
+                                ->orWhereNull('tipo_cambio');
+                          });
+                  })
+                  ->orWhere(function ($sub) use ($empId) {
+                      $sub->where('empleado_id', $empId)
+                          ->where('tipo_cambio', 'cobro_credito');
+                  })
+                  ->orWhere(function ($sub) use ($empId) {
+                      $sub->where('empleado_sustituto_id', $empId)
+                          ->where('tipo_cambio', 'devolucion_debito');
+                  });
+            })
+            ->where(function ($q) {
+                $q->whereNull('fecha_devolucion')
+                  ->orWhere('tipo_cambio', '!=', 'directo');
+            });
+
+        if ($this->creditoSortField === 'empleado') {
+            $query->leftJoin('empleados as emp_comp_cred', function($join) use ($empId) {
+                $join->on('emp_comp_cred.id', '=', DB::raw("CASE WHEN empleado_vacacions.empleado_id = {$empId} THEN empleado_vacacions.empleado_sustituto_id ELSE empleado_vacacions.empleado_id END"));
+            })->orderBy('emp_comp_cred.apellidos', $this->creditoSortDirection)
+              ->orderBy('emp_comp_cred.nombre', $this->creditoSortDirection)
+              ->select('empleado_vacacions.*');
+        } elseif ($this->creditoSortField === 'estado') {
+            $query->orderBy('estado', $this->creditoSortDirection);
+        } elseif ($this->creditoSortField === 'tipo') {
+            $query->orderBy('tipo_cambio', $this->creditoSortDirection);
+        } else {
+            $query->orderBy('fecha_inicio', $this->creditoSortDirection);
+        }
+
+        return $query->paginate(20, ['*'], 'creditoPage');
+    }
+
+    public function getCompaneroDeSolicitud(EmpleadoVacacion $v): ?Empleado
+    {
+        if (!$this->empleado) {
+            return $v->empleadoSustituto ?? $v->empleado;
+        }
+
+        if ((int)$v->empleado_id === (int)$this->empleado->id) {
+            return $v->empleadoSustituto;
+        }
+
+        return $v->empleado;
     }
 }

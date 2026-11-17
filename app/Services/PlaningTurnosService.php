@@ -985,95 +985,194 @@ class PlaningTurnosService
      * Intercambia el trabajador asignado en el día solicitado y en el día de devolución,
      * manteniendo intacto el color del turno y registrando la sustitución.
      */
+    /**
+     * Comprueba si un empleado tiene un turno asignado de trabajo en una fecha concreta.
+     */
+    public function tieneTurnoEnFecha(Empleado $empleado, string $fecha): bool
+    {
+        $c = Carbon::parse($fecha);
+        $gasolineraCodigo = $empleado->gasolinera_codigo ?? 1;
+        $this->asegurarCuadranteMes($gasolineraCodigo, $c->year, $c->month);
+
+        return PlaningTurno::whereDate('fecha', $fecha)
+            ->where('empleado_id', $empleado->id)
+            ->exists();
+    }
+
+    /**
+     * Aplica el cambio o cobertura de turno en el cuadrante de Planing.
+     * Soporta:
+     * - Intercambio directo (con fecha_devolucion)
+     * - Cobertura de turno sin fecha de devolución (Turnos a Débito / Crédito)
+     * - Cobro de turnos a crédito y Devolución de turnos a débito
+     */
     public function aplicarCambioTurno(EmpleadoVacacion $solicitud): bool
     {
         $solicitante = $solicitud->empleado;
         $companero = $solicitud->empleadoSustituto;
 
-        if (!$solicitante || !$companero || !$solicitud->fecha_inicio || !$solicitud->fecha_devolucion) {
+        if (!$solicitante || !$companero || !$solicitud->fecha_inicio) {
             return false;
         }
 
         $fechaSolicitada = Carbon::parse($solicitud->fecha_inicio)->toDateString();
-        $fechaDevolucion = Carbon::parse($solicitud->fecha_devolucion)->toDateString();
+        $esDirecto = !empty($solicitud->fecha_devolucion);
 
-        // 1. DÍA SOLICITADO: El compañero cubre el turno del solicitante
-        $turno1 = $solicitud->turno_origen_id ? PlaningTurno::find($solicitud->turno_origen_id) : null;
-        if (!$turno1) {
-            $turno1 = PlaningTurno::whereDate('fecha', $fechaSolicitada)
-                ->where(function ($q) use ($solicitante) {
-                    $q->where('empleado_id', $solicitante->id)
-                      ->orWhere('empleado_titular_id', $solicitante->id);
-                })
-                ->first();
+        if ($esDirecto) {
+            $fechaDevolucion = Carbon::parse($solicitud->fecha_devolucion)->toDateString();
+
+            // 1. DÍA SOLICITADO: El compañero cubre el turno del solicitante
+            $this->asignarSustitucionTurno($solicitante, $companero, $fechaSolicitada, "Cambio de turno con {$solicitante->nombre_corto}", $solicitud, 'origen');
+
+            // 2. DÍA DE DEVOLUCIÓN: El solicitante cubre el turno del compañero
+            $this->asignarSustitucionTurno($companero, $solicitante, $fechaDevolucion, "Devolución de cambio a {$companero->nombre_corto}", $solicitud, 'devolucion');
+
+            $solicitud->tipo_cambio = 'directo';
+            $solicitud->save();
+
+            return true;
         }
 
-        if (!$turno1) {
-            $estacionSolicitante = $solicitante->gasolinera_codigo ?? 1;
-            $c1 = Carbon::parse($fechaSolicitada);
-            $this->asegurarCuadranteMes($estacionSolicitante, $c1->year, $c1->month);
-            $cuadrante1 = $this->obtenerOCrearCuadrante($estacionSolicitante, $c1->year, $c1->month);
+        // Flujo Débito / Crédito (sin fecha de devolución)
+        $tipoCambio = $solicitud->tipo_cambio ?: 'solicitud_cubrir';
 
-            $turno1 = PlaningTurno::where('planing_cuadrante_id', $cuadrante1->id)
-                ->whereDate('fecha', $fechaSolicitada)
-                ->where(function ($q) use ($solicitante) {
-                    $q->where('empleado_id', $solicitante->id)
-                      ->orWhere('empleado_titular_id', $solicitante->id);
-                })
+        if ($tipoCambio === 'devolucion_debito') {
+            // El solicitante (deudor) cubre el turno del compañero (acreedor)
+            $this->asignarSustitucionTurno($companero, $solicitante, $fechaSolicitada, "Devolución de turno por {$solicitante->nombre_corto}", $solicitud, 'origen');
+
+            // Saldar deuda: solicitante debía a compañero
+            $solicitud->empleado_deudor_id = $solicitante->id;
+            $solicitud->empleado_acreedor_id = $companero->id;
+            $solicitud->deuda_saldada = true;
+
+            $deudaAnterior = EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+                ->where('empleado_deudor_id', $solicitante->id)
+                ->where('empleado_acreedor_id', $companero->id)
+                ->where('deuda_saldada', false)
+                ->where('id', '!=', $solicitud->id)
+                ->whereIn('estado', ['Aceptada', 'Aprobada'])
+                ->orderBy('created_at', 'asc')
                 ->first();
-        }
 
-        if ($turno1) {
-            if (!$turno1->empleado_titular_id) {
-                $turno1->empleado_titular_id = $turno1->empleado_id ?: $solicitante->id;
+            if ($deudaAnterior) {
+                $deudaAnterior->deuda_saldada = true;
+                $deudaAnterior->solicitud_relacionada_id = $solicitud->id;
+                $deudaAnterior->save();
+                $solicitud->solicitud_relacionada_id = $deudaAnterior->id;
             }
-            $turno1->empleado_id = $companero->id;
-            $turno1->es_sustitucion = true;
-            $turno1->motivo_sustitucion = "Cambio de turno con {$solicitante->nombre_corto}";
-            $turno1->save();
-            $solicitud->turno_origen_id = $turno1->id;
-        }
+        } elseif ($tipoCambio === 'cobro_credito') {
+            // El compañero (deudor) cubre el turno del solicitante (acreedor)
+            $this->asignarSustitucionTurno($solicitante, $companero, $fechaSolicitada, "Cobro de crédito por {$solicitante->nombre_corto}", $solicitud, 'origen');
 
-        // 2. DÍA DE DEVOLUCIÓN: El solicitante cubre el turno del compañero
-        $turno2 = $solicitud->turno_devolucion_id ? PlaningTurno::find($solicitud->turno_devolucion_id) : null;
-        if (!$turno2) {
-            $turno2 = PlaningTurno::whereDate('fecha', $fechaDevolucion)
-                ->where(function ($q) use ($companero) {
-                    $q->where('empleado_id', $companero->id)
-                      ->orWhere('empleado_titular_id', $companero->id);
-                })
+            // Saldar deuda: compañero debía a solicitante
+            $solicitud->empleado_deudor_id = $companero->id;
+            $solicitud->empleado_acreedor_id = $solicitante->id;
+            $solicitud->deuda_saldada = true;
+
+            $deudaAnterior = EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+                ->where('empleado_deudor_id', $companero->id)
+                ->where('empleado_acreedor_id', $solicitante->id)
+                ->where('deuda_saldada', false)
+                ->where('id', '!=', $solicitud->id)
+                ->whereIn('estado', ['Aceptada', 'Aprobada'])
+                ->orderBy('created_at', 'asc')
                 ->first();
-        }
 
-        if (!$turno2) {
-            $estacionCompanero = $companero->gasolinera_codigo ?? ($solicitante->gasolinera_codigo ?? 1);
-            $c2 = Carbon::parse($fechaDevolucion);
-            $this->asegurarCuadranteMes($estacionCompanero, $c2->year, $c2->month);
-            $cuadrante2 = $this->obtenerOCrearCuadrante($estacionCompanero, $c2->year, $c2->month);
-
-            $turno2 = PlaningTurno::where('planing_cuadrante_id', $cuadrante2->id)
-                ->whereDate('fecha', $fechaDevolucion)
-                ->where(function ($q) use ($companero) {
-                    $q->where('empleado_id', $companero->id)
-                      ->orWhere('empleado_titular_id', $companero->id);
-                })
-                ->first();
-        }
-
-        if ($turno2) {
-            if (!$turno2->empleado_titular_id) {
-                $turno2->empleado_titular_id = $turno2->empleado_id ?: $companero->id;
+            if ($deudaAnterior) {
+                $deudaAnterior->deuda_saldada = true;
+                $deudaAnterior->solicitud_relacionada_id = $solicitud->id;
+                $deudaAnterior->save();
+                $solicitud->solicitud_relacionada_id = $deudaAnterior->id;
             }
-            $turno2->empleado_id = $solicitante->id;
-            $turno2->es_sustitucion = true;
-            $turno2->motivo_sustitucion = "Devolución de cambio a {$companero->nombre_corto}";
-            $turno2->save();
-            $solicitud->turno_devolucion_id = $turno2->id;
+        } else {
+            // solicitud_cubrir o genérico sin devolución
+            // El compañero cubre el turno del solicitante
+            $this->asignarSustitucionTurno($solicitante, $companero, $fechaSolicitada, "Cubierto por {$companero->nombre_corto} (Turno a crédito/débito)", $solicitud, 'origen');
+
+            // Comprobar si el compañero ya debía turnos al solicitante
+            $deudaCompanero = EmpleadoVacacion::where('tipo', 'Cambio de Turno')
+                ->where('empleado_deudor_id', $companero->id)
+                ->where('empleado_acreedor_id', $solicitante->id)
+                ->where('deuda_saldada', false)
+                ->where('id', '!=', $solicitud->id)
+                ->whereIn('estado', ['Aceptada', 'Aprobada'])
+                ->orderBy('created_at', 'asc')
+                ->first();
+
+            if ($deudaCompanero) {
+                // El compañero salda 1 turno que debía
+                $deudaCompanero->deuda_saldada = true;
+                $deudaCompanero->solicitud_relacionada_id = $solicitud->id;
+                $deudaCompanero->save();
+
+                $solicitud->tipo_cambio = 'cobro_credito';
+                $solicitud->empleado_deudor_id = $companero->id;
+                $solicitud->empleado_acreedor_id = $solicitante->id;
+                $solicitud->deuda_saldada = true;
+                $solicitud->solicitud_relacionada_id = $deudaCompanero->id;
+            } else {
+                // Nuevo turno a débito para el solicitante y a crédito para el compañero
+                $solicitud->tipo_cambio = 'solicitud_cubrir';
+                $solicitud->empleado_deudor_id = $solicitante->id;
+                $solicitud->empleado_acreedor_id = $companero->id;
+                $solicitud->deuda_saldada = false;
+            }
         }
 
         $solicitud->save();
 
         return true;
+    }
+
+    /**
+     * Aplica la sustitución en el turno del cuadrante correspondiente
+     */
+    protected function asignarSustitucionTurno(Empleado $empleadoACubrir, Empleado $empleadoQueTrabaja, string $fecha, string $motivo, EmpleadoVacacion $solicitud, string $tipoSlot = 'origen'): ?PlaningTurno
+    {
+        $turnoId = $tipoSlot === 'origen' ? $solicitud->turno_origen_id : $solicitud->turno_devolucion_id;
+        $turno = $turnoId ? PlaningTurno::find($turnoId) : null;
+
+        if (!$turno) {
+            $turno = PlaningTurno::whereDate('fecha', $fecha)
+                ->where(function ($q) use ($empleadoACubrir) {
+                    $q->where('empleado_id', $empleadoACubrir->id)
+                      ->orWhere('empleado_titular_id', $empleadoACubrir->id);
+                })
+                ->first();
+        }
+
+        if (!$turno) {
+            $estacion = $empleadoACubrir->gasolinera_codigo ?? 1;
+            $c = Carbon::parse($fecha);
+            $this->asegurarCuadranteMes($estacion, $c->year, $c->month);
+            $cuadrante = $this->obtenerOCrearCuadrante($estacion, $c->year, $c->month);
+
+            $turno = PlaningTurno::where('planing_cuadrante_id', $cuadrante->id)
+                ->whereDate('fecha', $fecha)
+                ->where(function ($q) use ($empleadoACubrir) {
+                    $q->where('empleado_id', $empleadoACubrir->id)
+                      ->orWhere('empleado_titular_id', $empleadoACubrir->id);
+                })
+                ->first();
+        }
+
+        if ($turno) {
+            if (!$turno->empleado_titular_id) {
+                $turno->empleado_titular_id = $turno->empleado_id ?: $empleadoACubrir->id;
+            }
+            $turno->empleado_id = $empleadoQueTrabaja->id;
+            $turno->es_sustitucion = true;
+            $turno->motivo_sustitucion = $motivo;
+            $turno->save();
+
+            if ($tipoSlot === 'origen') {
+                $solicitud->turno_origen_id = $turno->id;
+            } else {
+                $solicitud->turno_devolucion_id = $turno->id;
+            }
+        }
+
+        return $turno;
     }
 }
 
