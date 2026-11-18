@@ -42,6 +42,7 @@ class PermissionSeeder extends Seeder
             'editar_documentacion_empleados',
             'recibir_notificaciones_competencia',
             'ver_analiticas',
+            'acceso_odoo',
         ];
 
         foreach ($permissions as $permission) {
