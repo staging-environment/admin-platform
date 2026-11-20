@@ -196,25 +196,34 @@ class FichaEmpleado extends Page
             || $user->email === 'utrecar@gmail.com'
             || $user->id === 1;
         $this->isAdmin = $isAdmin;
-                $defaultTab = 'fichajes';
-        if ($this->empleado && $this->empleado->isOnBajaMedica() && !request()->has('tab')) {
-            $defaultTab = 'bajas';
-        }
-        $this->activeTab = request()->query('tab', $defaultTab);
 
         $empleadoId = request()->query('empleado_id');
 
         if ($isAdmin && $empleadoId) {
             $this->empleado = Empleado::find($empleadoId);
-        } else {
-            $this->empleado = Empleado::where('email', $user->email)->first();
-            if (!$this->empleado && $isAdmin) {
-                $this->empleado = Empleado::find($empleadoId) ?: Empleado::first();
+
+            // El empleado solicitado no existe o fue eliminado (soft delete):
+            // avisar y continuar con la ficha propia en lugar de romper la página.
+            if (!$this->empleado) {
+                Notification::make()
+                    ->title('Empleado no encontrado')
+                    ->body("El empleado #{$empleadoId} no existe o ha sido eliminado.")
+                    ->warning()
+                    ->send();
             }
         }
 
-        // Auto-create mock employee for admin users who also have the Empleado role (or are testing)
-        if (!$this->empleado && ($user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)) {
+        if (!$this->empleado) {
+            $this->empleado = Empleado::where('email', $user->email)->first();
+            if (!$this->empleado && $isAdmin && !$empleadoId) {
+                $this->empleado = Empleado::first();
+            }
+        }
+
+        // Auto-create mock employee for admin users who also have the Empleado role (or are testing).
+        // Se comprueba también entre los eliminados: el email es único a nivel de BD.
+        if (!$this->empleado && ($user->can('gestion_recursos_humanos') || $user->email === 'jarodriguezbonilla@gmail.com' || $user->id === 1)
+            && !Empleado::withTrashed()->where('email', $user->email)->exists()) {
             $this->empleado = Empleado::create([
                 'nombre' => $user->name ?: 'jarodriguezbonilla',
                 'apellidos' => '(Admin)',
@@ -228,7 +237,13 @@ class FichaEmpleado extends Page
                 'email' => $user->email,
             ]);
         }
-        
+
+        $defaultTab = 'fichajes';
+        if ($this->empleado && $this->empleado->isOnBajaMedica() && !request()->has('tab')) {
+            $defaultTab = 'bajas';
+        }
+        $this->activeTab = request()->query('tab', $defaultTab);
+
         // Initialize default input times to current server time
         $this->hora_entrada = Carbon::now()->format('H:i');
         $this->hora_salida = Carbon::now()->format('H:i');

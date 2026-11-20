@@ -343,7 +343,7 @@
                                         Jornada en Curso
                                     </div>
                                     <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($fichajeActivo->hora_entrada)->format('H:i') }}</h2>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeActivo->server_checkin_at ? $fichajeActivo->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($fichajeActivo->fecha . ' ' . $fichajeActivo->hora_entrada)->format('d/m/Y H:i:s') }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $fichajeActivo->server_checkin_at ? $fichajeActivo->server_checkin_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse(\Carbon\Carbon::parse($fichajeActivo->fecha)->format('Y-m-d') . ' ' . substr((string) $fichajeActivo->hora_entrada, 0, 8))->format('d/m/Y H:i:s') }}</p>
                                     <div>
                                         <button type="button" wire:click="editFichaje({{ $fichajeActivo->id }})" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline inline-flex items-center gap-1 mt-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
@@ -433,7 +433,7 @@
                                             <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
                                             Última Salida: {{ \Carbon\Carbon::parse($ultimoFichajeCerradoDelDia->hora_salida)->format('H:i') }}
                                         </div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $ultimoFichajeCerradoDelDia->server_checkout_at ? $ultimoFichajeCerradoDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse($ultimoFichajeCerradoDelDia->fecha . ' ' . $ultimoFichajeCerradoDelDia->hora_salida)->format('d/m/Y H:i:s') }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Hora real de registro: {{ $ultimoFichajeCerradoDelDia->server_checkout_at ? $ultimoFichajeCerradoDelDia->server_checkout_at->timezone('Europe/Madrid')->format('d/m/Y H:i:s') : \Carbon\Carbon::parse(\Carbon\Carbon::parse($ultimoFichajeCerradoDelDia->fecha)->format('Y-m-d') . ' ' . substr((string) $ultimoFichajeCerradoDelDia->hora_salida, 0, 8))->format('d/m/Y H:i:s') }}</p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">Jornada previa completada. Si inicias otro turno hoy, registra tu entrada primero.</p>
                                     </div>
                                 @else
